@@ -13,9 +13,8 @@ class Wiki extends Model
      * @var array
      */
     protected $fillable = [
-        'subdomain',
         'sitename',
-        'metanamespace',
+        'domain',
     ];
 
     public function wikiDb() {

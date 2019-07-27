@@ -11,20 +11,17 @@ class WikiController extends Controller
 
     public function create( Request $request ){
         $this->validate($request, [
-            'subdomain' => 'required|unique:wikis',
+            'domain' => 'required|unique:wikis|regex:/^.+\.wiki\.opencura\.com$/',
             'sitename' => 'required',
-            // TODO this bottom one isn't actually required?
-            'metanamespace' => 'required',
         ]);
 
         $wikiDb = null;
         $dbAssignment = null;
-        // TODO create with the correct owner
+        // TODO create with some sort of owner etc?
         DB::transaction( function() use ( $request, &$wikiDb, &$dbAssignment ) {
             $wikiDb = Wiki::create([
-                'subdomain' => $request->input('subdomain'),
                 'sitename' => $request->input('sitename'),
-                'metanamespace' => $request->input('metanamespace'),
+                'domain' => $request->input('domain'),
             ]);
 
             $dbAssignment = DB::table('wiki_dbs')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wikiDb->id]);
@@ -50,11 +47,6 @@ class WikiController extends Controller
     public function list( Request $request ){
         $result = Wiki::all();
 
-        foreach ( $result as &$wiki ) {
-            // TODO do not hardcode this...
-            $wiki['homesrc'] = '//' . $wiki['subdomain'] . '.mw.ww.10.0.75.2.xip.io:1999';
-        }
-
         $res['success'] = true;
         $res['data'] = $result;
         return response($res);
@@ -65,12 +57,12 @@ class WikiController extends Controller
         return $this->list( $request );
     }
 
-    public function getWikiForSubdomain( Request $request ){
-        $subdomain = $request->input('subdomain');
+    public function getWikiForDomain( Request $request ){
+        $domain = $request->input('domain');
 
-        // first, because we only expect 1 result, subdomain is unqiue
+        // first, because we only expect 1 result, domain is unqiue
         // with, for eager loading of the wikiDb (in 1 query)
-        $result = Wiki::where('subdomain', $subdomain)->with(['wikiDb'])->first();
+        $result = Wiki::where('domain', $domain)->with(['wikiDb'])->first();
 
         $res['success'] = true;
         $res['data'] = $result;

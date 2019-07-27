@@ -16,9 +16,8 @@ class CreateWikisTable extends Migration
         Schema::create('wikis', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->string('subdomain')->unique();
+            $table->string('domain')->unique();
             $table->string('sitename');
-            $table->string('metanamespace');
 
             $table->timestamps();
         });

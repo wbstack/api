@@ -41,7 +41,7 @@ $wwRoutes = [
         'GET' => [
             'auth' => [
                 'wiki/database/countUnclaimed' => 'WikiDbController@countUnclaimed',
-                'wiki/getWikiForSubdomain' => 'WikiController@getWikiForSubdomain',
+                'wiki/getWikiForDomain' => 'WikiController@getWikiForDomain',
             ],
         ],
         'POST' => [
