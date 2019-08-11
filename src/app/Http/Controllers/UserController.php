@@ -34,20 +34,17 @@ class UserController extends BaseController
     public function register(Request $request)
     {
         $this->validate($request, [
-            'username' => 'required|unique:users',
             'email' => 'required|email|unique:users',
             'password' => 'required'
         ]);
 
         //$hasher = app()->make('hash');
-        $username = $request->input('username');
         $email = $request->input('email');
         //// TODO PASSWORD_DEFAULT  shouldnt be hardcoded everywhere...?
         //$password = password_hash( $request->input('password'), PASSWORD_DEFAULT );
         // Done the same hashing as in auth controller
         $password = Hash::make( $request->input('password') );
         $user = User::create([
-            'username' => $username,
             'email' => $email,
             'password' => $password,
         ]);
@@ -76,7 +73,6 @@ class UserController extends BaseController
     protected function convertUserForOutput ( User $user ) {
         return [
             'id' => $user->id,
-            'username' => $user->username,
             'email' => $user->email,
         ];
     }
