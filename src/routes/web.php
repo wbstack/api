@@ -34,6 +34,7 @@ $wwRoutes = [
             'noauth' => [
                 'auth/login' => 'AuthController@authenticate',
                 'user/register' => 'UserController@register',
+                'interest/register' => 'InterestController@recordCreation',
             ],
         ],
     ],
