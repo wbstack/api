@@ -10,7 +10,7 @@ class InterestController extends Controller
 
     public function recordCreation( Request $request ){
         $this->validate($request, [
-            'email' => 'required|email|unique:interest',
+            'email' => 'required|email|unique:interests',
         ]);
         $email = $request->input('email');
 

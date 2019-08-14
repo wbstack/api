@@ -20,18 +20,22 @@ $wwRoutes = [
         'GET' => [
             'noauth' => [
                 'wiki/count' => 'WikiController@count',
+                // TODO list shouldnt be public any more
                 'wiki/list' => 'WikiController@list',
             ],
             'auth' => [
+                // TODO as this is auth it should probably be post...
                 'wiki/mine' => 'WikiController@getForUser',
-                'invitation/list' => 'InvitationController@list',
+
             ],
         ],
         'POST' => [
             'auth' => [
                 'user/self' => 'UserController@self',
                 'wiki/create' => 'WikiController@create',
+                'invitation/list' => 'InvitationController@list',
                 'invitation/create' => 'InvitationController@create',
+                'invitation/delete' => 'InvitationController@delete',
             ],
             'noauth' => [
                 'auth/login' => 'AuthController@authenticate',

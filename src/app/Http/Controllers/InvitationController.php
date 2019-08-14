@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Interest;
+use App\Invitation;
 use Illuminate\Http\Request;
 
 class InvitationController extends Controller
@@ -19,7 +19,7 @@ class InvitationController extends Controller
     private function requireAdam( $user ) {
       // TODO this should be done with permissions and middleware...
       if( $user->email != 'adamshorland@gmail.com' ) {
-        throw new RuntimeException('A required!')
+        throw new RuntimeException('A required!');
       }
     }
 
@@ -28,7 +28,7 @@ class InvitationController extends Controller
         $this->requireAdam($user);
 
         $this->validate($request, [
-            'code' => 'required|unique:invitation',
+            'code' => 'required|unique:invitations',
         ]);
         $code = $request->input('code');
 
@@ -45,6 +45,33 @@ class InvitationController extends Controller
 
         $res['success'] = true;
         $res['message'] = 'Code created!';
+        $res['code'] = $code;
+        return response($res);
+    }
+
+    public function delete( Request $request ){
+        $user = $this->getAndRequireAuthedUser( $request );
+        $this->requireAdam($user);
+
+        $this->validate($request, [
+          //TODO is these a special validate for exists?
+            'code' => 'required',
+        ]);
+        $code = $request->input('code');
+
+        $test = Invitation::where('code', $code)->first();
+        if(!$test) {
+          $res['success'] = false;
+          $res['message'] = 'Code did not exist.';
+          return response($res);
+        }
+
+        // TODO check response of this method call?
+        $test->delete();
+
+        $res['success'] = true;
+        $res['message'] = 'Code deleted!';
+        $res['code'] = $code;
         return response($res);
     }
 

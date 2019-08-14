@@ -21,8 +21,6 @@ class WikiController extends Controller
         $user = $this->getAndRequireAuthedUser( $request );
         // TODO create the wiki with the user id as the owner...
 
-        var_dump($user->email);die();
-
         $this->validate($request, [
             'domain' => 'required|unique:wikis|regex:/^.+\.wiki\.opencura\.com$/',
             'sitename' => 'required',
