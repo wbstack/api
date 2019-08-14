@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Hash;
 use Validator;
 use App\User;
+use App\Invitation;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 
@@ -33,21 +34,41 @@ class UserController extends BaseController
      */
     public function register(Request $request)
     {
-        $this->validate($request, [
+        $validation = [
             'email' => 'required|email|unique:users',
             'password' => 'required'
-        ]);
+        ];
 
-        //$hasher = app()->make('hash');
+        // If this is the first user then do not require an invitation
+        if( User::count() === 0 ) {
+          $inviteRequired = false;
+        } else {
+          $inviteRequired = true;
+          $validation['invite'] = 'required';
+        }
+
+        $this->validate($request, $validation);
+
+        if( $inviteRequired ) {
+          $invite = Invitation::where('code', $request->input('invite'))->first();
+          if(!$invite) {
+            $res['success'] = false;
+            $res['message'] = 'Invite code invalid';
+            return response($res);
+          }
+        }
+
         $email = $request->input('email');
-        //// TODO PASSWORD_DEFAULT  shouldnt be hardcoded everywhere...?
-        //$password = password_hash( $request->input('password'), PASSWORD_DEFAULT );
-        // Done the same hashing as in auth controller
         $password = Hash::make( $request->input('password') );
         $user = User::create([
             'email' => $email,
             'password' => $password,
         ]);
+
+        // If we required and checked an invite, then delete it.
+        if( $inviteRequired && $invite ) {
+          $invite->delete();
+        }
 
         $res['success'] = true;
         $res['message'] = 'Register Successful!';
