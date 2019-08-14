@@ -30,4 +30,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password',
     ];
+
+    // TODO this should be done with roles or something in the DB....
+    public function isAdmin() {
+      return $this->email == 'adamshorland@gmail.com';
+    }
 }

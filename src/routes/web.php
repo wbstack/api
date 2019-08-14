@@ -23,13 +23,15 @@ $wwRoutes = [
                 'wiki/list' => 'WikiController@list',
             ],
             'auth' => [
-                'wiki/mine' => 'WikiController@getForUser'
+                'wiki/mine' => 'WikiController@getForUser',
+                'invitation/list' => 'InvitationController@list',
             ],
         ],
         'POST' => [
             'auth' => [
                 'user/self' => 'UserController@self',
                 'wiki/create' => 'WikiController@create',
+                'invitation/create' => 'InvitationController@create',
             ],
             'noauth' => [
                 'auth/login' => 'AuthController@authenticate',

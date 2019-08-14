@@ -9,7 +9,20 @@ use Illuminate\Support\Facades\DB;
 class WikiController extends Controller
 {
 
+    private function getAndRequireAuthedUser( Request $request ) {
+      if(!$request->auth) {
+        // This is a logic exception as the router / JWT middleware requires a user already
+        throw new LogicException("Controller should not be run without auth");
+      }
+      return $request->auth;
+    }
+
     public function create( Request $request ){
+        $user = $this->getAndRequireAuthedUser( $request );
+        // TODO create the wiki with the user id as the owner...
+
+        var_dump($user->email);die();
+
         $this->validate($request, [
             'domain' => 'required|unique:wikis|regex:/^.+\.wiki\.opencura\.com$/',
             'sitename' => 'required',
