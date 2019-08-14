@@ -52,9 +52,8 @@ class UserController extends BaseController
         if( $inviteRequired ) {
           $invite = Invitation::where('code', $request->input('invite'))->first();
           if(!$invite) {
-            $res['success'] = false;
-            $res['message'] = 'Invite code invalid';
-            return response($res);
+            $res['invite'] = ['Invite code not valid'];
+            return response($res)->setStatusCode(422);
           }
         }
 
