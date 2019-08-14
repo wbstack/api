@@ -18,7 +18,7 @@ class InterestController extends Controller
         if($test) {
           // Interest already registered
           $res['success'] = false;
-          $res['message'] = 'Your interest has already been registered.';
+          $res['message'] = 'Email already exists.';
           return response($res);
         }
 
@@ -27,7 +27,7 @@ class InterestController extends Controller
         ]);
 
         $res['success'] = true;
-        $res['message'] = 'Interest registered!';
+        $res['message'] = 'Registered!';
         return response($res);
 
     }
