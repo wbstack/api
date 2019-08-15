@@ -71,9 +71,14 @@ class WikiController extends Controller
 
     public function listWikisOwnedByCurrentUser( Request $request ){
       $user = $this->getAndRequireAuthedUser( $request );
-      return WikiManager::where('user_id', $user->id)
+      $result = WikiManager::where('user_id', $user->id)
       ->leftJoin('wikis', 'wiki_id', '=', 'wikis.id')
-      ->select('wikis.*');
+      ->select('wikis.*')
+      ->get();
+
+      $res['success'] = true;
+      $res['data'] = $result;
+      return response($res);
     }
 
     public function getWikiForDomain( Request $request ){
@@ -86,6 +91,12 @@ class WikiController extends Controller
         $res['success'] = true;
         $res['data'] = $result;
         return response($res);
+    }
+
+    public function getWikiDetailsForIdForOwner( Request $request ) {
+      $user = $this->getAndRequireAuthedUser( $request );
+      $domain = $request->input('wiki');
+
     }
 
 }
