@@ -24,6 +24,8 @@ class WikiDb extends Model
         return $this->belongsTo( Wiki::class );
     }
 
+// TODO starting to see the issue of internal vs extenal apis using the same lumen app here...
+// should this be private? should it not be?
 //    /**
 //     * The attributes excluded from the model's JSON form.
 //     *

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Wiki;
+use App\WikiDb;
 use App\WikiManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -114,10 +115,13 @@ class WikiController extends Controller
         ->leftJoin('users', 'user_id', '=', 'users.id')
         ->select('users.*')
         ->get();
+      // TODO add db once we are sure it wont show private stuff...?
+      //$wikiDb = WikiDb::where('wiki_id', $wikiId)->first();
 
       $res['success'] = true;
       $res['data'] = $wiki;
       $res['data']['wikimanagers'] = $wikiManagers;
+      //$res['data']['db'] = $wikiDb;
       return response($res);
 
     }
