@@ -25,8 +25,7 @@ $wwRoutes = [
             ],
             'auth' => [
                 // TODO as this is auth it should probably be post...
-                'wiki/mine' => 'WikiController@getForUser',
-
+                'wiki/mine' => 'WikiController@listWikisOwnedByCurrentUser',
             ],
         ],
         'POST' => [
@@ -36,6 +35,7 @@ $wwRoutes = [
                 'invitation/list' => 'InvitationController@list',
                 'invitation/create' => 'InvitationController@create',
                 'invitation/delete' => 'InvitationController@delete',
+                'wiki/managers/list' => 'WikiManagerController@listManagersOfWiki',
             ],
             'noauth' => [
                 'auth/login' => 'AuthController@authenticate',
