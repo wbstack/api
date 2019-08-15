@@ -95,7 +95,30 @@ class WikiController extends Controller
 
     public function getWikiDetailsForIdForOwner( Request $request ) {
       $user = $this->getAndRequireAuthedUser( $request );
-      $domain = $request->input('wiki');
+      $wikiId = $request->input('wiki');
+
+      // TODO general check to make sure current user can manage the wiki
+      // this should probably be middle ware?
+      $test = WikiManager::where('user_id', $user->id)
+      ->where('wiki_id', $wikiId)
+      ->first();
+      if(!$test) {
+        $res['success'] = false;
+        // TODO response code of not authorized
+        return response($res);
+      }
+
+      $wiki = Wiki::where('id', $wikiId)->first();
+      // TODO reuse code from the WikiManagerController?
+      $wikiManagers = WikiManager::where('wiki_id', $wikiId)
+        ->leftJoin('users', 'user_id', '=', 'users.id')
+        ->select('users.*')
+        ->get();
+
+      $res['success'] = true;
+      $res['data'] = $wiki;
+      $res['data']['wikimanagers'] = $wikiManagers;
+      return response($res);
 
     }
 

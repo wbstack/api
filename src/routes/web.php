@@ -32,6 +32,7 @@ $wwRoutes = [
                 'invitation/create' => 'InvitationController@create',
                 'invitation/delete' => 'InvitationController@delete',
                 'wiki/mine' => 'WikiController@listWikisOwnedByCurrentUser',
+                'wiki/details' => 'WikiController@getWikiDetailsForIdForOwner',
                 'wiki/managers/list' => 'WikiManagerController@listManagersOfWiki',
             ],
             'noauth' => [
