@@ -100,6 +100,7 @@ class WikiController extends Controller
 
       // TODO general check to make sure current user can manage the wiki
       // this should probably be middle ware?
+      // TODO only do 1 query where instead of 2?
       $test = WikiManager::where('user_id', $user->id)
       ->where('wiki_id', $wikiId)
       ->first();
@@ -109,19 +110,12 @@ class WikiController extends Controller
         return response($res);
       }
 
-      $wiki = Wiki::where('id', $wikiId)->first();
-      // TODO reuse code from the WikiManagerController?
-      $wikiManagers = WikiManager::where('wiki_id', $wikiId)
-        ->leftJoin('users', 'user_id', '=', 'users.id')
-        ->select('users.*')
-        ->get();
+      $wiki = Wiki::where('id', $wikiId)->with('wikiManagers')->first();
       // TODO add db once we are sure it wont show private stuff...?
-      //$wikiDb = WikiDb::where('wiki_id', $wikiId)->first();
+      // ->with('wikiDb') ????
 
       $res['success'] = true;
       $res['data'] = $wiki;
-      $res['data']['wikimanagers'] = $wikiManagers;
-      //$res['data']['db'] = $wikiDb;
       return response($res);
 
     }

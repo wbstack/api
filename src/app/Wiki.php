@@ -21,13 +21,8 @@ class Wiki extends Model
         return $this->hasOne( WikiDb::class );
     }
 
-//    /**
-//     * The attributes excluded from the model's JSON form.
-//     *
-//     * @var array
-//     */
-//    protected $hidden = [
-//        'password',
-//    ];
+    public function wikiManagers() {
+      return $this->belongsToMany(User::class, 'wiki_managers');
+    }
 
 }

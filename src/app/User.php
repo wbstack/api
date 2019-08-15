@@ -35,4 +35,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function isAdmin() {
       return $this->email == 'adamshorland@gmail.com';
     }
+
+    public function managesWikis() {
+      return $this->belongsToMany(Wiki::class, 'wiki_managers');
+    }
+
 }

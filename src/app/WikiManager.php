@@ -17,10 +17,10 @@ class WikiManager extends Model
         'user_id',
     ];
 
+    // TODO remove these relationships if they are not used...
     public function wiki() {
         return $this->belongsTo( Wiki::class );
     }
-
     public function user() {
         return $this->belongsTo( User::class );
     }
