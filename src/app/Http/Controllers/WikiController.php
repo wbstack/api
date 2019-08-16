@@ -28,20 +28,28 @@ class WikiController extends Controller
             'sitename' => 'required',
         ]);
 
-        $wikiDb = null;
+        $wiki = null;
         $dbAssignment = null;
         // TODO create with some sort of owner etc?
-        DB::transaction( function() use ( $user, $request, &$wikiDb, &$dbAssignment ) {
-            $wikiDb = Wiki::create([
+        DB::transaction( function() use ( $user, $request, &$wiki, &$dbAssignment ) {
+            $readyDbs = WikiDb::where( 'wiki_id', null )->count();
+            if($readyDbs == 0) {
+              abort(503, 'No databases ready');
+            }
+
+            $wiki = Wiki::create([
                 'sitename' => $request->input('sitename'),
                 'domain' => $request->input('domain'),
             ]);
 
-            $dbAssignment = DB::table('wiki_dbs')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wikiDb->id]);
+            $dbAssignment = DB::table('wiki_dbs')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
+            if(!$dbAssignment) {
+              abort(503, 'Database ready, but failed to assign');
+            }
 
             $ownerAssignment = WikiManager::create([
               'user_id' => $user->id,
-              'wiki_id' => $wikiDb->id,
+              'wiki_id' => $wiki->id,
             ]);
         } );
 
