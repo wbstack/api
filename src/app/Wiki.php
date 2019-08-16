@@ -17,8 +17,8 @@ class Wiki extends Model
         'domain',
     ];
 
-    public function wikiDb() {
-        return $this->hasOne( WikiDb::class );
+    public function wikiDbVersion() {
+        return $this->hasOne( WikiDb::class )->select(array('id', 'wiki_id','version'));
     }
 
     public function wikiManagers() {

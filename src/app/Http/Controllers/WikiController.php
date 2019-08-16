@@ -110,9 +110,10 @@ class WikiController extends Controller
         return response($res);
       }
 
-      $wiki = Wiki::where('id', $wikiId)->with('wikiManagers')->first();
-      // TODO add db once we are sure it wont show private stuff...?
-      // ->with('wikiDb') ????
+      $wiki = Wiki::where('id', $wikiId)
+      ->with('wikiManagers')
+      ->with('wikiDbVersion')
+      ->first();
 
       $res['success'] = true;
       $res['data'] = $wiki;
