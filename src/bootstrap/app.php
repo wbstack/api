@@ -79,6 +79,10 @@ $app->routeMiddleware([
     'throttle' => App\Http\Middleware\ThrottleRequests::class,
 ]);
 
+$app->routeMiddleware([
+    'admin' => App\Http\Middleware\AdminMiddleware::class,
+]);
+
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers

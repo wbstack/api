@@ -1,32 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Invitation;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class InvitationController extends Controller
 {
 
-    private function getAndRequireAuthedUser( Request $request ) {
-      if(!$request->auth) {
-        // This is a logic exception as the router / JWT middleware requires a user already
-        throw new LogicException("Controller should not be run without auth");
-      }
-      return $request->auth;
-    }
-
-    private function requireAdam( $user ) {
-      // TODO this should be done with permissions and middleware...
-      if( $user->email != 'adamshorland@gmail.com' ) {
-        throw new RuntimeException('A required!');
-      }
-    }
-
     public function create( Request $request ){
-        $user = $this->getAndRequireAuthedUser( $request );
-        $this->requireAdam($user);
-
         $this->validate($request, [
             'code' => 'required|unique:invitations',
         ]);
@@ -48,9 +31,6 @@ class InvitationController extends Controller
     }
 
     public function delete( Request $request ){
-        $user = $this->getAndRequireAuthedUser( $request );
-        $this->requireAdam($user);
-
         $this->validate($request, [
           //TODO is these a special validate for exists?
             'code' => 'required',

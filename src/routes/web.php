@@ -4,8 +4,6 @@
 
 use Laravel\Lumen\Routing\Router;
 
-// TODO use namespaces?
-
 // Public
 // Middleware:
 //  - cors
@@ -32,11 +30,14 @@ $router->group(['middleware' => ['cors', 'throttle:45,1']], function () use ($ro
           // TODO should wiki managers really be here?
           $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
         });
-        // invitation
-        $router->group(['prefix' => 'invitation'], function () use ($router) {
-          $router->post('list', ['uses' => 'InvitationsController@get']);
-          $router->post('create', ['uses' => 'InvitationController@create']);
-          $router->post('delete', ['uses' => 'InvitationController@delete']);
+        // admin
+        $router->group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => ['admin']], function() use ($router){
+          // invitation
+          $router->group(['prefix' => 'invitation'], function () use ($router) {
+            $router->post('list', ['uses' => 'InvitationsController@get']);
+            $router->post('create', ['uses' => 'InvitationController@create']);
+            $router->post('delete', ['uses' => 'InvitationController@delete']);
+          });
         });
     });
 });
