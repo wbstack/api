@@ -4,79 +4,40 @@
 
 use Laravel\Lumen\Routing\Router;
 
-$wwRoutes = [
-    'front' => [
-        'GET' => [
-            'noauth' => [
-                'wiki/count' => 'WikisController@count',
-            ],
-            'auth' => [
-            ],
-        ],
-        'POST' => [
-            'auth' => [
-                'user/self' => 'UserController@getSelf',
-                'wiki/create' => 'WikiController@create',
-                'invitation/list' => 'InvitationsController@get',
-                'invitation/create' => 'InvitationController@create',
-                'invitation/delete' => 'InvitationController@delete',
-                'wiki/mine' => 'WikisController@getWikisOwnedByCurrentUser',
-                'wiki/details' => 'WikiController@getWikiDetailsForIdForOwner',
-                'wiki/managers/list' => 'WikiManagersController@getManagersOfWiki',
-            ],
-            'noauth' => [
-                'auth/login' => 'AuthController@authenticate',
-                'user/register' => 'UserController@create',
-                'interest/register' => 'InterestController@create',
-            ],
-        ],
-    ],
-    'back' => [
-        'GET' => [
-            'auth' => [
-                'wiki/database/countUnclaimed' => 'WikiDbsController@countUnclaimed',
-                'wiki/getWikiForDomain' => 'WikiController@getWikiForDomain',
-            ],
-        ],
-        'POST' => [
-            'auth' => [
-                'wiki/database/recordCreation' => 'WikiDbController@create',
-            ],
-        ],
-    ],
-];
-
-// TODO use route groups?
 // TODO use namespaces?
 // TODO use route prefixes?
 
-// TODO only register backend routes when a request is coming internally?
-foreach ( $wwRoutes as $frontOrback => $methods ) {
-    foreach ( $methods as $method => $auths ) {
-        foreach ( $auths as $authOrNoAuth => $routes ) {
-            foreach ( $routes as $uri => $controller ) {
-                $action = [
-                    'uses' => $controller,
-                    'middleware' => [],
-                ];
-                if ( $frontOrback === 'back' ) {
-                    $action['middleware'][] = 'backend.auth';
-                }
-                if ( $frontOrback === 'front' ) {
-                    $action['middleware'][] = 'cors';
-                }
-                if ( $frontOrback === 'front' && $authOrNoAuth === 'auth' ) {
-                    $action['middleware'][] = 'jwt.auth';
-                }
-                $router->addRoute(
-                    $method,
-                    $uri,
-                    $action
-                );
-            }
-        }
-    }
-}
+// Public
+$router->group(['middleware' => ['cors']], function () use ($router) {
+    // GET
+    $router->get('wiki/count', ['uses' => 'WikisController@count']);
+    // POST
+    $router->post('auth/login', ['uses' => 'AuthController@authenticate']);
+    $router->post('user/register', ['uses' => 'UserController@create']);
+    $router->post('interest/register', ['uses' => 'InterestController@create']);
+});
+
+// Authed
+$router->group(['middleware' => ['cors', 'jwt.auth']], function () use ($router) {
+    // POST
+    $router->post('user/self', ['uses' => 'UserController@getSelf']);
+    $router->post('wiki/create', ['uses' => 'WikiController@create']);
+    $router->post('invitation/list', ['uses' => 'InvitationsController@get']);
+    $router->post('invitation/create', ['uses' => 'InvitationController@create']);
+    $router->post('invitation/delete', ['uses' => 'InvitationController@delete']);
+    $router->post('wiki/mine', ['uses' => 'WikisController@getWikisOwnedByCurrentUser']);
+    $router->post('wiki/details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
+    $router->post('wiki/managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
+});
+
+// Backend Only
+$router->group(['middleware' => ['backend.auth']], function () use ($router) {
+    // GET
+    $router->get('wiki/database/countUnclaimed', ['uses' => 'WikiDbsController@countUnclaimed']);
+    $router->get('wiki/getWikiForDomain', ['uses' => 'WikiController@getWikiForDomain']);
+    // POST
+    $router->post('wiki/database/recordCreation', ['uses' => 'WikiDbController@create']);
+});
 
 // Allow options methods on all routes?
 // TODO do I really want this to be all routes?

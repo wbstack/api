@@ -9,7 +9,9 @@ use Laravel\Lumen\Testing\DatabaseTransactions;
  */
 class WikiCountTest extends TestCase
 {
-    use DatabaseTransactions;
+
+    // DB needs to be empty before this 
+    use DatabaseMigrations;
 
     public function testRootPostNotAllowed()
     {
