@@ -27,12 +27,7 @@ class UserController extends BaseController
         $this->request = $request;
     }
 
-    /**
-     * Register new user
-     *
-     * @param $request Request
-     */
-    public function register(Request $request)
+    public function create(Request $request)
     {
         $validation = [
             'email' => 'required|email|unique:users',
@@ -75,7 +70,7 @@ class UserController extends BaseController
         return response($res);
     }
 
-    public function self( Request $request ) {
+    public function getSelf( Request $request ) {
         if ( isset( $request->auth ) ) {
             $res['success'] = true;
             // Filter what we give to the user
@@ -90,6 +85,7 @@ class UserController extends BaseController
         return response($res);
     }
 
+    // TODO why is this needed?
     protected function convertUserForOutput ( User $user ) {
         return [
             'id' => $user->id,

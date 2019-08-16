@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class InterestController extends Controller
 {
 
-    public function recordCreation( Request $request ){
+    public function create( Request $request ){
         $this->validate($request, [
             'email' => 'required|email|unique:interests',
         ]);

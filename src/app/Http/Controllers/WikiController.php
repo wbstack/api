@@ -54,34 +54,6 @@ class WikiController extends Controller
         return response($res);
     }
 
-    public function count(){
-        $res['success'] = true;
-        // TODO only count active?
-        $res['data'] = Wiki::count();
-        return response($res);
-
-    }
-
-    public function list( Request $request ){
-        $result = Wiki::all();
-
-        $res['success'] = true;
-        $res['data'] = $result;
-        return response($res);
-    }
-
-    public function listWikisOwnedByCurrentUser( Request $request ){
-      $user = $this->getAndRequireAuthedUser( $request );
-      $result = WikiManager::where('user_id', $user->id)
-      ->leftJoin('wikis', 'wiki_id', '=', 'wikis.id')
-      ->select('wikis.*')
-      ->get();
-
-      $res['success'] = true;
-      $res['data'] = $result;
-      return response($res);
-    }
-
     public function getWikiForDomain( Request $request ){
         $domain = $request->input('domain');
 
@@ -89,11 +61,15 @@ class WikiController extends Controller
         // with, for eager loading of the wikiDb (in 1 query)
         $result = Wiki::where('domain', $domain)->with(['wikiDb'])->first();
 
+        // TODO should this be accessible to everyone? Probably not!!!!
+        // SECURITY
+
         $res['success'] = true;
         $res['data'] = $result;
         return response($res);
     }
 
+    // TODO should this just be get wiki?
     public function getWikiDetailsForIdForOwner( Request $request ) {
       $user = $this->getAndRequireAuthedUser( $request );
       $wikiId = $request->input('wiki');

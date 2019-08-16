@@ -8,39 +8,39 @@ $wwRoutes = [
     'front' => [
         'GET' => [
             'noauth' => [
-                'wiki/count' => 'WikiController@count',
+                'wiki/count' => 'WikisController@count',
             ],
             'auth' => [
             ],
         ],
         'POST' => [
             'auth' => [
-                'user/self' => 'UserController@self',
+                'user/self' => 'UserController@getSelf',
                 'wiki/create' => 'WikiController@create',
-                'invitation/list' => 'InvitationController@list',
+                'invitation/list' => 'InvitationsController@get',
                 'invitation/create' => 'InvitationController@create',
                 'invitation/delete' => 'InvitationController@delete',
-                'wiki/mine' => 'WikiController@listWikisOwnedByCurrentUser',
+                'wiki/mine' => 'WikisController@getWikisOwnedByCurrentUser',
                 'wiki/details' => 'WikiController@getWikiDetailsForIdForOwner',
-                'wiki/managers/list' => 'WikiManagerController@listManagersOfWiki',
+                'wiki/managers/list' => 'WikiManagersController@getManagersOfWiki',
             ],
             'noauth' => [
                 'auth/login' => 'AuthController@authenticate',
-                'user/register' => 'UserController@register',
-                'interest/register' => 'InterestController@recordCreation',
+                'user/register' => 'UserController@create',
+                'interest/register' => 'InterestController@create',
             ],
         ],
     ],
     'back' => [
         'GET' => [
             'auth' => [
-                'wiki/database/countUnclaimed' => 'WikiDbController@countUnclaimed',
+                'wiki/database/countUnclaimed' => 'WikiDbsController@countUnclaimed',
                 'wiki/getWikiForDomain' => 'WikiController@getWikiForDomain',
             ],
         ],
         'POST' => [
             'auth' => [
-                'wiki/database/recordCreation' => 'WikiDbController@recordCreation',
+                'wiki/database/recordCreation' => 'WikiDbController@create',
             ],
         ],
     ],

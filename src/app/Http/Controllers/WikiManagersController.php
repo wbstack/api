@@ -7,7 +7,7 @@ use App\WikiManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class WikiManagerController extends Controller
+class WikiManagersController extends Controller
 {
 
     private function getAndRequireAuthedUser( Request $request ) {
@@ -18,7 +18,7 @@ class WikiManagerController extends Controller
       return $request->auth;
     }
 
-    public function listManagersOfWiki( Request $request ){
+    public function getManagersOfWiki( Request $request ){
       $user = $this->getAndRequireAuthedUser( $request );
 
       $wikiId = $request->input('wiki');

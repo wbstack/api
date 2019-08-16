@@ -75,15 +75,4 @@ class InvitationController extends Controller
         return response($res);
     }
 
-    public function list( Request $request ){
-        $user = $this->getAndRequireAuthedUser( $request );
-        $this->requireAdam($user);
-
-        $result = Invitation::all();
-
-        $res['success'] = true;
-        $res['data'] = $result;
-        return response($res);
-    }
-
 }

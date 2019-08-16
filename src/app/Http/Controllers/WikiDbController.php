@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class WikiDbController extends Controller
 {
 
-    public function recordCreation( Request $request ){
+    public function create( Request $request ){
         $this->validate($request, [
             'name' => 'required|unique:wiki_dbs',
             'user' => 'required',
@@ -31,13 +31,6 @@ class WikiDbController extends Controller
         ];
         return response($res);
 
-    }
-
-    public function countUnclaimed( Request $request ){
-        $result = WikiDb::where( 'wiki_id', null )->count();
-        $res['success'] = true;
-        $res['data'] = $result;
-        return response($res);
     }
 
 }
