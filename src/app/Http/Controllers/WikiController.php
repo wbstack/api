@@ -11,16 +11,7 @@ use Illuminate\Support\Facades\DB;
 class WikiController extends Controller
 {
 
-    private function getAndRequireAuthedUser( Request $request ) {
-      if(!$request->auth) {
-        // This is a logic exception as the router / JWT middleware requires a user already
-        throw new LogicException("Controller should not be run without auth");
-      }
-      return $request->auth;
-    }
-
     public function create( Request $request ){
-        $user = $this->getAndRequireAuthedUser( $request );
         // TODO create the wiki with the user id as the owner...
 
         $this->validate($request, [
@@ -79,7 +70,6 @@ class WikiController extends Controller
 
     // TODO should this just be get wiki?
     public function getWikiDetailsForIdForOwner( Request $request ) {
-      $user = $this->getAndRequireAuthedUser( $request );
       $wikiId = $request->input('wiki');
 
       // TODO general check to make sure current user can manage the wiki
