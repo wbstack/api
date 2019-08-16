@@ -7,7 +7,10 @@ use Laravel\Lumen\Routing\Router;
 // TODO use namespaces?
 
 // Public
-$router->group(['middleware' => ['cors']], function () use ($router) {
+// Middleware:
+//  - cors
+//  - throttle, 45 requests in 1 min
+$router->group(['middleware' => ['cors', 'throttle:45,1']], function () use ($router) {
     // GET
     $router->get('wiki/count', ['uses' => 'WikisController@count']);
     // POST
