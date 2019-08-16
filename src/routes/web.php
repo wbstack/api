@@ -14,27 +14,27 @@ $router->group(['middleware' => ['cors']], function () use ($router) {
     $router->post('auth/login', ['uses' => 'AuthController@authenticate']);
     $router->post('user/register', ['uses' => 'UserController@create']);
     $router->post('interest/register', ['uses' => 'InterestController@create']);
-});
 
-// Authed
-$router->group(['middleware' => ['cors', 'jwt.auth']], function () use ($router) {
-    // user
-    $router->group(['prefix' => 'user'], function () use ($router) {
-      $router->post('self', ['uses' => 'UserController@getSelf']);
-    });
-    // wiki
-    $router->group(['prefix' => 'wiki'], function () use ($router) {
-      $router->post('create', ['uses' => 'WikiController@create']);
-      $router->post('mine', ['uses' => 'WikisController@getWikisOwnedByCurrentUser']);
-      $router->post('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
-      // TODO should wiki managers really be here?
-      $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
-    });
-    // invitation
-    $router->group(['prefix' => 'invitation'], function () use ($router) {
-      $router->post('list', ['uses' => 'InvitationsController@get']);
-      $router->post('create', ['uses' => 'InvitationController@create']);
-      $router->post('delete', ['uses' => 'InvitationController@delete']);
+    // Authed
+    $router->group(['middleware' => ['jwt.auth']], function () use ($router) {
+        // user
+        $router->group(['prefix' => 'user'], function () use ($router) {
+          $router->post('self', ['uses' => 'UserController@getSelf']);
+        });
+        // wiki
+        $router->group(['prefix' => 'wiki'], function () use ($router) {
+          $router->post('create', ['uses' => 'WikiController@create']);
+          $router->post('mine', ['uses' => 'WikisController@getWikisOwnedByCurrentUser']);
+          $router->post('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
+          // TODO should wiki managers really be here?
+          $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
+        });
+        // invitation
+        $router->group(['prefix' => 'invitation'], function () use ($router) {
+          $router->post('list', ['uses' => 'InvitationsController@get']);
+          $router->post('create', ['uses' => 'InvitationController@create']);
+          $router->post('delete', ['uses' => 'InvitationController@delete']);
+        });
     });
 });
 
