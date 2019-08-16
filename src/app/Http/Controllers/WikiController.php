@@ -56,8 +56,8 @@ class WikiController extends Controller
         $res['success'] = true;
         $res['message'] = 'Success!';
         $res['data'] = [
-            'id' => $wikiDb->id,
-            'name' => $wikiDb->name,
+            'id' => $wiki->id,
+            'name' => $wiki->name,
         ];
         return response($res);
     }
