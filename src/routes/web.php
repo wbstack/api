@@ -5,7 +5,6 @@
 use Laravel\Lumen\Routing\Router;
 
 // TODO use namespaces?
-// TODO use route prefixes?
 
 // Public
 $router->group(['middleware' => ['cors']], function () use ($router) {
@@ -19,24 +18,35 @@ $router->group(['middleware' => ['cors']], function () use ($router) {
 
 // Authed
 $router->group(['middleware' => ['cors', 'jwt.auth']], function () use ($router) {
-    // POST
-    $router->post('user/self', ['uses' => 'UserController@getSelf']);
-    $router->post('wiki/create', ['uses' => 'WikiController@create']);
-    $router->post('invitation/list', ['uses' => 'InvitationsController@get']);
-    $router->post('invitation/create', ['uses' => 'InvitationController@create']);
-    $router->post('invitation/delete', ['uses' => 'InvitationController@delete']);
-    $router->post('wiki/mine', ['uses' => 'WikisController@getWikisOwnedByCurrentUser']);
-    $router->post('wiki/details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
-    $router->post('wiki/managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
+    // user
+    $router->group(['prefix' => 'user'], function () use ($router) {
+      $router->post('self', ['uses' => 'UserController@getSelf']);
+    });
+    // wiki
+    $router->group(['prefix' => 'wiki'], function () use ($router) {
+      $router->post('create', ['uses' => 'WikiController@create']);
+      $router->post('mine', ['uses' => 'WikisController@getWikisOwnedByCurrentUser']);
+      $router->post('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
+      // TODO should wiki managers really be here?
+      $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
+    });
+    // invitation
+    $router->group(['prefix' => 'invitation'], function () use ($router) {
+      $router->post('list', ['uses' => 'InvitationsController@get']);
+      $router->post('create', ['uses' => 'InvitationController@create']);
+      $router->post('delete', ['uses' => 'InvitationController@delete']);
+    });
 });
 
 // Backend Only
 $router->group(['middleware' => ['backend.auth']], function () use ($router) {
+  $router->group(['prefix' => 'wiki'], function () use ($router) {
     // GET
-    $router->get('wiki/database/countUnclaimed', ['uses' => 'WikiDbsController@countUnclaimed']);
-    $router->get('wiki/getWikiForDomain', ['uses' => 'WikiController@getWikiForDomain']);
+    $router->get('database/countUnclaimed', ['uses' => 'WikiDbsController@countUnclaimed']);
+    $router->get('getWikiForDomain', ['uses' => 'WikiController@getWikiForDomain']);
     // POST
-    $router->post('wiki/database/recordCreation', ['uses' => 'WikiDbController@create']);
+    $router->post('database/recordCreation', ['uses' => 'WikiDbController@create']);
+  });
 });
 
 // Allow options methods on all routes?
