@@ -79,8 +79,7 @@ class UserController extends BaseController
             return response($res);
         }
 
-        $res['success'] = false;
-        $res['message'] = 'Cannot find user!';
+        abort(404);
 
         return response($res);
     }

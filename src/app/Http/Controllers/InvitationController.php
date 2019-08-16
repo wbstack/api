@@ -34,9 +34,7 @@ class InvitationController extends Controller
 
         $test = Invitation::where('code', $code)->first();
         if($test) {
-          $res['success'] = false;
-          $res['message'] = 'Code already exists.';
-          return response($res);
+          abort(409);//conflict
         }
 
         $invite = Invitation::create([
@@ -61,9 +59,7 @@ class InvitationController extends Controller
 
         $test = Invitation::where('code', $code)->first();
         if(!$test) {
-          $res['success'] = false;
-          $res['message'] = 'Code did not exist.';
-          return response($res);
+          abort(404);
         }
 
         // TODO check response of this method call?

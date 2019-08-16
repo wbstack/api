@@ -28,9 +28,7 @@ class WikiManagersController extends Controller
       ->where('wiki_id', $wikiId)
       ->first();
       if(!$test) {
-        $res['success'] = false;
-        // TODO response code of not authorized
-        return response($res);
+        abort(403);
       }
 
       $result = WikiManager::where('wiki_id', $wikiId)

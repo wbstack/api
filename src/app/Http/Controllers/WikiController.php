@@ -89,9 +89,7 @@ class WikiController extends Controller
       ->where('wiki_id', $wikiId)
       ->first();
       if(!$test) {
-        $res['success'] = false;
-        // TODO response code of not authorized
-        return response($res);
+        abort(403);
       }
 
       $wiki = Wiki::where('id', $wikiId)
