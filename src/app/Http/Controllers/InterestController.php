@@ -12,18 +12,9 @@ class InterestController extends Controller
         $this->validate($request, [
             'email' => 'required|email|unique:interests',
         ]);
-        $email = $request->input('email');
-
-        $test = Interest::where('email', $email)->first();
-        if($test) {
-          // Interest already registered
-          $res['success'] = false;
-          $res['message'] = 'Email already exists.';
-          return response($res);
-        }
 
         $interest = Interest::create([
-            'email' => $email,
+            'email' => $request->input('email'),
         ]);
 
         $res['success'] = true;
