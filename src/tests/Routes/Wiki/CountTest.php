@@ -6,7 +6,6 @@ use App\Wiki;
 use App\Tests\TestCase;
 use App\Tests\Routes\Traits\CrossSiteHeadersOnOptions;
 use App\Tests\Routes\Traits\OptionsRequestAllowed;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 
 /**
@@ -20,8 +19,12 @@ class CountTest extends TestCase
   use CrossSiteHeadersOnOptions;
   use OptionsRequestAllowed;
 
-    // DB needs to be empty before this
-    use DatabaseMigrations;
+    use DatabaseTransactions;
+
+    public function setUp(){
+      parent::setUp();
+      Wiki::all()->each(function($a){$a->destroy($a->id);});
+    }
 
     public function testRootPostNotAllowed()
     {
@@ -41,16 +44,9 @@ class CountTest extends TestCase
 
     public function testWikiCountOne()
     {
-        $wikiDb = Wiki::create([
-            'sitename' => 'a',
-            'domain' => 'a.com',
-        ]);
-
-        $this->seeInDatabase('wikis', [
-          'domain' => 'a.com',
-          'sitename' => 'a',
-        ]);
-
+        // TODO should wikis be counted if they have no db?
+        // TODO what actually is the use of this whole count??
+        factory(Wiki::class, 'nodb')->create();
         $this->get($this->route)->seeJsonEquals([
           'data' => 1,
           'success' => true
@@ -60,25 +56,8 @@ class CountTest extends TestCase
 
     public function testWikiCountTwo()
     {
-        $wikiDb = Wiki::create([
-            'sitename' => 'a',
-            'domain' => 'a.com',
-        ]);
-        $wikiDb = Wiki::create([
-            'sitename' => 'b',
-            'domain' => 'b.com',
-        ]);
-
-        $this->seeInDatabase('wikis', [
-          'domain' => 'a.com',
-          'sitename' => 'a',
-        ]);
-
-        $this->seeInDatabase('wikis', [
-          'domain' => 'b.com',
-          'sitename' => 'b',
-        ]);
-
+        factory(Wiki::class, 'nodb')->create();
+        factory(Wiki::class, 'nodb')->create();
         $this->get($this->route)->seeJsonEquals([
           'data' => 2,
           'success' => true

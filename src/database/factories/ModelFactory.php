@@ -17,3 +17,10 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'password' => password_hash('a', PASSWORD_DEFAULT ),
     ];
 });
+
+$factory->defineAs(App\Wiki::class,'nodb' , function (Faker\Generator $faker) {
+    return [
+        'sitename' => $faker->name,
+        'domain' => str_replace( ' ', '_', $faker->unique->text ) . '.wiki.opencura.com',
+    ];
+});
