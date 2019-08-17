@@ -4,6 +4,7 @@ namespace App\Tests\Routes\Wiki\Managers;
 
 use App\Wiki;
 use App\Tests\TestCase;
+use App\Tests\Routes\Traits\CrossSiteHeadersOnOptions;
 use App\Tests\Routes\Traits\OptionsRequestAllowed;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
@@ -16,6 +17,7 @@ class CountTest extends TestCase
 
   protected $route = 'wiki/count';
 
+  use CrossSiteHeadersOnOptions;
   use OptionsRequestAllowed;
 
     // DB needs to be empty before this

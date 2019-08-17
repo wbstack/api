@@ -14,7 +14,7 @@ class WikisController extends Controller
     private function getAndRequireAuthedUser( Request $request ) {
       if(!$request->auth) {
         // This is a logic exception as the router / JWT middleware requires a user already
-        throw new LogicException("Controller should not be run without auth");
+        throw new \LogicException("Controller should not be run without auth");
       }
       return $request->auth;
     }
