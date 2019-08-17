@@ -15,12 +15,12 @@ class WikiController extends Controller
       public function getWikiForDomain( Request $request ){
           $domain = $request->input('domain');
 
-          // first, because we only expect 1 result, domain is unqiue
-          // with, for eager loading of the wikiDb (in 1 query)
-          $result = Wiki::where('domain', $domain)->with(['wikiDb'])->first();
-
-          // TODO should this be accessible to everyone? Probably not!!!!
-          // SECURITY
+          if($domain === 'localhost') {
+            // TODO if not in debug mode dont allow this code path to run
+            $result = Wiki::with(['wikiDb'])->first();
+          } else {
+            $result = Wiki::where('domain', $domain)->with(['wikiDb'])->first();
+          }
 
           $res['success'] = true;
           $res['data'] = $result;
