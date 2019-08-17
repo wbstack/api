@@ -1,3 +1,4 @@
+
 <?php
 
 /** @var Router $router */
@@ -43,11 +44,10 @@ $router->group(['middleware' => ['cors', 'throttle:45,1']], function () use ($ro
 });
 
 // Backend Only
-$router->group(['middleware' => ['backend.auth']], function () use ($router) {
+$router->group(['prefix' => 'backend', 'namespace' => 'Backend', 'middleware' => ['backend.auth']], function () use ($router) {
   $router->group(['prefix' => 'wiki'], function () use ($router) {
     // GET
     $router->get('database/countUnclaimed', ['uses' => 'WikiDbsController@countUnclaimed']);
-    $router->get('getWikiForDomain', ['uses' => 'WikiController@getWikiForDomain']);
     // POST
     $router->post('database/recordCreation', ['uses' => 'WikiDbController@create']);
   });
