@@ -26,20 +26,13 @@ class CountTest extends TestCase
       Wiki::all()->each(function($a){$a->destroy($a->id);});
     }
 
-    public function testRootPostNotAllowed()
-    {
-        $this->post($this->route);
-        // Method not allowed
-        $this->assertEquals(405, $this->response->status());
-    }
-
     public function testWikiCountNone()
     {
         $this->get('/wiki/count')->seeJsonEquals([
           'data' => 0,
           'success' => true
-        ]);
-        $this->assertEquals(200, $this->response->status());
+        ])
+        ->seeStatusCode(200);
     }
 
     public function testWikiCountOne()
@@ -50,8 +43,8 @@ class CountTest extends TestCase
         $this->get($this->route)->seeJsonEquals([
           'data' => 1,
           'success' => true
-        ]);
-        $this->assertEquals(200, $this->response->status());
+        ])
+        ->seeStatusCode(200);
     }
 
     public function testWikiCountTwo()
@@ -61,7 +54,7 @@ class CountTest extends TestCase
         $this->get($this->route)->seeJsonEquals([
           'data' => 2,
           'success' => true
-        ]);
-        $this->assertEquals(200, $this->response->status());
+        ])
+        ->seeStatusCode(200);
     }
 }
