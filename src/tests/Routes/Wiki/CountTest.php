@@ -1,21 +1,29 @@
 <?php
 
+namespace App\Tests\Routes\Wiki\Managers;
+
 use App\Wiki;
+use App\Tests\TestCase;
+use App\Tests\Routes\Traits\OptionsRequestAllowed;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 
 /**
  * @covers WikiController::count
  */
-class WikiCountTest extends TestCase
+class CountTest extends TestCase
 {
 
-    // DB needs to be empty before this 
+  protected $route = 'wiki/count';
+
+  use OptionsRequestAllowed;
+
+    // DB needs to be empty before this
     use DatabaseMigrations;
 
     public function testRootPostNotAllowed()
     {
-        $this->post('/wiki/count');
+        $this->post($this->route);
         // Method not allowed
         $this->assertEquals(405, $this->response->status());
     }
@@ -41,7 +49,7 @@ class WikiCountTest extends TestCase
           'sitename' => 'a',
         ]);
 
-        $this->get('/wiki/count')->seeJsonEquals([
+        $this->get($this->route)->seeJsonEquals([
           'data' => 1,
           'success' => true
         ]);
@@ -69,7 +77,7 @@ class WikiCountTest extends TestCase
           'sitename' => 'b',
         ]);
 
-        $this->get('/wiki/count')->seeJsonEquals([
+        $this->get($this->route)->seeJsonEquals([
           'data' => 2,
           'success' => true
         ]);

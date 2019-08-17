@@ -1,10 +1,14 @@
 <?php
 
+namespace App\Tests\Routes;
+
+use App\Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 
-class RootTest extends TestCase
+class EmptyTest extends TestCase
 {
+
     public function testRootGetNotAllowed()
     {
         $this->get('/');
