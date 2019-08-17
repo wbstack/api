@@ -1,4 +1,3 @@
-
 <?php
 
 /** @var Router $router */
