@@ -30,6 +30,7 @@ class UserController extends BaseController
     public function create(Request $request)
     {
         $validation = [
+          // TODO validate password length when not deving...
             'email' => 'required|email|unique:users',
             'password' => 'required'
         ];
