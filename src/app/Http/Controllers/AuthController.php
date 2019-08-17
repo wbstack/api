@@ -59,11 +59,7 @@ class AuthController extends BaseController
         // Find the user by email
         $user = User::where('email', $this->request->input('email'))->first();
         if (!$user) {
-            // You wil probably have some sort of helpers or whatever
-            // to make sure that you have the same response format for
-            // differents kind of responses. But let's return the
-            // below respose for now.
-            return $this->getStandardLoginErrorResponse();
+            return $this->abort();
 
         }
         // Verify the password and generate the token
@@ -74,14 +70,12 @@ class AuthController extends BaseController
                 'isAdmin' => $user->isAdmin(),
             ], 200);
         }
-        // Bad Request response
-        return $this->getStandardLoginErrorResponse();
+        $this->abort();
     }
 
-    private function getStandardLoginErrorResponse() {
-        return response()->json([
-            'error' => 'Can not log in with provided details.'
-        ], 400);
+    private function abort() {
+        // Standard way to abort so as not to give away any details
+        abort(400, 'Failed to authenticate.');
     }
 
 }
