@@ -30,7 +30,7 @@ class WikiController extends Controller
 
             $wiki = Wiki::create([
                 'sitename' => $request->input('sitename'),
-                'domain' => $request->input('domain'),
+                'domain' => strtolower($request->input('domain')),
             ]);
 
             $dbAssignment = DB::table('wiki_dbs')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
