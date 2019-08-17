@@ -42,16 +42,6 @@ $router->group(['middleware' => ['cors', 'throttle:45,1']], function () use ($ro
     });
 });
 
-// Backend Only
-$router->group(['prefix' => 'backend', 'namespace' => 'Backend', 'middleware' => ['backend.auth']], function () use ($router) {
-  $router->group(['prefix' => 'wiki'], function () use ($router) {
-    // GET
-    $router->get('database/countUnclaimed', ['uses' => 'WikiDbsController@countUnclaimed']);
-    // POST
-    $router->post('database/recordCreation', ['uses' => 'WikiDbController@create']);
-  });
-});
-
 // Allow options methods on all routes?
 // TODO do I really want this to be all routes?
 $router->options('{all:.*}', ['middleware' => 'cors', function() {

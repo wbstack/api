@@ -115,4 +115,11 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
+// TODO perhaps conditionally load this based on ENV var & deployment?
+$app->router->group([
+    'namespace' => 'App\Http\Controllers\Backend',
+], function ($router) {
+    require __DIR__.'/../routes/backend.php';
+});
+
 return $app;
