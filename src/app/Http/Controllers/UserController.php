@@ -32,7 +32,8 @@ class UserController extends BaseController
         $validation = [
           // TODO validate password length when not deving...
             'email' => 'required|email|unique:users',
-            'password' => 'required'
+            'password' => 'required',
+            'recaptcha' => 'required|captcha',
         ];
 
         // If this is the first user then do not require an invitation

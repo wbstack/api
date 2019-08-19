@@ -4,8 +4,67 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "94df0c7cc5db375fc212afb5764ce966",
+    "content-hash": "49336405937ae3fc853c3f38551da873",
     "packages": [
+        {
+            "name": "albertcht/invisible-recaptcha",
+            "version": "v1.9.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/albertcht/invisible-recaptcha.git",
+                "reference": "7aae21d07ef16ca14a7d0ec5b06472e2076fedef"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/albertcht/invisible-recaptcha/zipball/7aae21d07ef16ca14a7d0ec5b06472e2076fedef",
+                "reference": "7aae21d07ef16ca14a7d0ec5b06472e2076fedef",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.2",
+                "illuminate/support": "^5.0",
+                "php": "^5.6.4 || ^7.0"
+            },
+            "require-dev": {
+                "illuminate/view": "^5.0",
+                "phpunit/phpunit": "^6.1|^7.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "AlbertCht\\InvisibleReCaptcha\\InvisibleReCaptchaServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AlbertCht\\InvisibleReCaptcha\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Albert Chen",
+                    "homepage": "https://www.albert-chen.com"
+                }
+            ],
+            "description": "Invisible reCAPTCHA For Laravel.",
+            "keywords": [
+                "captcha",
+                "invisible",
+                "invisible-recaptcha",
+                "laravel",
+                "laravel5",
+                "no-captcha",
+                "php",
+                "recaptcha"
+            ],
+            "time": "2019-06-13T12:23:02+00:00"
+        },
         {
             "name": "doctrine/inflector",
             "version": "v1.3.0",

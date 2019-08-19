@@ -10,6 +10,7 @@
         "laravel/lumen-framework": "5.7.*",
         "illuminate/mail": "5.7.*",
         "vlucas/phpdotenv": "~2.2",
+        "albertcht/invisible-recaptcha": "1.9.*",
         "guzzlehttp/guzzle": "^6.0",
         "predis/predis": "~1.0",
         "illuminate/redis": "5.7.*"
