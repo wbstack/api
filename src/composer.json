@@ -9,7 +9,8 @@
         "firebase/php-jwt": "^5.0",
         "laravel/lumen-framework": "5.7.*",
         "illuminate/mail": "5.7.*",
-        "vlucas/phpdotenv": "~2.2"
+        "vlucas/phpdotenv": "~2.2",
+        "guzzlehttp/guzzle": "^6.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
