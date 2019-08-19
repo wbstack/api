@@ -15,12 +15,11 @@ class AdminMiddleware
      */
     public function handle($request, Closure $next)
     {
+      $user = $request->user();
         // Make sure there is an authed user
-        if(!$request->auth) {
+        if(!$user) {
           abort(403);
         }
-
-        $user = $request->auth;
 
         // And that user is me
         // TODO do something better here...?

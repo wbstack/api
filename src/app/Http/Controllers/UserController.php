@@ -72,10 +72,11 @@ class UserController extends BaseController
     }
 
     public function getSelf( Request $request ) {
-        if ( isset( $request->auth ) ) {
+      $user = $request->user();
+        if ( $user ) {
             $res['success'] = true;
             // Filter what we give to the user
-            $res['message'] = $this->convertUserForOutput( $request->auth );
+            $res['message'] = $this->convertUserForOutput( $user );
 
             return response($res);
         }

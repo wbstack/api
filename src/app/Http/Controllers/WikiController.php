@@ -12,7 +12,7 @@ class WikiController extends Controller
 {
 
     public function create( Request $request ){
-        $user = $request->auth;
+        $user = $request->user();
 
         $this->validate($request, [
             'domain' => 'required|unique:wikis|regex:/^.+\.wiki\.opencura\.com$/',
@@ -55,7 +55,7 @@ class WikiController extends Controller
 
     // TODO should this just be get wiki?
     public function getWikiDetailsForIdForOwner( Request $request ) {
-      $user = $request->auth;
+      $user = $request->user();
 
       $wikiId = $request->input('wiki');
 

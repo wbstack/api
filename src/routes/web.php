@@ -17,7 +17,7 @@ $router->group(['middleware' => ['cors', 'throttle:45,1']], function () use ($ro
     $router->post('interest/register', ['uses' => 'InterestController@create']);
 
     // Authed
-    $router->group(['middleware' => ['jwt.auth']], function () use ($router) {
+    $router->group(['middleware' => ['auth']], function () use ($router) {
         // user
         $router->group(['prefix' => 'user'], function () use ($router) {
           $router->post('self', ['uses' => 'UserController@getSelf']);

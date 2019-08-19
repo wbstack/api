@@ -10,16 +10,8 @@ use Illuminate\Support\Facades\DB;
 class WikiManagersController extends Controller
 {
 
-    private function getAndRequireAuthedUser( Request $request ) {
-      if(!$request->auth) {
-        // This is a logic exception as the router / JWT middleware requires a user already
-        throw new LogicException("Controller should not be run without auth");
-      }
-      return $request->auth;
-    }
-
     public function getManagersOfWiki( Request $request ){
-      $user = $this->getAndRequireAuthedUser( $request );
+      $user = $request->user();
 
       $wikiId = $request->input('wiki');
 

@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Firebase\JWT\JWT;
+use Firebase\JWT\ExpiredException;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,25 +27,24 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Here you may define how you wish users to be authenticated for your Lumen
-        // application. The callback which receives the incoming request instance
-        // should return either a User instance or null. You're free to obtain
-        // the User instance via an API token or any other method necessary.
-
-        die(); // this shouldnt be allow to run :)
-
         $this->app['auth']->viaRequest('api', function ($request) {
-            $header = $request->header('Api-Token');
+          $token = $request->get('token') ?: $request->header('Authorization');
 
-            if ( $header && $header == 'mytoken' ) {
-                return new User();
-            }
+          if(!$token) {
+              // Unauthorized response if token not there
+              return null;
+          }
 
-            return null;
+          try {
+              $credentials = JWT::decode($token, env('JWT_SECRET'), ['HS256']);
+          } catch(ExpiredException $e) {
+              return null;
+          } catch(Exception $e) {
+              return null;
+          }
 
-//            if ($request->input('api_token')) {
-//                return User::where('api_token', $request->input('api_token'))->first();
-//            }
+          return User::find($credentials->sub);
         });
     }
+
 }
