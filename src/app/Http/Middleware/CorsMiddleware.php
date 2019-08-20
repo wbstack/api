@@ -6,6 +6,8 @@ use Closure;
 
 /**
  * https://www.codementor.io/chiemelachinedum/steps-to-enable-cors-on-a-lumen-api-backend-e5a0s1ecx
+ *
+ * Maybe use https://packagist.org/packages/spatie/laravel-cors ? :)
  */
 class CorsMiddleware
 {
