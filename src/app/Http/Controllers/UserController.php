@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Hash;
 use Validator;
 use App\User;
 use App\Invitation;
+use App\UserVerificationToken;
+use App\Jobs\EmailVerificationJob;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 
@@ -65,6 +67,14 @@ class UserController extends BaseController
         if( $inviteRequired && $invite ) {
           $invite->delete();
         }
+
+        // TODO should be able to create new one without passing in token?
+        $emailToken = bin2hex(random_bytes(24));
+        UserVerificationToken::create([
+          'user_id' => $user->id,
+          'token' => $emailToken,
+        ]);
+        dispatch(new EmailVerificationJob($user, $emailToken));
 
         $res['success'] = true;
         $res['message'] = 'Register Successful!';
