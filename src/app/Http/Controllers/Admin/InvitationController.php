@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Invitation;
 use App\Http\Controllers\Controller;
+use App\Jobs\InvitationCreateJob;
 use App\Jobs\InvitationDeleteJob;
 use Illuminate\Http\Request;
 
@@ -14,20 +15,12 @@ class InvitationController extends Controller
         $this->validate($request, [
             'code' => 'required|unique:invitations',
         ]);
-        $code = $request->input('code');
 
-        $test = Invitation::where('code', $code)->first();
-        if($test) {
-          abort(409);//conflict
-        }
-
-        $invite = Invitation::create([
-            'code' => $code,
-        ]);
+        ( new InvitationCreateJob( $request->input('code') ) )->handle();
 
         $res['success'] = true;
         $res['message'] = 'Code created!';
-        $res['code'] = $code;
+        $res['code'] = $request->input('code');
         return response($res);
     }
 
