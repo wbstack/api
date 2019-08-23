@@ -114,18 +114,28 @@ $app->configure('mail');
 | can respond to, as well as the controllers that may handle them.
 |
 */
+*
+/**
+ * Load routes based on ENV vars.
+ * This means essentially this code base contains 2 api services.
+ * A backend and a frontend..
+ * TODO more cleanup about this idea..
+ */
 
-$app->router->group([
-    'namespace' => 'App\Http\Controllers',
-], function ($router) {
-    require __DIR__.'/../routes/web.php';
-});
+if( getenv( 'ROUTES_LOAD_WEB' ) == 1 ) {
+  $app->router->group([
+      'namespace' => 'App\Http\Controllers',
+  ], function ($router) {
+      require __DIR__.'/../routes/web.php';
+  });
+}
 
-// TODO perhaps conditionally load this based on ENV var & deployment?
-$app->router->group([
-    'namespace' => 'App\Http\Controllers\Backend',
-], function ($router) {
-    require __DIR__.'/../routes/backend.php';
-});
+if( getenv( 'ROUTES_LOAD_BACKEND' ) == 1 ) {
+  $app->router->group([
+      'namespace' => 'App\Http\Controllers\Backend',
+  ], function ($router) {
+      require __DIR__.'/../routes/backend.php';
+  });
+}
 
 return $app;
