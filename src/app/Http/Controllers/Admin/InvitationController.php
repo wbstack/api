@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Invitation;
 use App\Http\Controllers\Controller;
+use App\Jobs\InvitationDeleteJob;
 use Illuminate\Http\Request;
 
 class InvitationController extends Controller
@@ -32,22 +33,16 @@ class InvitationController extends Controller
 
     public function delete( Request $request ){
         $this->validate($request, [
-          //TODO is these a special validate for exists?
+          //TODO do we want to validate that this exists?
             'code' => 'required',
         ]);
-        $code = $request->input('code');
 
-        $test = Invitation::where('code', $code)->first();
-        if(!$test) {
-          abort(404);
-        }
+        ( new InvitationDeleteJob( $request->input('code') ) )->handle();
 
-        // TODO check response of this method call?
-        $test->delete();
-
+        // TODO do we actually need all of this response? or remove it?
         $res['success'] = true;
         $res['message'] = 'Code deleted!';
-        $res['code'] = $code;
+        $res['code'] = $request->input('code');
         return response($res);
     }
 
