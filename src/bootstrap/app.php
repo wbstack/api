@@ -114,7 +114,7 @@ $app->configure('mail');
 | can respond to, as well as the controllers that may handle them.
 |
 */
-*
+
 /**
  * Load routes based on ENV vars.
  * This means essentially this code base contains 2 api services.

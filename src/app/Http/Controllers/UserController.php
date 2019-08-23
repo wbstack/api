@@ -43,18 +43,10 @@ class UserController extends BaseController
           $inviteRequired = false;
         } else {
           $inviteRequired = true;
-          $validation['invite'] = 'required';
+          $validation['invite'] = 'required|exists:invitations,code';
         }
 
         $this->validate($request, $validation);
-
-        if( $inviteRequired ) {
-          $invite = Invitation::where('code', $request->input('invite'))->first();
-          if(!$invite) {
-            $res['invite'] = ['Invite code not valid'];
-            return response($res)->setStatusCode(422);
-          }
-        }
 
         $email = $request->input('email');
         $password = Hash::make( $request->input('password') );
@@ -64,8 +56,11 @@ class UserController extends BaseController
         ]);
 
         // If we required and checked an invite, then delete it.
-        if( $inviteRequired && $invite ) {
-          $invite->delete();
+        if( $inviteRequired ) {
+          $invite = Invitation::where('code', $request->input('invite'))->first();
+          if( $invite ) {
+            $invite->delete();
+          }
         }
 
         // TODO should be able to create new one without passing in token?
