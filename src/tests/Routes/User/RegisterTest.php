@@ -8,6 +8,8 @@ use App\Tests\TestCase;
 use App\Tests\Routes\Traits\CrossSiteHeadersOnOptions;
 use App\Tests\Routes\Traits\OptionsRequestAllowed;
 use Laravel\Lumen\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Mail;
+
 
 class RegisterTest extends TestCase {
 
@@ -22,15 +24,27 @@ class RegisterTest extends TestCase {
 
     public function testCreate_Success()
     {
-        $this->markTestSkipped("Need to account for recaptcha token");
+        // TODO mock the validate call? actually validate some bits, but not captcha
+        // Validator::shouldReceive('validate')
+        // ->once()
+        // ->with()
+        // ;
+
+        // Don't send mail during the test
+        Mail::shouldReceive('raw')->once();
+
         $invite = factory(Invitation::class)->create();
         $userToCreate = factory(User::class)->make();
-        $this->post($this->route, [
+
+        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
+        $resp = $this->post($this->route, [
           'email' => $userToCreate->email,
           'password' => 'anyPassword',
           'invite' => $invite->code,
         ])
-        ->seeStatusCode(200)
+        putenv('PHPUNIT_RECAPTCHA_CHECK=1');
+
+        $resp->seeStatusCode(200)
         ->seeJsonStructure(['data' => [ 'email', 'id' ],'message','success'])
         ->seeJsonContains(['email' => $userToCreate->email, 'success' => true])
         ->missingFromDatabase('invitations',['code' => $invite->code]);
@@ -63,6 +77,7 @@ class RegisterTest extends TestCase {
 
     public function testCreate_NoToken()
     {
+      putenv('PHPUNIT_RECAPTCHA_CHECK=1');
       $invite = factory(Invitation::class)->create();
         $user = factory(User::class)->make();
         $this->post($this->route, [

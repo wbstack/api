@@ -7,7 +7,9 @@ use Validator;
 use App\User;
 use App\Invitation;
 use App\UserVerificationToken;
-use App\Jobs\EmailVerificationJob;
+use App\Jobs\UesrVerificationTokenCreateAndSendJob;
+use App\Jobs\UserCreateJob;
+use App\Jobs\InvitationDeleteJob;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 
@@ -31,12 +33,19 @@ class UserController extends BaseController
 
     public function create(Request $request)
     {
+        // HTTP validation
         $validation = [
           // TODO validate password length when not deving...
             'email' => 'required|email|unique:users',
             'password' => 'required',
             'recaptcha' => 'required|captcha',
         ];
+
+        // XXX: for phpunit dont validate captcha when requested....
+        // TODO this should be mocked in the test instead
+        if(getenv('PHPUNIT_RECAPTCHA_CHECK') == '0') {
+          unset($validation['recaptcha']);
+        }
 
         // If this is the first user then do not require an invitation
         if( User::count() === 0 ) {
@@ -48,29 +57,15 @@ class UserController extends BaseController
 
         $this->validate($request, $validation);
 
-        $email = $request->input('email');
-        $password = Hash::make( $request->input('password') );
-        $user = User::create([
-            'email' => $email,
-            'password' => $password,
-        ]);
+        // WORK
+        $user = ( new UserCreateJob(
+          $request->input('email'),
+          $request->input('password')
+        ))->handle();
+        ( new InvitationDeleteJob( $request->input('invite') ) )->handle();
+        ( new UesrVerificationTokenCreateAndSendJob( $user ) )->handle();
 
-        // If we required and checked an invite, then delete it.
-        if( $inviteRequired ) {
-          $invite = Invitation::where('code', $request->input('invite'))->first();
-          if( $invite ) {
-            $invite->delete();
-          }
-        }
-
-        // TODO should be able to create new one without passing in token?
-        $emailToken = bin2hex(random_bytes(24));
-        UserVerificationToken::create([
-          'user_id' => $user->id,
-          'token' => $emailToken,
-        ]);
-        dispatch(new EmailVerificationJob($user, $emailToken));
-
+        // HTTP Response
         $res['success'] = true;
         $res['message'] = 'Register Successful!';
         $res['data'] = $this->convertUserForOutput( $user );
@@ -93,6 +88,7 @@ class UserController extends BaseController
     }
 
     // TODO why is this needed?
+    // TODO the model used by the frontend stuff should just not have the password...
     protected function convertUserForOutput ( User $user ) {
         return [
             'id' => $user->id,

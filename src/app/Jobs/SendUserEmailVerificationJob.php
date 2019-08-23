@@ -6,15 +6,13 @@ use App\Mail\UserVerification;
 use App\User;
 use Illuminate\Support\Facades\Mail;
 
-class EmailVerificationJob extends Job
+class SendUserEmailVerificationJob extends Job
 {
 
   private $user;
   private $token;
 
     /**
-     * Create a new job instance.
-     *
      * @return void
      */
     public function __construct( User $user, $token )
@@ -24,8 +22,6 @@ class EmailVerificationJob extends Job
     }
 
     /**
-     * Execute the job.
-     *
      * @return void
      */
     public function handle()
