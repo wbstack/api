@@ -11,7 +11,7 @@ class HandleJob extends Command
      *
      * @var string
      */
-    protected $signature = 'job:handle {job} {parameter?}';
+    protected $signature = 'job:handle {job} {parameter?} {parameterSeperator?}';
 
     /**
      * The console command description.
@@ -49,7 +49,12 @@ class HandleJob extends Command
             $this->error("{$class} class Not exists");
         }else {
             if ($this->argument('parameter')) {
+              if($this->argument('parameterSeperator')) {
+                $params = explode( $this->argument('parameterSeperator'), $this->argument('parameter') );
+                $job = new $class(...$params);
+              } else {
                 $job = new $class($this->argument('parameter'));
+              }
             } else {
                 $job = new $class();
             }

@@ -6,6 +6,9 @@ use App\Invitation;
 
 class InvitationCreateJob extends Job
 {
+
+    private $code;
+
     /**
      * @return void
      */

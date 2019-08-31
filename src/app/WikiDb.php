@@ -14,6 +14,7 @@ class WikiDb extends Model
      */
     protected $fillable = [
         'name',
+        'prefix',
         'user',
         'password',
         'version',

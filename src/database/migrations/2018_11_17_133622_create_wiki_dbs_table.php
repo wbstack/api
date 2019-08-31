@@ -16,9 +16,13 @@ class CreateWikidbsTable extends Migration
         Schema::create('wiki_dbs', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->string('name', 100)->unique();
+            $table->string('name', 100);
+            $table->string('prefix', 100);
             $table->string('user', 100);
             $table->string('password', 100);
+
+            // Require the dbname and prefix to be unique...
+            $table->unique(['name', 'prefix']);
 
             $table->string('version', 20);
             // Index needed so that we can easily query what needs to be updated
