@@ -5,6 +5,7 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 use App\Jobs\EnsureWikiDbPoolPopulatedJob;
+use App\Jobs\ExpireOldUserVerificationTokensJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -27,5 +28,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->job(new EnsureWikiDbPoolPopulatedJob)->everyMinute();
+        $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
     }
 }
