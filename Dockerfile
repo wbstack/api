@@ -26,3 +26,8 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 COPY --chown=www-data:www-data --from=composer /tmp/src2 /var/www/html
 
 WORKDIR /var/www/html
+
+COPY ./start.sh /usr/local/bin/start
+RUN chmod +x /usr/local/bin/start
+
+CMD ["/usr/local/bin/start"]
