@@ -14,7 +14,7 @@ class InvitationCreateJob extends Job
      */
     public function __construct( $code )
     {
-        $this->code = $code;
+        $this->code = strtolower($code);
     }
 
     /**
