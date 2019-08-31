@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\DB;
 class ProvisionWikiDbJob extends Job
 {
     private $prefix;
-    private $newSqlFile;
-    private $dbConnection;
+    private $newSqlFile = 'mw1.31-oc2';
+    private $dbConnection = 'mw';
     /**
      * @var string|null|false
      * null results in the default database being used
@@ -49,8 +49,6 @@ class ProvisionWikiDbJob extends Job
         $this->dbPassword = substr( bin2hex(random_bytes(24)), 0, 12 );
 
         $this->prefix = $prefix;
-        $this->newSqlFile = 'mw1.31-oc1';
-        $this->dbConnection = 'mw';
         $this->dbName = $dbName;
     }
 
