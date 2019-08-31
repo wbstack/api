@@ -41,7 +41,7 @@ class RegisterTest extends TestCase {
           'email' => $userToCreate->email,
           'password' => 'anyPassword',
           'invite' => $invite->code,
-        ])
+        ]);
         putenv('PHPUNIT_RECAPTCHA_CHECK=1');
 
         $resp->seeStatusCode(200)
