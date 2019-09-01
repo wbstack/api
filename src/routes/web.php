@@ -15,6 +15,7 @@ $router->group(['middleware' => ['cors', 'throttle:45,1']], function () use ($ro
     $router->post('auth/login', ['uses' => 'AuthController@authenticate']);
     $router->post('user/register', ['uses' => 'UserController@create']);
     $router->post('user/verifyEmail', ['uses' => 'UserVerificationTokenController@verify']);
+    $router->post('user/sendVerifyEmail', ['uses' => 'UserVerificationTokenController@createAndSendForUser']);
     $router->post('interest/register', ['uses' => 'InterestController@create']);
 
     // Authed

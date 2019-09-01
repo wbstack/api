@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\UserVerificationToken;
+use App\Jobs\UesrVerificationTokenCreateAndSendJob;
 use Illuminate\Http\Request;
 
 class UserVerificationTokenController extends Controller
@@ -14,8 +15,14 @@ class UserVerificationTokenController extends Controller
             'token' => 'required|exists:user_verification_tokens,token',
         ]);
 
-        $token = UserVerificationToken::where('token', $request->input('token'))->first();
-        $user = User::where('id', $token->user_id)->first();
+        $token = UserVerificationToken::where('token', $request->input('token'))->firstOrFail();
+        $user = User::where('id', $token->user_id)->firstOrFail();
+
+        if($user->verified){
+          // User already verified
+          abort(403);
+        }
+
         $user->verified = true;
         $user->save();
         $token->delete();
@@ -23,7 +30,18 @@ class UserVerificationTokenController extends Controller
         $res['success'] = true;
         $res['message'] = 'Verified!';
         return response($res);
+    }
 
+    public function createAndSendForUser( Request $request ) {
+      $user = $request->user();
+
+      if($user->verified){
+        // User already verified
+        abort(403);
+      }
+
+      // TODO why is this handle? Why not queue?
+      ( new UesrVerificationTokenCreateAndSendJob( $user ) )->handle();
     }
 
 }
