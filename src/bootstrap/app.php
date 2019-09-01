@@ -2,11 +2,9 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-try {
-    (new Dotenv\Dotenv(dirname(__DIR__)))->load();
-} catch (Dotenv\Exception\InvalidPathException $e) {
-    //
-}
+(new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
+    dirname(__DIR__)
+))->bootstrap();
 
 /*
 |--------------------------------------------------------------------------
@@ -94,11 +92,13 @@ $app->routeMiddleware([
 |
 */
 
+$app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(AlbertCht\InvisibleReCaptcha\InvisibleReCaptchaServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
-$app->register(App\Providers\AppServiceProvider::class);
+//$app->register(Laravel\Cashier\CashierServiceProvider::class);
+
 $app->configure('services');
 $app->configure('mail');
 
