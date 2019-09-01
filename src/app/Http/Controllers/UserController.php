@@ -47,9 +47,10 @@ class UserController extends BaseController
           unset($validation['recaptcha']);
         }
 
-        // If this is the first user then do not require an invitation
+        // If this is the first user then do not require an invitation or captcha
         if( User::count() === 0 ) {
           $inviteRequired = false;
+          unset($validation['recaptcha']);
         } else {
           $inviteRequired = true;
           $validation['invite'] = 'required|exists:invitations,code';
