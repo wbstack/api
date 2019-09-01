@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Invitation;
+use App\Interest;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class InvitationsController extends Controller
+class InterestsController extends Controller
 {
+
     public function get( Request $request ){
-        $result = Invitation::all();
+        $result = Interest::all();
 
         $res['success'] = true;
         $res['data'] = $result;

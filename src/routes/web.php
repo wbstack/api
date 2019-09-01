@@ -39,6 +39,12 @@ $router->group(['middleware' => ['cors', 'throttle:45,1']], function () use ($ro
             $router->post('create', ['uses' => 'InvitationController@create']);
             $router->post('delete', ['uses' => 'InvitationController@delete']);
           });
+          // interest
+          $router->group(['prefix' => 'interest'], function () use ($router) {
+            $router->post('list', ['uses' => 'InterestsController@get']);
+            // $router->post('create', ['uses' => 'InvitationController@create']);
+            // $router->post('delete', ['uses' => 'InvitationController@delete']);
+          });
         });
     });
 });
