@@ -125,14 +125,6 @@ CREATE TABLE `<<prefix>>_externallinks` (
   KEY `el_from_index_60` (`el_from`,`el_index_60`,`el_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-INSERT INTO `<<prefix>>_externallinks` (`el_id`, `el_from`, `el_to`, `el_index`, `el_index_60`) VALUES
-(1,	1,	'https://www.mediawiki.org/wiki/Special:MyLanguage/Help:Contents',	'https://org.mediawiki.www./wiki/Special:MyLanguage/Help:Contents',	UNHEX('')),
-(2,	1,	'https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Configuration_settings',	'https://org.mediawiki.www./wiki/Special:MyLanguage/Manual:Configuration_settings',	UNHEX('')),
-(3,	1,	'https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:FAQ',	'https://org.mediawiki.www./wiki/Special:MyLanguage/Manual:FAQ',	UNHEX('')),
-(4,	1,	'https://lists.wikimedia.org/mailman/listinfo/mediawiki-announce',	'https://org.wikimedia.lists./mailman/listinfo/mediawiki-announce',	UNHEX('')),
-(5,	1,	'https://www.mediawiki.org/wiki/Special:MyLanguage/Localisation#Translation_resources',	'https://org.mediawiki.www./wiki/Special:MyLanguage/Localisation#Translation_resources',	UNHEX('')),
-(6,	1,	'https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Combating_spam',	'https://org.mediawiki.www./wiki/Special:MyLanguage/Manual:Combating_spam',	UNHEX(''));
-
 CREATE TABLE `<<prefix>>_filearchive` (
   `fa_id` int(11) NOT NULL AUTO_INCREMENT,
   `fa_name` varbinary(255) NOT NULL DEFAULT '',
@@ -357,11 +349,6 @@ CREATE TABLE `<<prefix>>_job` (
   KEY `job_timestamp` (`job_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-INSERT INTO `<<prefix>>_job` (`job_id`, `job_cmd`, `job_namespace`, `job_title`, `job_timestamp`, `job_params`, `job_random`, `job_attempts`, `job_token`, `job_token_timestamp`, `job_sha1`) VALUES
-(1,	UNHEX('7573657247726F7570457870697279'),	0,	UNHEX('4D61696E5F50616765'),	UNHEX('3230313831313231313234333531'),	'a:1:{s:9:\"requestId\";s:24:\"2254576c0de5e9cc39d0fd8e\";}',	2116596865,	0,	UNHEX(''),	NULL,	UNHEX('706A30366F67356F7631326C64617665676262303669626978797A34703130')),
-(2,	UNHEX('68746D6C4361636865557064617465'),	0,	UNHEX('4D61696E5F50616765'),	UNHEX('3230313831313231313234333532'),	'a:8:{s:5:\"table\";s:9:\"pagelinks\";s:9:\"recursive\";b:1;s:13:\"rootJobIsSelf\";b:1;s:16:\"rootJobSignature\";s:40:\"a61c71eb6e6b2d48a20167f06eb94a7c0cd27d43\";s:16:\"rootJobTimestamp\";s:14:\"20181121124352\";s:11:\"causeAction\";s:10:\"page-touch\";s:10:\"causeAgent\";s:7:\"unknown\";s:9:\"requestId\";s:24:\"2254576c0de5e9cc39d0fd8e\";}',	951724426,	0,	UNHEX(''),	NULL,	UNHEX('653566356475696D677A35357472616C736A757A73313269786F3275396732')),
-(3,	UNHEX('68746D6C4361636865557064617465'),	0,	UNHEX('4D61696E5F50616765'),	UNHEX('3230313831313231313234333532'),	'a:8:{s:5:\"table\";s:13:\"templatelinks\";s:9:\"recursive\";b:1;s:13:\"rootJobIsSelf\";b:1;s:16:\"rootJobSignature\";s:40:\"74ce50dcd6ec47a5d174f89562dd93805541fc6e\";s:16:\"rootJobTimestamp\";s:14:\"20181121124352\";s:11:\"causeAction\";s:11:\"page-create\";s:10:\"causeAgent\";s:7:\"unknown\";s:9:\"requestId\";s:24:\"2254576c0de5e9cc39d0fd8e\";}',	527866552,	0,	UNHEX(''),	NULL,	UNHEX('66356C3071333979333433626F6B6B31636B616F66346761796D6B36776966'));
-
 CREATE TABLE `<<prefix>>_l10n_cache` (
   `lc_lang` varbinary(32) NOT NULL,
   `lc_key` varbinary(255) NOT NULL,
@@ -429,9 +416,6 @@ CREATE TABLE `<<prefix>>_objectcache` (
   KEY `exptime` (`exptime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-INSERT INTO `<<prefix>>_objectcache` (`keyname`, `value`, `exptime`) VALUES
-(UNHEX('77696B693A6D657373616765733A656E'),	'��\n�@�e�`w=o�]e!h�������-�����0�zO�<�vh:@��԰S��ܴϑ��u��Źp_k�`|w4}^���E�@YU�V��',	'2040-01-19 03:14:07');
-
 CREATE TABLE `<<prefix>>_oldimage` (
   `oi_name` varbinary(255) NOT NULL DEFAULT '',
   `oi_archive_name` varbinary(255) NOT NULL DEFAULT '',
@@ -478,9 +462,6 @@ CREATE TABLE `<<prefix>>_page` (
   KEY `page_len` (`page_len`),
   KEY `page_redirect_namespace_len` (`page_is_redirect`,`page_namespace`,`page_len`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
-INSERT INTO `<<prefix>>_page` (`page_id`, `page_namespace`, `page_title`, `page_restrictions`, `page_is_redirect`, `page_is_new`, `page_random`, `page_touched`, `page_links_updated`, `page_latest`, `page_len`, `page_content_model`, `page_lang`) VALUES
-(1,	0,	UNHEX('4D61696E5F50616765'),	'',	0,	1,	0.499397461217,	UNHEX('3230313831313231313234333532'),	UNHEX('3230313831313231313234333532'),	1,	735,	UNHEX('77696B6974657874'),	NULL);
 
 CREATE TABLE `<<prefix>>_pagelinks` (
   `pl_from` int(10) unsigned NOT NULL DEFAULT 0,
@@ -596,9 +577,6 @@ CREATE TABLE `<<prefix>>_recentchanges` (
   KEY `rc_name_type_patrolled_timestamp` (`rc_namespace`,`rc_type`,`rc_patrolled`,`rc_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-INSERT INTO `<<prefix>>_recentchanges` (`rc_id`, `rc_timestamp`, `rc_user`, `rc_user_text`, `rc_actor`, `rc_namespace`, `rc_title`, `rc_comment`, `rc_comment_id`, `rc_minor`, `rc_bot`, `rc_new`, `rc_cur_id`, `rc_this_oldid`, `rc_last_oldid`, `rc_type`, `rc_source`, `rc_patrolled`, `rc_ip`, `rc_old_len`, `rc_new_len`, `rc_deleted`, `rc_logid`, `rc_log_type`, `rc_log_action`, `rc_params`) VALUES
-(1,	UNHEX('3230313831313231313234333532'),	0,	UNHEX('4D6564696157696B692064656661756C74'),	0,	0,	UNHEX('4D61696E5F50616765'),	UNHEX(''),	0,	0,	0,	1,	1,	1,	0,	1,	UNHEX('6D772E6E6577'),	0,	UNHEX('3132372E302E302E31'),	0,	735,	0,	0,	NULL,	UNHEX(''),	'');
-
 CREATE TABLE `<<prefix>>_redirect` (
   `rd_from` int(10) unsigned NOT NULL DEFAULT 0,
   `rd_namespace` int(11) NOT NULL DEFAULT 0,
@@ -633,9 +611,6 @@ CREATE TABLE `<<prefix>>_revision` (
   KEY `page_user_timestamp` (`rev_page`,`rev_user`,`rev_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary MAX_ROWS=10000000 AVG_ROW_LENGTH=1024;
 
-INSERT INTO `<<prefix>>_revision` (`rev_id`, `rev_page`, `rev_text_id`, `rev_comment`, `rev_user`, `rev_user_text`, `rev_timestamp`, `rev_minor_edit`, `rev_deleted`, `rev_len`, `rev_parent_id`, `rev_sha1`, `rev_content_model`, `rev_content_format`) VALUES
-(1,	1,	1,	UNHEX(''),	0,	UNHEX('4D6564696157696B692064656661756C74'),	UNHEX('3230313831313231313234333532'),	0,	0,	735,	0,	UNHEX('6135776568756C646430676F32756E69616777767836366E36633830697271'),	NULL,	NULL);
-
 CREATE TABLE `<<prefix>>_revision_actor_temp` (
   `revactor_rev` int(10) unsigned NOT NULL,
   `revactor_actor` bigint(20) unsigned NOT NULL,
@@ -662,9 +637,6 @@ CREATE TABLE `<<prefix>>_searchindex` (
   FULLTEXT KEY `si_title` (`si_title`),
   FULLTEXT KEY `si_text` (`si_text`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-INSERT INTO `<<prefix>>_searchindex` (`si_page`, `si_title`, `si_text`) VALUES
-(1,	'main page',	' mediawiki hasu800 been installed. consult theu800 user user\'su800 guide foru800 information onu800 using theu800 wiki software. getting started getting started getting started * configuration settings list * mediawiki faqu800 * mediawiki release mailing list * localise mediawiki foru800 your language * learn howu800 tou800 combat spam onu800 your wiki ');
 
 CREATE TABLE `<<prefix>>_sites` (
   `site_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -708,9 +680,6 @@ CREATE TABLE `<<prefix>>_site_stats` (
   `ss_images` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`ss_row_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
-INSERT INTO `<<prefix>>_site_stats` (`ss_row_id`, `ss_total_edits`, `ss_good_articles`, `ss_total_pages`, `ss_users`, `ss_active_users`, `ss_images`) VALUES
-(1,	1,	0,	1,	1,	0,	0);
 
 CREATE TABLE `<<prefix>>_slots` (
   `slot_revision_id` bigint(20) unsigned NOT NULL,
@@ -756,9 +725,6 @@ CREATE TABLE `<<prefix>>_text` (
   `old_flags` tinyblob NOT NULL,
   PRIMARY KEY (`old_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary MAX_ROWS=10000000 AVG_ROW_LENGTH=10240;
-
-INSERT INTO `<<prefix>>_text` (`old_id`, `old_text`, `old_flags`) VALUES
-(1,	'<strong>OpenCura MediaWiki has been installed.</strong>\n\nConsult the [https://www.mediawiki.org/wiki/Special:MyLanguage/Help:Contents User\'s Guide] for information on using the wiki software.\n\n== Getting started ==\n* [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Configuration_settings Configuration settings list]\n* [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:FAQ MediaWiki FAQ]\n* [https://lists.wikimedia.org/mailman/listinfo/mediawiki-announce MediaWiki release mailing list]\n* [https://www.mediawiki.org/wiki/Special:MyLanguage/Localisation#Translation_resources Localise MediaWiki for your language]\n* [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Combating_spam Learn how to combat spam on your wiki]',	'utf-8');
 
 CREATE TABLE `<<prefix>>_transcache` (
   `tc_url` varbinary(255) NOT NULL,
@@ -855,9 +821,6 @@ CREATE TABLE `<<prefix>>_user` (
   KEY `user_email` (`user_email`(50))
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-INSERT INTO `<<prefix>>_user` (`user_id`, `user_name`, `user_real_name`, `user_password`, `user_newpassword`, `user_newpass_time`, `user_email`, `user_touched`, `user_token`, `user_email_authenticated`, `user_email_token`, `user_email_token_expires`, `user_registration`, `user_editcount`, `user_password_expires`) VALUES
-(1,	UNHEX('41646D696E4E616D65'),	UNHEX(''),	':pbkdf2:sha512:30000:64:Hpc3KKdgcb0SWVb+cNWLnA==:1oWnXlwt9Ca7VPqPLzFPtG12zsU27dziF4X4du18SwLX6lzvUVjmSljlVBEMVPiPcsbJLWtccnWF9eps+DMXLA==',	'',	NULL,	'',	UNHEX('3230313831313231313234333538'),	UNHEX('3836353137306664303135343139373961633766393764636234323630303164'),	NULL,	UNHEX('0000000000000000000000000000000000000000000000000000000000000000'),	NULL,	UNHEX('3230313831313231313234333531'),	0,	NULL);
-
 CREATE TABLE `<<prefix>>_user_former_groups` (
   `ufg_user` int(10) unsigned NOT NULL DEFAULT 0,
   `ufg_group` varbinary(255) NOT NULL DEFAULT '',
@@ -872,10 +835,6 @@ CREATE TABLE `<<prefix>>_user_groups` (
   KEY `ug_group` (`ug_group`),
   KEY `ug_expiry` (`ug_expiry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
-INSERT INTO `<<prefix>>_user_groups` (`ug_user`, `ug_group`, `ug_expiry`) VALUES
-(1,	UNHEX('62757265617563726174'),	NULL),
-(1,	UNHEX('7379736F70'),	NULL);
 
 CREATE TABLE `<<prefix>>_user_newtalk` (
   `user_id` int(10) unsigned NOT NULL DEFAULT 0,

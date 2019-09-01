@@ -1,9 +1,4 @@
--- Adminer 4.6.3 MySQL dump
-
-SET NAMES utf8;
-SET time_zone = '+00:00';
-SET foreign_key_checks = 0;
-SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
+-- Origionally an Adminer 4.6.3 MySQL dump
 
 CREATE TABLE `actor` (
   `actor_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -13,7 +8,6 @@ CREATE TABLE `actor` (
   UNIQUE KEY `actor_name` (`actor_name`),
   UNIQUE KEY `actor_user` (`actor_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `archive` (
   `ar_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -43,7 +37,6 @@ CREATE TABLE `archive` (
   KEY `usertext_timestamp` (`ar_user_text`,`ar_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `bot_passwords` (
   `bp_user` int(10) unsigned NOT NULL,
   `bp_app_id` varbinary(32) NOT NULL,
@@ -53,7 +46,6 @@ CREATE TABLE `bot_passwords` (
   `bp_grants` blob NOT NULL,
   PRIMARY KEY (`bp_user`,`bp_app_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `category` (
   `cat_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -65,7 +57,6 @@ CREATE TABLE `category` (
   UNIQUE KEY `cat_title` (`cat_title`),
   KEY `cat_pages` (`cat_pages`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `categorylinks` (
   `cl_from` int(10) unsigned NOT NULL DEFAULT 0,
@@ -81,7 +72,6 @@ CREATE TABLE `categorylinks` (
   KEY `cl_collation_ext` (`cl_collation`,`cl_to`,`cl_type`,`cl_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `change_tag` (
   `ct_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ct_rc_id` int(11) DEFAULT NULL,
@@ -96,7 +86,6 @@ CREATE TABLE `change_tag` (
   KEY `change_tag_tag_id` (`ct_tag`,`ct_rc_id`,`ct_rev_id`,`ct_log_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `comment` (
   `comment_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `comment_hash` int(11) NOT NULL,
@@ -105,7 +94,6 @@ CREATE TABLE `comment` (
   PRIMARY KEY (`comment_id`),
   KEY `comment_hash` (`comment_hash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `content` (
   `content_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -116,14 +104,12 @@ CREATE TABLE `content` (
   PRIMARY KEY (`content_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `content_models` (
   `model_id` smallint(6) NOT NULL AUTO_INCREMENT,
   `model_name` varbinary(64) NOT NULL,
   PRIMARY KEY (`model_id`),
   UNIQUE KEY `model_name` (`model_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `externallinks` (
   `el_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -138,14 +124,6 @@ CREATE TABLE `externallinks` (
   KEY `el_index_60` (`el_index_60`,`el_id`),
   KEY `el_from_index_60` (`el_from`,`el_index_60`,`el_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
-INSERT INTO `externallinks` (`el_id`, `el_from`, `el_to`, `el_index`, `el_index_60`) VALUES
-(1,	1,	'https://www.mediawiki.org/wiki/Special:MyLanguage/Help:Contents',	'https://org.mediawiki.www./wiki/Special:MyLanguage/Help:Contents',	UNHEX('')),
-(2,	1,	'https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Configuration_settings',	'https://org.mediawiki.www./wiki/Special:MyLanguage/Manual:Configuration_settings',	UNHEX('')),
-(3,	1,	'https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:FAQ',	'https://org.mediawiki.www./wiki/Special:MyLanguage/Manual:FAQ',	UNHEX('')),
-(4,	1,	'https://lists.wikimedia.org/mailman/listinfo/mediawiki-announce',	'https://org.wikimedia.lists./mailman/listinfo/mediawiki-announce',	UNHEX('')),
-(5,	1,	'https://www.mediawiki.org/wiki/Special:MyLanguage/Localisation#Translation_resources',	'https://org.mediawiki.www./wiki/Special:MyLanguage/Localisation#Translation_resources',	UNHEX('')),
-(6,	1,	'https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Combating_spam',	'https://org.mediawiki.www./wiki/Special:MyLanguage/Manual:Combating_spam',	UNHEX(''));
 
 CREATE TABLE `filearchive` (
   `fa_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -182,7 +160,6 @@ CREATE TABLE `filearchive` (
   KEY `fa_sha1` (`fa_sha1`(10))
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `image` (
   `img_name` varbinary(255) NOT NULL DEFAULT '',
   `img_size` int(10) unsigned NOT NULL DEFAULT 0,
@@ -210,7 +187,6 @@ CREATE TABLE `image` (
   KEY `img_media_mime` (`img_media_type`,`img_major_mime`,`img_minor_mime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `imagelinks` (
   `il_from` int(10) unsigned NOT NULL DEFAULT 0,
   `il_from_namespace` int(11) NOT NULL DEFAULT 0,
@@ -220,14 +196,12 @@ CREATE TABLE `imagelinks` (
   KEY `il_backlinks_namespace` (`il_from_namespace`,`il_to`,`il_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `image_comment_temp` (
   `imgcomment_name` varbinary(255) NOT NULL,
   `imgcomment_description_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`imgcomment_name`,`imgcomment_description_id`),
   UNIQUE KEY `imgcomment_name` (`imgcomment_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `interwiki` (
   `iw_prefix` varbinary(32) NOT NULL,
@@ -337,7 +311,6 @@ CREATE TABLE `ipblocks` (
   KEY `ipb_parent_block_id` (`ipb_parent_block_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `ip_changes` (
   `ipc_rev_id` int(10) unsigned NOT NULL DEFAULT 0,
   `ipc_rev_timestamp` binary(14) NOT NULL DEFAULT '\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
@@ -347,7 +320,6 @@ CREATE TABLE `ip_changes` (
   KEY `ipc_hex_time` (`ipc_hex`,`ipc_rev_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `iwlinks` (
   `iwl_from` int(10) unsigned NOT NULL DEFAULT 0,
   `iwl_prefix` varbinary(20) NOT NULL DEFAULT '',
@@ -356,7 +328,6 @@ CREATE TABLE `iwlinks` (
   KEY `iwl_prefix_title_from` (`iwl_prefix`,`iwl_title`,`iwl_from`),
   KEY `iwl_prefix_from_title` (`iwl_prefix`,`iwl_from`,`iwl_title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `job` (
   `job_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -378,18 +349,12 @@ CREATE TABLE `job` (
   KEY `job_timestamp` (`job_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-INSERT INTO `job` (`job_id`, `job_cmd`, `job_namespace`, `job_title`, `job_timestamp`, `job_params`, `job_random`, `job_attempts`, `job_token`, `job_token_timestamp`, `job_sha1`) VALUES
-(1,	UNHEX('7573657247726F7570457870697279'),	0,	UNHEX('4D61696E5F50616765'),	UNHEX('3230313831313231313234333531'),	'a:1:{s:9:\"requestId\";s:24:\"2254576c0de5e9cc39d0fd8e\";}',	2116596865,	0,	UNHEX(''),	NULL,	UNHEX('706A30366F67356F7631326C64617665676262303669626978797A34703130')),
-(2,	UNHEX('68746D6C4361636865557064617465'),	0,	UNHEX('4D61696E5F50616765'),	UNHEX('3230313831313231313234333532'),	'a:8:{s:5:\"table\";s:9:\"pagelinks\";s:9:\"recursive\";b:1;s:13:\"rootJobIsSelf\";b:1;s:16:\"rootJobSignature\";s:40:\"a61c71eb6e6b2d48a20167f06eb94a7c0cd27d43\";s:16:\"rootJobTimestamp\";s:14:\"20181121124352\";s:11:\"causeAction\";s:10:\"page-touch\";s:10:\"causeAgent\";s:7:\"unknown\";s:9:\"requestId\";s:24:\"2254576c0de5e9cc39d0fd8e\";}',	951724426,	0,	UNHEX(''),	NULL,	UNHEX('653566356475696D677A35357472616C736A757A73313269786F3275396732')),
-(3,	UNHEX('68746D6C4361636865557064617465'),	0,	UNHEX('4D61696E5F50616765'),	UNHEX('3230313831313231313234333532'),	'a:8:{s:5:\"table\";s:13:\"templatelinks\";s:9:\"recursive\";b:1;s:13:\"rootJobIsSelf\";b:1;s:16:\"rootJobSignature\";s:40:\"74ce50dcd6ec47a5d174f89562dd93805541fc6e\";s:16:\"rootJobTimestamp\";s:14:\"20181121124352\";s:11:\"causeAction\";s:11:\"page-create\";s:10:\"causeAgent\";s:7:\"unknown\";s:9:\"requestId\";s:24:\"2254576c0de5e9cc39d0fd8e\";}',	527866552,	0,	UNHEX(''),	NULL,	UNHEX('66356C3071333979333433626F6B6B31636B616F66346761796D6B36776966'));
-
 CREATE TABLE `l10n_cache` (
   `lc_lang` varbinary(32) NOT NULL,
   `lc_key` varbinary(255) NOT NULL,
   `lc_value` mediumblob NOT NULL,
   PRIMARY KEY (`lc_lang`,`lc_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `langlinks` (
   `ll_from` int(10) unsigned NOT NULL DEFAULT 0,
@@ -398,7 +363,6 @@ CREATE TABLE `langlinks` (
   PRIMARY KEY (`ll_from`,`ll_lang`),
   KEY `ll_lang` (`ll_lang`,`ll_title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `logging` (
   `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -429,7 +393,6 @@ CREATE TABLE `logging` (
   KEY `log_user_text_time` (`log_user_text`,`log_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `log_search` (
   `ls_field` varbinary(32) NOT NULL,
   `ls_value` varbinary(255) NOT NULL,
@@ -438,14 +401,12 @@ CREATE TABLE `log_search` (
   KEY `ls_log_id` (`ls_log_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `module_deps` (
   `md_module` varbinary(255) NOT NULL,
   `md_skin` varbinary(32) NOT NULL,
   `md_deps` mediumblob NOT NULL,
   PRIMARY KEY (`md_module`,`md_skin`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `objectcache` (
   `keyname` varbinary(255) NOT NULL DEFAULT '',
@@ -454,9 +415,6 @@ CREATE TABLE `objectcache` (
   PRIMARY KEY (`keyname`),
   KEY `exptime` (`exptime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
-INSERT INTO `objectcache` (`keyname`, `value`, `exptime`) VALUES
-(UNHEX('77696B693A6D657373616765733A656E'),	'��\n�@�e�`w=o�]e!h�������-�����0�zO�<�vh:@��԰S��ܴϑ��u��Źp_k�`|w4}^���E�@YU�V��',	'2038-01-19 03:14:07');
 
 CREATE TABLE `oldimage` (
   `oi_name` varbinary(255) NOT NULL DEFAULT '',
@@ -484,7 +442,6 @@ CREATE TABLE `oldimage` (
   KEY `oi_sha1` (`oi_sha1`(10))
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `page` (
   `page_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `page_namespace` int(11) NOT NULL,
@@ -506,9 +463,6 @@ CREATE TABLE `page` (
   KEY `page_redirect_namespace_len` (`page_is_redirect`,`page_namespace`,`page_len`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-INSERT INTO `page` (`page_id`, `page_namespace`, `page_title`, `page_restrictions`, `page_is_redirect`, `page_is_new`, `page_random`, `page_touched`, `page_links_updated`, `page_latest`, `page_len`, `page_content_model`, `page_lang`) VALUES
-(1,	0,	UNHEX('4D61696E5F50616765'),	'',	0,	1,	0.499397461217,	UNHEX('3230313831313231313234333532'),	UNHEX('3230313831313231313234333532'),	1,	735,	UNHEX('77696B6974657874'),	NULL);
-
 CREATE TABLE `pagelinks` (
   `pl_from` int(10) unsigned NOT NULL DEFAULT 0,
   `pl_from_namespace` int(11) NOT NULL DEFAULT 0,
@@ -519,7 +473,6 @@ CREATE TABLE `pagelinks` (
   KEY `pl_backlinks_namespace` (`pl_from_namespace`,`pl_namespace`,`pl_title`,`pl_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `page_props` (
   `pp_page` int(11) NOT NULL,
   `pp_propname` varbinary(60) NOT NULL,
@@ -529,7 +482,6 @@ CREATE TABLE `page_props` (
   UNIQUE KEY `pp_propname_page` (`pp_propname`,`pp_page`),
   UNIQUE KEY `pp_propname_sortkey_page` (`pp_propname`,`pp_sortkey`,`pp_page`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `page_restrictions` (
   `pr_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -546,7 +498,6 @@ CREATE TABLE `page_restrictions` (
   KEY `pr_cascade` (`pr_cascade`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `protected_titles` (
   `pt_namespace` int(11) NOT NULL,
   `pt_title` varbinary(255) NOT NULL,
@@ -560,7 +511,6 @@ CREATE TABLE `protected_titles` (
   KEY `pt_timestamp` (`pt_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `querycache` (
   `qc_type` varbinary(32) NOT NULL,
   `qc_value` int(10) unsigned NOT NULL DEFAULT 0,
@@ -568,7 +518,6 @@ CREATE TABLE `querycache` (
   `qc_title` varbinary(255) NOT NULL DEFAULT '',
   KEY `qc_type` (`qc_type`,`qc_value`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `querycachetwo` (
   `qcc_type` varbinary(32) NOT NULL,
@@ -582,13 +531,11 @@ CREATE TABLE `querycachetwo` (
   KEY `qcc_titletwo` (`qcc_type`,`qcc_namespacetwo`,`qcc_titletwo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `querycache_info` (
   `qci_type` varbinary(32) NOT NULL DEFAULT '',
   `qci_timestamp` binary(14) NOT NULL DEFAULT '19700101000000',
   PRIMARY KEY (`qci_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `recentchanges` (
   `rc_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -630,9 +577,6 @@ CREATE TABLE `recentchanges` (
   KEY `rc_name_type_patrolled_timestamp` (`rc_namespace`,`rc_type`,`rc_patrolled`,`rc_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-INSERT INTO `recentchanges` (`rc_id`, `rc_timestamp`, `rc_user`, `rc_user_text`, `rc_actor`, `rc_namespace`, `rc_title`, `rc_comment`, `rc_comment_id`, `rc_minor`, `rc_bot`, `rc_new`, `rc_cur_id`, `rc_this_oldid`, `rc_last_oldid`, `rc_type`, `rc_source`, `rc_patrolled`, `rc_ip`, `rc_old_len`, `rc_new_len`, `rc_deleted`, `rc_logid`, `rc_log_type`, `rc_log_action`, `rc_params`) VALUES
-(1,	UNHEX('3230313831313231313234333532'),	0,	UNHEX('4D6564696157696B692064656661756C74'),	0,	0,	UNHEX('4D61696E5F50616765'),	UNHEX(''),	0,	0,	0,	1,	1,	1,	0,	1,	UNHEX('6D772E6E6577'),	0,	UNHEX('3132372E302E302E31'),	0,	735,	0,	0,	NULL,	UNHEX(''),	'');
-
 CREATE TABLE `redirect` (
   `rd_from` int(10) unsigned NOT NULL DEFAULT 0,
   `rd_namespace` int(11) NOT NULL DEFAULT 0,
@@ -642,7 +586,6 @@ CREATE TABLE `redirect` (
   PRIMARY KEY (`rd_from`),
   KEY `rd_ns_title` (`rd_namespace`,`rd_title`,`rd_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `revision` (
   `rev_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -668,9 +611,6 @@ CREATE TABLE `revision` (
   KEY `page_user_timestamp` (`rev_page`,`rev_user`,`rev_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary MAX_ROWS=10000000 AVG_ROW_LENGTH=1024;
 
-INSERT INTO `revision` (`rev_id`, `rev_page`, `rev_text_id`, `rev_comment`, `rev_user`, `rev_user_text`, `rev_timestamp`, `rev_minor_edit`, `rev_deleted`, `rev_len`, `rev_parent_id`, `rev_sha1`, `rev_content_model`, `rev_content_format`) VALUES
-(1,	1,	1,	UNHEX(''),	0,	UNHEX('4D6564696157696B692064656661756C74'),	UNHEX('3230313831313231313234333532'),	0,	0,	735,	0,	UNHEX('6135776568756C646430676F32756E69616777767836366E36633830697271'),	NULL,	NULL);
-
 CREATE TABLE `revision_actor_temp` (
   `revactor_rev` int(10) unsigned NOT NULL,
   `revactor_actor` bigint(20) unsigned NOT NULL,
@@ -682,14 +622,12 @@ CREATE TABLE `revision_actor_temp` (
   KEY `page_actor_timestamp` (`revactor_page`,`revactor_actor`,`revactor_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `revision_comment_temp` (
   `revcomment_rev` int(10) unsigned NOT NULL,
   `revcomment_comment_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`revcomment_rev`,`revcomment_comment_id`),
   UNIQUE KEY `revcomment_rev` (`revcomment_rev`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `searchindex` (
   `si_page` int(10) unsigned NOT NULL,
@@ -699,9 +637,6 @@ CREATE TABLE `searchindex` (
   FULLTEXT KEY `si_title` (`si_title`),
   FULLTEXT KEY `si_text` (`si_text`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-INSERT INTO `searchindex` (`si_page`, `si_title`, `si_text`) VALUES
-(1,	'main page',	' mediawiki hasu800 been installed. consult theu800 user user\'su800 guide foru800 information onu800 using theu800 wiki software. getting started getting started getting started * configuration settings list * mediawiki faqu800 * mediawiki release mailing list * localise mediawiki foru800 your language * learn howu800 tou800 combat spam onu800 your wiki ');
 
 CREATE TABLE `sites` (
   `site_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -726,7 +661,6 @@ CREATE TABLE `sites` (
   KEY `sites_forward` (`site_forward`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `site_identifiers` (
   `si_site` int(10) unsigned NOT NULL,
   `si_type` varbinary(32) NOT NULL,
@@ -735,7 +669,6 @@ CREATE TABLE `site_identifiers` (
   KEY `site_ids_site` (`si_site`),
   KEY `site_ids_key` (`si_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `site_stats` (
   `ss_row_id` int(10) unsigned NOT NULL,
@@ -748,9 +681,6 @@ CREATE TABLE `site_stats` (
   PRIMARY KEY (`ss_row_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-INSERT INTO `site_stats` (`ss_row_id`, `ss_total_edits`, `ss_good_articles`, `ss_total_pages`, `ss_users`, `ss_active_users`, `ss_images`) VALUES
-(1,	1,	0,	1,	1,	0,	0);
-
 CREATE TABLE `slots` (
   `slot_revision_id` bigint(20) unsigned NOT NULL,
   `slot_role_id` smallint(5) unsigned NOT NULL,
@@ -760,14 +690,12 @@ CREATE TABLE `slots` (
   KEY `slot_revision_origin_role` (`slot_revision_id`,`slot_origin`,`slot_role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `slot_roles` (
   `role_id` smallint(6) NOT NULL AUTO_INCREMENT,
   `role_name` varbinary(64) NOT NULL,
   PRIMARY KEY (`role_id`),
   UNIQUE KEY `role_name` (`role_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `tag_summary` (
   `ts_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -781,7 +709,6 @@ CREATE TABLE `tag_summary` (
   UNIQUE KEY `tag_summary_rev_id` (`ts_rev_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `templatelinks` (
   `tl_from` int(10) unsigned NOT NULL DEFAULT 0,
   `tl_from_namespace` int(11) NOT NULL DEFAULT 0,
@@ -792,7 +719,6 @@ CREATE TABLE `templatelinks` (
   KEY `tl_backlinks_namespace` (`tl_from_namespace`,`tl_namespace`,`tl_title`,`tl_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `text` (
   `old_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `old_text` mediumblob NOT NULL,
@@ -800,16 +726,12 @@ CREATE TABLE `text` (
   PRIMARY KEY (`old_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary MAX_ROWS=10000000 AVG_ROW_LENGTH=10240;
 
-INSERT INTO `text` (`old_id`, `old_text`, `old_flags`) VALUES
-(1,	'<strong>MediaWiki has been installed.</strong>\n\nConsult the [https://www.mediawiki.org/wiki/Special:MyLanguage/Help:Contents User\'s Guide] for information on using the wiki software.\n\n== Getting started ==\n* [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Configuration_settings Configuration settings list]\n* [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:FAQ MediaWiki FAQ]\n* [https://lists.wikimedia.org/mailman/listinfo/mediawiki-announce MediaWiki release mailing list]\n* [https://www.mediawiki.org/wiki/Special:MyLanguage/Localisation#Translation_resources Localise MediaWiki for your language]\n* [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Combating_spam Learn how to combat spam on your wiki]',	'utf-8');
-
 CREATE TABLE `transcache` (
   `tc_url` varbinary(255) NOT NULL,
   `tc_contents` blob DEFAULT NULL,
   `tc_time` binary(14) DEFAULT NULL,
   PRIMARY KEY (`tc_url`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `updatelog` (
   `ul_key` varbinary(255) NOT NULL,
@@ -877,7 +799,6 @@ CREATE TABLE `uploadstash` (
   KEY `us_timestamp` (`us_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `user` (
   `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_name` varbinary(255) NOT NULL DEFAULT '',
@@ -900,15 +821,11 @@ CREATE TABLE `user` (
   KEY `user_email` (`user_email`(50))
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-INSERT INTO `user` (`user_id`, `user_name`, `user_real_name`, `user_password`, `user_newpassword`, `user_newpass_time`, `user_email`, `user_touched`, `user_token`, `user_email_authenticated`, `user_email_token`, `user_email_token_expires`, `user_registration`, `user_editcount`, `user_password_expires`) VALUES
-(1,	UNHEX('41646D696E4E616D65'),	UNHEX(''),	':pbkdf2:sha512:30000:64:Hpc3KKdgcb0SWVb+cNWLnA==:1oWnXlwt9Ca7VPqPLzFPtG12zsU27dziF4X4du18SwLX6lzvUVjmSljlVBEMVPiPcsbJLWtccnWF9eps+DMXLA==',	'',	NULL,	'',	UNHEX('3230313831313231313234333538'),	UNHEX('3836353137306664303135343139373961633766393764636234323630303164'),	NULL,	UNHEX('0000000000000000000000000000000000000000000000000000000000000000'),	NULL,	UNHEX('3230313831313231313234333531'),	0,	NULL);
-
 CREATE TABLE `user_former_groups` (
   `ufg_user` int(10) unsigned NOT NULL DEFAULT 0,
   `ufg_group` varbinary(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`ufg_user`,`ufg_group`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `user_groups` (
   `ug_user` int(10) unsigned NOT NULL DEFAULT 0,
@@ -919,10 +836,6 @@ CREATE TABLE `user_groups` (
   KEY `ug_expiry` (`ug_expiry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-INSERT INTO `user_groups` (`ug_user`, `ug_group`, `ug_expiry`) VALUES
-(1,	UNHEX('62757265617563726174'),	NULL),
-(1,	UNHEX('7379736F70'),	NULL);
-
 CREATE TABLE `user_newtalk` (
   `user_id` int(10) unsigned NOT NULL DEFAULT 0,
   `user_ip` varbinary(40) NOT NULL DEFAULT '',
@@ -930,7 +843,6 @@ CREATE TABLE `user_newtalk` (
   KEY `un_user_id` (`user_id`),
   KEY `un_user_ip` (`user_ip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `user_properties` (
   `up_user` int(10) unsigned NOT NULL,
@@ -940,12 +852,10 @@ CREATE TABLE `user_properties` (
   KEY `user_properties_property` (`up_property`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `valid_tag` (
   `vt_tag` varbinary(255) NOT NULL,
   PRIMARY KEY (`vt_tag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `watchlist` (
   `wl_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -959,7 +869,6 @@ CREATE TABLE `watchlist` (
   KEY `wl_user_notificationtimestamp` (`wl_user`,`wl_notificationtimestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `wbc_entity_usage` (
   `eu_row_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `eu_entity_id` varbinary(255) NOT NULL,
@@ -969,7 +878,6 @@ CREATE TABLE `wbc_entity_usage` (
   UNIQUE KEY `eu_entity_id` (`eu_entity_id`,`eu_aspect`,`eu_page_id`),
   KEY `eu_page_id` (`eu_page_id`,`eu_entity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `wb_changes` (
   `change_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -987,7 +895,6 @@ CREATE TABLE `wb_changes` (
   KEY `wb_changes_change_revision_id` (`change_revision_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `wb_changes_dispatch` (
   `chd_site` varbinary(32) NOT NULL,
   `chd_db` varbinary(32) NOT NULL,
@@ -1000,7 +907,6 @@ CREATE TABLE `wb_changes_dispatch` (
   KEY `wb_changes_dispatch_chd_touched` (`chd_touched`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `wb_changes_subscription` (
   `cs_row_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `cs_entity_id` varbinary(255) NOT NULL,
@@ -1009,7 +915,6 @@ CREATE TABLE `wb_changes_subscription` (
   UNIQUE KEY `cs_entity_id` (`cs_entity_id`,`cs_subscriber_id`),
   KEY `cs_subscriber_id` (`cs_subscriber_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `wb_entity_per_page` (
   `epp_entity_id` int(10) unsigned NOT NULL,
@@ -1021,13 +926,11 @@ CREATE TABLE `wb_entity_per_page` (
   KEY `epp_redirect_target` (`epp_redirect_target`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `wb_id_counters` (
   `id_value` int(10) unsigned NOT NULL,
   `id_type` varbinary(32) NOT NULL,
   UNIQUE KEY `wb_id_counters_type` (`id_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `wb_items_per_site` (
   `ips_row_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -1040,7 +943,6 @@ CREATE TABLE `wb_items_per_site` (
   KEY `wb_ips_item_id` (`ips_item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
-
 CREATE TABLE `wb_property_info` (
   `pi_property_id` int(10) unsigned NOT NULL,
   `pi_type` varbinary(32) NOT NULL,
@@ -1048,7 +950,6 @@ CREATE TABLE `wb_property_info` (
   PRIMARY KEY (`pi_property_id`),
   KEY `pi_type` (`pi_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
 
 CREATE TABLE `wb_terms` (
   `term_row_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -1068,6 +969,4 @@ CREATE TABLE `wb_terms` (
   KEY `term_search` (`term_language`,`term_entity_id`,`term_type`,`term_search_key`(16)),
   KEY `term_search_full` (`term_language`,`term_full_entity_id`,`term_type`,`term_search_key`(16))
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
-
 -- 2018-11-21 12:47:21

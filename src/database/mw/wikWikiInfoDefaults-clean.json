@@ -1,0 +1,15 @@
+{
+  "id": 1,
+  "domain": "foo",
+  "requestDomain": "foo",
+  "sitename": "foo",
+  "wiki_db": {
+    "id": 1,
+    "name": "sql-clean",
+    "user": "root",
+    "password": "toor",
+    "version": "something",
+    "prefix": "",
+    "wiki_id": 1
+  }
+}
