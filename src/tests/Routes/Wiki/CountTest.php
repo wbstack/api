@@ -21,7 +21,7 @@ class CountTest extends TestCase
 
     use DatabaseTransactions;
 
-    public function setUp(){
+    protected function setUp(): void {
       parent::setUp();
       Wiki::all()->each(function($a){$a->destroy($a->id);});
     }
