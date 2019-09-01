@@ -16,6 +16,7 @@ class CreateInterestsTable extends Migration
         Schema::create('interests', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email')->unique();
+            $table->boolean('invitaitonSent')->default(0);
             $table->timestamps();
         });
     }
@@ -27,8 +28,6 @@ class CreateInterestsTable extends Migration
      */
     public function down()
     {
-      // TODO remove the legacy one of these at one point in the future...
-        Schema::dropIfExists('interest');
         Schema::dropIfExists('interests');
     }
 }

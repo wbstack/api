@@ -14,5 +14,6 @@ class Interest extends Model
      */
     protected $fillable = [
         'email',
+        'invitaitonSent',
     ];
 }
