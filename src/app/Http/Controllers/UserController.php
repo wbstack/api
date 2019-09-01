@@ -78,7 +78,7 @@ class UserController extends BaseController
         if ( $user ) {
             $res['success'] = true;
             // Filter what we give to the user
-            $res['message'] = $this->convertUserForOutput( $user );
+            $res['data'] = $this->convertUserForOutput( $user );
 
             return response($res);
         }
@@ -94,6 +94,7 @@ class UserController extends BaseController
         return [
             'id' => $user->id,
             'email' => $user->email,
+            'verified' => $user->verified,
         ];
     }
 
