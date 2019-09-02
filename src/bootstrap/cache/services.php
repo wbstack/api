@@ -32,6 +32,7 @@
     28 => 'App\\Providers\\AuthServiceProvider',
     29 => 'App\\Providers\\EventServiceProvider',
     30 => 'App\\Providers\\RouteServiceProvider',
+    31 => 'AlbertCht\\InvisibleReCaptcha\\InvisibleReCaptchaServiceProvider',
   ),
   'eager' => 
   array (
@@ -54,6 +55,7 @@
     16 => 'App\\Providers\\AuthServiceProvider',
     17 => 'App\\Providers\\EventServiceProvider',
     18 => 'App\\Providers\\RouteServiceProvider',
+    19 => 'AlbertCht\\InvisibleReCaptcha\\InvisibleReCaptchaServiceProvider',
   ),
   'deferred' => 
   array (
