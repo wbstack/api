@@ -14,10 +14,14 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
-        \App\Http\Middleware\CheckForMaintenanceMode::class,
-        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        \App\Http\Middleware\TrimStrings::class,
-        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+          \Spatie\Cors\Cors::class,
+
+        // SHIFT Lumen didnt run any of these, so don't run them for us either..
+        // \App\Http\Middleware\CheckForMaintenanceMode::class,
+        // \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
+        // \App\Http\Middleware\TrimStrings::class,
+        // \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+
         // SHIFT the below was giving Class 'Fideloper\Proxy\TrustProxies' not found
         // and I don't know what it does yet, so juse remove it...
         //\App\Http\Middleware\TrustProxies::class,
@@ -29,19 +33,26 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middlewareGroups = [
-        'web' => [
-            \App\Http\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-            // \Illuminate\Session\Middleware\AuthenticateSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \App\Http\Middleware\VerifyCsrfToken::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ],
+        // SHIFT, we don't use the web routes right now...
+        // 'web' => [
+        //     \App\Http\Middleware\EncryptCookies::class,
+        //     \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        //     \Illuminate\Session\Middleware\StartSession::class,
+        //     // \Illuminate\Session\Middleware\AuthenticateSession::class,
+        //     \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        //     \App\Http\Middleware\VerifyCsrfToken::class,
+        //     \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        // ],
 
         'api' => [
-            'throttle:60,1',
+            // throttle, 45 requests in 1 min
+            'throttle:45,1',
+            // SHIFT, what does bindings do?
             'bindings',
+        ],
+
+        'backend' => [
+          'backend.auth'
         ],
     ];
 
@@ -53,15 +64,25 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
+        // Came with Laravel
         'auth' => \App\Http\Middleware\Authenticate::class,
-        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
-        'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+
+        // Came with Laravel SHIFT, but not used yet?
+        // 'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        // 'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        // 'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
+        // 'can' => \Illuminate\Auth\Middleware\Authorize::class,
+        // 'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        // 'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
+
+        // SHIFT from Lumen
+        'backend.auth' => App\Http\Middleware\BackendAuth::class,
+        //'throttle' => App\Http\Middleware\ThrottleRequests::class,
+        'admin' => App\Http\Middleware\AdminMiddleware::class,
+        //'auth' => App\Http\Middleware\Authenticate::class,
+        'cors' => \Spatie\Cors\Cors::class,
     ];
 
     /**
@@ -72,11 +93,12 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middlewarePriority = [
-        \Illuminate\Session\Middleware\StartSession::class,
-        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        \App\Http\Middleware\Authenticate::class,
-        \Illuminate\Session\Middleware\AuthenticateSession::class,
-        \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        \Illuminate\Auth\Middleware\Authorize::class,
+        // SHIFT? maybe I need this?
+        // \Illuminate\Session\Middleware\StartSession::class,
+        // \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        // \App\Http\Middleware\Authenticate::class,
+        // \Illuminate\Session\Middleware\AuthenticateSession::class,
+        // \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        // \Illuminate\Auth\Middleware\Authorize::class,
     ];
 }

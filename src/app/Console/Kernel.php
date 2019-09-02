@@ -21,15 +21,6 @@ class Kernel extends ConsoleKernel
       \App\Console\Commands\HandleJob::class,
     ];
 
-    // https://laravel.com/docs/5.8/middleware#assigning-middleware-to-routes
-    protected $routeMiddleware = [
-          'cors' => App\Http\Middleware\CorsMiddleware::class,
-          'backend.auth' => App\Http\Middleware\BackendAuth::class,
-          'throttle' => App\Http\Middleware\ThrottleRequests::class,
-          'admin' => App\Http\Middleware\AdminMiddleware::class,
-          'auth' => App\Http\Middleware\Authenticate::class,
-    ];
-
     /**
      * Define the application's command schedule.
      *

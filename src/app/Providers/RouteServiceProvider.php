@@ -53,18 +53,13 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes()
     {
-        // Route::prefix('api')
-        // throttle, 45 requests in 1 min
-        Route::middleware('cors')
-              ->middleware('throttle:45,1')
-             ->namespace($this->namespace)
+        Route::namespace($this->namespace)
              ->group(base_path('routes/api.php'));
     }
 
     protected function mapBackendRoutes()
     {
         Route::prefix('backend')
-             ->middleware('backend.auth')
              ->namespace($this->namespace . '\Backend')
              ->group(base_path('routes/backend.php'));
     }

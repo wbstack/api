@@ -179,6 +179,9 @@ return [
          * Improted from LUMEN
          */
         AlbertCht\InvisibleReCaptcha\InvisibleReCaptchaServiceProvider::class,
+        // The cors service provider is apparently meant to be loaded automagically
+        // but it doesnt seem to be working...
+        Spatie\Cors\CorsServiceProvider::class,
         //Laravel\Cashier\CashierServiceProvider::class
 
 

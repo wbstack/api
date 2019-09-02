@@ -42,9 +42,3 @@ $router->group(['middleware' => ['auth']], function () use ($router) {
         });
     });
 });
-
-// Allow options methods on all routes?
-// TODO do I really want this to be all routes?
-$router->options('{all:.*}', ['middleware' => 'cors', function () {
-    return response('');
-}]);
