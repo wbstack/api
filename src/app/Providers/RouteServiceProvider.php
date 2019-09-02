@@ -55,7 +55,8 @@ class RouteServiceProvider extends ServiceProvider
     {
         // Route::prefix('api')
         // throttle, 45 requests in 1 min
-        Route::middleware(['cors', 'throttle:45,1'])
+        Route::middleware('cors')
+              ->middleware('throttle:45,1')
              ->namespace($this->namespace)
              ->group(base_path('routes/api.php'));
     }
