@@ -1,7 +1,11 @@
 {
     "name": "laravel/lumen",
     "description": "The Laravel Lumen Framework.",
-    "keywords": ["framework", "laravel", "lumen"],
+    "keywords": [
+        "framework",
+        "laravel",
+        "lumen"
+    ],
     "license": "MIT",
     "type": "project",
     "require": {
@@ -12,9 +16,8 @@
         "illuminate/mail": "5.8.*",
         "illuminate/redis": "5.8.*",
         "laravel/cashier": "^10.1",
-        "laravel/lumen-framework": "5.8.*",
         "predis/predis": "~1.0",
-        "vlucas/phpdotenv": "^3.3"
+        "laravel/framework": "5.8.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
