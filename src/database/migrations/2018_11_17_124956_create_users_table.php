@@ -17,6 +17,8 @@ class CreateUsersTable extends Migration
             $table->increments('id');
             $table->string('email')->unique();
             $table->string('password');
+            # remeber_token needed https://stackoverflow.com/questions/24954537/is-it-compulsory-to-use-remember-token-field
+            $table->string('remember_token', 100)->nullable();
             $table->boolean('verified')->default(0);
             $table->timestamps();
         });

@@ -34,8 +34,10 @@ class VerificationController extends Controller
      */
     public function __construct()
     {
+        // TODO don't use this controller, use my own!
         $this->middleware('auth');
-        $this->middleware('signed')->only('verify');
+        // https://laravel-news.com/signed-routes
+        //$this->middleware('signed')->only('verify');
         $this->middleware('throttle:6,1')->only('verify', 'resend');
     }
 }

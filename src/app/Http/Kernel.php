@@ -74,8 +74,11 @@ class Kernel extends HttpKernel
         // 'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         // 'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         // 'can' => \Illuminate\Auth\Middleware\Authorize::class,
+        // TODO maybe gues middleware should be changed to 403 or something if authenticated?
         // 'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-        // 'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
+
+        // https://laravel-news.com/signed-routes
+        //'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
 
         // SHIFT from Lumen
         'backend.auth' => App\Http\Middleware\BackendAuth::class,
@@ -93,12 +96,11 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middlewarePriority = [
-        // SHIFT? maybe I need this?
-        // \Illuminate\Session\Middleware\StartSession::class,
-        // \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        // \App\Http\Middleware\Authenticate::class,
-        // \Illuminate\Session\Middleware\AuthenticateSession::class,
-        // \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        // \Illuminate\Auth\Middleware\Authorize::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \App\Http\Middleware\Authenticate::class,
+        \Illuminate\Session\Middleware\AuthenticateSession::class,
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        \Illuminate\Auth\Middleware\Authorize::class,
     ];
 }

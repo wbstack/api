@@ -6,14 +6,17 @@ use Laravel\Lumen\Routing\Router;
 // GET
 $router->get('wiki/count', ['uses' => 'WikisController@count']);
 // POST
-$router->post('auth/login', ['uses' => 'AuthController@authenticate']);
-$router->post('user/register', ['uses' => 'UserController@create']);
+$router->post('auth/login', ['uses' => 'Auth\LoginController@login']);
+// TODO actually use logout route in VUE app..
+$router->post('auth/logout', ['uses' => 'Auth\LoginController@logout']);
+$router->post('user/register', ['uses' => 'Auth\RegisterController@register']);
+// TODO finish converting for laravel below here
 $router->post('user/verifyEmail', ['uses' => 'UserVerificationTokenController@verify']);
 $router->post('user/sendVerifyEmail', ['uses' => 'UserVerificationTokenController@createAndSendForUser']);
 $router->post('interest/register', ['uses' => 'InterestController@create']);
 
 // Authed
-$router->group(['middleware' => ['auth']], function () use ($router) {
+$router->group(['middleware' => ['auth:api']], function () use ($router) {
     // user
     $router->group(['prefix' => 'user'], function () use ($router) {
         $router->post('self', ['uses' => 'UserController@getSelf']);

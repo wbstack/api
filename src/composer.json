@@ -17,6 +17,7 @@
         "illuminate/redis": "5.8.*",
         "laravel/cashier": "^10.1",
         "laravel/framework": "5.8.*",
+        "laravel/passport": "^7.4",
         "predis/predis": "~1.0",
         "spatie/laravel-cors": "^1.5"
     },

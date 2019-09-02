@@ -36,15 +36,15 @@ return [
     */
 
     'guards' => [
+        // Web routes arent used? so can be removed? SHIFT!
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
         ],
 
         'api' => [
-            'driver' => 'token',
+            'driver' => 'passport',
             'provider' => 'users',
-            'hash' => false,
         ],
     ],
 

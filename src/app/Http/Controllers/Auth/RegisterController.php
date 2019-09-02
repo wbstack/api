@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\User;
 use App\Http\Controllers\Controller;
+use App\Jobs\UserCreateJob;
+use App\Jobs\InvitationDeleteJob;
+use App\Jobs\UesrVerificationTokenCreateAndSendJob;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -25,10 +29,11 @@ class RegisterController extends Controller
 
     /**
      * Where to redirect users after registration.
+     * TODO SHIFT this probably isnt needed for api
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    //protected $redirectTo = '/dashboard';
 
     /**
      * Create a new controller instance.
@@ -37,7 +42,8 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest');
+        // SHIFT this would normally redirect if already loggedin. Dont make sense for api
+        //$this->middleware('guest');
     }
 
     /**
@@ -48,11 +54,32 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+      $validation = [
+          //'name' => ['required', 'string', 'max:255'],
+          'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+          // TODO production set password length limit..
+          'password' => ['required', 'string', /*'min:8'*/],
+          // SHIFT we confirm this in JS.. do don't do it here?
+          //'password' => ['required', 'string', 'min:8', 'confirmed'],
+          'recaptcha' => 'required|captcha',
+      ];
+
+      // XXX: for phpunit dont validate captcha when requested....
+      // TODO this should be mocked in the test instead
+      if (getenv('PHPUNIT_RECAPTCHA_CHECK') == '0') {
+          unset($validation['recaptcha']);
+      }
+
+      // If this is the first user then do not require an invitation or captcha
+      if (User::count() === 0) {
+          $inviteRequired = false;
+          unset($validation['recaptcha']);
+      } else {
+          $inviteRequired = true;
+          $validation['invite'] = 'required|exists:invitations,code';
+      }
+
+        return Validator::make($data, $validation);
     }
 
     /**
@@ -63,10 +90,35 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+      // WORK
+      $user = ( new UserCreateJob(
+        $data['email'],
+        $data['password']
+      ))->handle();
+      ( new InvitationDeleteJob($data['invite']) )->handle();
+      ( new UesrVerificationTokenCreateAndSendJob($user) )->handle();
+
+      return $user;
+    }
+
+    protected function registered(Request $request, $user)
+    {
+      // HTTP Response
+      $res['success'] = true;
+      $res['message'] = 'Register Successful!';
+      $res['data'] = $this->convertUserForOutput($user);
+
+      return response($res);
+    }
+
+    // TODO why is this needed?
+    // TODO the model used by the frontend stuff should just not have the password...
+    protected function convertUserForOutput(User $user)
+    {
+        return [
+            'id' => $user->id,
+            'email' => $user->email,
+            'verified' => $user->verified,
+        ];
     }
 }
