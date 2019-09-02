@@ -1,19 +1,22 @@
 <?php
 
-namespace App\Tests;
+namespace Tests;
 
-abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+
+abstract class TestCase extends BaseTestCase
 {
-    /**
-     * Creates the application.
-     *
-     * @return \Laravel\Lumen\Application
-     */
+    // Override trait method..
+    // https://stackoverflow.com/questions/11939166/how-to-override-trait-function-and-call-it-from-the-overridden-function
+    use CreatesApplication {
+        createApplication as protected traitCreateApplication;
+    }
+
     public function createApplication()
     {
-        // Run all jobs sync...
-        putenv('QUEUE_CONNECTION=sync');
-
-        return require __DIR__.'/../bootstrap/app.php';
+      // Run all jobs sync...
+      putenv('QUEUE_CONNECTION=sync');
+      return $this->traitCreateApplication();
     }
+
 }
