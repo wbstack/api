@@ -184,6 +184,8 @@ return [
         Spatie\Cors\CorsServiceProvider::class,
         //Laravel\Cashier\CashierServiceProvider::class
 
+        MattAllan\LaravelCodeStyle\ServiceProvider::class,
+
     ],
 
     /*

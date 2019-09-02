@@ -23,6 +23,7 @@
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
+        "matt-allan/laravel-code-style": "^0.3.0",
         "mockery/mockery": "~1.0",
         "phpunit/phpunit": "~7.0"
     },
@@ -46,7 +47,9 @@
         ],
         "phpunit": [
             "phpunit"
-        ]
+        ],
+        "check-style": "php-cs-fixer fix --dry-run --diff",
+        "fix-style": "php-cs-fixer fix"
     },
     "config": {
         "preferred-install": "dist",

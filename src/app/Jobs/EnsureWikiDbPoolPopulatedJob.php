@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\WikiDb;
-use Illuminate\Support\Facades\DB;
 
 class EnsureWikiDbPoolPopulatedJob extends Job
 {

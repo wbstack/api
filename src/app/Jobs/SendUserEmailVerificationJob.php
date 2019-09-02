@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\User;
-use App\Mail\UserVerification;
 use Illuminate\Support\Facades\Mail;
 
 class SendUserEmailVerificationJob extends Job

@@ -3,8 +3,6 @@
 namespace Tests\Routes;
 
 use Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class EmptyTest extends TestCase
 {

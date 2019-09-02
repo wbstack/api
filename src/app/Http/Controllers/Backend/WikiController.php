@@ -3,10 +3,7 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Wiki;
-use App\WikiDb;
-use App\WikiManager;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
 class WikiController extends Controller

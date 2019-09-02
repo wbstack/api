@@ -3,14 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
-use Validator;
-use App\Invitation;
-use App\Jobs\UserCreateJob;
 use Illuminate\Http\Request;
-use App\UserVerificationToken;
-use App\Jobs\InvitationDeleteJob;
-use Illuminate\Support\Facades\Hash;
-use App\Jobs\UesrVerificationTokenCreateAndSendJob;
 use Illuminate\Routing\Controller as BaseController;
 
 class UserController extends BaseController

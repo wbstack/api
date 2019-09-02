@@ -6,7 +6,6 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 
 class LoginController extends Controller
@@ -14,13 +13,14 @@ class LoginController extends Controller
     use ThrottlesLogins;
 
     // Used by ThrottlesLogins
-    protected function username() {
-      return 'email';
+    protected function username()
+    {
+        return 'email';
     }
 
     public function login(Request $request)
     {
-      // Validation
+        // Validation
         $rules = [
           'email' => 'required|exists:users',
           'password'  => 'required',
@@ -30,6 +30,7 @@ class LoginController extends Controller
         // Throttle
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
+
             return $this->sendLockoutResponse($request);
         }
 
@@ -40,10 +41,10 @@ class LoginController extends Controller
           //'is_active' => true
       ];
         if (Auth::attempt($data)) {
-
             $this->clearLoginAttempts($request);
 
             $user = Auth::user();
+
             return response()->json([
               'user'  =>  $user, // <- we're sending the user info for frontend usage
               'token' =>  $user->createToken('yourAppName')->accessToken, // <- token is generated and sent back to the front end
@@ -53,6 +54,7 @@ class LoginController extends Controller
           ]);
         } else {
             $this->incrementLoginAttempts($request);
+
             return response()->json('Unauthorized', 401);
         }
     }

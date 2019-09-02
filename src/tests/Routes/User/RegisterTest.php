@@ -6,8 +6,8 @@ use App\User;
 use App\Invitation;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Routes\Traits\OptionsRequestAllowed;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class RegisterTest extends TestCase
 {
@@ -36,7 +36,7 @@ class RegisterTest extends TestCase
         $userToCreate = factory(User::class)->make();
 
         putenv('PHPUNIT_RECAPTCHA_CHECK=0');
-        $resp = $this->json( 'POST', $this->route, [
+        $resp = $this->json('POST', $this->route, [
           'email' => $userToCreate->email,
           'password' => 'anyPassword',
           'invite' => $invite->code,
@@ -54,7 +54,7 @@ class RegisterTest extends TestCase
     {
         $invite = factory(Invitation::class)->create();
         $user = factory(User::class)->create();
-        $this->json( 'POST', $this->route, [
+        $this->json('POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
           'invite' => $invite->code,
@@ -67,7 +67,7 @@ class RegisterTest extends TestCase
     {
         $this->markTestSkipped('Fixme');
         $user = factory(User::class)->make();
-        $this->json( 'POST', $this->route, [
+        $this->json('POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
         ])
@@ -80,7 +80,7 @@ class RegisterTest extends TestCase
         putenv('PHPUNIT_RECAPTCHA_CHECK=1');
         $invite = factory(Invitation::class)->create();
         $user = factory(User::class)->make();
-        $this->json( 'POST', $this->route, [
+        $this->json('POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
           'invite' => $invite->code,
@@ -92,7 +92,7 @@ class RegisterTest extends TestCase
     public function testCreate_NoEmailOrPassword()
     {
         $user = factory(User::class)->create();
-        $this->json( 'POST', $this->route, [])
+        $this->json('POST', $this->route, [])
         ->assertStatus(422)
         ->assertJsonStructure(['errors' => ['email', 'password']]);
     }
@@ -100,7 +100,7 @@ class RegisterTest extends TestCase
     public function testCreate_BadInvitation()
     {
         $user = factory(User::class)->create();
-        $this->json( 'POST', $this->route, [
+        $this->json('POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
           'bad' => 'someInvite',
@@ -112,7 +112,7 @@ class RegisterTest extends TestCase
     public function testCreate_BadEmail()
     {
         $invite = factory(Invitation::class)->create();
-        $this->json( 'POST', $this->route, [
+        $this->json('POST', $this->route, [
           'email' => 'notAnEmail',
           'password' => 'anyPassword',
           'invite' => $invite->code,

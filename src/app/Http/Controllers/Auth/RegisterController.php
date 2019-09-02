@@ -7,15 +7,13 @@ use App\Jobs\UserCreateJob;
 use Illuminate\Http\Request;
 use App\Jobs\InvitationDeleteJob;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Validator;
 use App\Jobs\UesrVerificationTokenCreateAndSendJob;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
-
     /**
      * Handle a registration request for the application.
      *
@@ -31,8 +29,8 @@ class RegisterController extends Controller
         $request->input('email'),
         $request->input('password')
       ))->handle();
-        if($request->input('invite')) {
-          ( new InvitationDeleteJob($request->input('invite')) )->handle();
+        if ($request->input('invite')) {
+            ( new InvitationDeleteJob($request->input('invite')) )->handle();
         }
         ( new UesrVerificationTokenCreateAndSendJob($user) )->handle();
 

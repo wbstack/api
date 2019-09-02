@@ -20,6 +20,13 @@
       0 => 'Laravel\\Passport\\PassportServiceProvider',
     ),
   ),
+  'matt-allan/laravel-code-style' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'MattAllan\\LaravelCodeStyle\\ServiceProvider',
+    ),
+  ),
   'nesbot/carbon' => 
   array (
     'providers' => 

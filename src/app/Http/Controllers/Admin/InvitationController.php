@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Invitation;
 use Illuminate\Http\Request;
 use App\Jobs\InvitationCreateJob;
 use App\Jobs\InvitationDeleteJob;

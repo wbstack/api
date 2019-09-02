@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\UserVerificationToken;
-use App\Jobs\SendUserEmailVerificationJob;
 
 class UesrVerificationTokenCreateAndSendJob extends Job
 {

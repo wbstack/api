@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Wiki;
 use App\WikiManager;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class WikiManagersController extends Controller
 {
