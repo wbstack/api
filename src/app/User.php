@@ -35,6 +35,14 @@ class User extends Authenticatable
         //'remember_token',
     ];
 
+    // TODO this should be done with roles or something in the DB....
+    public function isAdmin() {
+      return $this->email == 'adamshorland@gmail.com';
+    }
+    public function managesWikis() {
+      return $this->belongsToMany(Wiki::class, 'wiki_managers');
+    }
+
 // SHIFT this was not added in the migration
     // /**
     //  * The attributes that should be cast to native types.
