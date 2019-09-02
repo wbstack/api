@@ -15,6 +15,7 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
     return [
         'email' => $faker->email,
         'password' => password_hash(substr($faker->unique->text, 0, 10), PASSWORD_DEFAULT),
+        'verified' => false,
     ];
 });
 
