@@ -12,7 +12,7 @@ class InvitationController extends Controller
 {
     public function create(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'code' => 'required|unique:invitations',
         ]);
 
@@ -27,7 +27,7 @@ class InvitationController extends Controller
 
     public function delete(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
           //TODO do we want to validate that this exists?
             'code' => 'required',
         ]);

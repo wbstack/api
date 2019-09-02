@@ -33,6 +33,7 @@
     29 => 'App\\Providers\\EventServiceProvider',
     30 => 'App\\Providers\\RouteServiceProvider',
     31 => 'AlbertCht\\InvisibleReCaptcha\\InvisibleReCaptchaServiceProvider',
+    32 => 'Spatie\\Cors\\CorsServiceProvider',
   ),
   'eager' => 
   array (
@@ -56,6 +57,7 @@
     17 => 'App\\Providers\\EventServiceProvider',
     18 => 'App\\Providers\\RouteServiceProvider',
     19 => 'AlbertCht\\InvisibleReCaptcha\\InvisibleReCaptchaServiceProvider',
+    20 => 'Spatie\\Cors\\CorsServiceProvider',
   ),
   'deferred' => 
   array (

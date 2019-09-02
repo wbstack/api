@@ -8,7 +8,7 @@ use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Firebase\JWT\ExpiredException;
 use Illuminate\Support\Facades\Hash;
-use Laravel\Lumen\Routing\Controller as BaseController;
+use Illuminate\Routing\Controller as BaseController;
 
 class AuthController extends BaseController
 {
@@ -58,7 +58,7 @@ class AuthController extends BaseController
      */
     public function authenticate(User $user)
     {
-        $this->validate($this->request, [
+        $this->request->validate([
             'email'     => 'required|email',
             'password'  => 'required',
         ]);

@@ -14,7 +14,7 @@ class WikiController extends Controller
     {
         $user = $request->user();
 
-        $this->validate($request, [
+        $request->validate([
             'domain' => 'required|unique:wikis|regex:/^.+\.wiki\.opencura\.com$/',
             'sitename' => 'required',
         ]);

@@ -11,7 +11,7 @@ use App\UserVerificationToken;
 use App\Jobs\InvitationDeleteJob;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\UesrVerificationTokenCreateAndSendJob;
-use Laravel\Lumen\Routing\Controller as BaseController;
+use Illuminate\Routing\Controller as BaseController;
 
 class UserController extends BaseController
 {
@@ -58,7 +58,7 @@ class UserController extends BaseController
             $validation['invite'] = 'required|exists:invitations,code';
         }
 
-        $this->validate($request, $validation);
+        $request->validate($validation);
 
         // WORK
         $user = ( new UserCreateJob(

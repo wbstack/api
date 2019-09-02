@@ -11,7 +11,7 @@ class UserVerificationTokenController extends Controller
 {
     public function verify(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'token' => 'required|exists:user_verification_tokens,token',
         ]);
 
