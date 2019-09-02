@@ -53,23 +53,18 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes()
     {
-        // SHIFT wanted to add below, but that means i need to alter the routes files
-        // TODO fix at some point?
         // Route::prefix('api')
-        //      ->middleware('api')
-        //      ->namespace($this->namespace)
-        //      ->group(base_path('routes/api.php'));
-        Route::group(base_path('routes/api.php'));
+        // throttle, 45 requests in 1 min
+        Route::middleware(['cors', 'throttle:45,1'])
+             ->namespace($this->namespace)
+             ->group(base_path('routes/api.php'));
     }
 
     protected function mapBackendRoutes()
     {
-        // SHIFT wanted to add below, but that means i need to alter the routes files
-        // TODO fix at some point?
-        // Route::prefix('api')
-        //      ->middleware('api')
-        //      ->namespace($this->namespace)
-        //      ->group(base_path('routes/backend.php'));
-        Route::group(base_path('routes/backend.php'));
+        Route::prefix('backend')
+             ->middleware('backend.auth')
+             ->namespace($this->namespace . '\Backend')
+             ->group(base_path('routes/backend.php'));
     }
 }
