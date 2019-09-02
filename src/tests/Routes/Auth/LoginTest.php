@@ -1,18 +1,16 @@
 <?php
 
-namespace App\Tests\Routes\Auth;
+namespace Tests\Routes\Auth;
 
 use App\User;
-use App\Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseTransactions;
-use App\Tests\Routes\Traits\OptionsRequestAllowed;
-use App\Tests\Routes\Traits\CrossSiteHeadersOnOptions;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\Routes\Traits\OptionsRequestAllowed;
 
 class LoginTest extends TestCase
 {
     protected $route = 'auth/login';
 
-    use CrossSiteHeadersOnOptions;
     use OptionsRequestAllowed;
     use DatabaseTransactions;
 
@@ -20,24 +18,24 @@ class LoginTest extends TestCase
     {
         // This random user probably doesn't exist in the db
         $user = factory(User::class)->make();
-        $this->post($this->route, ['email' => $user->email, 'password' => 'anyPassword'])
-        ->seeStatusCode(400);
+        $this->json( 'POST', $this->route, ['email' => $user->email, 'password' => 'anyPassword'])
+        ->assertStatus(422);
     }
 
     public function testLoginFail_badPassword()
     {
         $user = factory(User::class)->create();
-        $this->post($this->route, ['email' => $user->email, 'password' => 'someOtherPassword'])
-        ->seeStatusCode(400);
+        $this->json( 'POST', $this->route, ['email' => $user->email, 'password' => 'someOtherPassword'])
+        ->assertStatus(401);
     }
 
     public function testLoginSuccess()
     {
         $password = 'apassword';
         $user = factory(User::class)->create(['password' => password_hash($password, PASSWORD_DEFAULT)]);
-        $this->post($this->route, ['email' => $user->email, 'password' => $password])
-        ->seeStatusCode(200)
-        ->seeJsonStructure(['email', 'isAdmin', 'token'])
-        ->seeJsonContains(['email' => $user->email, 'isAdmin' => false]);
+        $this->json( 'POST', $this->route, ['email' => $user->email, 'password' => $password])
+        ->assertStatus(200)
+        ->assertJsonStructure(['email', 'isAdmin', 'token'])
+        ->assertJsonFragment(['email' => $user->email, 'isAdmin' => false]);
     }
 }

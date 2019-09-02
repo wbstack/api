@@ -1,24 +1,24 @@
 <?php
 
-namespace App\Tests\Routes;
+namespace Tests\Routes;
 
-use App\Tests\TestCase;
+use Tests\TestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Laravel\Lumen\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class EmptyTest extends TestCase
 {
-    public function testRootGetNotAllowed()
+    public function testRootGetNotFound()
     {
-        $this->get('/');
+        $response = $this->get('/');
         // Method not allowed
-        $this->assertEquals(405, $this->response->status());
+        $this->assertEquals(404, $response->status());
     }
 
-    public function testRootPostNotAllowed()
+    public function testRootPostNotFound()
     {
-        $this->post('/');
+        $response = $this->post('/');
         // Method not allowed
-        $this->assertEquals(405, $this->response->status());
+        $this->assertEquals(404, $response->status());
     }
 }

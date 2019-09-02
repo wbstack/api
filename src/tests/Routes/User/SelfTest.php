@@ -1,18 +1,16 @@
 <?php
 
-namespace App\Tests\Routes\User;
+namespace Tests\Routes\User;
 
 use App\User;
-use App\Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseTransactions;
-use App\Tests\Routes\Traits\OptionsRequestAllowed;
-use App\Tests\Routes\Traits\CrossSiteHeadersOnOptions;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\Routes\Traits\OptionsRequestAllowed;
 
 class SelfTest extends TestCase
 {
     protected $route = 'user/self';
 
-    use CrossSiteHeadersOnOptions;
     use OptionsRequestAllowed;
     use DatabaseTransactions;
 
@@ -23,6 +21,6 @@ class SelfTest extends TestCase
         $user = factory(User::class)->create();
         $this->actingAs($user)
           ->get($this->route)
-          ->seeStatusCode(200);
+          ->assertStatus(200);
     }
 }

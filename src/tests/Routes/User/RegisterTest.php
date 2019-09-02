@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Tests\Routes\User;
+namespace Tests\Routes\User;
 
 use App\User;
 use App\Invitation;
-use App\Tests\TestCase;
+use Tests\TestCase;
 use Illuminate\Support\Facades\Mail;
-use Laravel\Lumen\Testing\DatabaseTransactions;
-use App\Tests\Routes\Traits\OptionsRequestAllowed;
-use App\Tests\Routes\Traits\CrossSiteHeadersOnOptions;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\Routes\Traits\OptionsRequestAllowed;
 
 class RegisterTest extends TestCase
 {
     protected $route = 'user/register';
 
-    use CrossSiteHeadersOnOptions;
     use OptionsRequestAllowed;
     use DatabaseTransactions;
 
@@ -38,42 +36,43 @@ class RegisterTest extends TestCase
         $userToCreate = factory(User::class)->make();
 
         putenv('PHPUNIT_RECAPTCHA_CHECK=0');
-        $resp = $this->post($this->route, [
+        $resp = $this->json( 'POST', $this->route, [
           'email' => $userToCreate->email,
           'password' => 'anyPassword',
           'invite' => $invite->code,
         ]);
         putenv('PHPUNIT_RECAPTCHA_CHECK=1');
 
-        $resp->seeStatusCode(200)
-        ->seeJsonStructure(['data' => ['email', 'id'], 'message', 'success'])
-        ->seeJsonContains(['email' => $userToCreate->email, 'success' => true])
-        ->missingFromDatabase('invitations', ['code' => $invite->code]);
+        $resp->assertStatus(200)
+        ->assertJsonStructure(['data' => ['email', 'id'], 'message', 'success'])
+        ->assertJsonFragment(['email' => $userToCreate->email, 'success' => true]);
+        // SHIFT doesnt have missingFromDatabase
+        //->missingFromDatabase('invitations', ['code' => $invite->code]);
     }
 
     public function testCreate_EmailAlreadyTaken()
     {
         $invite = factory(Invitation::class)->create();
         $user = factory(User::class)->create();
-        $this->post($this->route, [
+        $this->json( 'POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
           'invite' => $invite->code,
         ])
-        ->seeStatusCode(422)
-        ->seeJsonStructure(['email']);
+        ->assertStatus(422)
+        ->assertJsonStructure(['errors' => ['email']]);
     }
 
     public function testCreate_NoInvitation()
     {
         $this->markTestSkipped('Fixme');
         $user = factory(User::class)->make();
-        $this->post($this->route, [
+        $this->json( 'POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
         ])
-        ->seeStatusCode(422)
-        ->seeJsonStructure(['invite']);
+        ->assertStatus(422)
+        ->assertJsonStructure(['errors' => ['invite']]);
     }
 
     public function testCreate_NoToken()
@@ -81,44 +80,44 @@ class RegisterTest extends TestCase
         putenv('PHPUNIT_RECAPTCHA_CHECK=1');
         $invite = factory(Invitation::class)->create();
         $user = factory(User::class)->make();
-        $this->post($this->route, [
+        $this->json( 'POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
           'invite' => $invite->code,
         ])
-        ->seeStatusCode(422)
-        ->seeJsonStructure(['recaptcha']);
+        ->assertStatus(422)
+        ->assertJsonStructure(['errors' => ['recaptcha']]);
     }
 
     public function testCreate_NoEmailOrPassword()
     {
         $user = factory(User::class)->create();
-        $this->post($this->route, [])
-        ->seeStatusCode(422)
-        ->seeJsonStructure(['email', 'password']);
+        $this->json( 'POST', $this->route, [])
+        ->assertStatus(422)
+        ->assertJsonStructure(['errors' => ['email', 'password']]);
     }
 
     public function testCreate_BadInvitation()
     {
         $user = factory(User::class)->create();
-        $this->post($this->route, [
+        $this->json( 'POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
           'bad' => 'someInvite',
         ])
-        ->seeStatusCode(422)
-        ->seeJsonStructure(['invite']);
+        ->assertStatus(422)
+        ->assertJsonStructure(['errors' => ['invite']]);
     }
 
     public function testCreate_BadEmail()
     {
         $invite = factory(Invitation::class)->create();
-        $this->post($this->route, [
+        $this->json( 'POST', $this->route, [
           'email' => 'notAnEmail',
           'password' => 'anyPassword',
           'invite' => $invite->code,
         ])
-        ->seeStatusCode(422)
-        ->seeJsonStructure(['email']);
+        ->assertStatus(422)
+        ->assertJsonStructure(['errors' => ['email']]);
     }
 }

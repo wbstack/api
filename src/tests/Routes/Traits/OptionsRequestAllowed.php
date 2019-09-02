@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Tests\Routes\Traits;
+namespace Tests\Routes\Traits;
 
 trait OptionsRequestAllowed
 {
     public function testOptionsRequestResponds200()
     {
-        $this->call('OPTIONS', $this->route);
-        $this->assertEquals(200, $this->response->status());
+        $response = $this->json('OPTIONS', $this->route);
+        $this->assertEquals(200, $response->status());
     }
 }

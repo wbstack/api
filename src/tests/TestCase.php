@@ -3,20 +3,20 @@
 namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Contracts\Console\Kernel;
 
 abstract class TestCase extends BaseTestCase
 {
-    // Override trait method..
-    // https://stackoverflow.com/questions/11939166/how-to-override-trait-function-and-call-it-from-the-overridden-function
-    use CreatesApplication {
-        createApplication as protected traitCreateApplication;
-    }
-
+    /**
+    * Creates the application.
+    *
+    * @return \Illuminate\Foundation\Application
+    */
     public function createApplication()
     {
-        // Run all jobs sync...
-        putenv('QUEUE_CONNECTION=sync');
-
-        return $this->traitCreateApplication();
+      putenv('QUEUE_CONNECTION=sync');
+      $app = require __DIR__.'/../bootstrap/app.php';
+      $app->make(Kernel::class)->bootstrap();
+      return $app;
     }
 }

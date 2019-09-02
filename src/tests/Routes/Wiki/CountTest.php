@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Tests\Routes\Wiki\Managers;
+namespace Tests\Routes\Wiki\Managers;
 
 use App\Wiki;
-use App\Tests\TestCase;
-use Laravel\Lumen\Testing\DatabaseTransactions;
-use App\Tests\Routes\Traits\OptionsRequestAllowed;
-use App\Tests\Routes\Traits\CrossSiteHeadersOnOptions;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\Routes\Traits\OptionsRequestAllowed;
 
 /**
  * @covers WikiController::count
@@ -15,7 +14,6 @@ class CountTest extends TestCase
 {
     protected $route = 'wiki/count';
 
-    use CrossSiteHeadersOnOptions;
     use OptionsRequestAllowed;
     use DatabaseTransactions;
 
@@ -29,11 +27,11 @@ class CountTest extends TestCase
 
     public function testWikiCountNone()
     {
-        $this->get('/wiki/count')->seeJsonEquals([
+        $this->json('GET', '/wiki/count')->assertJson([
           'data' => 0,
           'success' => true,
         ])
-        ->seeStatusCode(200);
+        ->assertStatus(200);
     }
 
     public function testWikiCountOne()
@@ -41,21 +39,21 @@ class CountTest extends TestCase
         // TODO should wikis be counted if they have no db?
         // TODO what actually is the use of this whole count??
         factory(Wiki::class, 'nodb')->create();
-        $this->get($this->route)->seeJsonEquals([
+        $this->json('GET', $this->route)->assertJson([
           'data' => 1,
           'success' => true,
         ])
-        ->seeStatusCode(200);
+        ->assertStatus(200);
     }
 
     public function testWikiCountTwo()
     {
         factory(Wiki::class, 'nodb')->create();
         factory(Wiki::class, 'nodb')->create();
-        $this->get($this->route)->seeJsonEquals([
+        $this->json('GET', $this->route)->assertJson([
           'data' => 2,
           'success' => true,
         ])
-        ->seeStatusCode(200);
+        ->assertStatus(200);
     }
 }
