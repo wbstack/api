@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\DB;
 
 class WikiController extends Controller
 {
-
-    public function create( Request $request ){
+    public function create(Request $request)
+    {
         $user = $request->user();
 
         $this->validate($request, [
@@ -22,10 +22,10 @@ class WikiController extends Controller
         $wiki = null;
         $dbAssignment = null;
         // TODO create with some sort of owner etc?
-        DB::transaction( function() use ( $user, $request, &$wiki, &$dbAssignment ) {
-            $readyDbs = WikiDb::where( 'wiki_id', null )->count();
-            if($readyDbs == 0) {
-              abort(503, 'No databases ready');
+        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment) {
+            $readyDbs = WikiDb::where('wiki_id', null)->count();
+            if ($readyDbs == 0) {
+                abort(503, 'No databases ready');
             }
 
             $wiki = Wiki::create([
@@ -34,15 +34,15 @@ class WikiController extends Controller
             ]);
 
             $dbAssignment = DB::table('wiki_dbs')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
-            if(!$dbAssignment) {
-              abort(503, 'Database ready, but failed to assign');
+            if (! $dbAssignment) {
+                abort(503, 'Database ready, but failed to assign');
             }
 
             $ownerAssignment = WikiManager::create([
               'user_id' => $user->id,
               'wiki_id' => $wiki->id,
             ]);
-        } );
+        });
 
         $res['success'] = true;
         $res['message'] = 'Success!';
@@ -50,34 +50,35 @@ class WikiController extends Controller
             'id' => $wiki->id,
             'name' => $wiki->name,
         ];
+
         return response($res);
     }
 
     // TODO should this just be get wiki?
-    public function getWikiDetailsForIdForOwner( Request $request ) {
-      $user = $request->user();
+    public function getWikiDetailsForIdForOwner(Request $request)
+    {
+        $user = $request->user();
 
-      $wikiId = $request->input('wiki');
+        $wikiId = $request->input('wiki');
 
-      // TODO general check to make sure current user can manage the wiki
-      // this should probably be middle ware?
-      // TODO only do 1 query where instead of 2?
-      $test = WikiManager::where('user_id', $user->id)
+        // TODO general check to make sure current user can manage the wiki
+        // this should probably be middle ware?
+        // TODO only do 1 query where instead of 2?
+        $test = WikiManager::where('user_id', $user->id)
       ->where('wiki_id', $wikiId)
       ->first();
-      if(!$test) {
-        abort(403);
-      }
+        if (! $test) {
+            abort(403);
+        }
 
-      $wiki = Wiki::where('id', $wikiId)
+        $wiki = Wiki::where('id', $wikiId)
       ->with('wikiManagers')
       ->with('wikiDbVersion')
       ->first();
 
-      $res['success'] = true;
-      $res['data'] = $wiki;
-      return response($res);
+        $res['success'] = true;
+        $res['data'] = $wiki;
 
+        return response($res);
     }
-
 }

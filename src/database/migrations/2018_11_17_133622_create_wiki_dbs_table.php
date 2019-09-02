@@ -26,7 +26,7 @@ class CreateWikidbsTable extends Migration
 
             $table->string('version', 20);
             // Index needed so that we can easily query what needs to be updated
-            $table->index( 'version');
+            $table->index('version');
 
             $table->integer('wiki_id')->nullable()->unsigned()->unique();
 

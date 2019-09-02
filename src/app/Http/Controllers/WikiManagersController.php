@@ -9,28 +9,28 @@ use Illuminate\Support\Facades\DB;
 
 class WikiManagersController extends Controller
 {
+    public function getManagersOfWiki(Request $request)
+    {
+        $user = $request->user();
 
-    public function getManagersOfWiki( Request $request ){
-      $user = $request->user();
+        $wikiId = $request->input('wiki');
 
-      $wikiId = $request->input('wiki');
-
-      // TODO require user to be manager of the current wiki
-      $test = WikiManager::where('user_id', $user->id)
+        // TODO require user to be manager of the current wiki
+        $test = WikiManager::where('user_id', $user->id)
       ->where('wiki_id', $wikiId)
       ->first();
-      if(!$test) {
-        abort(403);
-      }
+        if (! $test) {
+            abort(403);
+        }
 
-      $result = WikiManager::where('wiki_id', $wikiId)
+        $result = WikiManager::where('wiki_id', $wikiId)
       ->leftJoin('users', 'user_id', '=', 'users.id')
       ->select('users.*')
       ->get();
 
-      $res['success'] = true;
-      $res['data'] = $result;
-      return response($res);
-    }
+        $res['success'] = true;
+        $res['data'] = $result;
 
+        return response($res);
+    }
 }

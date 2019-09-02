@@ -5,19 +5,17 @@ namespace App\Tests\Routes\User;
 use App\User;
 use App\Invitation;
 use App\Tests\TestCase;
-use App\Tests\Routes\Traits\CrossSiteHeadersOnOptions;
-use App\Tests\Routes\Traits\OptionsRequestAllowed;
-use Laravel\Lumen\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
+use Laravel\Lumen\Testing\DatabaseTransactions;
+use App\Tests\Routes\Traits\OptionsRequestAllowed;
+use App\Tests\Routes\Traits\CrossSiteHeadersOnOptions;
 
-
-class RegisterTest extends TestCase {
-
+class RegisterTest extends TestCase
+{
     protected $route = 'user/register';
 
     use CrossSiteHeadersOnOptions;
     use OptionsRequestAllowed;
-
     use DatabaseTransactions;
 
     // TODO test password length when not deving
@@ -48,9 +46,9 @@ class RegisterTest extends TestCase {
         putenv('PHPUNIT_RECAPTCHA_CHECK=1');
 
         $resp->seeStatusCode(200)
-        ->seeJsonStructure(['data' => [ 'email', 'id' ],'message','success'])
+        ->seeJsonStructure(['data' => ['email', 'id'], 'message', 'success'])
         ->seeJsonContains(['email' => $userToCreate->email, 'success' => true])
-        ->missingFromDatabase('invitations',['code' => $invite->code]);
+        ->missingFromDatabase('invitations', ['code' => $invite->code]);
     }
 
     public function testCreate_EmailAlreadyTaken()
@@ -68,7 +66,7 @@ class RegisterTest extends TestCase {
 
     public function testCreate_NoInvitation()
     {
-      $this->markTestSkipped('Fixme');
+        $this->markTestSkipped('Fixme');
         $user = factory(User::class)->make();
         $this->post($this->route, [
           'email' => $user->email,
@@ -80,8 +78,8 @@ class RegisterTest extends TestCase {
 
     public function testCreate_NoToken()
     {
-      putenv('PHPUNIT_RECAPTCHA_CHECK=1');
-      $invite = factory(Invitation::class)->create();
+        putenv('PHPUNIT_RECAPTCHA_CHECK=1');
+        $invite = factory(Invitation::class)->create();
         $user = factory(User::class)->make();
         $this->post($this->route, [
           'email' => $user->email,
@@ -123,5 +121,4 @@ class RegisterTest extends TestCase {
         ->seeStatusCode(422)
         ->seeJsonStructure(['email']);
     }
-
 }

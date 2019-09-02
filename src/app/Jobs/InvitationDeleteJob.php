@@ -9,7 +9,7 @@ class InvitationDeleteJob extends Job
     /**
      * @return void
      */
-    public function __construct( $code )
+    public function __construct($code)
     {
         $this->code = strtolower($code);
     }
@@ -19,10 +19,10 @@ class InvitationDeleteJob extends Job
      */
     public function handle()
     {
-      $invite = Invitation::where('code', $this->code)->first();
-      if( $invite ) {
-        $invite->delete();
-      }
-      // TODO optionally fail if the code isn't there?
+        $invite = Invitation::where('code', $this->code)->first();
+        if ($invite) {
+            $invite->delete();
+        }
+        // TODO optionally fail if the code isn't there?
     }
 }

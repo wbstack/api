@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Wiki extends Model
 {
-
     /**
      * The attributes that are mass assignable.
      *
@@ -17,18 +16,20 @@ class Wiki extends Model
         'domain',
     ];
 
-    public function wikiDbVersion() {
-        return $this->hasOne( WikiDb::class )->select(array('id', 'wiki_id','version'));
+    public function wikiDbVersion()
+    {
+        return $this->hasOne(WikiDb::class)->select(['id', 'wiki_id', 'version']);
     }
 
-// TODO this should just be on the backend model? =]
-// OR some sort of access controll needs to be done..
-    public function wikiDb() {
-        return $this->hasOne( WikiDb::class );
+    // TODO this should just be on the backend model? =]
+    // OR some sort of access controll needs to be done..
+    public function wikiDb()
+    {
+        return $this->hasOne(WikiDb::class);
     }
 
-    public function wikiManagers() {
-      return $this->belongsToMany(User::class, 'wiki_managers');
+    public function wikiManagers()
+    {
+        return $this->belongsToMany(User::class, 'wiki_managers');
     }
-
 }

@@ -6,9 +6,8 @@ use Laravel\Lumen\Routing\Controller as BaseController;
 
 class Controller extends BaseController
 {
-
-    function hello() {
+    public function hello()
+    {
         return 'Hello World';
     }
-
 }

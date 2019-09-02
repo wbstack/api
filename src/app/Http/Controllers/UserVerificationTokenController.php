@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use Illuminate\Http\Request;
 use App\UserVerificationToken;
 use App\Jobs\UesrVerificationTokenCreateAndSendJob;
-use Illuminate\Http\Request;
 
 class UserVerificationTokenController extends Controller
 {
-
-    public function verify( Request $request ){
+    public function verify(Request $request)
+    {
         $this->validate($request, [
             'token' => 'required|exists:user_verification_tokens,token',
         ]);
@@ -18,9 +18,9 @@ class UserVerificationTokenController extends Controller
         $token = UserVerificationToken::where('token', $request->input('token'))->firstOrFail();
         $user = User::where('id', $token->user_id)->firstOrFail();
 
-        if($user->verified){
-          // User already verified
-          abort(403);
+        if ($user->verified) {
+            // User already verified
+            abort(403);
         }
 
         $user->verified = true;
@@ -29,19 +29,20 @@ class UserVerificationTokenController extends Controller
 
         $res['success'] = true;
         $res['message'] = 'Verified!';
+
         return response($res);
     }
 
-    public function createAndSendForUser( Request $request ) {
-      $user = $request->user();
+    public function createAndSendForUser(Request $request)
+    {
+        $user = $request->user();
 
-      if($user->verified){
-        // User already verified
-        abort(403);
-      }
+        if ($user->verified) {
+            // User already verified
+            abort(403);
+        }
 
-      // TODO why is this handle? Why not queue?
-      ( new UesrVerificationTokenCreateAndSendJob( $user ) )->handle();
+        // TODO why is this handle? Why not queue?
+        ( new UesrVerificationTokenCreateAndSendJob($user) )->handle();
     }
-
 }

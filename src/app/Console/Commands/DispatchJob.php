@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 
 /**
- * From https://stackoverflow.com/questions/43357472/how-to-manually-run-a-laravel-lumen-job-using-command-line
+ * From https://stackoverflow.com/questions/43357472/how-to-manually-run-a-laravel-lumen-job-using-command-line.
  */
 class DispatchJob extends Command
 {
@@ -43,14 +43,14 @@ class DispatchJob extends Command
         $prefix = '\\App\Jobs\\';
 
         $jobClassName = trim($this->argument('job'));
-        if(stripos($jobClassName,"/")){
-            $jobClassName = str_replace('/','\\',$jobClassName);
+        if (stripos($jobClassName, '/')) {
+            $jobClassName = str_replace('/', '\\', $jobClassName);
         }
-        $class = '\\App\\Jobs\\' . $jobClassName;
+        $class = '\\App\\Jobs\\'.$jobClassName;
 
-        if(!class_exists($class)){
+        if (! class_exists($class)) {
             $this->error("{$class} class Not exists");
-        }else {
+        } else {
             if ($this->argument('parameter')) {
                 $job = new $class($this->argument('parameter'));
             } else {
@@ -60,6 +60,5 @@ class DispatchJob extends Command
             dispatch($job);
             $this->info("Successfully Dispatch {$class} ");
         }
-
     }
 }

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class WikiManager extends Model
 {
-
     /**
      * The attributes that are mass assignable.
      *
@@ -18,11 +17,13 @@ class WikiManager extends Model
     ];
 
     // TODO remove these relationships if they are not used...
-    public function wiki() {
-        return $this->belongsTo( Wiki::class );
-    }
-    public function user() {
-        return $this->belongsTo( User::class );
+    public function wiki()
+    {
+        return $this->belongsTo(Wiki::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

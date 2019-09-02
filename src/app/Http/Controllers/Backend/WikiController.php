@@ -5,26 +5,26 @@ namespace App\Http\Controllers\Backend;
 use App\Wiki;
 use App\WikiDb;
 use App\WikiManager;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
 class WikiController extends Controller
 {
+    public function getWikiForDomain(Request $request)
+    {
+        $domain = $request->input('domain');
 
-      public function getWikiForDomain( Request $request ){
-          $domain = $request->input('domain');
-
-          if($domain === 'localhost') {
+        if ($domain === 'localhost') {
             // TODO if not in debug mode dont allow this code path to run
             $result = Wiki::with(['wikiDb'])->first();
-          } else {
+        } else {
             $result = Wiki::where('domain', $domain)->with(['wikiDb'])->first();
-          }
+        }
 
-          $res['success'] = true;
-          $res['data'] = $result;
-          return response($res);
-      }
+        $res['success'] = true;
+        $res['data'] = $result;
 
+        return response($res);
+    }
 }

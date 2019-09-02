@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Validator;
 use App\User;
+use Validator;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Firebase\JWT\ExpiredException;
@@ -18,49 +18,54 @@ class AuthController extends BaseController
      * @var \Illuminate\Http\Request
      */
     private $request;
+
     /**
      * Create a new controller instance.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return void
      */
-    public function __construct(Request $request) {
+    public function __construct(Request $request)
+    {
         $this->request = $request;
     }
+
     /**
      * Create a new token.
      *
      * @param  \App\User   $user
      * @return string
      */
-    protected function jwt(User $user) {
+    protected function jwt(User $user)
+    {
         $payload = [
-            'iss' => "lumen-jwt", // Issuer of the token
+            'iss' => 'lumen-jwt', // Issuer of the token
             'sub' => $user->id, // Subject of the token
             'iat' => time(), // Time when JWT was issued.
-            'exp' => time() + 60*60 // Expiration time
+            'exp' => time() + 60 * 60, // Expiration time
         ];
 
         // As you can see we are passing `JWT_SECRET` as the second parameter that will
         // be used to decode the token in the future.
         return JWT::encode($payload, env('JWT_SECRET'));
     }
+
     /**
      * Authenticate a user and return the token if the provided credentials are correct.
      *
      * @param  \App\User   $user
      * @return mixed
      */
-    public function authenticate(User $user) {
+    public function authenticate(User $user)
+    {
         $this->validate($this->request, [
             'email'     => 'required|email',
-            'password'  => 'required'
+            'password'  => 'required',
         ]);
         // Find the user by email
         $user = User::where('email', $this->request->input('email'))->first();
-        if (!$user) {
+        if (! $user) {
             return $this->abort();
-
         }
         // Verify the password and generate the token
         if (Hash::check($this->request->input('password'), $user->password)) {
@@ -73,9 +78,9 @@ class AuthController extends BaseController
         $this->abort();
     }
 
-    private function abort() {
+    private function abort()
+    {
         // Standard way to abort so as not to give away any details
         abort(400, 'Failed to authenticate.');
     }
-
 }

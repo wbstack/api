@@ -1,4 +1,5 @@
 <?php
+
 return [
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),

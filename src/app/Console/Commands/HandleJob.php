@@ -40,21 +40,21 @@ class HandleJob extends Command
         $prefix = '\\App\Jobs\\';
 
         $jobClassName = trim($this->argument('job'));
-        if(stripos($jobClassName,"/")){
-            $jobClassName = str_replace('/','\\',$jobClassName);
+        if (stripos($jobClassName, '/')) {
+            $jobClassName = str_replace('/', '\\', $jobClassName);
         }
-        $class = '\\App\\Jobs\\' . $jobClassName;
+        $class = '\\App\\Jobs\\'.$jobClassName;
 
-        if(!class_exists($class)){
+        if (! class_exists($class)) {
             $this->error("{$class} class Not exists");
-        }else {
+        } else {
             if ($this->argument('parameter')) {
-              if($this->argument('parameterSeperator')) {
-                $params = explode( $this->argument('parameterSeperator'), $this->argument('parameter') );
-                $job = new $class(...$params);
-              } else {
-                $job = new $class($this->argument('parameter'));
-              }
+                if ($this->argument('parameterSeperator')) {
+                    $params = explode($this->argument('parameterSeperator'), $this->argument('parameter'));
+                    $job = new $class(...$params);
+                } else {
+                    $job = new $class($this->argument('parameter'));
+                }
             } else {
                 $job = new $class();
             }
@@ -62,6 +62,5 @@ class HandleJob extends Command
             $job->handle();
             $this->info("Successfully Handeled {$class} ");
         }
-
     }
 }

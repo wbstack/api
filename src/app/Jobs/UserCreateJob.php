@@ -5,18 +5,18 @@ namespace App\Jobs;
 use App\User;
 use Illuminate\Support\Facades\Hash;
 
-
 class UserCreateJob extends Job
 {
+    private $email;
 
-  private $email;
-  private $password;
-  private $verified;
+    private $password;
 
-    public function __construct( $email, $password, $verified = false )
+    private $verified;
+
+    public function __construct($email, $password, $verified = false)
     {
-      // TODO maybe pass in an unsaved eloquent model?
-      // // but that would make CLI job creation hard
+        // TODO maybe pass in an unsaved eloquent model?
+        // // but that would make CLI job creation hard
         $this->email = $email;
         $this->password = $password;
         $this->verified = false;
@@ -27,11 +27,12 @@ class UserCreateJob extends Job
      */
     public function handle()
     {
-      $user = User::create([
+        $user = User::create([
           'email' => $this->email,
-          'password' => Hash::make( $this->password ),
+          'password' => Hash::make($this->password),
           'verified' => $this->verified,
       ]);
-      return $user;
+
+        return $user;
     }
 }

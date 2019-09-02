@@ -14,13 +14,12 @@ class EnsureWikiDbPoolPopulatedJob extends Job
      */
     public function handle()
     {
-      $unassignedDbs = WikiDb::where( 'wiki_id', null )->count();
-      $toCreate = 10 - $unassignedDbs;
-      if( $toCreate > 0 ) {
-        for ($i = 0; $i < $toCreate; $i++) {
-          dispatch(new ProvisionWikiDbJob());
+        $unassignedDbs = WikiDb::where('wiki_id', null)->count();
+        $toCreate = 10 - $unassignedDbs;
+        if ($toCreate > 0) {
+            for ($i = 0; $i < $toCreate; $i++) {
+                dispatch(new ProvisionWikiDbJob());
+            }
         }
-      }
     }
-
 }

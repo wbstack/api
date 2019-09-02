@@ -2,7 +2,7 @@
 
 /**
  * Doc for having this code: https://mikhailkozlov.com/blog/2016/02/29/request_rate_limiting_in_lumen_5/
- * Taken from: https://raw.githubusercontent.com/laravel/framework/5.7/src/Illuminate/Routing/Middleware/ThrottleRequests.php
+ * Taken from: https://raw.githubusercontent.com/laravel/framework/5.7/src/Illuminate/Routing/Middleware/ThrottleRequests.php.
  */
 
 namespace App\Http\Middleware;
@@ -100,11 +100,11 @@ class ThrottleRequests
      */
     protected function resolveRequestSignature($request)
     {
-      return sha1(
-          $request->method() .
-          '|' . $request->server('SERVER_NAME') .
-          '|' . $request->path() .
-          '|' . $request->ip()
+        return sha1(
+          $request->method().
+          '|'.$request->server('SERVER_NAME').
+          '|'.$request->path().
+          '|'.$request->ip()
       );
         // if ($user = $request->user()) {
         //     return sha1($user->getAuthIdentifier());

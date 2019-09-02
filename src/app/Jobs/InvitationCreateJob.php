@@ -6,13 +6,12 @@ use App\Invitation;
 
 class InvitationCreateJob extends Job
 {
-
     private $code;
 
     /**
      * @return void
      */
-    public function __construct( $code )
+    public function __construct($code)
     {
         $this->code = strtolower($code);
     }
@@ -22,14 +21,14 @@ class InvitationCreateJob extends Job
      */
     public function handle()
     {
-      $test = Invitation::where('code', $this->code)->first();
-      if($test) {
-        // Silent return if it already exits
-        // TODO should this fail instead?
-        return;
-      }
+        $test = Invitation::where('code', $this->code)->first();
+        if ($test) {
+            // Silent return if it already exits
+            // TODO should this fail instead?
+            return;
+        }
 
-      $invite = Invitation::create([
+        $invite = Invitation::create([
           'code' => $this->code,
       ]);
     }

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class WikiDb extends Model
 {
-
     /**
      * The attributes that are mass assignable.
      *
@@ -21,11 +20,12 @@ class WikiDb extends Model
         'wiki_id',
     ];
 
-    public function wiki() {
-        return $this->belongsTo( Wiki::class );
+    public function wiki()
+    {
+        return $this->belongsTo(Wiki::class);
     }
 
-// TODO starting to see the issue of internal vs extenal apis using the same lumen app here...
+    // TODO starting to see the issue of internal vs extenal apis using the same lumen app here...
 // should this be private? should it not be?
 //    /**
 //     * The attributes excluded from the model's JSON form.

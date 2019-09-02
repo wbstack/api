@@ -1,13 +1,13 @@
 <?php
 
-if(getenv('WIKWIKI_INFO_FROM') === 'defaults-file') {
-	require_once __DIR__ . '/../wikWikiInfoDefaults.php';
+if (getenv('WIKWIKI_INFO_FROM') === 'defaults-file') {
+    require_once __DIR__.'/../wikWikiInfoDefaults.php';
 } else {
-	// Assume API...
-	require_once __DIR__ . '/../wikWikiInfoOrFailCli.php';
+    // Assume API...
+    require_once __DIR__.'/../wikWikiInfoOrFailCli.php';
 }
 
-/**
+/*
  * We want to make this whole thing as seamless as possible to the
  * end-user. Unfortunately, we can't do _all_ of the work in the class
  * because A) included files are not in global scope, but in the scope
@@ -34,21 +34,21 @@ if(getenv('WIKWIKI_INFO_FROM') === 'defaults-file') {
  */
 use MediaWiki\MediaWikiServices;
 
-if ( !defined( 'RUN_MAINTENANCE_IF_MAIN' ) ) {
-	echo "This file must be included after Maintenance.php\n";
-	exit( 1 );
+if (! defined('RUN_MAINTENANCE_IF_MAIN')) {
+    echo "This file must be included after Maintenance.php\n";
+    exit(1);
 }
 
 // Wasn't included from the file scope, halt execution (probably wanted the class)
 // If a class is using commandLine.inc (old school maintenance), they definitely
 // cannot be included and will proceed with execution
-if ( !Maintenance::shouldExecute() && $maintClass != CommandLineInc::class ) {
-	return;
+if (! Maintenance::shouldExecute() && $maintClass != CommandLineInc::class) {
+    return;
 }
 
-if ( !$maintClass || !class_exists( $maintClass ) ) {
-	echo "\$maintClass is not set or is set to a non-existent class.\n";
-	exit( 1 );
+if (! $maintClass || ! class_exists($maintClass)) {
+    echo "\$maintClass is not set or is set to a non-existent class.\n";
+    exit(1);
 }
 
 // Get an object to start us off
@@ -63,33 +63,34 @@ $maintenance->setup();
 $self = $maintenance->getName();
 
 // Define how settings are loaded (e.g. LocalSettings.php)
-if ( !defined( 'MW_CONFIG_CALLBACK' ) && !defined( 'MW_CONFIG_FILE' ) ) {
-	define( 'MW_CONFIG_FILE', $maintenance->loadSettings() );
+if (! defined('MW_CONFIG_CALLBACK') && ! defined('MW_CONFIG_FILE')) {
+    define('MW_CONFIG_FILE', $maintenance->loadSettings());
 }
 
 // Custom setup for Maintenance entry point
-if ( !defined( 'MW_SETUP_CALLBACK' ) ) {
-	function wfMaintenanceSetup() {
-		// phpcs:ignore MediaWiki.NamingConventions.ValidGlobalName.wgPrefix
-		global $maintenance, $wgLocalisationCacheConf, $wgCacheDirectory;
-		if ( $maintenance->getDbType() === Maintenance::DB_NONE ) {
-			if ( $wgLocalisationCacheConf['storeClass'] === false
-				&& ( $wgLocalisationCacheConf['store'] == 'db'
-					|| ( $wgLocalisationCacheConf['store'] == 'detect' && !$wgCacheDirectory ) )
-			) {
-				$wgLocalisationCacheConf['storeClass'] = LCStoreNull::class;
-			}
-		}
+if (! defined('MW_SETUP_CALLBACK')) {
+    function wfMaintenanceSetup()
+    {
+        // phpcs:ignore MediaWiki.NamingConventions.ValidGlobalName.wgPrefix
+        global $maintenance, $wgLocalisationCacheConf, $wgCacheDirectory;
+        if ($maintenance->getDbType() === Maintenance::DB_NONE) {
+            if ($wgLocalisationCacheConf['storeClass'] === false
+                && ($wgLocalisationCacheConf['store'] == 'db'
+                    || ($wgLocalisationCacheConf['store'] == 'detect' && ! $wgCacheDirectory))
+            ) {
+                $wgLocalisationCacheConf['storeClass'] = LCStoreNull::class;
+            }
+        }
 
-		$maintenance->finalSetup();
-	}
-	define( 'MW_SETUP_CALLBACK', 'wfMaintenanceSetup' );
+        $maintenance->finalSetup();
+    }
+    define('MW_SETUP_CALLBACK', 'wfMaintenanceSetup');
 }
 
 require_once "$IP/includes/Setup.php";
 
 // Initialize main config instance
-$maintenance->setConfig( MediaWikiServices::getInstance()->getMainConfig() );
+$maintenance->setConfig(MediaWikiServices::getInstance()->getMainConfig());
 
 // Sanity-check required extensions are installed
 $maintenance->checkRequiredExtensions();
@@ -106,23 +107,23 @@ $success = $maintenance->execute();
 // Potentially debug globals
 $maintenance->globals();
 
-if ( $maintenance->getDbType() !== Maintenance::DB_NONE ) {
-	// Perform deferred updates.
-	$lbFactory = MediaWikiServices::getInstance()->getDBLoadBalancerFactory();
-	$lbFactory->commitMasterChanges( $maintClass );
-	DeferredUpdates::doUpdates();
+if ($maintenance->getDbType() !== Maintenance::DB_NONE) {
+    // Perform deferred updates.
+    $lbFactory = MediaWikiServices::getInstance()->getDBLoadBalancerFactory();
+    $lbFactory->commitMasterChanges($maintClass);
+    DeferredUpdates::doUpdates();
 }
 
 // log profiling info
 wfLogProfilingData();
 
-if ( isset( $lbFactory ) ) {
-	// Commit and close up!
-	$lbFactory->commitMasterChanges( 'doMaintenance' );
-	$lbFactory->shutdown( $lbFactory::SHUTDOWN_NO_CHRONPROT );
+if (isset($lbFactory)) {
+    // Commit and close up!
+    $lbFactory->commitMasterChanges('doMaintenance');
+    $lbFactory->shutdown($lbFactory::SHUTDOWN_NO_CHRONPROT);
 }
 
 // Exit with an error status if execute() returned false
-if ( $success === false ) {
-	exit( 1 );
+if ($success === false) {
+    exit(1);
 }

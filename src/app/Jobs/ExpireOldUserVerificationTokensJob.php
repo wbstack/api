@@ -6,7 +6,6 @@ use App\UserVerificationToken;
 
 class ExpireOldUserVerificationTokensJob extends Job
 {
-
     /**
      * @return void
      */

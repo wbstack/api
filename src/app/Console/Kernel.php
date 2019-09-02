@@ -2,10 +2,10 @@
 
 namespace App\Console;
 
-use Illuminate\Console\Scheduling\Schedule;
-use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 use App\Jobs\EnsureWikiDbPoolPopulatedJob;
+use Illuminate\Console\Scheduling\Schedule;
 use App\Jobs\ExpireOldUserVerificationTokensJob;
+use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {

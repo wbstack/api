@@ -15,16 +15,16 @@ class AdminMiddleware
      */
     public function handle($request, Closure $next)
     {
-      $user = $request->user();
+        $user = $request->user();
         // Make sure there is an authed user
-        if(!$user) {
-          abort(403);
+        if (! $user) {
+            abort(403);
         }
 
         // And that user is me
         // TODO do something better here...?
-        if($user->email !== 'adamshorland@gmail.com') {
-          abort(403);
+        if ($user->email !== 'adamshorland@gmail.com') {
+            abort(403);
         }
 
         return $next($request);

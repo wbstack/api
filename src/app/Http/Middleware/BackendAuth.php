@@ -35,8 +35,8 @@ class BackendAuth
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        $token = $request->header( 'X-Backend-Token' );
-        $service = $request->header( 'X-Backend-Service' );
+        $token = $request->header('X-Backend-Token');
+        $service = $request->header('X-Backend-Service');
 
         // TODO restrict on IP range
 
@@ -46,10 +46,10 @@ class BackendAuth
         $tokenOk = $token === 'backend-token';
         $serviceOk = $service === 'backend-service';
 
-        if ( !$tokenOk || !$serviceOk ) {
+        if (! $tokenOk || ! $serviceOk) {
             // TODO log failures
             return response()->json([
-                'error' => 'Unauthorized.'
+                'error' => 'Unauthorized.',
             ], 401);
         }
 
