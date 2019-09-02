@@ -4,6 +4,8 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Jobs\EnsureWikiDbPoolPopulatedJob;
+use App\Jobs\ExpireOldUserVerificationTokensJob;
 
 class Kernel extends ConsoleKernel
 {
