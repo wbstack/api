@@ -175,6 +175,13 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        /*
+         * Improted from LUMEN
+         */
+        AlbertCht\InvisibleReCaptcha\InvisibleReCaptchaServiceProvider::class,
+        //Laravel\Cashier\CashierServiceProvider::class
+
+
     ],
 
     /*

@@ -35,25 +35,13 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
+      // In lumen this used to be in bootstrap....
+      if( getenv( 'ROUTES_LOAD_WEB' ) == 1 ) {
         $this->mapApiRoutes();
-
-        $this->mapWebRoutes();
-
-        //
-    }
-
-    /**
-     * Define the "web" routes for the application.
-     *
-     * These routes all receive session state, CSRF protection, etc.
-     *
-     * @return void
-     */
-    protected function mapWebRoutes()
-    {
-        Route::middleware('web')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/web.php'));
+      }
+      if( getenv( 'ROUTES_LOAD_BACKEND' ) == 1 ) {
+        $this->mapBackendRoutes();
+      }
     }
 
     /**
@@ -65,9 +53,23 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes()
     {
-        Route::prefix('api')
-             ->middleware('api')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/api.php'));
+        // SHIFT wanted to add below, but that means i need to alter the routes files
+        // TODO fix at some point?
+        // Route::prefix('api')
+        //      ->middleware('api')
+        //      ->namespace($this->namespace)
+        //      ->group(base_path('routes/api.php'));
+        Route::group(base_path('routes/api.php'));
+    }
+
+    protected function mapBackendRoutes()
+    {
+        // SHIFT wanted to add below, but that means i need to alter the routes files
+        // TODO fix at some point?
+        // Route::prefix('api')
+        //      ->middleware('api')
+        //      ->namespace($this->namespace)
+        //      ->group(base_path('routes/backend.php'));
+        Route::group(base_path('routes/backend.php'));
     }
 }

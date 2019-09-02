@@ -13,7 +13,19 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+      // TODO SHIFT is this needed? I see the commands() function below
+      // that might do automagic loading?
+      \App\Console\Commands\DispatchJob::class,
+      \App\Console\Commands\HandleJob::class,
+    ];
+
+    // https://laravel.com/docs/5.8/middleware#assigning-middleware-to-routes
+    protected $routeMiddleware = [
+          'cors' => App\Http\Middleware\CorsMiddleware::class,
+          'backend.auth' => App\Http\Middleware\BackendAuth::class,
+          'throttle' => App\Http\Middleware\ThrottleRequests::class,
+          'admin' => App\Http\Middleware\AdminMiddleware::class,
+          'auth' => App\Http\Middleware\Authenticate::class,
     ];
 
     /**
@@ -24,8 +36,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+      $schedule->job(new EnsureWikiDbPoolPopulatedJob)->everyMinute();
+      $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
     }
 
     /**
