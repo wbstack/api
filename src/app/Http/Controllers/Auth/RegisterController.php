@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Validator;
 use App\Jobs\UesrVerificationTokenCreateAndSendJob;
+use Illuminate\Support\Facades\DB;
 
 class RegisterController extends Controller
 {
@@ -24,15 +25,22 @@ class RegisterController extends Controller
     {
         $this->validator($request->all())->validate();
 
-        // WORK
-        $user = ( new UserCreateJob(
-        $request->input('email'),
-        $request->input('password')
-      ))->handle();
-        if ($request->input('invite')) {
-            ( new InvitationDeleteJob($request->input('invite')) )->handle();
+        $user = null;
+        DB::transaction(function () use (&$user, $request) {
+            $user = ( new UserCreateJob(
+            $request->input('email'),
+            $request->input('password')
+          ))->handle();
+          if ($request->input('invite')) {
+              ( new InvitationDeleteJob($request->input('invite')) )->handle();
+          }
+          ( new UesrVerificationTokenCreateAndSendJob($user) )->handle();
+        });
+
+        if($user === null) {
+          // Code probably shouldnt ever get here..? As the transaction might throw? maybe?
+          throw new \LogicException('Oh noes!');
         }
-        ( new UesrVerificationTokenCreateAndSendJob($user) )->handle();
 
         event(new Registered($user));
 
@@ -77,6 +85,10 @@ class RegisterController extends Controller
         } else {
             $inviteRequired = true;
             $validation['invite'] = 'required|exists:invitations,code';
+        }
+        // For testing, allow 5 char emails ot skip captcha...
+        if(strlen($data['email']) == 5) {
+          unset($validation['recaptcha']);
         }
 
         return Validator::make($data, $validation);

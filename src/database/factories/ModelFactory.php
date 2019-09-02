@@ -21,7 +21,7 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
 
 $factory->define(App\Invitation::class, function (Faker\Generator $faker) {
     return [
-        'code' => substr($faker->unique->text, 0, 10),
+        'code' => strtolower(substr($faker->unique->text, 0, 3)),
     ];
 });
 
