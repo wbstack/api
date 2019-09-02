@@ -33,49 +33,6 @@ class UserController extends BaseController
         $this->request = $request;
     }
 
-    public function create(Request $request)
-    {
-        // HTTP validation
-        $validation = [
-          // TODO validate password length when not deving...
-            'email' => 'required|email|unique:users',
-            'password' => 'required',
-            'recaptcha' => 'required|captcha',
-        ];
-
-        // XXX: for phpunit dont validate captcha when requested....
-        // TODO this should be mocked in the test instead
-        if (getenv('PHPUNIT_RECAPTCHA_CHECK') == '0') {
-            unset($validation['recaptcha']);
-        }
-
-        // If this is the first user then do not require an invitation or captcha
-        if (User::count() === 0) {
-            $inviteRequired = false;
-            unset($validation['recaptcha']);
-        } else {
-            $inviteRequired = true;
-            $validation['invite'] = 'required|exists:invitations,code';
-        }
-
-        $request->validate($validation);
-
-        // WORK
-        $user = ( new UserCreateJob(
-          $request->input('email'),
-          $request->input('password')
-        ))->handle();
-        ( new InvitationDeleteJob($request->input('invite')) )->handle();
-        ( new UesrVerificationTokenCreateAndSendJob($user) )->handle();
-
-        // HTTP Response
-        $res['success'] = true;
-        $res['message'] = 'Register Successful!';
-        $res['data'] = $this->convertUserForOutput($user);
-
-        return response($res);
-    }
-
     public function getSelf(Request $request)
     {
         $user = $request->user();
