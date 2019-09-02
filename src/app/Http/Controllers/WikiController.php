@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Wiki;
 use App\WikiDb;
+use App\WikiDomain;
 use App\WikiManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ class WikiController extends Controller
         $user = $request->user();
 
         $request->validate([
-            'domain' => 'required|unique:wikis|regex:/^.+\.wiki\.opencura\.com$/',
+            'domain' => 'required|unique:wikis|unique:wiki_domains|regex:/^.+\.wiki\.opencura\.com$/',
             'sitename' => 'required',
         ]);
 
@@ -31,6 +32,12 @@ class WikiController extends Controller
             $wiki = Wiki::create([
                 'sitename' => $request->input('sitename'),
                 'domain' => strtolower($request->input('domain')),
+            ]);
+
+            // Also track the domain forever in your domains table
+            $wikiDomain = WikiDomain::create([
+                'domain' => $wiki->domain,
+                'wiki_id' => $wiki->id,
             ]);
 
             $dbAssignment = DB::table('wiki_dbs')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
