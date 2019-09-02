@@ -28,25 +28,6 @@ class RegisterController extends Controller
     use RegistersUsers;
 
     /**
-     * Where to redirect users after registration.
-     * TODO SHIFT this probably isnt needed for api.
-     *
-     * @var string
-     */
-    //protected $redirectTo = '/dashboard';
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        // SHIFT this would normally redirect if already loggedin. Dont make sense for api
-        //$this->middleware('guest');
-    }
-
-    /**
      * Get a validator for an incoming registration request.
      *
      * @param  array  $data

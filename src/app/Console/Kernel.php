@@ -9,17 +9,6 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
-    /**
-     * The Artisan commands provided by your application.
-     *
-     * @var array
-     */
-    protected $commands = [
-      // TODO SHIFT is this needed? I see the commands() function below
-      // that might do automagic loading?
-      \App\Console\Commands\DispatchJob::class,
-      \App\Console\Commands\HandleJob::class,
-    ];
 
     /**
      * Define the application's command schedule.

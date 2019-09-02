@@ -32,8 +32,7 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        // SHIFT, remember_token was not added in the migration
-        //'remember_token',
+        'remember_token',
     ];
 
     // TODO this should be done with roles or something in the DB....
@@ -47,13 +46,4 @@ class User extends Authenticatable
         return $this->belongsToMany(Wiki::class, 'wiki_managers');
     }
 
-    // SHIFT this was not added in the migration
-    // /**
-    //  * The attributes that should be cast to native types.
-    //  *
-    //  * @var array
-    //  */
-    // protected $casts = [
-    //     'email_verified_at' => 'datetime',
-    // ];
 }
