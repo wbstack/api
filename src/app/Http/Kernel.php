@@ -52,7 +52,7 @@ class Kernel extends HttpKernel
         ],
 
         'backend' => [
-          'backend.auth'
+          'backend.auth',
         ],
     ];
 

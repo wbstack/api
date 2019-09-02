@@ -14,9 +14,9 @@ abstract class TestCase extends BaseTestCase
 
     public function createApplication()
     {
-      // Run all jobs sync...
-      putenv('QUEUE_CONNECTION=sync');
-      return $this->traitCreateApplication();
-    }
+        // Run all jobs sync...
+        putenv('QUEUE_CONNECTION=sync');
 
+        return $this->traitCreateApplication();
+    }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Console;
 
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Jobs\EnsureWikiDbPoolPopulatedJob;
+use Illuminate\Console\Scheduling\Schedule;
 use App\Jobs\ExpireOldUserVerificationTokensJob;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
@@ -29,8 +29,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-      $schedule->job(new EnsureWikiDbPoolPopulatedJob)->everyMinute();
-      $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
+        $schedule->job(new EnsureWikiDbPoolPopulatedJob)->everyMinute();
+        $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
     }
 
     /**

@@ -2,15 +2,15 @@
 
 namespace App;
 
+use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Passport\HasApiTokens;
 
 /**
  * TODO SHIFT NOTE, switch from verified field to email_verified_at..
  * SHIFT NOTE, used to use Authorizable
- * SHIFT NOTE, used to implement AuthorizableContract
+ * SHIFT NOTE, used to implement AuthorizableContract.
  */
 class User extends Authenticatable
 {
@@ -22,7 +22,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'email', 'password', 'verified'
+        'email', 'password', 'verified',
     ];
 
     /**
@@ -37,14 +37,17 @@ class User extends Authenticatable
     ];
 
     // TODO this should be done with roles or something in the DB....
-    public function isAdmin() {
-      return $this->email == 'adamshorland@gmail.com';
-    }
-    public function managesWikis() {
-      return $this->belongsToMany(Wiki::class, 'wiki_managers');
+    public function isAdmin()
+    {
+        return $this->email == 'adamshorland@gmail.com';
     }
 
-// SHIFT this was not added in the migration
+    public function managesWikis()
+    {
+        return $this->belongsToMany(Wiki::class, 'wiki_managers');
+    }
+
+    // SHIFT this was not added in the migration
     // /**
     //  * The attributes that should be cast to native types.
     //  *

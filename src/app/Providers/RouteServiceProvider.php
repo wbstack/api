@@ -35,13 +35,13 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
-      // In lumen this used to be in bootstrap....
-      if( getenv( 'ROUTES_LOAD_WEB' ) == 1 ) {
-        $this->mapApiRoutes();
-      }
-      if( getenv( 'ROUTES_LOAD_BACKEND' ) == 1 ) {
-        $this->mapBackendRoutes();
-      }
+        // In lumen this used to be in bootstrap....
+        if (getenv('ROUTES_LOAD_WEB') == 1) {
+            $this->mapApiRoutes();
+        }
+        if (getenv('ROUTES_LOAD_BACKEND') == 1) {
+            $this->mapBackendRoutes();
+        }
     }
 
     /**
@@ -60,7 +60,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapBackendRoutes()
     {
         Route::prefix('backend')
-             ->namespace($this->namespace . '\Backend')
+             ->namespace($this->namespace.'\Backend')
              ->group(base_path('routes/backend.php'));
     }
 }
