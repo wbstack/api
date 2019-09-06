@@ -3,9 +3,13 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Wiki extends Model
 {
+
+    use SoftDeletes;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -14,6 +18,10 @@ class Wiki extends Model
     protected $fillable = [
         'sitename',
         'domain',
+    ];
+
+    protected $dates = [
+        'deleted_at',
     ];
 
     public function wikiDbVersion()

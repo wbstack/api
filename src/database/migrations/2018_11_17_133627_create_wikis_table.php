@@ -19,6 +19,7 @@ class CreateWikisTable extends Migration
             $table->string('domain')->unique();
             $table->string('sitename');
 
+            $table->softDeletes();
             $table->timestamps();
         });
     }
