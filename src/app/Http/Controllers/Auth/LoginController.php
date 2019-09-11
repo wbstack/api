@@ -48,9 +48,6 @@ class LoginController extends Controller
             return response()->json([
               'user'  =>  $user, // <- we're sending the user info for frontend usage
               'token' =>  $user->createToken('yourAppName')->accessToken, // <- token is generated and sent back to the front end
-              // TODO SHIFT, old UI uses these, so keep adding them for now, but should use user key?
-              'email' => $user->email,
-              'isAdmin' => $user->isAdmin(),
           ]);
         } else {
             $this->incrementLoginAttempts($request);
