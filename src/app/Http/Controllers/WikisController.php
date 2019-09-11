@@ -19,15 +19,14 @@ class WikisController extends Controller
 
     public function getWikisOwnedByCurrentUser(Request $request)
     {
-        $user = $request->user();
-        $result = WikiManager::where('user_id', $user->id)
-      ->leftJoin('wikis', 'wiki_id', '=', 'wikis.id')
-      ->select('wikis.*')
-      ->get();
-
-        $res['success'] = true;
-        $res['data'] = $result;
-
-        return response($res);
+        // TODO FIXME, right now this returns alll of the details of the wiki managers :/
+        // which it should not do FIXME BEFORE RELEASE...
+        return response(
+          $request->user()
+          ->managesWikis()
+          ->with('wikiManagers')
+          ->with('wikiDbVersion')
+          ->get()
+        );
     }
 }

@@ -38,6 +38,11 @@ class Wiki extends Model
 
     public function wikiManagers()
     {
+        // TODO FIXME FOR RELEASE
+        // Really this shouldnt use the User model? or at least not with the default set of private fileds?
+        // When this is retrieved by the user owning the model we want 1 set of fields returned.
+        // If it is returned by an admin, perhaps another
+        // If it is returned by the owner of a wiki for which the user is a manager, then another....
         return $this->belongsToMany(User::class, 'wiki_managers');
     }
 }
