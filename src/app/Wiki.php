@@ -29,7 +29,7 @@ class Wiki extends Model
         return $this->hasOne(WikiDb::class)->select(['id', 'wiki_id', 'version']);
     }
 
-    // TODO this should just be on the backend model? =]
+    // TODO this should just be on the backend model? =] Or marked as a private relationship or something?
     // OR some sort of access controll needs to be done..
     public function wikiDb()
     {
@@ -38,11 +38,6 @@ class Wiki extends Model
 
     public function wikiManagers()
     {
-        // TODO FIXME FOR RELEASE
-        // Really this shouldnt use the User model? or at least not with the default set of private fileds?
-        // When this is retrieved by the user owning the model we want 1 set of fields returned.
-        // If it is returned by an admin, perhaps another
-        // If it is returned by the owner of a wiki for which the user is a manager, then another....
-        return $this->belongsToMany(User::class, 'wiki_managers');
+        return $this->belongsToMany(User::class, 'wiki_managers')->select(['email']);
     }
 }
