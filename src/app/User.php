@@ -33,6 +33,11 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        // cashier
+        'stripe_id',
+        'trial_ends_at',
+        'card_brand',
+        'card_last_four',
     ];
 
     // TODO this should be done with roles or something in the DB....

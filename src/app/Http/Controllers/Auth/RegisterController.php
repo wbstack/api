@@ -49,7 +49,7 @@ class RegisterController extends Controller
         // HTTP Response
         $res['success'] = true;
         $res['message'] = 'Register Successful!';
-        $res['data'] = $this->convertUserForOutput($user);
+        $res['data'] = $user;
 
         return response($res);
     }
@@ -92,16 +92,5 @@ class RegisterController extends Controller
         }
 
         return Validator::make($data, $validation);
-    }
-
-    // TODO why is this needed?
-    // TODO the model used by the frontend stuff should just not have the password...
-    protected function convertUserForOutput(User $user)
-    {
-        return [
-            'id' => $user->id,
-            'email' => $user->email,
-            'verified' => $user->verified,
-        ];
     }
 }
