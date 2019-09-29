@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a04a2eddbb6e56453480d2007c44049",
+    "content-hash": "c2360616780e88998e9c7219fcbb3e49",
     "packages": [
         {
             "name": "albertcht/invisible-recaptcha",
@@ -1740,6 +1740,57 @@
                 "random"
             ],
             "time": "2018-07-02T15:55:56+00:00"
+        },
+        {
+            "name": "percymamedy/laravel-dev-booter",
+            "version": "v0.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/percymamedy/laravel-dev-booter.git",
+                "reference": "5231366c557f2e11b2167e1d58ef330285ea6cce"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/percymamedy/laravel-dev-booter/zipball/5231366c557f2e11b2167e1d58ef330285ea6cce",
+                "reference": "5231366c557f2e11b2167e1d58ef330285ea6cce",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "~5.0",
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "~3.0",
+                "phpunit/phpunit": "~4.0|~5.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.3.x-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "PercyMamedy\\LaravelDevBooter\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PercyMamedy\\LaravelDevBooter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Percy Mamedy",
+                    "email": "percymamedy@gmail.com"
+                }
+            ],
+            "description": "Boost your Laravel app by registering Prod services only on Prod.",
+            "time": "2017-06-09T19:40:47+00:00"
         },
         {
             "name": "phenx/php-font-lib",

@@ -184,8 +184,15 @@ return [
         Spatie\Cors\CorsServiceProvider::class,
         //Laravel\Cashier\CashierServiceProvider::class
 
-        MattAllan\LaravelCodeStyle\ServiceProvider::class,
+        PercyMamedy\LaravelDevBooter\ServiceProvider::class,
+    ],
 
+    // TODO maybe this should only be in dev?
+    'dev_providers' => [
+        MattAllan\LaravelCodeStyle\ServiceProvider::class,
+    ],
+    'local_providers' => [
+        MattAllan\LaravelCodeStyle\ServiceProvider::class,
     ],
 
     /*

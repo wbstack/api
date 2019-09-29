@@ -35,7 +35,8 @@
     31 => 'App\\Providers\\RouteServiceProvider',
     32 => 'AlbertCht\\InvisibleReCaptcha\\InvisibleReCaptchaServiceProvider',
     33 => 'Spatie\\Cors\\CorsServiceProvider',
-    34 => 'MattAllan\\LaravelCodeStyle\\ServiceProvider',
+    34 => 'PercyMamedy\\LaravelDevBooter\\ServiceProvider',
+    35 => 'MattAllan\\LaravelCodeStyle\\ServiceProvider',
   ),
   'eager' => 
   array (
@@ -61,7 +62,8 @@
     19 => 'App\\Providers\\RouteServiceProvider',
     20 => 'AlbertCht\\InvisibleReCaptcha\\InvisibleReCaptchaServiceProvider',
     21 => 'Spatie\\Cors\\CorsServiceProvider',
-    22 => 'MattAllan\\LaravelCodeStyle\\ServiceProvider',
+    22 => 'PercyMamedy\\LaravelDevBooter\\ServiceProvider',
+    23 => 'MattAllan\\LaravelCodeStyle\\ServiceProvider',
   ),
   'deferred' => 
   array (

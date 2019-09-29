@@ -1,0 +1,4 @@
+# We only want to ignore these for the docker build
+# I hope they are included in docker-compose...
+/src/vendor
+/src/bootstrap/cache/*
