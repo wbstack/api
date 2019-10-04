@@ -2,3 +2,4 @@
 # I hope they are included in docker-compose...
 /src/vendor
 /src/bootstrap/cache/*
+/src/storage/*.key
