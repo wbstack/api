@@ -51,7 +51,7 @@ class ProvisionWikiDbJob extends Job
             $prefix = 'mwt_'.substr(bin2hex(random_bytes(24)), 0, 8);
         }
 
-        $this->dbUser = substr(bin2hex(random_bytes(24)), 0, 12);
+        $this->dbUser = 'mwu_' . substr(bin2hex(random_bytes(24)), 0, 8);
         $this->dbPassword = substr(bin2hex(random_bytes(24)), 0, 12);
 
         $this->prefix = $prefix;
