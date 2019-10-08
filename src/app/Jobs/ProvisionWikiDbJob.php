@@ -45,14 +45,14 @@ class ProvisionWikiDbJob extends Job
             $dbName = env('MW_DB_DATABASE');
         }
         if ($dbName === 'null' || $dbName === null) {
-            $dbName = 'mwdb_'.substr(bin2hex(random_bytes(24)), 0, 8);
+            $dbName = 'mwdb_'.substr(bin2hex(random_bytes(24)), 0, 10);
         }
         if ($prefix === 'null' || $prefix === null) {
-            $prefix = 'mwt_'.substr(bin2hex(random_bytes(24)), 0, 8);
+            $prefix = 'mwt_'.substr(bin2hex(random_bytes(24)), 0, 10);
         }
 
-        $this->dbUser = 'mwu_' . substr(bin2hex(random_bytes(24)), 0, 8);
-        $this->dbPassword = substr(bin2hex(random_bytes(24)), 0, 12);
+        $this->dbUser = 'mwu_' . substr(bin2hex(random_bytes(24)), 0, 10);
+        $this->dbPassword = substr(bin2hex(random_bytes(24)), 0, 14);
 
         $this->prefix = $prefix;
         $this->dbName = $dbName;
@@ -63,52 +63,82 @@ class ProvisionWikiDbJob extends Job
      */
     public function handle()
     {
-        $pdo = DB::connection($this->dbConnection)->getPdo();
+        $conn = DB::connection($this->dbConnection);
+        $pdo = $conn->getPdo();
 
         // TODO if a custom dbname is used, check for conflicts first...
         // TODO check for conflicts with the prefix for tables too...
 
-        if ($this->dbName) {
-            if ($pdo->exec('CREATE DATABASE IF NOT EXISTS '.$this->dbName) === false) {
-                throw new \RuntimeException(
-            'Failed to create database with dbname: '.$this->dbName);
+            // CREATE THE USER
+            // This looks stupid because it is.
+            // For some reason the mediawiki-db-manager user seems to be able to create user
+            // but these exec call to the PDO seems to throw an exception saying:
+            // PDOException: SQLSTATE[HY000]: General error: 1396 Operation CREATE USER failed for 'mwu_0985131dfa'@'%'
+            // So, catch this exception and check the error state ourselves, and allow us to continue past this?
+            try{
+                $conn->statement("CREATE USER '".$this->dbUser."'@'%' IDENTIFIED BY '".$this->dbPassword."'");
+            }
+            catch( \Illuminate\Database\QueryException $e ) {
+                // Probably fine, and if not fine then the ALTER will fail below? :)
+                $conn->statement("ALTER USER '".$this->dbUser."'@'%' IDENTIFIED BY '".$this->dbPassword."'");
+            }
+
+            // CREATE (maybe) AND USE DB
+            if ($this->dbName) {
+                if ($pdo->exec('CREATE DATABASE IF NOT EXISTS '.$this->dbName) === false) {
+                    throw new \RuntimeException(
+                'Failed to create database with dbname: '.$this->dbName);
+                }
+            } else {
+              // Default to mediawiki
+              $this->dbName = 'mediawiki';
             }
             if ($pdo->exec('USE '.$this->dbName) === false) {
                 throw new \RuntimeException(
             'Failed to use database with dbname: '.$this->dbName);
             }
-        }
 
-        // User stuff
-        if ($pdo->exec('CREATE USER \''.$this->dbUser.'\'@\'%\' IDENTIFIED BY \''.$this->dbPassword.'\'') === false) {
-            throw new \RuntimeException(
-           'Failed to create user: '.$this->dbUser);
-        }
-        // TODO more limited GRANTS...
-        // TODO cant grant based on table prefix, so maybe do have seperate dbs...?
-        if ($pdo->exec('GRANT ALL ON '.$this->dbName.'.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
-            throw new \RuntimeException(
-           'Failed to grant user: '.$this->dbUser);
-        }
-
-        // Get SQL statements to run
-        $rawSql = file_get_contents(__DIR__.'/../../database/mw/new/'.$this->newSqlFile.'.sql');
-        $prefixedSql = str_replace('<<prefix>>', $this->prefix, $rawSql);
-        $sqlParts = explode("\n\n", $prefixedSql);
-
-        foreach ($sqlParts as $part) {
-            if (strpos($part, '--') === 0) {
-                // Skip comment blocks
-                continue;
-            }
-
-            // Execute each chunk of SQL...
-            if ($pdo->exec($part) === false) {
+            // GRANT THE USER ACCESS TO THE DB
+            // TODO more limited GRANTS...
+            // TODO cant grant based on table prefix, so maybe do have seperate dbs...?
+            if ($pdo->exec('GRANT ALL ON '.$this->dbName.'.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
                 throw new \RuntimeException(
-            'SQL execution failed for prefix '.$prefix.' SQL part: '.$part);
+               'Failed to grant user: '.$this->dbUser);
             }
-        }
 
+            // Needs https://dev.mysql.com/doc/refman/8.0/en/privileges-provided.html#priv_reload
+            // and is probably not needed...
+            // if ($pdo->exec('FLUSH PRIVILEGES') === false) {
+            //     throw new \RuntimeException(
+            //    'Failed to flush privs: '.$this->dbUser);
+            // }
+
+            // ADD THE TABLES
+            // Get SQL statements to run
+            $rawSql = file_get_contents(__DIR__.'/../../database/mw/new/'.$this->newSqlFile.'.sql');
+            $prefixedSql = str_replace('<<prefix>>', $this->prefix, $rawSql);
+            $sqlParts = explode("\n\n", $prefixedSql);
+
+            foreach ($sqlParts as $part) {
+                if (strpos($part, '--') === 0) {
+                    // Skip comment blocks
+                    continue;
+                }
+
+                // Execute each chunk of SQL...
+                if ($pdo->exec($part) === false) {
+                    throw new \RuntimeException(
+                'SQL execution failed for prefix '.$prefix.' SQL part: '.$part);
+                }
+            }
+
+        // TODO per plan, create some record before the above transaction stuff happens..
+        // so:
+        //  - Add wikiDb record, stating pending state?
+        //  - Create the DB and tables in a TRANSACTION
+        //  - update the wikiDb Record on success
+        //
+        //  This way, if this wikiDb create fails, there is still a record of the DB that has been / is being created?
         $wikiDb = WikiDb::create([
           'name' => $this->dbName,
           'user' => $this->dbUser,
