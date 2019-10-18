@@ -2,6 +2,8 @@
 
 return [
 
+    'queryservice_host' => env('QUERY_SERVICE_HOST', 'queryservice:9999'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

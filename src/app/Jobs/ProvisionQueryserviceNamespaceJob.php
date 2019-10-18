@@ -39,17 +39,49 @@ class ProvisionQueryserviceNamespaceJob extends Job
      */
     public function handle()
     {
+        $properties = file_get_contents( __DIR__ . DIRECTORY_SEPARATOR . '../data/RWStore.properties' );
 
-        // Docs: https://wiki.blazegraph.com/wiki/index.php/REST_API#CREATE_DATA_SET
-        // See: https://github.com/wikimedia/wikidata-query-deploy/blob/8ef3870cb43696d981bea254a6d44ecf5f11f4c9/default.properties
-        // See: https://github.com/wikimedia/wikidata-query-deploy/blob/8ef3870cb43696d981bea254a6d44ecf5f11f4c9/createNamespace.sh
-        // TODO this needs to match the version deployed?
+        // Replace the namespace in the properties file
+        $properties = str_replace( 'REPLACE_NAMESPACE', $this->namespace, $properties );
+
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            // TODO when there are multiple hosts, this will need to be different?
+            // OR go through the gateway?
+            CURLOPT_URL => config('app.queryservice_host') . "/bigdata/namespace",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => $properties,
+            CURLOPT_HTTPHEADER => [
+                "content-type: text/plain",
+            ],
+        ]);
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            echo "cURL Error #:" . $err;
+            return;
+        } else {
+            if( $response === 'CREATED: ' . $this->namespace) {
+                $qsns = QueryserviceNamespace::create([
+                    'namespace' => $this->namespace,
+                    'internalHost' => $this->internalHost,
+                ]);
+            }
+            // Else log create failed?
+        }
 
         // TODO make sure ns is new
         // TODO create the namespace?
         // TODO record the namespace
 
-        //com.bigdata.rdf.sail.namespace=NAMESPACE
 
 /*
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -58,10 +90,5 @@ class ProvisionQueryserviceNamespaceJob extends Job
 <entry key="com.bigdata.rdf.sail.namespace">MY_NAMESPACE_NAME</entry>
 </properties>
 */
-
-        $qsns = QueryserviceNamespace::create([
-          'namespace' => $this->namespace,
-          'internalHost' => $this->internalHost,
-      ]);
     }
 }
