@@ -40,6 +40,8 @@ class ProvisionQueryserviceNamespaceJob extends Job
     public function handle()
     {
         $properties = file_get_contents( __DIR__ . DIRECTORY_SEPARATOR . '../data/RWStore.properties' );
+        // Currently only one, but will change at some point...
+        $queryServiceHost = config( 'app.queryservice_host' );
 
         // Replace the namespace in the properties file
         $properties = str_replace( 'REPLACE_NAMESPACE', $this->namespace, $properties );
@@ -48,7 +50,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
         curl_setopt_array($curl, [
             // TODO when there are multiple hosts, this will need to be different?
             // OR go through the gateway?
-            CURLOPT_URL => config('app.queryservice_host') . "/bigdata/namespace",
+            CURLOPT_URL => $queryServiceHost . "/bigdata/namespace",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 10,
@@ -73,22 +75,11 @@ class ProvisionQueryserviceNamespaceJob extends Job
                 $qsns = QueryserviceNamespace::create([
                     'namespace' => $this->namespace,
                     'internalHost' => $this->internalHost,
+                    'backend' => $queryServiceHost,
                 ]);
             }
-            // Else log create failed?
+            // TODO Else log create failed?
         }
 
-        // TODO make sure ns is new
-        // TODO create the namespace?
-        // TODO record the namespace
-
-
-/*
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-<properties>
-<entry key="com.bigdata.rdf.sail.namespace">MY_NAMESPACE_NAME</entry>
-</properties>
-*/
     }
 }

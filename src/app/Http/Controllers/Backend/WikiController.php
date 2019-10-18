@@ -13,10 +13,10 @@ class WikiController extends Controller
         $domain = $request->input('domain');
 
         if ($domain === 'localhost') {
-            // TODO if not in debug mode dont allow this code path to run
-            $result = Wiki::with(['wikiDb'])->first();
+            // TODO if not in debug mode don't allow this code path to run
+            $result = Wiki::with(['wikiDb','wikiQueryserviceNamespace'])->first();
         } else {
-            $result = Wiki::where('domain', $domain)->with(['wikiDb'])->first();
+            $result = Wiki::where('domain', $domain)->with(['wikiDb','wikiQueryserviceNamespace'])->first();
         }
 
         $res['success'] = true;

@@ -18,6 +18,7 @@ class CreateQueryservicenamespacesTable extends Migration
 
             $table->string('namespace', 100)->unique();
             $table->string('internalHost', 100)->unique();
+            $table->string('backend', 100);
 
             $table->integer('wiki_id')->nullable()->unsigned()->unique();
 
