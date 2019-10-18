@@ -32,6 +32,6 @@ class GetWikiForXJob extends Command
         $value = trim($this->argument('value'));
         $result = Wiki::where($key, $value)->with(['wikiDb','wikiQueryserviceNamespace'])->first();
 
-        $this->info(json_encode($result));
+        $this->info(json_encode($result, JSON_PRETTY_PRINT));
     }
 }
