@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\User;
-use App\Jobs\UserCreateJob;
-use Illuminate\Http\Request;
-use App\Jobs\InvitationDeleteJob;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Validator;
+use App\Jobs\InvitationDeleteJob;
 use App\Jobs\UesrVerificationTokenCreateAndSendJob;
+use App\Jobs\UserCreateJob;
+use App\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {

@@ -8,12 +8,11 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use RuntimeException;
-use Illuminate\Support\Str;
 use Illuminate\Cache\RateLimiter;
-use Illuminate\Support\InteractsWithTime;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 class ThrottleRequests
 {

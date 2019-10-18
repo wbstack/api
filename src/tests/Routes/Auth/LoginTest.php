@@ -3,9 +3,9 @@
 namespace Tests\Routes\Auth;
 
 use App\User;
-use Tests\TestCase;
-use Tests\Routes\Traits\OptionsRequestAllowed;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\Routes\Traits\OptionsRequestAllowed;
+use Tests\TestCase;
 
 class LoginTest extends TestCase
 {

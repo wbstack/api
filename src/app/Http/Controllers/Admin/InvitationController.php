@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Jobs\InvitationCreateJob;
 use App\Jobs\InvitationDeleteJob;
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class InvitationController extends Controller
 {

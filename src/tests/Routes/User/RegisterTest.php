@@ -2,12 +2,12 @@
 
 namespace Tests\Routes\User;
 
-use App\User;
 use App\Invitation;
-use Tests\TestCase;
+use App\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
 use Tests\Routes\Traits\OptionsRequestAllowed;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class RegisterTest extends TestCase
 {

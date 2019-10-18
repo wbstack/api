@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Interest;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
 class InterestsController extends Controller
 {

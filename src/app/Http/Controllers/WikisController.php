@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Wiki;
-use App\WikiManager;
 use Illuminate\Http\Request;
 
 class WikisController extends Controller
