@@ -8,18 +8,14 @@ class ProvisionQueryserviceNamespaceJob extends Job
 {
 
     private $namespace;
-    private $internalHost;
 
     /**
      * @return void
      */
-    public function __construct($namespace = null, $internalHost = null)
+    public function __construct($namespace = null)
     {
         if ($namespace !== null && preg_match('/[^A-Za-z0-9]/', $namespace)) {
             throw new \InvalidArgumentException('$namespace must only contain [^A-Za-z0-9] or null, got '.$namespace);
-        }
-        if ($internalHost !== null && preg_match('/[^A-Za-z0-9]/', $internalHost)) {
-            throw new \InvalidArgumentException('$internalHost must only contain [^A-Za-z0-9] or null, got '.$internalHost);
         }
 
         // Auto generation and corrections
@@ -27,11 +23,8 @@ class ProvisionQueryserviceNamespaceJob extends Job
         if ($namespace === 'null' || $namespace === null) {
             $namespace = 'qsns_'.substr(bin2hex(random_bytes(24)), 0, 10);
         }
-        if ($internalHost === 'null' || $internalHost === null) {
-            $internalHost = 'qshost_'.substr(bin2hex(random_bytes(24)), 0, 10);
-        }
+
         $this->namespace = $namespace;
-        $this->internalHost = $internalHost;
     }
 
     /**
@@ -74,7 +67,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
             if( $response === 'CREATED: ' . $this->namespace) {
                 $qsns = QueryserviceNamespace::create([
                     'namespace' => $this->namespace,
-                    'internalHost' => $this->internalHost,
+                    //'internalHost' => $this->internalHost,
                     'backend' => $queryServiceHost,
                 ]);
             }

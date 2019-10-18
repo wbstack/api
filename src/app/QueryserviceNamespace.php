@@ -13,7 +13,7 @@ class QueryserviceNamespace extends Model
      */
     protected $fillable = [
         'namespace',
-        'internalHost',
+        //'internalHost',
         'backend',
     ];
 
