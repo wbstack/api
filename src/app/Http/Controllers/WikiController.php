@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
 use App\WikiDomain;
@@ -24,9 +25,12 @@ class WikiController extends Controller
         $dbAssignment = null;
         // TODO create with some sort of owner etc?
         DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment) {
-            $readyDbs = WikiDb::where('wiki_id', null)->count();
-            if ($readyDbs == 0) {
+            // Fail if there is not enough storage ready
+            if (WikiDb::where('wiki_id', null)->count() == 0) {
                 abort(503, 'No databases ready');
+            }
+            if (QueryserviceNamespace::where('wiki_id', null)->count() == 0) {
+                abort(503, 'No query namespaces ready');
             }
 
             $wiki = Wiki::create([
@@ -40,9 +44,14 @@ class WikiController extends Controller
                 'wiki_id' => $wiki->id,
             ]);
 
+            // Assign storage
             $dbAssignment = DB::table('wiki_dbs')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
             if (! $dbAssignment) {
                 abort(503, 'Database ready, but failed to assign');
+            }
+            $nsAssignment = DB::table('queryservice_namespaces')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
+            if (! $nsAssignment) {
+                abort(503, 'QS Namespace ready, but failed to assign');
             }
 
             $ownerAssignment = WikiManager::create([
