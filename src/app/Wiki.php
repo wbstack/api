@@ -29,11 +29,15 @@ class Wiki extends Model
         return $this->hasOne(WikiDb::class)->select(['id', 'wiki_id', 'version']);
     }
 
-    // TODO this should just be on the backend model? =] Or marked as a private relationship or something?
-    // OR some sort of access controll needs to be done..
+    // TODO these should just be on the backend model? =] Or marked as a private relationship or something?
+    // OR some sort of access control needs to be done..
     public function wikiDb()
     {
         return $this->hasOne(WikiDb::class);
+    }
+    public function wikiQueryserviceNamespace()
+    {
+        return $this->hasOne(QueryserviceNamespace::class);
     }
 
     public function wikiManagers()
