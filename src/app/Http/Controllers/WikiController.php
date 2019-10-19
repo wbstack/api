@@ -7,8 +7,10 @@ use App\Wiki;
 use App\WikiDb;
 use App\WikiDomain;
 use App\WikiManager;
+use App\WikiSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class WikiController extends Controller
 {
@@ -53,6 +55,14 @@ class WikiController extends Controller
             if (! $nsAssignment) {
                 abort(503, 'QS Namespace ready, but failed to assign');
             }
+
+            // Create initial needed non default settings
+            // Docs: https://www.mediawiki.org/wiki/Manual:$wgSecretKey
+            WikiSetting::create([
+                'wiki_id' => $wiki->id,
+                'name' => 'wgSecretKey',
+                'value' => Str::random(64),
+            ]);
 
             $ownerAssignment = WikiManager::create([
               'user_id' => $user->id,

@@ -40,8 +40,13 @@ class Wiki extends Model
         return $this->hasOne(QueryserviceNamespace::class);
     }
 
+    public function settings() {
+        return $this->hasMany(WikiSetting::class );
+    }
+
     public function wikiManagers()
     {
+        // TODO should this be hasMany ?
         return $this->belongsToMany(User::class, 'wiki_managers')->select(['email']);
     }
 }
