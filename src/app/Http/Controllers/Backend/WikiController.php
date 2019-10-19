@@ -14,9 +14,10 @@ class WikiController extends Controller
 
         if ($domain === 'localhost') {
             // TODO if not in debug mode don't allow this code path to run
-            $result = Wiki::with(['wikiDb','wikiQueryserviceNamespace'])->first();
+            $result = Wiki::with(['wikiDb','wikiQueryserviceNamespace','settings'])->first();
         } else {
-            $result = Wiki::where('domain', $domain)->with(['wikiDb','wikiQueryserviceNamespace'])->first();
+            // TODO don't select the timestamps and redundant info for the settings?
+            $result = Wiki::where('domain', $domain)->with(['wikiDb','wikiQueryserviceNamespace','settings'])->first();
         }
 
         $res['success'] = true;
