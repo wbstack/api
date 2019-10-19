@@ -11,7 +11,7 @@ call_user_func(function () {
 
     // Set the model to the globals to be used by local settings..
     /* @var WikiInfo[] $wikiInfo */
-    $GLOBALS[WIKIINFO_KEY] = $wikiInfo;
+    $GLOBALS[WIKWIKI_GLOBAL] = $wikiInfo;
     // END generic getting of wiki info from domain
 
     if ($wikiInfo === [] || $wikiInfo === null) {
