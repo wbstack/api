@@ -12,7 +12,8 @@ class WikiController extends Controller
     {
         $domain = $request->input('domain');
 
-        if ($domain === 'localhost') {
+        // If we are developing and the request is localhost or mediawiki then return the settings of the first wiki :)
+        if ($domain === 'localhost' || $domain === 'mediawiki') {
             // TODO if not in debug mode don't allow this code path to run
             $result = Wiki::with(['wikiDb','wikiQueryserviceNamespace','settings'])->first();
         } else {

@@ -11,8 +11,9 @@ class CreateEventPageUpdatesTable extends Migration
     {
         Schema::create('event_page_updates', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('site', 100);
-            $table->string('title', 100);
+            $table->integer('wiki_id');
+            // 14 allows 100 billion as an entity id..
+            $table->string('title', 14);
             $table->integer('namespace');
 
             $table->timestamps();

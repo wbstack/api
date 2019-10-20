@@ -4,13 +4,15 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EventPageUpdate extends Model
+class QsBatch extends Model
 {
 
     protected $fillable = [
+        'done',
+        'eventFrom',
+        'eventTo',
         'wiki_id',
-        'title',
-        'namespace',
+        'entityIds'
     ];
 
     public function wiki()
