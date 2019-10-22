@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\MediawikiInit;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
@@ -68,6 +69,8 @@ class WikiController extends Controller
               'user_id' => $user->id,
               'wiki_id' => $wiki->id,
             ]);
+
+            dispatch(new MediawikiInit($wiki->domain,'Admin', $user->email));
         });
 
         $res['success'] = true;
