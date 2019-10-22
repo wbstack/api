@@ -19,9 +19,11 @@ class WikiController extends Controller
     {
         $user = $request->user();
 
+        // TODO extra validation that username is correct?
         $request->validate([
             'domain' => 'required|unique:wikis|unique:wiki_domains|regex:/^.+\.wiki\.opencura\.com$/',
             'sitename' => 'required',
+            'username' => 'required',
         ]);
 
         $wiki = null;
@@ -70,7 +72,7 @@ class WikiController extends Controller
               'wiki_id' => $wiki->id,
             ]);
 
-            dispatch(new MediawikiInit($wiki->domain,'Admin', $user->email));
+            dispatch(new MediawikiInit($wiki->domain,$request->input('username'), $user->email));
         });
 
         $res['success'] = true;
