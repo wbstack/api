@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   mediawiki-clean:
-    image: gcr.io/open-cura/mediawiki:1.33-0.1
+    image: gcr.io/wbstack/mediawiki:1.33-0.8
     volumes:
       - ./doMaintenance.php:/var/www/html/maintenance/doMaintenance.php
       - ./wikWikiInfoDefaults-clean.json:/var/www/html/wikWikiInfoDefaults.json
@@ -12,32 +12,32 @@ services:
       WIKWIKI_INFO_FROM: defaults-file
     links:
     - sql-clean
-  mediawiki-upgrade:
-    image: gcr.io/open-cura/mediawiki:1.33-0.1
-    volumes:
-      - ./doMaintenance.php:/var/www/html/maintenance/doMaintenance.php
-      - ./wikWikiInfoDefaults-upgrade.json:/var/www/html/wikWikiInfoDefaults.json
-      - ./wikWikiInfoDefaults.php:/var/www/html/wikWikiInfoDefaults.php
-    environment:
-      WIKWIKI_INFO_FROM: defaults-file
-    links:
-    - sql-upgrade
+#  mediawiki-upgrade:
+#    image: gcr.io/wbstack/mediawiki:1.33-0.8
+#    volumes:
+#      - ./doMaintenance.php:/var/www/html/maintenance/doMaintenance.php
+#      - ./wikWikiInfoDefaults-upgrade.json:/var/www/html/wikWikiInfoDefaults.json
+#      - ./wikWikiInfoDefaults.php:/var/www/html/wikWikiInfoDefaults.php
+#    environment:
+#      WIKWIKI_INFO_FROM: defaults-file
+#    links:
+#    - sql-upgrade
   sql-clean:
     image: mariadb:10
     environment:
       MYSQL_ROOT_PASSWORD: toor
       MYSQL_DATABASE: wiki
-  sql-upgrade:
-    image: mariadb:10
-    environment:
-      MYSQL_ROOT_PASSWORD: toor
-      MYSQL_DATABASE: wiki
-    volumes:
-    - ./upgradeFrom.sql:/docker-entrypoint-initdb.d/01_upgradeFrom.sql
-    networks:
-      default:
-        aliases:
-         - mediawiki-sql
+#  sql-upgrade:
+#    image: mariadb:10
+#    environment:
+#      MYSQL_ROOT_PASSWORD: toor
+#      MYSQL_DATABASE: wiki
+#    volumes:
+#    - ./upgradeFrom.sql:/docker-entrypoint-initdb.d/01_upgradeFrom.sql
+#    networks:
+#      default:
+#        aliases:
+#         - mediawiki-sql
   sql-admin:
     image: adminer:4.6
     ports:

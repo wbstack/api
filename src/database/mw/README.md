@@ -11,12 +11,6 @@ This directory contains the SQL needed to create and update wiki DDs.
 *Future*
 mw1.33-oc1 - First version of 1.33
 
-*Current*
-mw1.31-oc2 - First test of database change updating in "api"
-
-*Legacy*
-mw1.31-oc1 - Starting install of 1.31 from ages ago
-
 ### Generating SQL
 
 Make sure you have updated the docker-compose.yml to:
@@ -49,13 +43,13 @@ Then get the SQL from adminer:
  - Select ONLY interwiki and updatelog data
  - Click "Export"
  - Copy output to the new directory with correct name, and make alterations:
- - Remove SET statements
- - Run cleanSql.php over the file
+     - Remove SET statements
+     - Run cleanSql.php over the file
  - Compare the resulting schemas to see what has changed...
 
 ### To generate the updates needed for a schema?
 
-Something like this?
+Something like this? TODO do this....
 
 <pre>
 docker-compose exec mediawiki-upgrade bash
