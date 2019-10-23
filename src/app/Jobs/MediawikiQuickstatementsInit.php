@@ -22,8 +22,7 @@ class MediawikiQuickstatementsInit extends Job
     {
         $curl = curl_init();
         curl_setopt_array($curl, [
-            // TODO get host from env var...
-            CURLOPT_URL => "mediawiki-backend:80/w/api.php?action=wbstackQuickstatementsInit&format=json",
+            CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . "/w/api.php?action=wbstackQuickstatementsInit&format=json",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 10,
