@@ -14,6 +14,8 @@ class WikiController extends Controller
     {
         $domain = $request->input('domain');
 
+        // XXX: this same logic is in quickstatements.php and platform api WikiController backend
+
         // TODO don't do the localhost checks when in production? :)
         if ( substr($domain,-10, 10) === '.localhost' ){
             // localhost development, with a full domain prefixing .localhost
