@@ -40,6 +40,7 @@ class MediawikiQuickstatementsInit extends Job
         curl_close($curl);
 
         $response = json_decode($response, true);
+        var_dump($response);
         $response = $response['wbstackQuickstatementsInit'];
 
         if($response['success'] == 0) {
