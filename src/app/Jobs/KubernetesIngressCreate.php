@@ -66,7 +66,7 @@ class KubernetesIngressCreate extends Job
                                 [
                                     'path' => '/',
                                     'backend' => [
-                                        'serviceName' => 'mediawiki',
+                                        'serviceName' => 'mediawiki-app-web',
                                         'servicePort' => 80,
                                     ],
                                 ],
@@ -87,7 +87,7 @@ class KubernetesIngressCreate extends Job
                                 [
                                     'path' => '/tools/quickstatements',
                                     'backend' => [
-                                        'serviceName' => 'quickstatements',
+                                        'serviceName' => 'tool-quickstatements',
                                         'servicePort' => 80,
                                     ],
                                 ],
