@@ -49,7 +49,7 @@ class KubernetesIngressCreate extends Job
                 'name' => 'mediawiki-site-' . $this->id,
                 'namespace' => 'default',
                 'labels' => [
-                    'id' => $this->id,
+                    'id' => strval($this->id),
                     'domain' => $this->wikiDomain,
                     // Generation should be updated when this ingress spec is changed.
                     // This will allow updating older ingresses to match newer ones etc.
