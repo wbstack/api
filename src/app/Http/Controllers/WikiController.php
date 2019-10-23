@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\MediawikiInit;
+use App\Jobs\MediawikiQuickstatementsInit;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
@@ -72,7 +73,9 @@ class WikiController extends Controller
               'wiki_id' => $wiki->id,
             ]);
 
+            // TODO maybe always make these run in a certain order..?
             dispatch(new MediawikiInit($wiki->domain,$request->input('username'), $user->email));
+            dispatch(new MediawikiQuickstatementsInit($wiki->domain));
         });
 
         $res['success'] = true;
