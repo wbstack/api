@@ -56,6 +56,9 @@ class KubernetesIngressCreate extends Job
                     'generation' => '2019-10-23.1',
                     'app.kubernetes.io/managed-by' => 'wbstack-platform',
                 ],
+                'annotations' => [
+                    'nginx.ingress.kubernetes.io/rewrite-target' => '/$2',
+                ],
             ],
             'spec' => [
                 'rules' => [
@@ -64,28 +67,28 @@ class KubernetesIngressCreate extends Job
                         'http' => [
                             'paths' => [
                                 [
-                                    'path' => '/',
+                                    'path' => '/()(.*)',
                                     'backend' => [
                                         'serviceName' => 'mediawiki-app-web',
                                         'servicePort' => 80,
                                     ],
                                 ],
                                 [
-                                    'path' => '/query',
+                                    'path' => '/(query)(.*)',
                                     'backend' => [
                                         'serviceName' => 'queryservice-ui',
                                         'servicePort' => 80,
                                     ],
                                 ],
                                 [
-                                    'path' => '/query/sparql',
+                                    'path' => '/(query/)(sparql.*)',
                                     'backend' => [
                                         'serviceName' => 'queryservice-proxy',
                                         'servicePort' => 80,
                                     ],
                                 ],
                                 [
-                                    'path' => '/tools/quickstatements',
+                                    'path' => '/(tools/quickstatements)(.*)',
                                     'backend' => [
                                         'serviceName' => 'tool-quickstatements',
                                         'servicePort' => 80,
