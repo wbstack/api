@@ -49,16 +49,28 @@ class KubernetesIngressCreate extends Job
                 'name' => 'mediawiki-site-' . $this->id,
                 'namespace' => 'default',
                 'labels' => [
-                    'id' => strval($this->id),
-                    'domain' => $this->wikiDomain,
+                    'wbstack-wiki-id' => strval($this->id),
+                    'wbstack-wiki-domain' => $this->wikiDomain,
                     // Generation should be updated when this ingress spec is changed.
                     // This will allow updating older ingresses to match newer ones etc.
-                    'generation' => '2019-10-23.1',
+                    'wbstack-ingress-generation' => '2019-10-23.1',
                     'app.kubernetes.io/managed-by' => 'wbstack-platform',
                 ],
                 'annotations' => [
+                    'kubernetes.io/ingress.class' => 'nginx',
+//                    'certmanager.k8s.io/acme-challenge-type' => 'dns01',
+//                    'certmanager.k8s.io/acme-dns01-provider' => 'prod-dns',
+//                    'certmanager.k8s.io/cluster-issuer' => 'letsencrypt-staging',
+                    'nginx.ingress.kubernetes.io/force-ssl-redirect' => 'true',
+                    'nginx.ingress.kubernetes.io/use-regex' => 'true',
                     'nginx.ingress.kubernetes.io/rewrite-target' => '/$2',
+                    'nginx.ingress.kubernetes.io/configuration-snippet' => 'rewrite ^(/query|/tools/quickstatements)$ $1/ permanent;',
                 ],
+                /**
+                 * In YAML...
+                 *     nginx.ingress.kubernetes.io/configuration-snippet: |
+                rewrite ^(/query|/tools/quickstatements)$ $1/ permanent;
+                 */
             ],
             'spec' => [
                 'rules' => [
