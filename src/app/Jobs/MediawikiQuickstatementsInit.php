@@ -35,15 +35,17 @@ class MediawikiQuickstatementsInit extends Job
 
         $response = curl_exec($curl);
         $err = curl_error($curl);
+        if($err) {
+            throw new \RuntimeException('curl error for ' . $this->wikiDomain . ': ' . $err);
+        }
 
         curl_close($curl);
 
         $response = json_decode($response, true);
-        var_dump($response);
         $response = $response['wbstackQuickstatementsInit'];
 
         if($response['success'] == 0) {
-            throw new \RuntimeException('wbstackQuickstatementsInit call for ' . $this->wikiDomain . ' was not successful');
+            throw new \RuntimeException('wbstackQuickstatementsInit call for ' . $this->wikiDomain . ' was not successful:' . json_encode($response));
         }
         // Otherwise there was success (and we could get the userId if we wanted...
     }

@@ -46,6 +46,9 @@ class MediawikiInit extends Job
 
         $response = curl_exec($curl);
         $err = curl_error($curl);
+        if($err) {
+            throw new \RuntimeException('curl error for ' . $this->wikiDomain . ': ' . $err);
+        }
 
         curl_close($curl);
 
@@ -53,7 +56,7 @@ class MediawikiInit extends Job
         $response = $response['wbstackInit'];
 
         if($response['success'] == 0) {
-            throw new \RuntimeException('wbstackInit call for ' . $this->wikiDomain . ' was not successful');
+            throw new \RuntimeException('wbstackInit call for ' . $this->wikiDomain . ' was not successful:' . json_encode($response));
         }
         // Otherwise there was success (and we could get the userId if we wanted...
     }
