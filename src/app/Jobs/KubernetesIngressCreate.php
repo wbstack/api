@@ -53,26 +53,27 @@ class KubernetesIngressCreate extends Job
                     'wbstack-wiki-domain' => $this->wikiDomain,
                     // Generation should be updated when this ingress spec is changed.
                     // This will allow updating older ingresses to match newer ones etc.
-                    'wbstack-ingress-generation' => '2019-10-23.1',
+                    'wbstack-ingress-generation' => '2019-10-24.1',
                     'app.kubernetes.io/managed-by' => 'wbstack-platform',
                 ],
                 'annotations' => [
                     'kubernetes.io/ingress.class' => 'nginx',
-//                    'certmanager.k8s.io/acme-challenge-type' => 'dns01',
-//                    'certmanager.k8s.io/acme-dns01-provider' => 'prod-dns',
-//                    'certmanager.k8s.io/cluster-issuer' => 'letsencrypt-staging',
                     'nginx.ingress.kubernetes.io/force-ssl-redirect' => 'true',
                     'nginx.ingress.kubernetes.io/use-regex' => 'true',
                     'nginx.ingress.kubernetes.io/rewrite-target' => '/$2',
                     'nginx.ingress.kubernetes.io/configuration-snippet' => 'rewrite ^(/query|/tools/quickstatements)$ $1/ permanent;',
                 ],
-                /**
-                 * In YAML...
-                 *     nginx.ingress.kubernetes.io/configuration-snippet: |
-                rewrite ^(/query|/tools/quickstatements)$ $1/ permanent;
-                 */
             ],
             'spec' => [
+                'tls' => [
+                    [
+                        'hosts' => [
+                            $this->wikiDomain
+                        ],
+                        // TODO this should be an env var...
+                        'secretName' => 'opencura-com-tls-prod',
+                    ]
+                ],
                 'rules' => [
                     [
                         'host' => $this->wikiDomain,
@@ -81,6 +82,7 @@ class KubernetesIngressCreate extends Job
                                 [
                                     'path' => '/()(.*)',
                                     'backend' => [
+                                        // TODO this should be an env var...
                                         'serviceName' => 'mediawiki-app-web',
                                         'servicePort' => 80,
                                     ],
@@ -88,6 +90,7 @@ class KubernetesIngressCreate extends Job
                                 [
                                     'path' => '/(query)(.*)',
                                     'backend' => [
+                                        // TODO this should be an env var...
                                         'serviceName' => 'queryservice-ui',
                                         'servicePort' => 80,
                                     ],
@@ -95,6 +98,7 @@ class KubernetesIngressCreate extends Job
                                 [
                                     'path' => '/(query/)(sparql.*)',
                                     'backend' => [
+                                        // TODO this should be an env var...
                                         'serviceName' => 'queryservice-proxy',
                                         'servicePort' => 80,
                                     ],
@@ -102,6 +106,7 @@ class KubernetesIngressCreate extends Job
                                 [
                                     'path' => '/(tools/quickstatements)(.*)',
                                     'backend' => [
+                                        // TODO this should be an env var...
                                         'serviceName' => 'tool-quickstatements',
                                         'servicePort' => 80,
                                     ],
