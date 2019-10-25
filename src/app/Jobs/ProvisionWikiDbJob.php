@@ -105,13 +105,12 @@ class ProvisionWikiDbJob extends Job
                 throw new \RuntimeException(
                'Failed to grant user: '.$this->dbUser);
             }
-
-            // Needs https://dev.mysql.com/doc/refman/8.0/en/privileges-provided.html#priv_reload
-            // and is probably not needed...
-            // if ($pdo->exec('FLUSH PRIVILEGES') === false) {
-            //     throw new \RuntimeException(
-            //    'Failed to flush privs: '.$this->dbUser);
-            // }
+            // GRANT the user access to see slave status
+            // GRANT REPLICATION CLIENT ON *.* TO 'mwu_36be7164b0'@'%'
+            if ($pdo->exec('GRANT REPLICATION CLIENT ON *.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
+                throw new \RuntimeException(
+               'Failed to grant user: '.$this->dbUser);
+            }
 
             // ADD THE TABLES
             // Get SQL statements to run
