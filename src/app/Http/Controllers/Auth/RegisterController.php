@@ -63,12 +63,8 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         $validation = [
-          //'name' => ['required', 'string', 'max:255'],
           'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-          // TODO production set password length limit..
-          'password' => ['required', 'string'/*'min:8'*/],
-          // SHIFT we confirm this in JS.. do don't do it here?
-          //'password' => ['required', 'string', 'min:8', 'confirmed'],
+          'password' => ['required', 'string','min:8', 'confirmed'],
           'recaptcha' => 'required|captcha',
       ];
 
