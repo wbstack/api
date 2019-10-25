@@ -23,7 +23,11 @@ class WikiController extends Controller
 
         // TODO extra validation that username is correct?
         $request->validate([
-            'domain' => 'required|unique:wikis|unique:wiki_domains|regex:/^.+\.wiki\.opencura\.com$/',
+            // .wiki.opencura.com is 18 characters long
+            // if we want at least 5 chars for the site sub domain
+            // that is 23 length
+            // This also stops things like mail. www. pop. ETC...
+            'domain' => 'required|unique:wikis|unique:wiki_domains|min:23|regex:/^[a-zA-Z0-9_-]+\.wiki\.opencura\.com$/',
             'sitename' => 'required',
             'username' => 'required',
         ]);
