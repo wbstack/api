@@ -57,7 +57,7 @@ class QsController extends Controller
                 // If we already have a not done event for the same wiki
                 foreach($notDoneBatches as $qsBatch){
                     if($qsBatch->wiki_id == $wikiId) {
-                        $entityBatch = array_merge( $entityBatch, $qsBatch->entityIds );
+                        $entityBatch = array_merge( $entityBatch, explode( ',', $qsBatch->entityIds ) );
                         $qsBatch->delete();
                     }
                 }
