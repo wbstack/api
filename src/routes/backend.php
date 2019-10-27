@@ -15,4 +15,5 @@ $router->group(['prefix' => 'qs'], function () use ($router) {
     $router->get('getBatches', ['uses' => 'QsController@getBatches']);
     // POST
     $router->post('markDone', ['uses' => 'QsController@markBatchesDone']);
+    $router->post('markFailed', ['uses' => 'QsController@markBatchesFailed']);
 });
