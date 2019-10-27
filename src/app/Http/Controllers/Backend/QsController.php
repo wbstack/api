@@ -78,6 +78,16 @@ class QsController extends Controller
             // and for now mark it as done
             /** @var Collection $batches */
             $sorted = collect($batches)->sortBy('id');
+
+            if($sorted->isEmpty()) {
+                /**
+                 * If sorted collection is empty, then look back at the still $notDoneBatches
+                 * and just shove them in...
+                 * This should be done better.
+                 */
+                $sorted = $notDoneBatches;
+            }
+
             $first = $sorted->first();
 
             if($first === null){
