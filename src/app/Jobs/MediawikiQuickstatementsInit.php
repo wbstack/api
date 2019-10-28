@@ -33,7 +33,7 @@ class MediawikiQuickstatementsInit extends Job
             ],
         ]);
 
-        $response = curl_exec($curl);
+        $rawResponse = curl_exec($curl);
         $err = curl_error($curl);
         if($err) {
             throw new \RuntimeException('curl error for ' . $this->wikiDomain . ': ' . $err);
@@ -41,11 +41,11 @@ class MediawikiQuickstatementsInit extends Job
 
         curl_close($curl);
 
-        $response = json_decode($response, true);
+        $response = json_decode($rawResponse, true);
         $response = $response['wbstackQuickstatementsInit'];
 
         if($response['success'] == 0) {
-            throw new \RuntimeException('wbstackQuickstatementsInit call for ' . $this->wikiDomain . ' was not successful:' . json_encode($response));
+            throw new \RuntimeException('wbstackQuickstatementsInit call for ' . $this->wikiDomain . ' was not successful:' . $rawResponse);
         }
         // Otherwise there was success (and we could get the userId if we wanted...
     }
