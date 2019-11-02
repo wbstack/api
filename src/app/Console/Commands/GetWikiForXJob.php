@@ -35,6 +35,6 @@ class GetWikiForXJob extends Command
             ->with(['wikiDb','wikiQueryserviceNamespace','settings'])
             ->first();
 
-        $this->info($result->toJson(JSON_PRETTY_PRINT));
+        $this->line($result->toJson(JSON_PRETTY_PRINT));
     }
 }
