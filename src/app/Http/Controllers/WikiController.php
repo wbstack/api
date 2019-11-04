@@ -27,7 +27,7 @@ class WikiController extends Controller
             // if we want at least 5 chars for the site sub domain
             // that is 23 length
             // This also stops things like mail. www. pop. ETC...
-            'domain' => 'required|unique:wikis|unique:wiki_domains|min:23|regex:/^[a-zA-Z0-9_-]+\.wiki\.opencura\.com$/',
+            'domain' => 'required|unique:wikis|unique:wiki_domains|min:23|regex:/^[a-z0-9-]+\.wiki\.opencura\.com$/',
             'sitename' => 'required',
             'username' => 'required',
         ]);
