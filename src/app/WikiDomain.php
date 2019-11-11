@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class WikiDomain extends Model
 {
-
     protected $fillable = [
         'domain',
         'wiki_id',
@@ -16,5 +15,4 @@ class WikiDomain extends Model
     {
         return $this->hasOne(Wiki::class);
     }
-
 }

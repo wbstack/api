@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\QueryserviceNamespace;
 use App\WikiDb;
+use App\QueryserviceNamespace;
 
 class EnsureStoragePoolsPopulatedJob extends Job
 {

@@ -2,8 +2,8 @@
 
 namespace Tests\Routes\Interest;
 
-use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
+use Tests\Routes\Traits\OptionsRequestAllowed;
 
 class RegisterTest extends TestCase
 {

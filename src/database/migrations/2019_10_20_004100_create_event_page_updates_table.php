@@ -6,7 +6,6 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateEventPageUpdatesTable extends Migration
 {
-
     public function up()
     {
         Schema::create('event_page_updates', function (Blueprint $table) {

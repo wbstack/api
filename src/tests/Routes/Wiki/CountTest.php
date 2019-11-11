@@ -3,9 +3,9 @@
 namespace Tests\Routes\Wiki\Managers;
 
 use App\Wiki;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
+use Tests\Routes\Traits\OptionsRequestAllowed;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 /**
  * @covers WikiController::count

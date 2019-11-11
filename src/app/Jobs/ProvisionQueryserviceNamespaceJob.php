@@ -6,7 +6,6 @@ use App\QueryserviceNamespace;
 
 class ProvisionQueryserviceNamespaceJob extends Job
 {
-
     private $namespace;
 
     /**
@@ -32,26 +31,26 @@ class ProvisionQueryserviceNamespaceJob extends Job
      */
     public function handle()
     {
-        $properties = file_get_contents( __DIR__ . DIRECTORY_SEPARATOR . '../data/RWStore.properties' );
+        $properties = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'../data/RWStore.properties');
         // Currently only one, but will change at some point...
-        $queryServiceHost = config( 'app.queryservice_host' );
+        $queryServiceHost = config('app.queryservice_host');
 
         // Replace the namespace in the properties file
-        $properties = str_replace( 'REPLACE_NAMESPACE', $this->namespace, $properties );
+        $properties = str_replace('REPLACE_NAMESPACE', $this->namespace, $properties);
 
         $curl = curl_init();
         curl_setopt_array($curl, [
             // TODO when there are multiple hosts, this will need to be different?
             // OR go through the gateway?
-            CURLOPT_URL => $queryServiceHost . "/bigdata/namespace",
+            CURLOPT_URL => $queryServiceHost.'/bigdata/namespace',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 10,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => $properties,
             CURLOPT_HTTPHEADER => [
-                "content-type: text/plain",
+                'content-type: text/plain',
             ],
         ]);
 
@@ -61,10 +60,11 @@ class ProvisionQueryserviceNamespaceJob extends Job
         curl_close($curl);
 
         if ($err) {
-            echo "cURL Error #:" . $err;
+            echo 'cURL Error #:'.$err;
+
             return;
         } else {
-            if( $response === 'CREATED: ' . $this->namespace) {
+            if ($response === 'CREATED: '.$this->namespace) {
                 $qsns = QueryserviceNamespace::create([
                     'namespace' => $this->namespace,
                     //'internalHost' => $this->internalHost,
@@ -73,6 +73,5 @@ class ProvisionQueryserviceNamespaceJob extends Job
             }
             // TODO Else log create failed?
         }
-
     }
 }

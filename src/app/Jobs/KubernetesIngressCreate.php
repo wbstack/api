@@ -7,9 +7,9 @@ use Maclof\Kubernetes\Models\Ingress;
 
 class KubernetesIngressCreate extends Job
 {
-
     private $id;
     private $wikiDomain;
+
     /**
      * @return void
      */
@@ -27,7 +27,7 @@ class KubernetesIngressCreate extends Job
         // Docs for the client https://github.com/maclof/kubernetes-client
 
         // Connection example from: https://github.com/maclof/kubernetes-client#using-a-service-account
-        echo "Creating k8s client";
+        echo 'Creating k8s client';
         $client = new Client([
             // Service host per: https://kubernetes.io/docs/tasks/administer-cluster/access-cluster-api/#accessing-the-api-from-a-pod
             'master' => 'https://kubernetes.default.svc',
@@ -38,7 +38,7 @@ class KubernetesIngressCreate extends Job
 
         $ingress = new Ingress([
             'metadata' => [
-                /**
+                /*
                  * From: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/
                  * Kubernetes resources can have names up to 253 characters long.
                  * The characters allowed in names are: digits (0-9), lower case letters (a-z), -, and ..
@@ -46,7 +46,7 @@ class KubernetesIngressCreate extends Job
                  * So, just use the ID number here
                  * We can add a label showing the domain and allowing selection.
                  */
-                'name' => 'mediawiki-site-' . $this->id,
+                'name' => 'mediawiki-site-'.$this->id,
                 'namespace' => 'default',
                 'labels' => [
                     'wbstack-wiki-id' => strval($this->id),
@@ -68,11 +68,11 @@ class KubernetesIngressCreate extends Job
                 'tls' => [
                     [
                         'hosts' => [
-                            $this->wikiDomain
+                            $this->wikiDomain,
                         ],
                         // TODO this should be an env var...
                         'secretName' => 'opencura-com-tls-prod',
-                    ]
+                    ],
                 ],
                 'rules' => [
                     [
@@ -118,15 +118,15 @@ class KubernetesIngressCreate extends Job
             ],
         ]);
 
-        echo "Getting ingress resources";
+        echo 'Getting ingress resources';
         $ingresses = $client->ingresses();
-        echo "Checking if resource exists: " . $ingress->getMetadata('name');
+        echo 'Checking if resource exists: '.$ingress->getMetadata('name');
         $exists = $ingresses->exists($ingress->getMetadata('name'));
         if ($exists) {
             die('Should not already exist...');
         }
 
-        echo "Creating ingress resource";
+        echo 'Creating ingress resource';
         $result = $client->ingresses()->create($ingress);
         // TODO check result
         // TODO output something?

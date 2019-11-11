@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Jobs\InvitationDeleteJob;
-use App\Jobs\UesrVerificationTokenCreateAndSendJob;
-use App\Jobs\UserCreateJob;
 use App\User;
-use Illuminate\Auth\Events\Registered;
+use App\Jobs\UserCreateJob;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Jobs\InvitationDeleteJob;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Validator;
+use App\Jobs\UesrVerificationTokenCreateAndSendJob;
 
 class RegisterController extends Controller
 {
@@ -31,15 +31,15 @@ class RegisterController extends Controller
             $request->input('email'),
             $request->input('password')
           ))->handle();
-          if ($request->input('invite')) {
-              ( new InvitationDeleteJob($request->input('invite')) )->handle();
-          }
-          ( new UesrVerificationTokenCreateAndSendJob($user) )->handle();
+            if ($request->input('invite')) {
+                ( new InvitationDeleteJob($request->input('invite')) )->handle();
+            }
+            ( new UesrVerificationTokenCreateAndSendJob($user) )->handle();
         });
 
-        if($user === null) {
-          // Code probably shouldnt ever get here..? As the transaction might throw? maybe?
-          throw new \LogicException('Oh noes!');
+        if ($user === null) {
+            // Code probably shouldnt ever get here..? As the transaction might throw? maybe?
+            throw new \LogicException('Oh noes!');
         }
 
         event(new Registered($user));
@@ -65,7 +65,7 @@ class RegisterController extends Controller
         $validation = [
           'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             // Not confirmed for password as we do that ourselves? No, we do it in the UI..
-          'password' => ['required', 'string','min:8'/*, 'confirmed'*/],
+          'password' => ['required', 'string', 'min:8'/*, 'confirmed'*/],
           'recaptcha' => 'required|captcha',
       ];
 
@@ -84,8 +84,8 @@ class RegisterController extends Controller
             $validation['invite'] = 'required|exists:invitations,code';
         }
         // For testing, allow 5 char emails ot skip captcha...
-        if(strlen($data['email']) == 5) {
-          unset($validation['recaptcha']);
+        if (strlen($data['email']) == 5) {
+            unset($validation['recaptcha']);
         }
 
         return Validator::make($data, $validation);

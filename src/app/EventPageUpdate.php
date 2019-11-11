@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class EventPageUpdate extends Model
 {
-
     protected $fillable = [
         'wiki_id',
         'title',
@@ -17,5 +16,4 @@ class EventPageUpdate extends Model
     {
         return $this->belongsTo(Wiki::class);
     }
-
 }

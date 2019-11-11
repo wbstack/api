@@ -6,7 +6,6 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateWikiSettingsTable extends Migration
 {
-
     public function up()
     {
         Schema::create('wiki_settings', function (Blueprint $table) {

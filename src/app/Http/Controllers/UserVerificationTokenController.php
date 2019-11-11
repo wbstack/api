@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\UesrVerificationTokenCreateAndSendJob;
 use App\User;
-use App\UserVerificationToken;
 use Illuminate\Http\Request;
+use App\UserVerificationToken;
+use App\Jobs\UesrVerificationTokenCreateAndSendJob;
 
 class UserVerificationTokenController extends Controller
 {

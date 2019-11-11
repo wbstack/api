@@ -32,7 +32,7 @@ class GetWikiForXJob extends Command
         $value = trim($this->argument('value'));
         // TODO don't select the timestamps and redundant info for the settings?
         $result = Wiki::where($key, $value)
-            ->with(['wikiDb','wikiQueryserviceNamespace','settings'])
+            ->with(['wikiDb', 'wikiQueryserviceNamespace', 'settings'])
             ->first();
 
         $this->line($result->toJson(JSON_PRETTY_PRINT));

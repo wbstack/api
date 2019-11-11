@@ -6,7 +6,6 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateQsBatchesTable extends Migration
 {
-
     public function up()
     {
         Schema::create('qs_batches', function (Blueprint $table) {

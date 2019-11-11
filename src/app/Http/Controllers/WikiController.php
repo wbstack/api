@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\KubernetesIngressCreate;
-use App\Jobs\MediawikiInit;
-use App\Jobs\MediawikiQuickstatementsInit;
-use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
 use App\WikiDomain;
 use App\WikiManager;
 use App\WikiSetting;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Jobs\MediawikiInit;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\QueryserviceNamespace;
+use Illuminate\Support\Facades\DB;
+use App\Jobs\KubernetesIngressCreate;
+use App\Jobs\MediawikiQuickstatementsInit;
 
 class WikiController extends Controller
 {
@@ -79,8 +79,8 @@ class WikiController extends Controller
             ]);
 
             // TODO maybe always make these run in a certain order..?
-            dispatch(new KubernetesIngressCreate($wiki->id,$wiki->domain));
-            dispatch(new MediawikiInit($wiki->domain,$request->input('username'), $user->email));
+            dispatch(new KubernetesIngressCreate($wiki->id, $wiki->domain));
+            dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
             dispatch(new MediawikiQuickstatementsInit($wiki->domain));
         });
 

@@ -1,7 +1,6 @@
 <?php
 
 /** @var Router $router */
-
 use Laravel\Lumen\Routing\Router;
 
 // GET

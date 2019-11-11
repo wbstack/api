@@ -27,7 +27,8 @@ class WikiManager extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function email(){
-      $this->user()->email;
+    public function email()
+    {
+        $this->user()->email;
     }
 }

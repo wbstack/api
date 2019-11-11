@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Backend;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Collection;
 
 class QsController extends Controller
 {
@@ -15,9 +15,9 @@ class QsController extends Controller
         $batches = [];
         $returnCollection = [];
 
-        DB::transaction(function () use ( &$notDoneBatches, &$batches, &$returnCollection ) {
+        DB::transaction(function () use (&$notDoneBatches, &$batches, &$returnCollection) {
 //            // Get batches that have not yet been done
-            $notDoneBatches = \App\QsBatch::where('done', 0)->with(['wiki','wiki.wikiQueryserviceNamespace'])->get();
+            $notDoneBatches = \App\QsBatch::where('done', 0)->with(['wiki', 'wiki.wikiQueryserviceNamespace'])->get();
 //
 //            // Find out which events batches have been generated up to for
 //            $batchesUpTo = 0;
@@ -29,12 +29,12 @@ class QsController extends Controller
 
             // If there are no pending batches, get the highest ID so we don't make more..
             //if($batchesUpTo == 0) {
-                $maxIdBatch = \App\QsBatch::orderBy('id', 'desc')->first();
-                if($maxIdBatch) {
-                    $batchesUpTo = $maxIdBatch->eventTo;
-                } else {
-                    die('sometihng went wrong 666778');
-                }
+            $maxIdBatch = \App\QsBatch::orderBy('id', 'desc')->first();
+            if ($maxIdBatch) {
+                $batchesUpTo = $maxIdBatch->eventTo;
+            } else {
+                die('sometihng went wrong 666778');
+            }
             //}
 
             // Get events after that point and batch by wiki_id
@@ -42,22 +42,22 @@ class QsController extends Controller
             $events = \App\EventPageUpdate::where('id', '>', $batchesUpTo)->get();
             $wikiBatchesEntities = [];
             $lastEventId = 0;
-            foreach( $events as $event ) {
-                if($event->namespace == 120 || $event->namespace == 122) {
+            foreach ($events as $event) {
+                if ($event->namespace == 120 || $event->namespace == 122) {
                     $wikiBatchesEntities[$event->wiki_id][] = $event->title;
                 }
-                if($event->id > $lastEventId) {
+                if ($event->id > $lastEventId) {
                     $lastEventId = $event->id;
                 }
             }
 
             // Inset the newly created batches into the table...
-            foreach($wikiBatchesEntities as $wikiId => $entityBatch) {
+            foreach ($wikiBatchesEntities as $wikiId => $entityBatch) {
 
                 // If we already have a not done event for the same wiki
-                foreach($notDoneBatches as $qsBatch){
-                    if($qsBatch->wiki_id == $wikiId) {
-                        $entityBatch = array_merge( $entityBatch, explode( ',', $qsBatch->entityIds ) );
+                foreach ($notDoneBatches as $qsBatch) {
+                    if ($qsBatch->wiki_id == $wikiId) {
+                        $entityBatch = array_merge($entityBatch, explode(',', $qsBatch->entityIds));
                         $qsBatch->delete();
                     }
                 }
@@ -67,7 +67,7 @@ class QsController extends Controller
                     'eventFrom' => $batchesUpTo,
                     'eventTo'=> $lastEventId,
                     'wiki_id' => $wikiId,
-                    'entityIds' => implode( ',', array_unique( $entityBatch ) )
+                    'entityIds' => implode(',', array_unique($entityBatch)),
                 ]);
                 // TODO to the loading on all batches at once? :D
                 $batch->load(['wiki', 'wiki.wikiQueryserviceNamespace']);
@@ -79,7 +79,7 @@ class QsController extends Controller
             /** @var Collection $batches */
             $sorted = collect($batches)->sortBy('id');
 
-            if($sorted->isEmpty()) {
+            if ($sorted->isEmpty()) {
                 /**
                  * If sorted collection is empty, then look back at the still $notDoneBatches
                  * and just shove them in...
@@ -90,13 +90,13 @@ class QsController extends Controller
 
             $first = $sorted->first();
 
-            if($first === null){
+            if ($first === null) {
                 $returnCollection = [];
             } else {
                 $first->update(['done' => 1]);
                 $returnCollection = [$first];
             }
-        } );
+        });
 
         return response(collect($returnCollection));
     }
@@ -105,10 +105,11 @@ class QsController extends Controller
     {
         $rawBatches = $request->input('batches');
         $batches = explode(',', $rawBatches);
-        foreach($batches as $batch) {
-            \App\QsBatch::where( 'id', $batch )
+        foreach ($batches as $batch) {
+            \App\QsBatch::where('id', $batch)
                 ->update(['done' => 1]);
         }
+
         return response(1);
     }
 
@@ -116,10 +117,11 @@ class QsController extends Controller
     {
         $rawBatches = $request->input('batches');
         $batches = explode(',', $rawBatches);
-        foreach($batches as $batch) {
-            \App\QsBatch::where( 'id', $batch )
+        foreach ($batches as $batch) {
+            \App\QsBatch::where('id', $batch)
                 ->update(['done' => 0]);
         }
+
         return response(1);
     }
 }

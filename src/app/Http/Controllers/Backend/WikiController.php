@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Backend;
 
-use App\Http\Controllers\Controller;
 use App\Wiki;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class WikiController extends Controller
 {
-    private static $with = ['wikiDb','wikiQueryserviceNamespace','settings'];
+    private static $with = ['wikiDb', 'wikiQueryserviceNamespace', 'settings'];
 
     public function getWikiForDomain(Request $request)
     {
@@ -17,11 +17,11 @@ class WikiController extends Controller
         // XXX: this same logic is in quickstatements.php and platform api WikiController backend
 
         // TODO don't do the localhost checks when in production? :)
-        if ( substr($domain,-10, 10) === '.localhost' ){
+        if (substr($domain, -10, 10) === '.localhost') {
             // localhost development, with a full domain prefixing .localhost
             // eg. wiki.addshore.com.localhost
-            $result = Wiki::where('domain', substr($domain,0, -10))->with(self::$with)->first();
-        } else if ( $domain === 'localhost' || $domain === 'mediawiki' ) {
+            $result = Wiki::where('domain', substr($domain, 0, -10))->with(self::$with)->first();
+        } elseif ($domain === 'localhost' || $domain === 'mediawiki') {
             // If just using localhost then just get the first undeleted wiki
             // TODO actually check this doesn't show deleted wikis?
             $result = Wiki::with(self::$with)->first();

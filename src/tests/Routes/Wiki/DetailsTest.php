@@ -2,8 +2,8 @@
 
 namespace Tests\Routes\Wiki\Managers;
 
-use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
+use Tests\Routes\Traits\OptionsRequestAllowed;
 
 class DetailsTest extends TestCase
 {

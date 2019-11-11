@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Wiki extends Model
 {
-
     use SoftDeletes;
 
     /**
@@ -35,13 +34,15 @@ class Wiki extends Model
     {
         return $this->hasOne(WikiDb::class);
     }
+
     public function wikiQueryserviceNamespace()
     {
         return $this->hasOne(QueryserviceNamespace::class);
     }
 
-    public function settings() {
-        return $this->hasMany(WikiSetting::class );
+    public function settings()
+    {
+        return $this->hasMany(WikiSetting::class);
     }
 
     public function wikiManagers()
