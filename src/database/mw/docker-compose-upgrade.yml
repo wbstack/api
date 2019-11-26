@@ -1,0 +1,36 @@
+version: '3.1'
+
+services:
+
+  mediawiki:
+    image: gcr.io/wbstack/mediawiki:1.33-c0.3-e0.24
+    volumes:
+      - ./maintWikWiki.json:/var/www/html/maintWikWiki.json
+      - ./LocalSettings.php:/var/www/html/LocalSettings.php
+    environment:
+      MW_DB_SERVER_MASTER: mediawiki-sql
+      MW_DB_SERVER_SLAVE: mediawiki-sql
+      MW_EMAIL_DOMAIN: foo
+      MW_REDIS_SERVER: foo
+      MW_MAILGUN_API_KEY: foo
+      MW_MAILGUN_DOMAIN: foo
+      MW_RECAPTCHA_SITEKEY: foo
+      MW_RECAPTCHA_SECRETKEY: foo
+      PLATFORM_API_BACKEND_HOST: foo
+    links:
+    - sql-upgrade
+  sql-upgrade:
+    image: mariadb:10
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_DATABASE: wiki
+    volumes:
+    - ./upgradeFrom.sql:/docker-entrypoint-initdb.d/01_upgradeFrom.sql
+    networks:
+      default:
+        aliases:
+         - mediawiki-sql
+  sql-admin:
+    image: adminer:4.6
+    ports:
+    - 1234:8080
