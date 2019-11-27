@@ -21,7 +21,8 @@ class LoginController extends Controller
     {
         // Validation
         $rules = [
-          'email' => 'required|exists:users',
+           // Do not specify that the email is required to exist, as this exposes that a user is registered...
+          'email' => 'required',
           'password'  => 'required',
       ];
         $request->validate($rules);
