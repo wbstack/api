@@ -1,0 +1,1 @@
+TRUNCATE `<<prefix>>_l10n_cache`;

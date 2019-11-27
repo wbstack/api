@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * This can be run with for example:
- * php artisan job:handle UpdateWikiDbJob id,1,mw1.31-oc1,mw1.31-oc2 ,.
+ * php artisan job:handle UpdateWikiDbJob id,1,mw1.31-oc1,mw1.31-oc2 ,
  *
  * If you wanted to be wreckless and pick any wiki:
  * php artisan job:handle UpdateWikiDbJob version,mw1.31-oc1,mw1.31-oc1,mw1.31-oc2 ,
@@ -33,6 +33,7 @@ class UpdateWikiDbJob extends Job
         $this->selectValue = $selectValue;
         $this->from = $from;
         $this->to = $to;
+		// TODO logic of db update files should be kept somewhere...
         $updateFileName = $from.'_to_'.$to.'.sql';
         $updateFilePath = __DIR__.'/../../database/mw/updates/'.$updateFileName;
         if (! file_exists($updateFilePath)) {
