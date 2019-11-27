@@ -1,0 +1,40 @@
+version: '2'
+services:
+  api:
+    image: gcr.io/wbstack/api:0.5
+    volumes:
+      - ./src:/var/www/html
+      - ./start.sh:/usr/local/bin/start
+    ports:
+      - 8082:80
+    restart: always
+    depends_on:
+      - sql
+    links:
+      - sql
+      - redis
+    environment:
+      - CONTAINER_ROLE=app
+    env_file:
+      - docker-compose.api.env
+  sql:
+    image: mariadb:10
+    environment:
+      MYSQL_ROOT_PASSWORD: imarootpassword
+      MYSQL_DATABASE: apidb
+    restart: always
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.8
+    restart: always
+    ports:
+      - 8070:80
+    environment:
+      PMA_HOST: 'sql'
+      PMA_PORT: 3306
+      PMA_USER: 'root'
+      PMA_PASSWORD: 'imarootpassword'
+  redis:
+    image: redis:latest
+    restart: always
+    expose:
+      - 6379

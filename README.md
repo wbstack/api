@@ -4,6 +4,20 @@ Docs: https://lumen.laravel.com/docs/5.7
 Routing: https://lumen.laravel.com/docs/5.7/routing
 Testing: https://lumen.laravel.com/docs/5.7/testing
 
+### Develop:
+
+docker-compose up -d
+
+Load http://localhost:8070/ until the DB is defiantly up and connection works
+
+docker-compose exec api php artisan migrate:fresh
+docker-compose exec api php artisan passport:install
+docker-compose exec api php artisan db:seed
+
+Run the tests:
+
+docker-compose exec api vendor/bin/phpunit
+
 ### TODOS:
  - authorization for model changes (GATES?) https://lumen.laravel.com/docs/5.7/authorization
  - Make the models more delete,create,modify,etc?
