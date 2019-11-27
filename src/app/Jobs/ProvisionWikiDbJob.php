@@ -10,7 +10,7 @@ class ProvisionWikiDbJob extends Job
     private $prefix;
 
     // TODO should be injected somehow?
-    private $newSqlFile = 'mw1.33-wbs1';
+    private $newSqlFile = 'mw1.33-wbs2';
 
     private $dbConnection = 'mw';
 
