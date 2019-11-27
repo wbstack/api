@@ -65,6 +65,12 @@ class UpdateWikiDbJob extends Job
         // Connect to the mediawiki server
         $pdo = DB::connection('mw')->getPdo();
 
+        // Use the create database
+        if ($pdo->exec('USE '.$wikidb->name) === false) {
+            throw new \RuntimeException(
+                'Failed to use database with name: '.$wikidb->name);
+        }
+
         foreach ($sqlParts as $part) {
             if (strpos($part, '--') === 0) {
                 // Skip comment blocks
