@@ -84,7 +84,7 @@ class RegisterController extends Controller
             $validation['invite'] = 'required|exists:invitations,code';
         }
         // For testing, allow 5 char emails ot skip captcha...
-        if (strlen($data['email']) == 5) {
+        if (array_key_exists('email', $data) && strlen($data['email']) == 5) {
             unset($validation['recaptcha']);
         }
 

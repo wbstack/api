@@ -91,7 +91,6 @@ class RegisterTest extends TestCase
 
     public function testCreate_NoEmailOrPassword()
     {
-        $user = factory(User::class)->create();
         $this->json('POST', $this->route, [])
         ->assertStatus(422)
         ->assertJsonStructure(['errors' => ['email', 'password']]);

@@ -33,9 +33,10 @@ class LoginTest extends TestCase
     {
         $password = 'apassword';
         $user = factory(User::class)->create(['password' => password_hash($password, PASSWORD_DEFAULT)]);
-        $this->json('POST', $this->route, ['email' => $user->email, 'password' => $password])
-        ->assertStatus(200)
-        ->assertJsonStructure(['email', 'isAdmin', 'token'])
-        ->assertJsonFragment(['email' => $user->email, 'isAdmin' => false]);
+        $response = $this->json('POST', $this->route, ['email' => $user->email, 'password' => $password]);
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['user' => ['email'], 'token']);
+        $userResponsePart = $response->json('user');
+        $this->assertEquals( $user->email, $userResponsePart['email'] );
     }
 }
