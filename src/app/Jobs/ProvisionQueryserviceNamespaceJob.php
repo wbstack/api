@@ -4,6 +4,10 @@ namespace App\Jobs;
 
 use App\QueryserviceNamespace;
 
+/**
+ * Example usage
+ * php artisan job:handle ProvisionQueryserviceNamespaceJob
+ */
 class ProvisionQueryserviceNamespaceJob extends Job
 {
     private $namespace;
@@ -47,6 +51,8 @@ class ProvisionQueryserviceNamespaceJob extends Job
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 10,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			// User agent is needed by the query service...
+			CURLOPT_USERAGENT => 'WBStack ProvisionQueryserviceNamespaceJob',
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => $properties,
             CURLOPT_HTTPHEADER => [
@@ -60,9 +66,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
         curl_close($curl);
 
         if ($err) {
-            echo 'cURL Error #:'.$err;
-
-            return;
+			throw new \RuntimeException('cURL Error #:'.$err);
         } else {
             if ($response === 'CREATED: '.$this->namespace) {
                 $qsns = QueryserviceNamespace::create([
@@ -70,7 +74,10 @@ class ProvisionQueryserviceNamespaceJob extends Job
                     //'internalHost' => $this->internalHost,
                     'backend' => $queryServiceHost,
                 ]);
-            }
+                // TODO error if $qsns is not actually created...
+            } else {
+				throw new \RuntimeException('Valid response, but couldn\'t find "CREATED: " in: '.$response);
+			}
             // TODO Else log create failed?
         }
     }

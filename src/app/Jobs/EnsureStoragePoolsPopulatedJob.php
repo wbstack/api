@@ -5,9 +5,14 @@ namespace App\Jobs;
 use App\WikiDb;
 use App\QueryserviceNamespace;
 
+/**
+ * Example usage
+ * php artisan job:handle EnsureStoragePoolsPopulatedJob
+ */
 class EnsureStoragePoolsPopulatedJob extends Job
 {
     private $requiredDbs = 10;
+    private $requiredQueryServiceNS = 10;
 
     /**
      * @return void
@@ -20,7 +25,7 @@ class EnsureStoragePoolsPopulatedJob extends Job
 
         // Wiki Dbs
         $unassignedDbs = WikiDb::where('wiki_id', null)->count();
-        $toCreate = 10 - $unassignedDbs;
+        $toCreate = $this->requiredDbs - $unassignedDbs;
         if ($toCreate > 0) {
             for ($i = 0; $i < $toCreate; $i++) {
                 dispatch(new ProvisionWikiDbJob());
@@ -29,7 +34,7 @@ class EnsureStoragePoolsPopulatedJob extends Job
 
         // Query service namespaces
         $unassignedQueryserviceNamespaces = QueryserviceNamespace::where('wiki_id', null)->count();
-        $toCreate = 10 - $unassignedQueryserviceNamespaces;
+        $toCreate = $this->requiredQueryServiceNS - $unassignedQueryserviceNamespaces;
         if ($toCreate > 0) {
             for ($i = 0; $i < $toCreate; $i++) {
                 dispatch(new ProvisionQueryserviceNamespaceJob());
