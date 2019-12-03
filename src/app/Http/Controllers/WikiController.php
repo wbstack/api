@@ -19,6 +19,8 @@ class WikiController extends Controller
 {
     public function create(Request $request)
     {
+        die('WIKI CREATION CURRENTLY PAUSED -- 3 Dec Addshore');
+
         $user = $request->user();
 
         // TODO extra validation that username is correct?
