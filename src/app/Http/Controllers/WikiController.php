@@ -12,15 +12,12 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\QueryserviceNamespace;
 use Illuminate\Support\Facades\DB;
-use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiQuickstatementsInit;
 
 class WikiController extends Controller
 {
     public function create(Request $request)
     {
-        die('WIKI CREATION CURRENTLY PAUSED -- 3 Dec Addshore');
-
         $user = $request->user();
 
         // TODO extra validation that username is correct?
@@ -81,7 +78,6 @@ class WikiController extends Controller
             ]);
 
             // TODO maybe always make these run in a certain order..?
-            dispatch(new KubernetesIngressCreate($wiki->id, $wiki->domain));
             dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
             dispatch(new MediawikiQuickstatementsInit($wiki->domain));
         });
