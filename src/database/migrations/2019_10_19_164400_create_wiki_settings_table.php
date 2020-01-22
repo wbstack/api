@@ -12,8 +12,9 @@ class CreateWikiSettingsTable extends Migration
             $table->increments('id');
             $table->string('name', 100);
             $table->string('value', 100);
-            $table->integer('wiki_id')->nullable()->unsigned()->unique();
+            $table->integer('wiki_id')->nullable()->unsigned();
 
+            $table->index('wiki_id');
             $table->unique(['wiki_id', 'name']);
 
             $table->timestamps();
