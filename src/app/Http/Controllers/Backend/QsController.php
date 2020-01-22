@@ -43,7 +43,11 @@ class QsController extends Controller
             $wikiBatchesEntities = [];
             $lastEventId = 0;
             foreach ($events as $event) {
-                if ($event->namespace == 120 || $event->namespace == 122) {
+                if (
+                    $event->namespace == 120 ||// item
+                    $event->namespace == 122 ||// property
+                    $event->namespace == 146// lexeme
+                ) {
                     $wikiBatchesEntities[$event->wiki_id][] = $event->title;
                 }
                 if ($event->id > $lastEventId) {
