@@ -27,7 +27,7 @@ class WikiController extends Controller
             // that is 23 length
             // This also stops things like mail. www. pop. ETC...
             'domain' => 'required|unique:wikis|unique:wiki_domains|min:23|regex:/^[a-z0-9-]+\.wiki\.opencura\.com$/',
-            'sitename' => 'required',
+            'sitename' => 'required|min:3',
             'username' => 'required',
         ]);
 
