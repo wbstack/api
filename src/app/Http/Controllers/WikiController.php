@@ -92,6 +92,31 @@ class WikiController extends Controller
         return response($res);
     }
 
+    public function delete(Request $request) {
+        $user = $request->user();
+
+        $request->validate([
+            'wiki' => 'required|numeric',
+        ]);
+
+        $wikiId = $request->input('wiki');
+        $userId = $user->id;
+
+        // Check that the requesting user manages the wiki
+        if( WikiManager::where( 'user_id', $userId )->where( 'wiki_id', $wikiId )->count() !== 1 ) {
+            // The deletion was requested by a user that does not manage the wiki
+            return response()->json('Unauthorized', 401);
+        }
+
+        // Delete the wiki
+        Wiki::find( $wikiId )->delete();
+
+        // Return a success
+        return response()->json('Success', 200);
+
+    }
+
+
     // TODO should this just be get wiki?
     public function getWikiDetailsForIdForOwner(Request $request)
     {

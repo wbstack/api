@@ -27,6 +27,7 @@ $router->group(['middleware' => ['auth:api']], function () use ($router) {
     // wiki
     $router->group(['prefix' => 'wiki'], function () use ($router) {
         $router->post('create', ['uses' => 'WikiController@create']);
+        $router->post('delete', ['uses' => 'WikiController@delete']);
         $router->post('mine', ['uses' => 'WikisController@getWikisOwnedByCurrentUser']);
         $router->post('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
         // TODO should wiki managers really be here?
