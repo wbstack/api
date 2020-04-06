@@ -2,27 +2,23 @@
 
 use App\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
-class UsersTableSeeder extends Seeder
+class UsersSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
-        $user = User::create([
+        User::create([
           'email' => 'adamshorland@gmail.com',
           'password' => Hash::make('a'),
           'verified' => true,
         ]);
-        $user = User::create([
+        User::create([
           'email' => 'a@a.a',
           'password' => Hash::make('a'),
           'verified' => true,
         ]);
-        $user = User::create([
+        User::create([
           'email' => 'b@b.b',
           'password' => Hash::make('b'),
           'verified' => false,
