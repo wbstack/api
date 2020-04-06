@@ -5,6 +5,10 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * The purpose of RedirectIfAuthenticated is to keep an already authenticated user
+ * from reaching the login or registration routes/views since they're already logged in.
+ */
 class RedirectIfAuthenticated
 {
     /**
@@ -18,7 +22,8 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if (Auth::guard($guard)->check()) {
-            return redirect('/home');
+            return response()->json('Endpoint not needed', 400);
+            //return redirect('/home');
         }
 
         return $next($request);

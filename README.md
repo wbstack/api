@@ -18,6 +18,8 @@ Run the tests:
 
 docker-compose exec api vendor/bin/phpunit
 
+If you want to develop with the UI then simply point the UI docker-compose setup to localhost:8082
+
 ### TODOS:
  - authorization for model changes (GATES?) https://lumen.laravel.com/docs/5.7/authorization
  - Make the models more delete,create,modify,etc?

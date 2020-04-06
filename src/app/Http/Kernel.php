@@ -63,8 +63,7 @@ class Kernel extends HttpKernel
         // 'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         // 'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         // 'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        // TODO maybe gues middleware should be changed to 403 or something if authenticated?
-        // 'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
 
         // https://laravel-news.com/signed-routes
         //'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
