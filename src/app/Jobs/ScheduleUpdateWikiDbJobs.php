@@ -5,11 +5,8 @@ namespace App\Jobs;
 use App\WikiDb;
 
 /**
- * This can be run with for example:
- * php artisan job:handle ScheduleUpdateWikiDbJobs id,1,mw1.31-oc1,mw1.31-oc2 ,
- *
  * If you wanted to be wreckless and schedule for all of the wikis:
- * php artisan job:handle ScheduleUpdateWikiDbJobs version,mw1.31-oc1,mw1.31-oc1,mw1.31-oc2 ,
+ * php artisan job:handle ScheduleUpdateWikiDbJobs version,mw1.33-wbs3,mw1.33-wbs3,mw1.33-wbs4 ,
  */
 class ScheduleUpdateWikiDbJobs extends Job
 {

@@ -1,81 +1,104 @@
-This directory contains the SQL needed to create and update wiki DDs.
+This directory contains the SQL needed to create and update wiki DBs.
 
-### TODOS
+**Todos**
  - Create steps to create update files....
  - Programmatically get the SQL instead of using adminer?
- - On start of wiki use we need to create a homepage and user...
  - Allow mediawiki LS.php to be runable with no prefix (currently you end up with _tablename.....)
  - Allow mediawiki LS.php to be run with now redis etc for sql creation...
  - Allow mediawiki LS.php to be run with only a master?
  - Maybe actually allow doing this by running maint scripts instead? :/ (OR some internal only API?)
    - Could be all generated in "production" then? maybe?
 
-### Versions
+**Versions**
 
-mw1.33-wbs2 - With EntitySchema table
-mw1.33-wbs1 - First version of 1.33
+ - mw1.33-wbs4 - New extensions, Math is the only table (mathoid...)
+ - mw1.33-wbs3 - TRUNCATE l10n_cache table that we stopped using
+ - mw1.33-wbs2 - With EntitySchema table
+ - mw1.33-wbs1 - First version of 1.33
 
 ### Generating clean / fresh SQL
 
+FIXME: why is LocalSettings copied into this process? We just remove it and dont use it? Or?
+
 Make sure you have updated the docker-compose-clean.yml to:
- - Include the latest version of the Mediawiki image
- - doMaintenance.php override is up to date
+ - Include the latest version of the Mediawiki image with the new code added but not loaded
+ - Update LocalSettings.php to match produciton ish (+ new extensions loaded)
+ - doMaintenance.php override is up to date (with the current MW version loaded)
 
-Start the setup:
+**Start the setup:**
 
-  docker-compose -f docker-compose-clean.yaml up -d
-  # WAIT and check you can connect via adminer?
+```docker-compose -f docker-compose-clean.yml up -d```
 
-Cleanup the setup:
+**Check & wait for mysql access in adminer?**
 
-  docker-compose -f docker-compose-clean.yaml down --volumes
+https://localhost:1234 sql-clean root/toor wiki
 
-Then:
+You might get an error is MySql is not ready yet.
 
-<pre>
-docker-compose -f docker-compose-clean.yaml exec mediawiki bash
+```SQLSTATE[HY000] [2002] Connection refused```
+
+If so, retry.
+
+**Then:**
+
+```
+docker-compose -f docker-compose-clean.yml exec mediawiki bash
 mv LocalSettings.php LocalSettings.php.temp
 php ./maintenance/install.php --dbserver sql-clean --dbuser root --dbpass toor --dbname wiki --with-extensions --pass AdminPass SiteName AdminName
 php ./maintenance/update.php --quick
 php ./maintenance/update.php --quick
 php ./maintenance/update.php --quick
-</pre>
+php ./maintenance/update.php --quick
+```
 
-Then get the SQL from adminer:
+**Then get the SQL from adminer:**
 
  - Navigate to http://localhost:1234
- - Log in with sql-clean, root, toor
+ - Log in with sql-clean, root, toor, wiki
  - Navigate to "wiki" DB
  - Click "Export" (near the top left)
- - Select options, Output: open, Format: SQL, Tables: CREATE, Data: INSERT
- - Select ONLY interwiki and updatelog data
- - Click "Export"
- - Copy output to the new directory with correct name, and make alterations:
+ - Select these options:
+   - Output: open
+   - Format: SQL
+   - Tables: CREATE
+   - Data: INSERT
+ - Deselect ALL DATA except "interwiki" and "updatelog"
+ - Click "Export" (at the top)
+ - Copy output to the "new" directory with correct name, and make alterations:
      - Remove SET statements
+     - Update the sql file in cleanSql.php
      - Run cleanSql.php over the file
  - Compare the resulting schemas to see what has changed... (use https://www.diffchecker.com/ ?)
 
+**Cleanup the setup:**
+
+```docker-compose -f docker-compose-clean.yml down --volumes```
+
 ### Generating update / upgrade SQL
 
+NOTE: I did not clean these docs while generating wbs4 as the diff was super easy.
+
+If the diff between SQLs is super easy, maybe you can just make the updates file yourself..
+
 Make sure you have updated the docker-compose-upgrade.yml to:
- - Include the latest version of the Mediawiki image
- - doMaintenance.php override is up to date
+ - Include the latest version of the Mediawiki image with the new code / extensions loaded
+ - doMaintenance.php override is up to date (with the MW version loaded)
  - Include the OLD version of the schema for the update mysql service in the upgradeFrom.sql file
    - Make sure to setup the prefix to be SQL worthy.. /<<prefix>>_/prefix_/
 
-Start the setup:
+**Start the setup:**
 
-  docker-compose -f docker-compose-upgrade.yml up -d
+```docker-compose -f docker-compose-upgrade.yml up -d```
 
-Cleanup the setup:
+**Cleanup the setup:**
 
-  docker-compose -f docker-compose-upgrade.yaml down --volumes
+```docker-compose -f docker-compose-upgrade.yml down --volumes```
 
-Then:
+**Then:**
 
-<pre>
+```
 docker-compose -f docker-compose-upgrade.yml exec mediawiki bash
 WW_DOMAIN=maint php ./maintenance/update.php --schema sql.sql --quick
 cat sql.sql
-</pre>
+```
 

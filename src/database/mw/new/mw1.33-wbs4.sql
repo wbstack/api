@@ -477,6 +477,18 @@ CREATE TABLE `<<prefix>>_log_search` (
   KEY `ls_log_id` (`ls_log_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
+CREATE TABLE `<<prefix>>_mathoid` (
+  `math_inputhash` varbinary(16) NOT NULL,
+  `math_input` blob NOT NULL,
+  `math_tex` blob DEFAULT NULL,
+  `math_mathml` blob DEFAULT NULL,
+  `math_svg` blob DEFAULT NULL,
+  `math_style` tinyint(4) DEFAULT NULL,
+  `math_input_type` tinyint(4) DEFAULT NULL,
+  `math_png` mediumblob DEFAULT NULL,
+  PRIMARY KEY (`math_inputhash`)
+) ENGINE=InnoDB DEFAULT CHARSET=binary;
+
 CREATE TABLE `<<prefix>>_module_deps` (
   `md_module` varbinary(255) NOT NULL,
   `md_skin` varbinary(32) NOT NULL,
@@ -1065,4 +1077,4 @@ CREATE TABLE `<<prefix>>_wb_terms` (
   KEY `tmp1` (`term_language`,`term_type`,`term_entity_type`,`term_search_key`),
   KEY `wb_terms_entity_id` (`term_entity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
--- 2019-11-26 19:14:13
+-- 2020-04-09 08:51:26

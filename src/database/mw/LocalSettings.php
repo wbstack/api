@@ -22,22 +22,23 @@ if ( !isset( $maintClass ) || ( isset( $maintClass ) && $maintClass !== 'PHPUnit
                 'info',
             ],
             'ignoreAllInGroup' => [
-                'DBPerformance'
+                'DBPerformance',
+                'objectcache',// ideally want to show objectcache errors, but not warnings
             ],
             'logAllInGroup' => [
                 'WBSTACK',
                 'HttpError',
                 'SpamBlacklistHit',
                 'security',
-                'exception',
-                'error',
+                'exception-json',
+                //'error',
                 'fatal',
                 'badpass',
                 'badpass-priv',
                 'api-warning',
             ],
             'logAllInGroupExceptDebug' => [
-                'Wikibase',
+                //'Wikibase',
             ],
         ]],
     ];
@@ -75,16 +76,16 @@ $wgDBservers = [
         'flags' => DBO_DEFAULT,
         'load' => 0,
     ],
-//    [
-//        'host' => getenv('MW_DB_SERVER_REPLICA'),
-//        'dbname' => $wgDBname,
-//        'user' => $wikWiki->wiki_db->user,
-//        'password' => $wikWiki->wiki_db->password,
-//        'type' => "mysql",
-//        'flags' => DBO_DEFAULT,
-//        'max lag' => 10,
-//        'load' => 1,
-//    ],
+    [
+        'host' => getenv('MW_DB_SERVER_REPLICA'),
+        'dbname' => $wgDBname,
+        'user' => $wikWiki->wiki_db->user,
+        'password' => $wikWiki->wiki_db->password,
+        'type' => "mysql",
+        'flags' => DBO_DEFAULT,
+        'max lag' => 10,
+        'load' => 1,
+    ],
 ];
 
 $wgDBprefix = $wikWiki->wiki_db->prefix . '_';
@@ -124,6 +125,12 @@ $wgEmergencyContact = "emergency.wbstack@addshore.com";
 $wgPasswordSender = 'noreply@' . getenv('MW_EMAIL_DOMAIN');
 $wgNoReplyAddress = 'noreply@' . getenv('MW_EMAIL_DOMAIN');
 
+## Jobs
+# For now jobs will run in the requests, this obviously isn't the ideal solution and really
+# there should be a job running service deployed...
+# This was set to 2 as Andra experienced a backup of jobs. https://github.com/addshore/wbstack/issues/51
+$wgJobRunRate = 2;
+
 ## Notifications
 $wgEnotifUserTalk = false;
 $wgEnotifWatchlist = false;
@@ -146,6 +153,9 @@ $wgLanguageCode = "en";
 
 ## --- CACHING ---
 $wgCacheDirectory = '/tmp/mw-cache';
+
+//  Set this to true to disable cache updates on web requests.
+$wgLocalisationCacheConf['manualRecache'] = true;
 
 // Don't specific a redis cache when running dbless maint script
 if($wikWiki->requestDomain !== 'maint') {
@@ -224,7 +234,8 @@ require_once "$IP/extensions/Wikibase/repo/ExampleSettings.php";
 require_once "$IP/extensions/Wikibase/client/WikibaseClient.php";
 require_once "$IP/extensions/Wikibase/client/ExampleSettings.php";
 
-$wwWbConceptUri = preg_replace( '!^//!', 'http://', $GLOBALS['wgServer'] ) . '/entity/';
+$wwWbSiteBaseUri = preg_replace( '!^//!', 'http://', $GLOBALS['wgServer'] );
+$wwWbConceptUri = $wwWbSiteBaseUri . '/entity/';
 
 $wgWBClientSettings['siteGlobalID'] = $wgDBname;
 $wgWBClientSettings['repoScriptPath'] = '/w';
@@ -255,6 +266,18 @@ $wgWBRepoSettings['dataRightsUrl'] = null;
 $wgWBRepoSettings['dataRightsText'] = 'None yet set.';
 $wgWBRepoSettings['conceptBaseUri'] = $wwWbConceptUri;
 
+// Until we can scale redis memory we don't want to do this - https://github.com/addshore/wbstack/issues/37
+$wgWBRepoSettings['sharedCacheType'] = CACHE_NONE;
+
+# WikibaseLexeme, By default not enabled
+if( $wikWiki->getSetting('wwExtEnableWikibaseLexeme') ) {
+    wfLoadExtension( 'WikibaseLexeme' );
+}
+
+# WikibaseInWikitext (custom ext)
+wfLoadExtension( 'WikibaseInWikitext' );
+$wgWikibaseInWikitextSparqlDefaultUi = $wwWbSiteBaseUri . '/query';
+
 # EntitySchema
 wfLoadExtension( 'EntitySchema' );
 
@@ -281,9 +304,20 @@ $wgGroupPermissions['platform']['mwoauthmanageconsumer'] = true;
 $wgGroupPermissions['platform']['mwoauthviewprivate'] = true;
 $wgGroupPermissions['platform']['mwoauthupdateownconsumer'] = true;
 
+# JsonConfig
+wfLoadExtension( 'JsonConfig' );
+
+# Score
+wfLoadExtension( 'Score' );
+
+# Math
+wfLoadExtension( 'Math' );
+
+# Kartographer
+wfLoadExtension( 'Kartographer' );
+
 # Thanks
-# TODO db needs to be updated for this
-#wfLoadExtension( 'Thanks' );
+wfLoadExtension( 'Thanks' );
 
 # Elastica & CirrusSearch
 # TODO configure
@@ -326,13 +360,108 @@ $wgHooks['PageContentSaveComplete'][] = function ( $wikiPage, $user, $mainConten
         );
         $status = $request->execute();
         if ( !$status->isOK() ) {
-            wfDebugLog('WBSTACK', 'Failed to call platform event/pageUpdate endpoint: ' . $status->getStatusValue());
+            wfDebugLog('WBSTACK', 'Failed to call platform event/pageUpdate endpoint for PageContentSaveComplete: ' . $status->getStatusValue());
+        }
+    });
+};
+
+// https://www.mediawiki.org/wiki/Manual:Hooks/ArticleDeleteComplete
+$wgHooks['ArticleDeleteComplete'][] = function ( $wikiPage, &$user, $reason, $id, $content, $logEntry, $archivedRevisionCount ) {
+    global $wikWiki;
+    $data = [
+        'wiki_id' => $wikWiki->id,
+        'title' => $wikiPage->getTitle()->getDBkey(),
+        'namespace' => $wikiPage->getTitle()->getNamespace(),
+    ];
+    \DeferredUpdates::addCallableUpdate( function() use ( $data ) {
+        $options = [];
+        $options['userAgent'] = 'wikwiki ArticleDeleteComplete wdqsupdater thingy';
+        $options['method'] = 'POST';
+        $options['timeout'] = 4;
+        $options['postData'] = json_encode($data);
+        $request = \MWHttpRequest::factory(
+            'http://' . getenv( 'PLATFORM_API_BACKEND_HOST' ) . '/backend/event/pageUpdate',
+            $options
+        );
+        $status = $request->execute();
+        if ( !$status->isOK() ) {
+            wfDebugLog('WBSTACK', 'Failed to call platform event/pageUpdate endpoint for ArticleDeleteComplete: ' . $status->getStatusValue());
+        }
+    });
+};
+
+// https://www.mediawiki.org/wiki/Manual:Hooks/TitleMoveComplete
+$wgHooks['TitleMoveComplete'][] = function ( $title, $newTitle, $user, $oldid, $newid, $reason, $revision ) {
+    global $wikWiki;
+    $dataOne = [
+        'wiki_id' => $wikWiki->id,
+        'title' => $title->getDBkey(),
+        'namespace' => $title->getNamespace(),
+    ];
+    \DeferredUpdates::addCallableUpdate( function() use ( $dataOne ) {
+        $options = [];
+        $options['userAgent'] = 'wikwiki TitleMoveComplete wdqsupdater thingy';
+        $options['method'] = 'POST';
+        $options['timeout'] = 4;
+        $options['postData'] = json_encode($dataOne);
+        $request = \MWHttpRequest::factory(
+            'http://' . getenv( 'PLATFORM_API_BACKEND_HOST' ) . '/backend/event/pageUpdate',
+            $options
+        );
+        $status = $request->execute();
+        if ( !$status->isOK() ) {
+            wfDebugLog('WBSTACK', 'Failed to call platform event/pageUpdate endpoint for TitleMoveComplete dataOne: ' . $status->getStatusValue());
+        }
+    });
+    $dataTwo = [
+        'wiki_id' => $wikWiki->id,
+        'title' => $newTitle->getDBkey(),
+        'namespace' => $newTitle->getNamespace(),
+    ];
+    \DeferredUpdates::addCallableUpdate( function() use ( $dataTwo ) {
+        $options = [];
+        $options['userAgent'] = 'wikwiki TitleMoveComplete wdqsupdater thingy';
+        $options['method'] = 'POST';
+        $options['timeout'] = 4;
+        $options['postData'] = json_encode($dataTwo);
+        $request = \MWHttpRequest::factory(
+            'http://' . getenv( 'PLATFORM_API_BACKEND_HOST' ) . '/backend/event/pageUpdate',
+            $options
+        );
+        $status = $request->execute();
+        if ( !$status->isOK() ) {
+            wfDebugLog('WBSTACK', 'Failed to call platform event/pageUpdate endpoint for TitleMoveComplete dataTwo: ' . $status->getStatusValue());
+        }
+    });
+};
+
+// https://www.mediawiki.org/wiki/Manual:Hooks/ArticleDeleteComplete
+$wgHooks['ArticleUndelete'][] = function ( $title, $create, $comment, $oldPageId, $restoredPages ) {
+    global $wikWiki;
+    $data = [
+        'wiki_id' => $wikWiki->id,
+        'title' => $title->getDBkey(),
+        'namespace' => $title->getNamespace(),
+    ];
+    \DeferredUpdates::addCallableUpdate( function() use ( $data ) {
+        $options = [];
+        $options['userAgent'] = 'wikwiki ArticleUndelete wdqsupdater thingy';
+        $options['method'] = 'POST';
+        $options['timeout'] = 4;
+        $options['postData'] = json_encode($data);
+        $request = \MWHttpRequest::factory(
+            'http://' . getenv( 'PLATFORM_API_BACKEND_HOST' ) . '/backend/event/pageUpdate',
+            $options
+        );
+        $status = $request->execute();
+        if ( !$status->isOK() ) {
+            wfDebugLog('WBSTACK', 'Failed to call platform event/pageUpdate endpoint for ArticleUndelete: ' . $status->getStatusValue());
         }
     });
 };
 
 // https://www.mediawiki.org/wiki/Manual:Hooks/SkinBuildSidebar
-$wgHooks['SkinBuildSidebar'][] = function ( $skin, &$sidebar ) {
+$wgHooks['SkinBuildSidebar'][] = function ( $skin, &$sidebar ) use ( $wikWiki ) {
     $sidebar['Wikibase'][] = [
         'text'  => 'New Item',
         'href'  => '/wiki/Special:NewItem',
@@ -341,6 +470,12 @@ $wgHooks['SkinBuildSidebar'][] = function ( $skin, &$sidebar ) {
         'text'  => 'New Property',
         'href'  => '/wiki/Special:NewProperty',
     ];
+    if( $wikWiki->getSetting('wwExtEnableWikibaseLexeme') ) {
+        $sidebar['Wikibase'][] = [
+            'text'  => 'New Lexeme',
+            'href'  => '/wiki/Special:NewLexeme',
+        ];
+    }
     $sidebar['Wikibase'][] = [
         'text'  => 'New Schema',
         'href'  => '/wiki/Special:NewEntitySchema',

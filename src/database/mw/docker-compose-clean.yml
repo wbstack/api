@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   mediawiki:
-    image: gcr.io/wbstack/mediawiki:1.33-c0.3-e0.24
+    image: gcr.io/wbstack/mediawiki:1.33-b0.5-c0.8-e0.38
     volumes:
       - ./doMaintenance.php:/var/www/html/maintenance/doMaintenance.php
       - ./wikWikiInfoDefaults-clean.json:/var/www/html/wikWikiInfoDefaults.json

@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * This can be run with for example:
- * php artisan job:handle UpdateWikiDbJob id,1,mw1.31-oc1,mw1.31-oc2 ,
+ * php artisan job:handle UpdateWikiDbJob id,1,mw1.33-wbs1,mw1.33-wbs2 ,
  *
  * If you wanted to be wreckless and pick any wiki:
- * php artisan job:handle UpdateWikiDbJob version,mw1.31-oc1,mw1.31-oc1,mw1.31-oc2 ,
+ * php artisan job:handle UpdateWikiDbJob version,mw1.33-wbs1,mw1.33-wbs2 ,
  */
 class UpdateWikiDbJob extends Job
 {
@@ -25,7 +25,10 @@ class UpdateWikiDbJob extends Job
     private $updateFilePath;
 
     /**
-     * @return void
+     * @param string $selectCol Selection field in the wiki_dbs table e.g. "wiki_id"
+     * @param string $selectValue Selection value in the wiki_dbs table e.g. "38"
+     * @param string $from The version of schema to update from
+     * @param string $to The version of schema to update to
      */
     public function __construct($selectCol, $selectValue, $from, $to)
     {
