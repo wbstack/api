@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Jobs\PruneEventPageUpdatesTable;
+use App\Jobs\PruneQueryserviceBatchesTable;
 use Illuminate\Console\Scheduling\Schedule;
 use App\Jobs\EnsureStoragePoolsPopulatedJob;
 use App\Jobs\ExpireOldUserVerificationTokensJob;
@@ -19,6 +21,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->job(new EnsureStoragePoolsPopulatedJob)->everyMinute();
         $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
+        $schedule->job(new PruneEventPageUpdatesTable)->everyFifteenMinutes();
+        $schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes();
     }
 
     /**
