@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\UserVerificationToken;
 use App\Jobs\UesrVerificationTokenCreateAndSendJob;
 
+/**
+ * Verification of user emails
+ */
 class UserVerificationTokenController extends Controller
 {
     public function verify(Request $request)
@@ -20,7 +23,9 @@ class UserVerificationTokenController extends Controller
 
         if ($user->verified) {
             // User already verified
-            abort(403);
+            $res['success'] = true;
+            $res['message'] = 'Already Verified!';
+            return response($res);
         }
 
         $user->verified = true;
@@ -28,8 +33,7 @@ class UserVerificationTokenController extends Controller
         $token->delete();
 
         $res['success'] = true;
-        $res['message'] = 'Verified!';
-
+        $res['message'] = 'Successfully Verified!';
         return response($res);
     }
 
