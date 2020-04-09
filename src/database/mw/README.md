@@ -11,6 +11,7 @@ This directory contains the SQL needed to create and update wiki DBs.
 
 **Versions**
 
+ - mw1.33-wbs5 - New extensions, TBA
  - mw1.33-wbs4 - New extensions, Math is the only table (mathoid...)
  - mw1.33-wbs3 - TRUNCATE l10n_cache table that we stopped using
  - mw1.33-wbs2 - With EntitySchema table
@@ -31,7 +32,7 @@ Make sure you have updated the docker-compose-clean.yml to:
 
 **Check & wait for mysql access in adminer?**
 
-https://localhost:1234 sql-clean root/toor wiki
+http://localhost:1234/?server=sql-clean&username=root&db=wiki&table=prefix_echo_email_batch
 
 You might get an error is MySql is not ready yet.
 
@@ -76,23 +77,35 @@ php ./maintenance/update.php --quick
 
 ### Generating update / upgrade SQL
 
-NOTE: I did not clean these docs while generating wbs4 as the diff was super easy.
-
 If the diff between SQLs is super easy, maybe you can just make the updates file yourself..
+
+**READ THE README** for the update format, else you WILL get it wrong (\n\n etc...)
 
 Make sure you have updated the docker-compose-upgrade.yml to:
  - Include the latest version of the Mediawiki image with the new code / extensions loaded
  - doMaintenance.php override is up to date (with the MW version loaded)
- - Include the OLD version of the schema for the update mysql service in the upgradeFrom.sql file
-   - Make sure to setup the prefix to be SQL worthy.. /<<prefix>>_/prefix_/
+ - Include the **OLD** version of the schema for the update mysql service in the upgradeFrom.sql file
+   - Make sure to setup the prefix to be SQL worthy.. ```/<<prefix>>_/prefix_/```
+ - Copy LocalSettings.php from the new mediawiki image (which has new extensions loaded)
+   - Comment out the REPLCIA db server, else the update will fail
+
+Troubleshooting:
+ - Some extensions don't handle only outputting sql very well.. In these cases youll have to make your own update sql file...
+   - Example, Echo in https://github.com/addshore/wbstack/issues/70
 
 **Start the setup:**
 
 ```docker-compose -f docker-compose-upgrade.yml up -d```
 
-**Cleanup the setup:**
+**Check & wait for mysql access in adminer?**
 
-```docker-compose -f docker-compose-upgrade.yml down --volumes```
+http://localhost:1234/?server=sql-upgrade&username=root&db=wiki&table=prefix_echo_email_batch
+
+You might get an error is MySql is not ready yet.
+
+```SQLSTATE[HY000] [2002] Connection refused```
+
+If so, retry.
 
 **Then:**
 
@@ -102,3 +115,6 @@ WW_DOMAIN=maint php ./maintenance/update.php --schema sql.sql --quick
 cat sql.sql
 ```
 
+**Cleanup the setup:**
+
+```docker-compose -f docker-compose-upgrade.yml down --volumes```

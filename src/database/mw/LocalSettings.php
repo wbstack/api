@@ -76,16 +76,16 @@ $wgDBservers = [
         'flags' => DBO_DEFAULT,
         'load' => 0,
     ],
-    [
-        'host' => getenv('MW_DB_SERVER_REPLICA'),
-        'dbname' => $wgDBname,
-        'user' => $wikWiki->wiki_db->user,
-        'password' => $wikWiki->wiki_db->password,
-        'type' => "mysql",
-        'flags' => DBO_DEFAULT,
-        'max lag' => 10,
-        'load' => 1,
-    ],
+//    [
+//        'host' => getenv('MW_DB_SERVER_REPLICA'),
+//        'dbname' => $wgDBname,
+//        'user' => $wikWiki->wiki_db->user,
+//        'password' => $wikWiki->wiki_db->password,
+//        'type' => "mysql",
+//        'flags' => DBO_DEFAULT,
+//        'max lag' => 10,
+//        'load' => 1,
+//    ],
 ];
 
 $wgDBprefix = $wikWiki->wiki_db->prefix . '_';
@@ -112,7 +112,6 @@ $wgFavicon = "{$wgScriptPath}/favicon.ico";
 //$wgUploadPath = "{$wgScriptPath}/images/docker/{$dockerDb}";
 //$wgTmpDirectory = "{$wgUploadDirectory}/tmp";
 
-// TODO email (use a service?)
 $wgEnableEmail = true;
 $wgEnableUserEmail = false;
 $wgAllowHTMLEmail = true;
@@ -136,6 +135,8 @@ $wgEnotifUserTalk = false;
 $wgEnotifWatchlist = false;
 
 ## Files
+// $wgUseImageMagick Is needed so that Score auto trims rendered musical notations
+$wgUseImageMagick = true;
 $wgEnableUploads = false;
 $wgAllowCopyUploads = false;
 $wgUseInstantCommons = false;
@@ -147,8 +148,12 @@ $wgFileExtensions = array_merge( $wgFileExtensions,
 //$wgFileExtensions[] = 'djvu';
 
 ## Locale
-// TODO configuration
-$wgShellLocale = "en_US.utf8";
+/**
+ * The docker image only has C.UTF-8 currently.
+ * This is the default for https://www.mediawiki.org/wiki/Manual:$wgShellLocale for core as of 1.30
+ * But explicitly set it here as it is all the image has!
+ */
+$wgShellLocale = "C.UTF-8";
 $wgLanguageCode = "en";
 
 ## --- CACHING ---
@@ -309,6 +314,7 @@ wfLoadExtension( 'JsonConfig' );
 
 # Score
 wfLoadExtension( 'Score' );
+$wgMusicalNotationEnableWikibaseDataType = true;
 
 # Math
 wfLoadExtension( 'Math' );
@@ -316,8 +322,44 @@ wfLoadExtension( 'Math' );
 # Kartographer
 wfLoadExtension( 'Kartographer' );
 
+# Page Images
+wfLoadExtension( 'PageImages' );
+
+# Scribunto
+wfLoadExtension( 'Scribunto' );
+
+# Cite
+wfLoadExtension( 'Cite' );
+
+# TemplateSandbox
+wfLoadExtension( 'TemplateSandbox' );
+
+# WikiEditor
+wfLoadExtension( 'WikiEditor' );
+
+# CodeEditor
+wfLoadExtension( 'CodeEditor' );
+
+# SecureLinkFixer
+wfLoadExtension( 'SecureLinkFixer' );
+
+# Echo
+wfLoadExtension( 'Echo' );
+
 # Thanks
-wfLoadExtension( 'Thanks' );
+#wfLoadExtension( 'Thanks' );
+
+# Graph
+wfLoadExtension( 'Graph' );
+
+# Poem
+wfLoadExtension( 'Poem' );
+
+# TemplateData
+wfLoadExtension( 'TemplateData' );
+
+# AdvancedSearch
+wfLoadExtension( 'AdvancedSearch' );
 
 # Elastica & CirrusSearch
 # TODO configure
