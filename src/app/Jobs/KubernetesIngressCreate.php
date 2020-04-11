@@ -17,11 +17,12 @@ class KubernetesIngressCreate extends Job
     private $wikiDomain;
 
     /**
-     * @return void
+     * @param int|string $wikiId
+     * @param string $wikiDomain
      */
-    public function __construct($id, $wikiDomain)
+    public function __construct($wikiId, $wikiDomain)
     {
-        $this->id = $id;
+        $this->id = $wikiId;
         $this->wikiDomain = $wikiDomain;
     }
 
@@ -68,7 +69,7 @@ class KubernetesIngressCreate extends Job
                     'nginx.ingress.kubernetes.io/use-regex' => 'true',
                     'nginx.ingress.kubernetes.io/rewrite-target' => '/$2',
                     'nginx.ingress.kubernetes.io/configuration-snippet' => 'rewrite ^(/query|/tools/quickstatements)$ $1/ permanent;',
-                    'cert-manager.io/cluster-issuer' => 'letsencrypt-staging'
+                    'cert-manager.io/cluster-issuer' => 'letsencrypt-prod'
                 ],
             ],
             'spec' => [

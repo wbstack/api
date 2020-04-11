@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\KubernetesIngressCreate;
 use App\Wiki;
 use App\WikiDb;
 use App\WikiDomain;
@@ -20,13 +21,21 @@ class WikiController extends Controller
     {
         $user = $request->user();
 
-        // TODO extra validation that username is correct?
-        $request->validate([
+        $submittedDomain = $request->input('domain');
+        $isSubdomain = preg_match( '/.wiki\.opencura\.com$/', $submittedDomain );
+        if ( $isSubdomain ) {
             // .wiki.opencura.com is 18 characters long
             // if we want at least 5 chars for the site sub domain
             // that is 23 length
             // This also stops things like mail. www. pop. ETC...
-            'domain' => 'required|unique:wikis|unique:wiki_domains|min:23|regex:/^[a-z0-9-]+\.wiki\.opencura\.com$/',
+            $domainRequirements = 'required|unique:wikis|unique:wiki_domains|min:23|regex:/^[a-z0-9-]+\.wiki\.opencura\.com$/';
+        } else {
+            $domainRequirements = 'required|unique:wikis|unique:wiki_domains|min:4|regex:/[a-z0-9-]+\.[a-z]+$/';
+        }
+
+        // TODO extra validation that username is correct?
+        $request->validate([
+            'domain' => $domainRequirements,
             'sitename' => 'required|min:3',
             'username' => 'required',
         ]);
@@ -34,7 +43,7 @@ class WikiController extends Controller
         $wiki = null;
         $dbAssignment = null;
         // TODO create with some sort of owner etc?
-        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment) {
+        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain) {
             // Fail if there is not enough storage ready
             if (WikiDb::where('wiki_id', null)->count() == 0) {
                 abort(503, 'No databases ready');
@@ -80,6 +89,10 @@ class WikiController extends Controller
             // TODO maybe always make these run in a certain order..?
             dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
             dispatch(new MediawikiQuickstatementsInit($wiki->domain));
+            // Only dispatch a job to add a k8s ingress IF we are using a custom domain...
+            if (!$isSubdomain) {
+                $this->dispatch(new KubernetesIngressCreate( $wiki->id, $wiki->domain ));
+            }
         });
 
         $res['success'] = true;
@@ -87,6 +100,7 @@ class WikiController extends Controller
         $res['data'] = [
             'id' => $wiki->id,
             'name' => $wiki->name,
+            'domain' => $wiki->domain,
         ];
 
         return response($res);
