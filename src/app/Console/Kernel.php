@@ -19,10 +19,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        // TODO it would be good if some of these could be opportunist & triggered rather than crons..
         $schedule->job(new EnsureStoragePoolsPopulatedJob)->everyMinute();
         $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
-        //$schedule->job(new PruneEventPageUpdatesTable)->everyFifteenMinutes();
-        //$schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes();
+        $schedule->job(new PruneEventPageUpdatesTable)->everyFifteenMinutes();
+        $schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes();
     }
 
     /**

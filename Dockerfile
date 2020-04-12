@@ -1,4 +1,4 @@
-FROM composer as composer
+FROM composer:1.10 as composer
 
 COPY ./src/composer.json /tmp/src1/composer.json
 COPY ./src/composer.lock /tmp/src1/composer.lock
