@@ -36,6 +36,7 @@
     32 => 'AlbertCht\\InvisibleReCaptcha\\InvisibleReCaptchaServiceProvider',
     33 => 'Spatie\\Cors\\CorsServiceProvider',
     34 => 'PercyMamedy\\LaravelDevBooter\\ServiceProvider',
+    35 => 'Intervention\\Image\\ImageServiceProvider',
   ),
   'eager' => 
   array (
@@ -62,6 +63,7 @@
     20 => 'AlbertCht\\InvisibleReCaptcha\\InvisibleReCaptchaServiceProvider',
     21 => 'Spatie\\Cors\\CorsServiceProvider',
     22 => 'PercyMamedy\\LaravelDevBooter\\ServiceProvider',
+    23 => 'Intervention\\Image\\ImageServiceProvider',
   ),
   'deferred' => 
   array (

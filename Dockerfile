@@ -14,13 +14,14 @@ RUN composer install --no-dev --no-progress --optimize-autoloader
 FROM php:7.2-apache
 
 RUN apt-get update && apt-get install -y \
-    # Needed for the gd php lib
-	libpng-dev \
+	# Needed for the imagick php extension install
+	libmagickwand-dev \
+	&& echo "" | pecl install imagick \
+	&& docker-php-ext-enable \
+	imagick \
 	&& docker-php-ext-install \
 	# Obviously needed for mysql connection
 	pdo pdo_mysql \
-	# Needed for image manipulation for logo transformations?
-	gd \
 	&& a2enmod rewrite
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public

@@ -75,10 +75,22 @@ class WikiLogoController extends Controller
             Image::make(Input::file('logo')->getRealPath())->resize(135, 135)->stream()->detach()
         );
 
-        // Get the logo URL of the reduced logo
-        $url = $disk->url( $reducedPath );
+        // And a favicon
+        $faviconPath = $logosDir . '/64.ico';
+        if( $disk->exists( $faviconPath ) ) {
+            $disk->delete( $faviconPath );
+        }
+        $disk->writeStream(
+            $faviconPath,
+            Image::make(Input::file('logo')->getRealPath())->encode('ico')->resize(64, 64)->stream()->detach()
+        );
+
+        // Get the urls
+        $logoUrl = $disk->url( $reducedPath );
+        $faviconUrl = $disk->url( $faviconPath );
         // Append the time to the url so that client caches will be invalidated
-        $url .= '?updated=' . time();
+        $logoUrl .= '?u=' . time();
+        $faviconUrl .= '?u=' . time();
 
         // Docs: https://www.mediawiki.org/wiki/Manual:$wgLogo
         WikiSetting::updateOrCreate(
@@ -87,12 +99,22 @@ class WikiLogoController extends Controller
                 'name' => 'wgLogo',
             ],
             [
-                'value' => $url,
+                'value' => $logoUrl,
+            ]
+        );
+        // Docs: https://www.mediawiki.org/wiki/Manual:$wgFavicon
+        WikiSetting::updateOrCreate(
+            [
+                'wiki_id' => $wikiId,
+                'name' => 'wgFavicon',
+            ],
+            [
+                'value' => $faviconUrl,
             ]
         );
 
         $res['success'] = true;
-        $res['url'] = $url;
+        $res['url'] = $logoUrl;
         return response($res);
     }
 }
