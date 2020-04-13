@@ -13,15 +13,21 @@ RUN composer install --no-dev --no-progress --optimize-autoloader
 
 FROM php:7.2-apache
 
-# Install and enabled plugins
-RUN docker-php-ext-install pdo pdo_mysql
-RUN a2enmod rewrite
+RUN apt-get update && apt-get install -y \
+    # Needed for the gd php lib
+	libpng-dev \
+	&& docker-php-ext-install \
+	# Obviously needed for mysql connection
+	pdo pdo_mysql \
+	# Needed for image manipulation for logo transformations?
+	gd \
+	&& a2enmod rewrite
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
 # Change the document root
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 COPY --chown=www-data:www-data --from=composer /tmp/src2 /var/www/html
 

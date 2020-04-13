@@ -127,9 +127,7 @@ class WikiController extends Controller
 
         // Return a success
         return response()->json('Success', 200);
-
     }
-
 
     // TODO should this just be get wiki?
     public function getWikiDetailsForIdForOwner(Request $request)

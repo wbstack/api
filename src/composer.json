@@ -15,13 +15,15 @@
         "guzzlehttp/guzzle": "^6.0",
         "illuminate/mail": "5.8.*",
         "illuminate/redis": "5.8.*",
+        "intervention/image": "^2.5",
         "laravel/cashier": "^10.1",
         "laravel/framework": "5.8.*",
         "laravel/passport": "^7.4",
         "maclof/kubernetes-client": "^0.14.3",
         "percymamedy/laravel-dev-booter": "^0.2.2",
         "predis/predis": "~1.0",
-        "spatie/laravel-cors": "^1.5"
+        "spatie/laravel-cors": "^1.5",
+        "superbalist/laravel-google-cloud-storage": "^2.2"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

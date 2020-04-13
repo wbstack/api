@@ -30,6 +30,7 @@ $router->group(['middleware' => ['auth:api']], function () use ($router) {
         $router->post('delete', ['uses' => 'WikiController@delete']);
         $router->post('mine', ['uses' => 'WikisController@getWikisOwnedByCurrentUser']);
         $router->post('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
+        $router->post('logo/update', ['uses' => 'WikiLogoController@update']);
         // TODO should wiki managers really be here?
         $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
     });
