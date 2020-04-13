@@ -45,20 +45,31 @@ class WikiLogoController extends Controller
             return response()->json('Unauthorized', 401);
         }
 
+        // Get the disk we use to store logos
+        $disk = Storage::disk('gcs-public-static');
         // Get a directory for storing all things relating to this site
         // TODO should be in the site model? maybe?
         $siteDir = md5( $wikiId . md5( $wikiId ) );
+        $logosDir = 'sites/' . $siteDir . '/logos';
+
+        // Delete the old raw file if it was already there
+        $rawFilePath = $logosDir . '/raw.png';
+        if( $disk->exists( $rawFilePath ) ) {
+            $disk->delete( $rawFilePath );
+        }
 
         // Store the raw file uploaded by the user
-        $rawPath = $request->file('logo' )->storeAs(
-            'sites/' . $siteDir . '/logos',
+        $request->file('logo' )->storeAs(
+            $logosDir,
             'raw.png',
             'gcs-public-static'
         );
 
         // Store a conversion for the actual site logo
-        $disk = Storage::disk('gcs-public-static');
-        $reducedPath = 'sites/' . $siteDir . '/logos/135.png';
+        $reducedPath = $logosDir . '/135.png';
+        if( $disk->exists( $reducedPath ) ) {
+            $disk->delete( $reducedPath );
+        }
         $disk->writeStream(
             $reducedPath,
             Image::make(Input::file('logo')->getRealPath())->resize(135, 135)->stream()->detach()
