@@ -20,6 +20,12 @@ use Intervention\Image\Facades\Image;
 
 class WikiLogoController extends Controller
 {
+
+    /**
+     * It would be beneficial to have a bit of atomicness here?
+     * Right now WgLogo is always the same path when set, so if we start writing new files but die we still end up updating the site.
+     * Fine for now but...
+     */
     public function update(Request $request)
     {
         $request->validate([
@@ -61,7 +67,16 @@ class WikiLogoController extends Controller
         // Get the logo URL of the reduced logo
         $url = $disk->url( $reducedPath );
 
-        // TODO update the settings key
+        // Docs: https://www.mediawiki.org/wiki/Manual:$wgLogo
+        WikiSetting::updateOrCreate(
+            [
+                'wiki_id' => $wikiId,
+                'name' => 'wgLogo',
+            ],
+            [
+                'value' => $url,
+            ]
+        );
 
         $res['success'] = true;
         $res['url'] = $url;
