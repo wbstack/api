@@ -11,7 +11,7 @@ class CreateWikiSettingsTable extends Migration
         Schema::create('wiki_settings', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 100);
-            $table->string('value', 100);
+            $table->string('value', 200);
             $table->integer('wiki_id')->nullable()->unsigned();
 
             $table->index('wiki_id');

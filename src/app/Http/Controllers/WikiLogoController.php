@@ -77,6 +77,8 @@ class WikiLogoController extends Controller
 
         // Get the logo URL of the reduced logo
         $url = $disk->url( $reducedPath );
+        // Append the time to the url so that client caches will be invalidated
+        $url .= '?updated=' . time();
 
         // Docs: https://www.mediawiki.org/wiki/Manual:$wgLogo
         WikiSetting::updateOrCreate(
