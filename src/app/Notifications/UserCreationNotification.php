@@ -2,14 +2,14 @@
 
 namespace App\Notifications;
 
-use Illuminate\Support\Facades\Lang;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Lang;
 
-class ResetPasswordNotification extends Notification
+class UserCreationNotification extends Notification
 {
     /**
-     * The password reset token.
+     * The email verification token
      *
      * @var string
      */
@@ -61,21 +61,20 @@ class ResetPasswordNotification extends Notification
          * bites us a bit.
          * Ideally we would be able to have the route password.reset etc actually direct to the UI VUE route
          * Then we could use the ResetPassword Notification notification too...
+         * TODO this is now duplicated in a few notifications.... TODO switch on ENV instead?
          */
-        //$resetPasswordLink = url(config('app.url').route('password.reset', ['token' => $this->token, 'email' => $notifiable->getEmailForPasswordReset()], false));
-        $queryPart = "?token=$this->token&email={$notifiable->getEmailForPasswordReset()}";
         if( config('app.url') === 'http://localhost' ) {
-            $resetPasswordLink = 'http://localhost:8081/reset-password' . $queryPart;
+            $verifyEmailLink = 'http://localhost:8081/emailVerification/' . $this->token;
         } else {
-            $resetPasswordLink = 'https://wbstack.com/reset-password' . $queryPart;
+            $verifyEmailLink = 'https://wbstack.com/emailVerification/' . $this->token;
         }
 
         return (new MailMessage)
-            ->subject(Lang::get('Reset Password Notification'))
-            ->line(Lang::get('You are receiving this email because we received a password reset request for your account.'))
-            ->action(Lang::get('Reset Password'), $resetPasswordLink)
-            ->line(Lang::get('This password reset link will expire in :count minutes.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
-            ->line(Lang::get('If you did not request a password reset, no further action is required.'));
+            ->subject(Lang::get('Account Creation Notification'))
+            ->line(Lang::get('Thanks for signing up, we’re glad you’re here.'))
+            ->line(Lang::get('You can get started in seconds — just click below to begin.'))
+            ->action(Lang::get('Verify Email'), $verifyEmailLink)
+            ->line(Lang::get('If this account was not created by you, please do nothing.'));
     }
 
     /**

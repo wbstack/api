@@ -11,7 +11,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Validator;
-use App\Jobs\UesrVerificationTokenCreateAndSendJob;
+use App\Jobs\UserCreationVerificationCreateTokenAndSendJob;
 
 class RegisterController extends Controller
 {
@@ -34,7 +34,7 @@ class RegisterController extends Controller
             if ($request->input('invite')) {
                 ( new InvitationDeleteJob($request->input('invite')) )->handle();
             }
-            ( new UesrVerificationTokenCreateAndSendJob($user) )->handle();
+            ( new UserCreationVerificationCreateTokenAndSendJob($user) )->handle();
         });
 
         if ($user === null) {

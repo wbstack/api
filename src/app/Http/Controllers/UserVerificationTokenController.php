@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Http\Request;
 use App\UserVerificationToken;
-use App\Jobs\UesrVerificationTokenCreateAndSendJob;
+use App\Jobs\UserCreationVerificationCreateTokenAndSendJob;
 
 /**
  * Verification of user emails
@@ -47,6 +47,6 @@ class UserVerificationTokenController extends Controller
         }
 
         // TODO why is this handle? Why not queue?
-        ( new UesrVerificationTokenCreateAndSendJob($user) )->handle();
+        ( new UserCreationVerificationCreateTokenAndSendJob($user) )->handle();
     }
 }

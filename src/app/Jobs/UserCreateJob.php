@@ -23,7 +23,7 @@ class UserCreateJob extends Job
     }
 
     /**
-     * @return App\User
+     * @return User
      */
     public function handle()
     {
