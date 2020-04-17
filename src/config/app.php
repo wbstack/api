@@ -178,7 +178,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         /*
-         * Improted from LUMEN
+         * Imported from LUMEN
          */
         AlbertCht\InvisibleReCaptcha\InvisibleReCaptchaServiceProvider::class,
         // The cors service provider is apparently meant to be loaded automagically

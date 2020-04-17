@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -43,6 +44,7 @@ class LoginController extends Controller
         if (Auth::attempt($data)) {
             $this->clearLoginAttempts($request);
 
+            /** @var User $user */
             $user = Auth::user();
 
             return response()->json([
