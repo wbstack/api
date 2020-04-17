@@ -9,6 +9,7 @@ use App\WikiDomain;
 use App\WikiManager;
 use App\WikiSetting;
 use App\Jobs\MediawikiInit;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\QueryserviceNamespace;
@@ -86,9 +87,15 @@ class WikiController extends Controller
               'wiki_id' => $wiki->id,
             ]);
 
+            // If we are local, the dev environment wont be able to run these jobs yet, so end this closure early.
+            // TODO maybe send different jobs instead? or do this in the jobs?
+            if( App::environment() === 'local' ) {
+                return;
+            }
+
             // TODO maybe always make these run in a certain order..?
-            dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
-            dispatch(new MediawikiQuickstatementsInit($wiki->domain));
+            $this->dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
+            $this->dispatch(new MediawikiQuickstatementsInit($wiki->domain));
             // Only dispatch a job to add a k8s ingress IF we are using a custom domain...
             if (!$isSubdomain) {
                 $this->dispatch(new KubernetesIngressCreate( $wiki->id, $wiki->domain ));

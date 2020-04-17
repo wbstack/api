@@ -19,7 +19,7 @@ class LoginTest extends TestCase
         // This random user probably doesn't exist in the db
         $user = factory(User::class)->make();
         $this->json('POST', $this->route, ['email' => $user->email, 'password' => 'anyPassword'])
-        ->assertStatus(422);
+        ->assertStatus(401);
     }
 
     public function testLoginFail_badPassword()

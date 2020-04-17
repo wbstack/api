@@ -111,6 +111,7 @@ return [
 
     'redis' => [
 
+        // 5.8 -> 6.0 of laravel, the default client switched to phpredis
         'client' => env('REDIS_CLIENT', 'predis'),
 
         'options' => [
