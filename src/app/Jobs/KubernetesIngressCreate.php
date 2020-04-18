@@ -60,15 +60,12 @@ class KubernetesIngressCreate extends Job
                     'wbstack-wiki-domain' => $this->wikiDomain,
                     // Generation should be updated when this ingress spec is changed.
                     // This will allow updating older ingresses to match newer ones etc.
-                    'wbstack-ingress-generation' => '2020-04-10.1',
+                    'wbstack-ingress-generation' => '2020-04-18.1',
                     'app.kubernetes.io/managed-by' => 'wbstack-platform',
                 ],
                 'annotations' => [
                     'kubernetes.io/ingress.class' => 'nginx',
                     'nginx.ingress.kubernetes.io/force-ssl-redirect' => 'true',
-                    'nginx.ingress.kubernetes.io/use-regex' => 'true',
-                    'nginx.ingress.kubernetes.io/rewrite-target' => '/$2',
-                    'nginx.ingress.kubernetes.io/configuration-snippet' => 'rewrite ^(/query|/tools/quickstatements)$ $1/ permanent;',
                     'cert-manager.io/cluster-issuer' => 'letsencrypt-prod'
                 ],
             ],
@@ -87,43 +84,11 @@ class KubernetesIngressCreate extends Job
                         'http' => [
                             'paths' => [
                                 [
-                                    'path' => '/()(.*)',
+                                    'path' => '/',
                                     'backend' => [
                                         // TODO this should be an env var...
-                                        'serviceName' => 'mediawiki-app-web',
-                                        'servicePort' => 80,
-                                    ],
-                                ],
-                                [
-                                    'path' => '/()(w/api.php.*)',
-                                    'backend' => [
-                                        // TODO this should be an env var...
-                                        'serviceName' => 'mediawiki-app-web-api',
-                                        'servicePort' => 80,
-                                    ],
-                                ],
-                                [
-                                    'path' => '/(query)(.*)',
-                                    'backend' => [
-                                        // TODO this should be an env var...
-                                        'serviceName' => 'queryservice-ui',
-                                        'servicePort' => 80,
-                                    ],
-                                ],
-                                [
-                                    'path' => '/(query/)(sparql.*)',
-                                    'backend' => [
-                                        // TODO this should be an env var...
-                                        'serviceName' => 'queryservice-proxy',
-                                        'servicePort' => 80,
-                                    ],
-                                ],
-                                [
-                                    'path' => '/(tools/quickstatements)(.*)',
-                                    'backend' => [
-                                        // TODO this should be an env var...
-                                        'serviceName' => 'tool-quickstatements',
-                                        'servicePort' => 80,
+                                        'serviceName' => 'platform-nginx',
+                                        'servicePort' => 8080,
                                     ],
                                 ],
                             ],
