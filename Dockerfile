@@ -13,16 +13,18 @@ RUN composer install --no-dev --no-progress --optimize-autoloader
 
 FROM php:7.2-apache
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update \
 	# Needed for the imagick php extension install
-	libmagickwand-dev \
+	&& apt-get install -y libmagickwand-dev \
 	&& echo "" | pecl install imagick \
-	&& docker-php-ext-enable \
-	imagick \
-	&& docker-php-ext-install \
+	&& docker-php-ext-enable imagick \
 	# Obviously needed for mysql connection
-	pdo pdo_mysql \
-	&& a2enmod rewrite
+	&& docker-php-ext-install pdo pdo_mysql \
+	# For rewrite rules
+	&& a2enmod rewrite \
+	# Needed for gluedev/laravel-stackdriver
+	&& pecl install opencensus-alpha \
+	&& docker-php-ext-enable opencensus
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 

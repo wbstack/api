@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use GlueDev\Laravel\Stackdriver\StackdriverExceptionHandler;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
@@ -12,13 +13,7 @@ class Handler extends ExceptionHandler
      *
      * @var array
      */
-    protected $dontReport = [
-        // NOTE: Lumen shift removed these..
-        // AuthorizationException::class,
-        // HttpException::class,
-        // ModelNotFoundException::class,
-        // ValidationException::class,
-    ];
+    protected $dontReport = [];
 
     /**
      * A list of the inputs that are never flashed for validation exceptions.
@@ -38,6 +33,7 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
+        StackdriverExceptionHandler::report($exception);
         parent::report($exception);
     }
 

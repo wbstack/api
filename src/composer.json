@@ -10,6 +10,7 @@
     "require": {
         "albertcht/invisible-recaptcha": "1.9.*",
         "firebase/php-jwt": "^5.0",
+        "gluedev/laravel-stackdriver": "^0.2.2",
         "guzzlehttp/guzzle": "^6.0",
         "illuminate/mail": "^6.0",
         "illuminate/redis": "^6.0",
