@@ -5,7 +5,7 @@ return [
      * Should the entire Stackdriver package be enabled or disabled
      * By default, it is enabled when the app_env is not local
      */
-    'enabled' => env('STACKDRIVER_ENABLED', false),
+    'enabled' => (bool)env('STACKDRIVER_ENABLED', false),
 
     /**
      * There are multiple way to authenticate in order to send data to Google Stackdriver
@@ -33,7 +33,7 @@ return [
         /**
          * Disable logging
          */
-        'enabled' => env('STACKDRIVER_LOGGING_ENABLED', true),
+        'enabled' => (bool)env('STACKDRIVER_LOGGING_ENABLED', true),
 
         /**
          * The name of the log to write entries to. Defaults to Laravel app name
@@ -56,7 +56,7 @@ return [
          * See: http://googleapis.github.io/google-cloud-php/#/docs/cloud-logging/v1.14.0/logging/psrlogger
          */
         'psrOptions' => [
-            'batchEnabled' => true,
+            'batchEnabled' => (bool)env('STACKDRIVER_LOGGING_BATCH_ENABLED', true),
             'batchOptions' => [
                 'batchSize' => 50,
                 'callPeriod' => 2.0,
@@ -69,7 +69,7 @@ return [
         /**
          * Disable tracing alone
          */
-        'enabled' => env('STACKDRIVER_TRACING_ENABLED', true),
+        'enabled' => (bool)env('STACKDRIVER_TRACING_ENABLED', true),
 
         /**
          * Add any extra options for the Tracing client here
@@ -100,7 +100,7 @@ return [
         /**
          * Disable error reporting alone
          */
-        'enabled' => env('STACKDRIVER_ERROR_REPORTING_ENABLED', true),
+        'enabled' => (bool)env('STACKDRIVER_ERROR_REPORTING_ENABLED', true),
 
         /**
          * Name of the service, defaults to the Laravel app name
@@ -134,7 +134,7 @@ return [
          * See: http://googleapis.github.io/google-cloud-php/#/docs/cloud-logging/v1.14.0/logging/psrlogger
          */
         'psrOptions' => [
-            'batchEnabled' => true,
+            'batchEnabled' => (bool)env('STACKDRIVER_ERROR_REPORTING_BATCH_ENABLED', true),
             'batchOptions' => [
                 'batchSize' => 50,
                 'callPeriod' => 2.0,
