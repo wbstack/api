@@ -2,20 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\KubernetesIngressCreate;
-use App\Wiki;
-use App\WikiDb;
-use App\WikiDomain;
 use App\WikiManager;
 use App\WikiSetting;
-use App\Jobs\MediawikiInit;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\QueryserviceNamespace;
-use Illuminate\Support\Facades\DB;
-use App\Jobs\MediawikiQuickstatementsInit;
 use Intervention\Image\Facades\Image;
 
 class WikiLogoController extends Controller
@@ -72,7 +62,7 @@ class WikiLogoController extends Controller
         }
         $disk->writeStream(
             $reducedPath,
-            Image::make(Input::file('logo')->getRealPath())->resize(135, 135)->stream()->detach()
+            Image::make($request->file('logo')->getRealPath())->resize(135, 135)->stream()->detach()
         );
 
         // And a favicon
@@ -82,7 +72,7 @@ class WikiLogoController extends Controller
         }
         $disk->writeStream(
             $faviconPath,
-            Image::make(Input::file('logo')->getRealPath())->encode('ico')->resize(64, 64)->stream()->detach()
+            Image::make($request->file('logo')->getRealPath())->encode('ico')->resize(64, 64)->stream()->detach()
         );
 
         // Get the urls
