@@ -14,7 +14,6 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\QueryserviceNamespace;
 use Illuminate\Support\Facades\DB;
-use App\Jobs\MediawikiQuickstatementsInit;
 
 class WikiController extends Controller
 {
@@ -95,7 +94,6 @@ class WikiController extends Controller
 
             // TODO maybe always make these run in a certain order..?
             $this->dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
-            $this->dispatch(new MediawikiQuickstatementsInit($wiki->domain));
             // Only dispatch a job to add a k8s ingress IF we are using a custom domain...
             if (!$isSubdomain) {
                 $this->dispatch(new KubernetesIngressCreate( $wiki->id, $wiki->domain ));
