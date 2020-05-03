@@ -26,11 +26,13 @@ $router->group(['middleware' => ['auth:api']], function () use ($router) {
     });
     // wiki
     $router->group(['prefix' => 'wiki'], function () use ($router) {
+        // TODO wiki id should probably be in the path of most of these routes...
         $router->post('create', ['uses' => 'WikiController@create']);
         $router->post('delete', ['uses' => 'WikiController@delete']);
         $router->post('mine', ['uses' => 'WikisController@getWikisOwnedByCurrentUser']);
         $router->post('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
         $router->post('logo/update', ['uses' => 'WikiLogoController@update']);
+        $router->post('setting/{setting}/update', ['uses' => 'WikiSettingController@update']);
         // TODO should wiki managers really be here?
         $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
     });
