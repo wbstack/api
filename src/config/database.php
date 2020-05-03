@@ -34,22 +34,32 @@ return [
     */
 
     'connections' => [
-
-        'sqlite' => [
-            'driver' => 'sqlite',
-            'url' => env('DATABASE_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
-            'prefix' => '',
-            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-        ],
-
         'mysql' => [
-            'driver' => 'mysql',
+            'read' => [
+                'host' => [
+                    // ConnectionFactory does a Arr::shuffle of these currently
+                    // These can not currently be ordered or weighted
+                    // Which mean 50/50 to the master and replcias right now...
+                    // But this does mean if the replicas are all down, the master will still used for reads..
+                    // Upstream: https://github.com/laravel/ideas/issues/2225
+                    env('DB_HOST_READ'),
+                    env('DB_HOST_WRITE'),
+                ],
+            ],
+            'write' => [
+                'host' => [
+                    env('DB_HOST_WRITE')
+                ],
+            ],
+            // If the sticky option is enabled and a "write" operation has been performed
+            // against the database during the current request cycle,
+            // any further "read" operations will use the "write" connection.
+            'sticky'    => true,
+            'driver'    => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
+            'database' => env('DB_DATABASE'),
+            'username' => env('DB_USERNAME'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
@@ -64,12 +74,26 @@ return [
         ],
 
         'mw' => [
+            // TODO one day these might be a different server...
+            'read' => [
+                'host' => [
+                    env('DB_HOST_READ')
+                ],
+            ],
+            'write' => [
+                'host' => [
+                    env('DB_HOST_WRITE')
+                ],
+            ],
+            // If the sticky option is enabled and a "write" operation has been performed
+            // against the database during the current request cycle,
+            // any further "read" operations will use the "write" connection.
+            'sticky'    => true,
             'driver' => 'mysql',
             'url' => env('MW_DATABASE_URL'),
-            'host' => env('MW_DB_HOST', '127.0.0.1'),
             'port' => env('MW_DB_PORT', '3306'),
             'database' => env('MW_DB_DATABASE'),
-            'username' => env('MW_DB_USERNAME', 'forge'),
+            'username' => env('MW_DB_USERNAME'),
             'password' => env('MW_DB_PASSWORD', ''),
             'unix_socket' => env('MW_DB_SOCKET', ''),
             'charset' => 'utf8mb4',
