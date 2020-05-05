@@ -5,6 +5,12 @@ use Laravel\Lumen\Routing\Router;
 
 // GET
 $router->get('wiki/count', ['uses' => 'WikisController@count']);
+$router->get(
+    'healthz',
+    function() {
+        return 'It\'s Alive';
+    }
+);
 // POST
 $router->post('auth/login', ['uses' => 'Auth\LoginController@login']);
 // TODO actually use logout route in VUE app..
