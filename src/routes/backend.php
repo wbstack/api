@@ -15,6 +15,7 @@ $router->group(['prefix' => 'wiki'], function () use ($router) {
 $router->group(['prefix' => 'event'], function () use ($router) {
     // POST
     $router->post('pageUpdate', ['uses' => 'EventController@pageUpdate']);
+    $router->post('pageUpdateBatch', ['uses' => 'EventController@pageUpdateBatch']);
 });
 
 $router->group(['prefix' => 'qs'], function () use ($router) {

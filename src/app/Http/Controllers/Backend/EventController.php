@@ -11,4 +11,9 @@ class EventController extends Controller
     {
         \App\EventPageUpdate::create(json_decode($request->getContent(), true));
     }
+
+    public function pageUpdateBatch(Request $request)
+    {
+        \App\EventPageUpdate::insert(json_decode($request->getContent(), true));
+    }
 }
