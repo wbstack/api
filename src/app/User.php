@@ -9,9 +9,44 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
- * TODO SHIFT NOTE, switch from verified field to email_verified_at..
- * SHIFT NOTE, used to use Authorizable
- * SHIFT NOTE, used to implement AuthorizableContract.
+ * App\User
+ *
+ * @property int $id
+ * @property string $email
+ * @property string $password
+ * @property string|null $remember_token
+ * @property int $verified
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $stripe_id
+ * @property string|null $card_brand
+ * @property string|null $card_last_four
+ * @property string|null $trial_ends_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Client[] $clients
+ * @property-read int|null $clients_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Wiki[] $managesWikis
+ * @property-read int|null $manages_wikis_count
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Cashier\Subscription[] $subscriptions
+ * @property-read int|null $subscriptions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Token[] $tokens
+ * @property-read int|null $tokens_count
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereCardBrand($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereCardLastFour($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereStripeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereTrialEndsAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereVerified($value)
+ * @mixin \Eloquent
  */
 class User extends Authenticatable
 {

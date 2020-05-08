@@ -34,6 +34,7 @@ class Kernel extends ConsoleKernel
     protected function commands()
     {
         $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__.'/Commands/User');
         $this->load(__DIR__.'/Commands/Job');
         $this->load(__DIR__.'/Commands/Wiki');
         $this->load(__DIR__.'/Commands/Invitation');

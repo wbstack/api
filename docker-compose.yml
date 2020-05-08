@@ -23,6 +23,8 @@ services:
       MYSQL_ROOT_PASSWORD: imarootpassword
       MYSQL_DATABASE: apidb
     restart: always
+    volumes:
+      - sql-data:/var/lib/mysql
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:4.8
     restart: always
@@ -38,3 +40,6 @@ services:
     restart: always
     expose:
       - 6379
+
+volumes:
+  sql-data:

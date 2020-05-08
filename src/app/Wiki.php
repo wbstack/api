@@ -5,6 +5,36 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * App\Wiki
+ *
+ * @property int $id
+ * @property string $domain
+ * @property string $sitename
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\WikiSetting[] $settings
+ * @property-read int|null $settings_count
+ * @property-read \App\WikiDb|null $wikiDb
+ * @property-read \App\WikiDb|null $wikiDbVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\User[] $wikiManagers
+ * @property-read int|null $wiki_managers_count
+ * @property-read \App\QueryserviceNamespace|null $wikiQueryserviceNamespace
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki newQuery()
+ * @method static \Illuminate\Database\Query\Builder|\App\Wiki onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereDomain($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereSitename($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Wiki withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Wiki withoutTrashed()
+ * @mixin \Eloquent
+ */
 class Wiki extends Model
 {
     use SoftDeletes;
