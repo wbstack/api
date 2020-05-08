@@ -42,11 +42,17 @@ class UserVerificationTokenController extends Controller
         $user = $request->user();
 
         if ($user->verified) {
-            // User already verified
-            abort(403);
+            $res['success'] = true;
+            $res['message'] = 'Already verified';
+            return response($res);
         }
 
         // TODO why is this handle? Why not queue?
         ( new UserCreationVerificationCreateTokenAndSendJob($user) )->handle();
+
+        $res['success'] = true;
+        $res['message'] = 'Email sent!';
+        return response($res);
+
     }
 }

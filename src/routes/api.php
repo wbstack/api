@@ -18,7 +18,6 @@ $router->post('auth/logout', ['uses' => 'Auth\LoginController@logout']);
 $router->post('user/register', ['uses' => 'Auth\RegisterController@register']);
 // TODO finish converting for laravel below here
 $router->post('user/verifyEmail', ['uses' => 'UserVerificationTokenController@verify']);
-$router->post('user/sendVerifyEmail', ['uses' => 'UserVerificationTokenController@createAndSendForUser']);
 $router->post('user/forgotPassword', ['uses' => 'Auth\ForgotPasswordController@sendResetLinkEmail']);
 $router->post('user/resetPassword', ['uses' => 'Auth\ResetPasswordController@reset']);
 
@@ -29,6 +28,7 @@ $router->group(['middleware' => ['auth:api']], function () use ($router) {
     // user
     $router->group(['prefix' => 'user'], function () use ($router) {
         $router->post('self', ['uses' => 'UserController@getSelf']);
+        $router->post('sendVerifyEmail', ['uses' => 'UserVerificationTokenController@createAndSendForUser']);
     });
     // wiki
     $router->group(['prefix' => 'wiki'], function () use ($router) {
