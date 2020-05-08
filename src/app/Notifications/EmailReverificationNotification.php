@@ -7,9 +7,10 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
 
 /**
- * Notification to be sent after account creation that includes a verification link.
+ * A notification to be sent when an account has already been created, but the verification link has been lost, or has expired
+ * and a new link is needed by the user.
  */
-class UserCreationNotification extends Notification
+class EmailReverificationNotification extends Notification
 {
     /**
      * The email verification token
@@ -73,11 +74,10 @@ class UserCreationNotification extends Notification
         }
 
         return (new MailMessage)
-            ->subject(Lang::get('Account Creation Notification'))
-            ->line(Lang::get('Thanks for signing up, we’re glad you’re here.'))
+            ->subject(Lang::get('Email Verification'))
+            ->line(Lang::get('Someone, probably you, has requested another email verification link.'))
             ->line(Lang::get('You can get started in seconds — just click below to begin.'))
-            ->action(Lang::get('Verify Email'), $verifyEmailLink)
-            ->line(Lang::get('If this account was not created by you, please do nothing.'));
+            ->action(Lang::get('Verify Email'), $verifyEmailLink);
     }
 
     /**
