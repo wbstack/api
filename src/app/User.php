@@ -3,6 +3,8 @@
 namespace App;
 
 use App\Notifications\ResetPasswordNotification;
+use http\Exception\RuntimeException;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Laravel\Cashier\Billable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -48,7 +50,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereVerified($value)
  * @mixin \Eloquent
  */
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, Notifiable, Billable;
 
@@ -91,4 +93,28 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Wiki::class, 'wiki_managers');
     }
+
+    public function hasVerifiedEmail()
+    {
+        return (bool)$this->verified;
+    }
+
+    public function markEmailAsVerified()
+    {
+        $this->verified = 1;
+    }
+
+    public function sendEmailVerificationNotification()
+    {
+        // This is required by the MustVerifyEmail interface that we use for middle ware.
+        // But we currently send our emails via a different means, so we havn't implemented this..
+        throw new RuntimeException('Not yet implemented');
+    }
+
+    public function getEmailForVerification()
+    {
+        return $this->email;
+    }
+
+
 }

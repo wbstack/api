@@ -25,25 +25,31 @@ $router->post('interest/register', ['uses' => 'InterestController@create']);
 
 // Authed
 $router->group(['middleware' => ['auth:api']], function () use ($router) {
+
     // user
     $router->group(['prefix' => 'user'], function () use ($router) {
         $router->post('self', ['uses' => 'UserController@getSelf']);
         $router->post('sendVerifyEmail', ['uses' => 'UserVerificationTokenController@createAndSendForUser']);
     });
+
     // wiki
+    // TODO wiki id should probably be in the path of most of these routes...
     $router->group(['prefix' => 'wiki'], function () use ($router) {
-        // TODO wiki id should probably be in the path of most of these routes...
+        // TODO maybe the UI just shouldn't make this request if users are not verified...
+        $router->post('mine', ['uses' => 'WikisController@getWikisOwnedByCurrentUser']);
+    });
+    $router->group(['prefix' => 'wiki', 'middleware' => ['verified']], function () use ($router) {
         $router->post('create', ['uses' => 'WikiController@create']);
         $router->post('delete', ['uses' => 'WikiController@delete']);
-        $router->post('mine', ['uses' => 'WikisController@getWikisOwnedByCurrentUser']);
         $router->post('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
         $router->post('logo/update', ['uses' => 'WikiLogoController@update']);
         $router->post('setting/{setting}/update', ['uses' => 'WikiSettingController@update']);
         // TODO should wiki managers really be here?
         $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
     });
+
     // admin
-    $router->group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => ['admin']], function () use ($router) {
+    $router->group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => ['admin', 'verified']], function () use ($router) {
         // invitation
         $router->group(['prefix' => 'invitation'], function () use ($router) {
             $router->post('list', ['uses' => 'InvitationsController@get']);
@@ -57,4 +63,5 @@ $router->group(['middleware' => ['auth:api']], function () use ($router) {
         // $router->post('delete', ['uses' => 'InvitationController@delete']);
         });
     });
+
 });
