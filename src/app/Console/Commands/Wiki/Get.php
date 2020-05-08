@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Wiki;
 
 use App\Wiki;
 use Illuminate\Console\Command;
 
-class GetWikiForXJob extends Command
+class Get extends Command
 {
-    protected $signature = 'app:getWiki {key} {value?}';
+    protected $signature = 'wbs-wiki:get {key} {value?}';
 
-    protected $description = 'Get Wiki For X job';
+    protected $description = 'Get Wiki data by key and value.';
 
     /**
      * Create a new command instance.

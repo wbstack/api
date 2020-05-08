@@ -6,7 +6,7 @@ use App\QueryserviceNamespace;
 
 /**
  * Example usage
- * php artisan job:handle ProvisionQueryserviceNamespaceJob
+ * php artisan wbs-job:handle ProvisionQueryserviceNamespaceJob
  */
 class ProvisionQueryserviceNamespaceJob extends Job
 {

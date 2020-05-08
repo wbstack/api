@@ -1,24 +1,27 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Job;
 
 use Illuminate\Console\Command;
 
-class HandleJob extends Command
+/**
+ * Example: wbs-job:handle InvitationCreateJob someCode
+ */
+class Handle extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'job:handle {job} {parameter?} {parameterSeperator?}';
+    protected $signature = 'wbs-job:handle {job} {parameter?} {parameterSeperator?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Handle job';
+    protected $description = 'Handle a job right now';
 
     /**
      * Create a new command instance.
@@ -43,14 +46,14 @@ class HandleJob extends Command
         if (stripos($jobClassName, '/')) {
             $jobClassName = str_replace('/', '\\', $jobClassName);
         }
-        $class = '\\App\\Jobs\\'.$jobClassName;
+        $class = $prefix.$jobClassName;
 
         if (! class_exists($class)) {
             $this->error("{$class} class Not exists");
         } else {
             if ($this->argument('parameter')) {
-                if ($this->argument('parameterSeperator')) {
-                    $params = explode($this->argument('parameterSeperator'), $this->argument('parameter'));
+                if ($this->argument('parameterSeparator')) {
+                    $params = explode($this->argument('parameterSeparator'), $this->argument('parameter'));
                     $job = new $class(...$params);
                 } else {
                     $job = new $class($this->argument('parameter'));
@@ -60,7 +63,7 @@ class HandleJob extends Command
             }
 
             $job->handle();
-            $this->info("Successfully Handeled {$class} ");
+            $this->info("Successfully Handled {$class} ");
         }
     }
 }

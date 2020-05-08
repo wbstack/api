@@ -8,27 +8,19 @@ class InvitationCreateJob extends Job
 {
     private $code;
 
-    /**
-     * @return void
-     */
-    public function __construct($code)
+    public function __construct( string $code)
     {
         $this->code = strtolower($code);
     }
 
-    /**
-     * @return void
-     */
     public function handle()
     {
         $test = Invitation::where('code', $this->code)->first();
         if ($test) {
-            // Silent return if it already exits
-            // TODO should this fail instead?
-            return;
+            return false;
         }
 
-        $invite = Invitation::create([
+        return Invitation::create([
           'code' => $this->code,
       ]);
     }

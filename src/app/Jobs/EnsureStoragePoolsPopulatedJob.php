@@ -7,7 +7,7 @@ use App\QueryserviceNamespace;
 
 /**
  * Example usage
- * php artisan job:handle EnsureStoragePoolsPopulatedJob
+ * php artisan wbs-job:handle EnsureStoragePoolsPopulatedJob
  */
 class EnsureStoragePoolsPopulatedJob extends Job
 {

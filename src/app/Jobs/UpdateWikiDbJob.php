@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * This can be run with for example:
- * php artisan job:handle UpdateWikiDbJob id,1,mw1.33-wbs1,mw1.33-wbs2 ,
+ * php artisan wbs-job:handle UpdateWikiDbJob id,1,mw1.33-wbs1,mw1.33-wbs2 ,
  *
  * If you wanted to be wreckless and pick any wiki:
- * php artisan job:handle UpdateWikiDbJob version,mw1.33-wbs1,mw1.33-wbs2 ,
+ * php artisan wbs-job:handle UpdateWikiDbJob version,mw1.33-wbs1,mw1.33-wbs2 ,
  */
 class UpdateWikiDbJob extends Job
 {

@@ -1,27 +1,29 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Job;
 
 use Illuminate\Console\Command;
 
 /**
  * From https://stackoverflow.com/questions/43357472/how-to-manually-run-a-laravel-lumen-job-using-command-line.
+ *
+ * Example: wbs-job:dispatch InvitationCreateJob someCode
  */
-class DispatchJob extends Command
+class Dispatch extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'job:dispatch {job} {parameter?}';
+    protected $signature = 'wbs-job:dispatch {job} {parameter?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Dispatch job';
+    protected $description = 'Dispatch a job to the job queue';
 
     /**
      * Create a new command instance.
@@ -46,7 +48,7 @@ class DispatchJob extends Command
         if (stripos($jobClassName, '/')) {
             $jobClassName = str_replace('/', '\\', $jobClassName);
         }
-        $class = '\\App\\Jobs\\'.$jobClassName;
+        $class = $prefix.$jobClassName;
 
         if (! class_exists($class)) {
             $this->error("{$class} class Not exists");

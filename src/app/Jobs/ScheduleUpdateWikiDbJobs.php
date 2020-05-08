@@ -6,7 +6,7 @@ use App\WikiDb;
 
 /**
  * If you wanted to be wreckless and schedule for all of the wikis:
- * php artisan job:handle ScheduleUpdateWikiDbJobs version,mw1.33-wbs3,mw1.33-wbs3,mw1.33-wbs4 ,
+ * php artisan wbs-job:handle ScheduleUpdateWikiDbJobs version,mw1.33-wbs3,mw1.33-wbs3,mw1.33-wbs4 ,
  */
 class ScheduleUpdateWikiDbJobs extends Job
 {
