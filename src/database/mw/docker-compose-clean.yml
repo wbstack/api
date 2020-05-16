@@ -3,11 +3,9 @@ version: '3.1'
 services:
 
   mediawiki:
-    image: gcr.io/wbstack/mediawiki:1.33-b0.7-c0.10-e0.44
+    image: gcr.io/wbstack/mediawiki:1.33-b0.8-c0.12-e0.86
     volumes:
-      - ./doMaintenance.php:/var/www/html/maintenance/doMaintenance.php
-      - ./wikWikiInfoDefaults-clean.json:/var/www/html/wikWikiInfoDefaults.json
-      - ./wikWikiInfoDefaults.php:/var/www/html/wikWikiInfoDefaults.php
+      - ./maintWikWiki.json:/var/www/html/w/maintWikWiki.json
     environment:
       WIKWIKI_INFO_FROM: defaults-file
     links:

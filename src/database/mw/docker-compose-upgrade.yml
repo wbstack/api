@@ -5,8 +5,8 @@ services:
   mediawiki:
     image: gcr.io/wbstack/mediawiki:1.33-b0.7-c0.10-e0.44
     volumes:
-      - ./maintWikWiki.json:/var/www/html/maintWikWiki.json
-      - ./LocalSettings.php:/var/www/html/LocalSettings.php
+      - ./maintWikWiki.json:/var/www/html/w/maintWikWiki.json
+      - ./LocalSettings.php:/var/www/html/w/LocalSettings.php
     environment:
       MW_DB_SERVER_MASTER: mediawiki-sql
       MW_DB_SERVER_SLAVE: mediawiki-sql

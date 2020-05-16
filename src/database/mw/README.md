@@ -19,12 +19,9 @@ This directory contains the SQL needed to create and update wiki DBs.
 
 ### Generating clean / fresh SQL
 
-FIXME: why is LocalSettings copied into this process? We just remove it and dont use it? Or?
-
 Make sure you have updated the docker-compose-clean.yml to:
  - Include the latest version of the Mediawiki image with the new code added but not loaded
- - Update LocalSettings.php to match produciton ish (+ new extensions loaded)
- - doMaintenance.php override is up to date (with the current MW version loaded)
+ - Update maintWikWiki.json to match the defaults needs to load all extension from the mw image
 
 **Start the setup:**
 
@@ -32,7 +29,7 @@ Make sure you have updated the docker-compose-clean.yml to:
 
 **Check & wait for mysql access in adminer?**
 
-http://localhost:1234/?server=sql-clean&username=root&db=wiki&table=prefix_echo_email_batch
+http://localhost:1234/?server=sql-clean&username=root&db=wiki
 
 You might get an error is MySql is not ready yet.
 
@@ -44,12 +41,12 @@ If so, retry.
 
 ```
 docker-compose -f docker-compose-clean.yml exec mediawiki bash
-mv LocalSettings.php LocalSettings.php.temp
-php ./maintenance/install.php --dbserver sql-clean --dbuser root --dbpass toor --dbname wiki --with-extensions --pass AdminPass SiteName AdminName
-php ./maintenance/update.php --quick
-php ./maintenance/update.php --quick
-php ./maintenance/update.php --quick
-php ./maintenance/update.php --quick
+mv ./w/LocalSettings.php ./w/LocalSettings.php.temp
+WW_DOMAIN=maint php ./w/maintenance/install.php --dbserver sql-clean --dbuser root --dbpass toor --dbname wiki --with-extensions --pass AdminPass SiteName AdminName
+WW_DOMAIN=maint php ./w/maintenance/update.php --quick
+WW_DOMAIN=maint php ./w/maintenance/update.php --quick
+WW_DOMAIN=maint php ./w/maintenance/update.php --quick
+WW_DOMAIN=maint php ./w/maintenance/update.php --quick
 ```
 
 **Then get the SQL from adminer:**
