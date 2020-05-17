@@ -15,15 +15,21 @@ class WikiSettingController extends Controller
      * @var string[]
      */
     static $settingMap = [
-        'skin' => 'wgDefaultSkin'
+        'skin' => 'wgDefaultSkin',
+        'extConfirmAccount' => 'wwExtEnableConfirmAccount',
+        'wikibaseStringLengthString' => 'wwWikibaseStringLengthString',
+        'wikibaseStringLengthMonolingualText' => 'wwWikibaseStringLengthMonolingualText',
         ];
-    static $settingAllowedValues = [
-        'skin' => [ 'vector', 'modern', 'timeless' ]
+
+    static $settingValidation = [
+        'skin' => 'string|in:vector,modern,timeless',
+        'extConfirmAccount' => 'boolean',
+        'wikibaseStringLengthString' => 'integer|between:400,2500',
+        'wikibaseStringLengthMonolingualText' => 'integer|between:400,2500',
     ];
 
     public function update( $setting, Request $request)
     {
-        // Only allow setting skin...
         $request->validate([
             'wiki' => 'required|numeric',
             'setting' => 'required|string|in:' . implode( ',', array_keys( self::$settingMap ) ),
@@ -32,7 +38,7 @@ class WikiSettingController extends Controller
 
         // Only allow certain values
         $request->validate([
-            'value' => 'required|string|in:' . implode( ',', self::$settingAllowedValues[$apiSetting] ),
+            'value' => 'required' .( array_key_exists( $apiSetting, self::$settingValidation ) ? '|' . self::$settingValidation[$apiSetting] : '' ),
         ]);
         $value = $request->input('value');
 
