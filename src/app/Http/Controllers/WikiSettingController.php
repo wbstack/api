@@ -19,6 +19,7 @@ class WikiSettingController extends Controller
         'extConfirmAccount' => 'wwExtEnableConfirmAccount',
         'wikibaseStringLengthString' => 'wwWikibaseStringLengthString',
         'wikibaseStringLengthMonolingualText' => 'wwWikibaseStringLengthMonolingualText',
+        'wikibaseStringLengthMultilang' => 'wwWikibaseStringLengthMultilang',
         ];
 
     static $settingValidation = [
@@ -26,6 +27,7 @@ class WikiSettingController extends Controller
         'extConfirmAccount' => 'boolean',
         'wikibaseStringLengthString' => 'integer|between:400,2500',
         'wikibaseStringLengthMonolingualText' => 'integer|between:400,2500',
+        'wikibaseStringLengthMultilang' => 'integer|between:250,2500',
     ];
 
     public function update( $setting, Request $request)
