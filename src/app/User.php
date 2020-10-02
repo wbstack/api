@@ -108,7 +108,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         // This is required by the MustVerifyEmail interface that we use for middle ware.
         // But we currently send our emails via a different means, so we havn't implemented this..
-        throw new RuntimeException('Not yet implemented');
+
+        // We can not throw an exception here as this is still called! (even if we don't use it)
+        // https://github.com/addshore/wbstack/issues/120
+        //throw new RuntimeException('Not yet implemented');
     }
 
     public function getEmailForVerification()
