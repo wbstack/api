@@ -3,10 +3,10 @@ version: '3.1'
 services:
 
   mediawiki:
-    image: gcr.io/wbstack/mediawiki:1.33-b0.7-c0.10-e0.44
+    image: gcr.io/wbstack/mediawiki:1.34-7.3-b0.1-c0.1-e0.2
     volumes:
       - ./maintWikWiki.json:/var/www/html/w/maintWikWiki.json
-      - ./LocalSettings.php:/var/www/html/w/LocalSettings.php
+#      - ./LocalSettings.php:/var/www/html/w/LocalSettings.php
     environment:
       MW_DB_SERVER_MASTER: mediawiki-sql
       MW_DB_SERVER_SLAVE: mediawiki-sql
