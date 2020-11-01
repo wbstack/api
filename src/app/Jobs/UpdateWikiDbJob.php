@@ -6,6 +6,9 @@ use App\WikiDb;
 use Illuminate\Support\Facades\DB;
 
 /**
+ * This is possibly a legacy way of applying schema change patches that are simple to wikis.
+ * If you are updating using update.php you may want to look at the MediaikiUpdate job...
+ * 
  * This can be run with for example:
  * php artisan wbs-job:handle UpdateWikiDbJob id,1,mw1.33-wbs1,mw1.33-wbs2 ,
  *

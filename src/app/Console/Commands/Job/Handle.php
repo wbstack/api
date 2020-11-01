@@ -14,7 +14,7 @@ class Handle extends Command
      *
      * @var string
      */
-    protected $signature = 'wbs-job:handle {job} {parameter?} {parameterSeperator?}';
+    protected $signature = 'wbs-job:handle {job} {parameter?} {parameterSeparator?}';
 
     /**
      * The console command description.
