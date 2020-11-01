@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\DB;
 /**
  * wikidb id 38 is addshore-alpha
  * php artisan wbs-job:handle MediawikiUpdate id,38,mw1.33-wbs5,mw1.34-wbs1,mediawiki-134 ,
+ * 
+ * If you want to update any random wiki then...
+ * php artisan wbs-job:handle MediawikiUpdate version,mw1.33-wbs5,mw1.33-wbs5,mw1.34-wbs1,mediawiki-134 ,
  */
 class MediawikiUpdate extends Job
 {
@@ -40,8 +43,11 @@ class MediawikiUpdate extends Job
      */
     public function handle()
     {
-        // Get the Wikidb and Wiki we are operating on
-        $wikidb = WikiDb::where($this->selectCol, $this->selectValue)->firstOrFail();
+        // Get the Wikidb and Wiki we are operating on, where the wiki is NOT deleted
+        $wikidb = WikiDb::where($this->selectCol, $this->selectValue)
+            ->leftJoin('wikis', 'wiki_id', '=', 'wikis.id')
+            ->whereNull( 'wikis.deleted_at')
+            ->firstOrFail();
 
         // Make sure the wikidb is at the expected level
         if ($wikidb->version !== $this->from) {
@@ -51,12 +57,7 @@ class MediawikiUpdate extends Job
         );
         }
 
-        // Make sure the wiki is not deleted? and is callable?
         $wiki = $wikidb->wiki;
-        // TOOD might need more handeling of soft deleted things?
-        if(!$wiki) {
-            die('oh noes? db not attached to a wiki currently?');
-        }
         $wikiDomain = $wiki->domain;
 
         $curl = curl_init();
@@ -99,6 +100,7 @@ class MediawikiUpdate extends Job
         echo json_encode($response['output']).PHP_EOL;
         echo json_encode($response['script']).PHP_EOL;
         echo json_encode($response['return']).PHP_EOL;
+        echo json_encode($wikiDomain).PHP_EOL;
         echo json_encode("success: " . $success).PHP_EOL;
 
         // Exception if really bad
