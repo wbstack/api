@@ -45,6 +45,7 @@ class MediawikiUpdate extends Job
     {
         // Get the Wikidb and Wiki we are operating on, where the wiki is NOT deleted
         $wikidb = WikiDb::where($this->selectCol, $this->selectValue)
+            ->select('wiki_dbs.*') // Needed to avoid confusing the update later?! =o https://stackoverflow.com/a/56141702/4746236
             ->leftJoin('wikis', 'wiki_id', '=', 'wikis.id')
             ->whereNull( 'wikis.deleted_at')
             ->firstOrFail();
