@@ -12,6 +12,8 @@ This directory contains the SQL needed to create and update wiki DBs.
 
 **Versions**
 
+- mw1.35-wbs1 - Fist 1.35 install
+
 - mw1.34-wbs1 - Fist 1.34 install
 
  - mw1.33-wbs5 - New extensions, TBA
@@ -51,7 +53,13 @@ If so, retry.
 ```
 docker-compose -f docker-compose-clean.yml exec mediawiki bash
 mv ./w/LocalSettings.php ./w/LocalSettings.php.temp
-WW_DOMAIN=maint php ./w/maintenance/install.php --dbserver sql-clean --dbuser root --dbpass toor --dbname wiki --with-extensions --pass AdminPass SiteName AdminName
+WW_DOMAIN=maint php ./w/maintenance/install.php --dbserver sql-clean --dbuser root --dbpass toor --dbname wiki --with-extensions --pass AdminPass0 SiteName AdminName
+```
+
+WHILE https://phabricator.wikimedia.org/T267809 is broken you'll then need to edit the auto generated LocalSettings.php file...
+(per the instructions in the ticket)
+
+```
 WW_DOMAIN=maint php ./w/maintenance/update.php --quick
 WW_DOMAIN=maint php ./w/maintenance/update.php --quick
 WW_DOMAIN=maint php ./w/maintenance/update.php --quick
@@ -70,6 +78,7 @@ WW_DOMAIN=maint php ./w/maintenance/update.php --quick
    - Tables: CREATE
    - Data: INSERT
  - Deselect ALL DATA except "content_models", "interwiki", "slot_roles", "updatelog"
+ - Review any tables that appear to be new to see if their data should be included...
  - Click "Export" (at the top)
  - Copy output to the "new" directory with correct name, and make alterations:
      - Remove SET statements
