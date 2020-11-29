@@ -44,8 +44,10 @@ class WikiController extends Controller
         $dbAssignment = null;
         // TODO create with some sort of owner etc?
         DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain) {
+            $wikiDbCondition = ['wiki_id'=>null,'version'=>'mw1.35-wbs1'];
+
             // Fail if there is not enough storage ready
-            if (WikiDb::where('wiki_id', null)->count() == 0) {
+            if (WikiDb::where($wikiDbCondition)->count() == 0) {
                 abort(503, 'No databases ready');
             }
             if (QueryserviceNamespace::where('wiki_id', null)->count() == 0) {
@@ -64,7 +66,7 @@ class WikiController extends Controller
             ]);
 
             // Assign storage
-            $dbAssignment = DB::table('wiki_dbs')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
+            $dbAssignment = DB::table('wiki_dbs')->where($wikiDbCondition)->limit(1)->update(['wiki_id' => $wiki->id]);
             if (! $dbAssignment) {
                 abort(503, 'Database ready, but failed to assign');
             }

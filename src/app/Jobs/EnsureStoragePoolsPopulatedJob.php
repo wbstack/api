@@ -24,7 +24,8 @@ class EnsureStoragePoolsPopulatedJob extends Job
         // This avoid these jobs running away and creating things if they then fail to insert records into the sql..
 
         // Wiki Dbs
-        $unassignedDbs = WikiDb::where('wiki_id', null)->count();
+        $wikiDbCondition = ['wiki_id'=>null,'version'=>'mw1.35-wbs1'];
+        $unassignedDbs = WikiDb::where($wikiDbCondition)->count();
         $toCreate = $this->requiredDbs - $unassignedDbs;
         if ($toCreate > 0) {
             for ($i = 0; $i < $toCreate; $i++) {
