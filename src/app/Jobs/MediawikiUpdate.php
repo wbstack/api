@@ -7,10 +7,13 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * wikidb id 38 is addshore-alpha
- * php artisan wbs-job:handle MediawikiUpdate id,38,mw1.34-wbs1,mw1.35-wbs1,mediawiki-135 ,
+ * php artisan wbs-job:handle MediawikiUpdate wikis.id,38,mw1.34-wbs1,mw1.35-wbs1,mediawiki-135 ,
  * 
  * If you want to update any random wiki then...
- * php artisan wbs-job:handle MediawikiUpdate version,mw1.34-wbs1,mw1.34-wbs1,mw1.35-wbs1,mediawiki-135 ,
+ * php artisan wbs-job:handle MediawikiUpdate wiki_dbs.version,mw1.34-wbs1,mw1.34-wbs1,mw1.35-wbs1,mediawiki-135 ,
+ * 
+ * And loop them (10 at a time)
+ * for i in {1..10}; do php artisan wbs-job:handle MediawikiUpdate wiki_dbs.version,mw1.34-wbs1,mw1.34-wbs1,mw1.35-wbs1,mediawiki-135 ,; done
  */
 class MediawikiUpdate extends Job
 {
