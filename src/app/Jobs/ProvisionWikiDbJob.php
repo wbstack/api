@@ -5,6 +5,10 @@ namespace App\Jobs;
 use App\WikiDb;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Example usage
+ * php artisan wbs-job:handle ProvisionWikiDbJob
+ */
 class ProvisionWikiDbJob extends Job
 {
     private $prefix;
@@ -45,14 +49,14 @@ class ProvisionWikiDbJob extends Job
             $dbName = env('MW_DB_DATABASE');
         }
         if ($dbName === 'null' || $dbName === null) {
-            $dbName = 'mwdb_'.substr(bin2hex(random_bytes(24)), 0, 10);
+            $dbName = 'mwdb_'.substr(bin2hex(random_bytes(48)), 0, 10);
         }
         if ($prefix === 'null' || $prefix === null) {
-            $prefix = 'mwt_'.substr(bin2hex(random_bytes(24)), 0, 10);
+            $prefix = 'mwt_'.substr(bin2hex(random_bytes(48)), 0, 10);
         }
 
-        $this->dbUser = 'mwu_'.substr(bin2hex(random_bytes(24)), 0, 10);
-        $this->dbPassword = substr(bin2hex(random_bytes(24)), 0, 14);
+        $this->dbUser = 'mwu_'.substr(bin2hex(random_bytes(48)), 0, 10);
+        $this->dbPassword = substr(bin2hex(random_bytes(48)), 0, 14);
 
         $this->prefix = $prefix;
         $this->dbName = $dbName;
@@ -63,7 +67,6 @@ class ProvisionWikiDbJob extends Job
      */
     public function handle()
     {
-        return;
         $conn = DB::connection($this->dbConnection);
         $pdo = $conn->getPdo();
 

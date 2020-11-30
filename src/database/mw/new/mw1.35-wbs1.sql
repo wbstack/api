@@ -226,7 +226,7 @@ CREATE TABLE `<<prefix>>_echo_push_subscription` (
   UNIQUE KEY `eps_token_sha256` (`eps_token_sha256`),
   KEY `eps_provider` (`eps_provider`),
   KEY `echo_push_subscription_user_id` (`eps_user`),
-  CONSTRAINT `echo_push_subscription_ibfk_1` FOREIGN KEY (`eps_provider`) REFERENCES `echo_push_provider` (`epp_id`)
+  CONSTRAINT `echo_push_subscription_ibfk_1` FOREIGN KEY (`eps_provider`) REFERENCES `<<prefix>>_echo_push_provider` (`epp_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
 CREATE TABLE `<<prefix>>_echo_target_page` (
