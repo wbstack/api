@@ -63,6 +63,7 @@ class ProvisionWikiDbJob extends Job
      */
     public function handle()
     {
+        return;
         $conn = DB::connection($this->dbConnection);
         $pdo = $conn->getPdo();
 
