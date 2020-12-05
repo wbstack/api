@@ -16,7 +16,7 @@ FROM php:7.3-apache
 
 RUN apt-get update \
 	# Needed for the imagick php extension install
-	&& apt-get install -y libmagickwand-dev \
+	&& apt-get install -y --no-install-recommends libmagickwand-dev \
 	&& echo "" | pecl install imagick \
 	&& docker-php-ext-enable imagick \
 	# Obviously needed for mysql connection
@@ -25,7 +25,8 @@ RUN apt-get update \
 	&& a2enmod rewrite \
 	# Needed for gluedev/laravel-stackdriver
 	&& pecl install opencensus-alpha \
-	&& docker-php-ext-enable opencensus
+	&& docker-php-ext-enable opencensus \
+	&& rm -rf /var/lib/apt/lists/*
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
@@ -41,3 +42,5 @@ COPY ./start.sh /usr/local/bin/start
 RUN chmod +x /usr/local/bin/start
 
 CMD ["/usr/local/bin/start"]
+
+LABEL org.opencontainers.image.source="https://github.com/wbstack/api"
