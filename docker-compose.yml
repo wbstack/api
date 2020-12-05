@@ -3,7 +3,7 @@ services:
   api:
     image: gcr.io/wbstack/api:0.5
     volumes:
-      - ./src:/var/www/html
+      - ./:/var/www/html
       - ./start.sh:/usr/local/bin/start
     ports:
       - 8082:80

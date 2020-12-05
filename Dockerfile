@@ -1,15 +1,16 @@
 FROM composer:1.10 as composer
 
-COPY ./src/composer.json /tmp/src1/composer.json
-COPY ./src/composer.lock /tmp/src1/composer.lock
+COPY ./composer.json /tmp/src1/composer.json
+COPY ./composer.lock /tmp/src1/composer.lock
 
 WORKDIR /tmp/src1
 RUN composer install --no-dev --no-progress --no-autoloader
 
-COPY ./src /tmp/src2
+COPY ./ /tmp/src2
 RUN cp -r /tmp/src1/vendor /tmp/src2/vendor
 WORKDIR /tmp/src2
 RUN composer install --no-dev --no-progress --optimize-autoloader
+
 
 FROM php:7.3-apache
 

@@ -1,2 +1,7 @@
-/src/vendor
-/src/storage/*.key
+/vendor
+/.idea
+Homestead.json
+Homestead.yaml
+.env
+.php_cs.cache
+/storage/*.key
