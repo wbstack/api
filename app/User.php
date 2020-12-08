@@ -83,12 +83,6 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->notify(new ResetPasswordNotification($token));
     }
 
-    // TODO this should be done with roles or something in the DB....
-    public function isAdmin()
-    {
-        return $this->email == 'adamshorland@gmail.com';
-    }
-
     public function managesWikis()
     {
         return $this->belongsToMany(Wiki::class, 'wiki_managers');

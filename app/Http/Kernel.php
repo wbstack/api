@@ -71,7 +71,6 @@ class Kernel extends HttpKernel
         // SHIFT from Lumen
         'backend.auth' => \App\Http\Middleware\BackendAuth::class,
         //'throttle' => App\Http\Middleware\ThrottleRequests::class,
-        'admin' => \App\Http\Middleware\AdminMiddleware::class,
         //'auth' => App\Http\Middleware\Authenticate::class,
         'cors' => \Spatie\Cors\Cors::class,
     ];

@@ -48,20 +48,4 @@ $router->group(['middleware' => ['auth:api']], function () use ($router) {
         $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
     });
 
-    // admin
-    $router->group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => ['admin', 'verified']], function () use ($router) {
-        // invitation
-        $router->group(['prefix' => 'invitation'], function () use ($router) {
-            $router->post('list', ['uses' => 'InvitationsController@get']);
-            $router->post('create', ['uses' => 'InvitationController@create']);
-            $router->post('delete', ['uses' => 'InvitationController@delete']);
-        });
-        // interest
-        $router->group(['prefix' => 'interest'], function () use ($router) {
-            $router->post('list', ['uses' => 'InterestsController@get']);
-            // $router->post('create', ['uses' => 'InvitationController@create']);
-        // $router->post('delete', ['uses' => 'InvitationController@delete']);
-        });
-    });
-
 });
