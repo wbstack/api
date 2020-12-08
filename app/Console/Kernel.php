@@ -5,7 +5,8 @@ namespace App\Console;
 use App\Jobs\PruneEventPageUpdatesTable;
 use App\Jobs\PruneQueryserviceBatchesTable;
 use Illuminate\Console\Scheduling\Schedule;
-use App\Jobs\EnsureStoragePoolsPopulatedJob;
+use App\Jobs\ProvisionWikiDbJob;
+use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ExpireOldUserVerificationTokensJob;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -20,7 +21,13 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // TODO it would be good if some of these could be opportunist & triggered rather than crons..
-        $schedule->job(new EnsureStoragePoolsPopulatedJob)->everyMinute();
+
+        // Make sure that the DB and QS pools are always populated somewhat.
+        // This will create at most 1 new entry for each per minute...
+        $schedule->job(new ProvisionWikiDbJob(null,null,10))->everyMinute();
+        $schedule->job(new ProvisionQueryserviceNamespaceJob(null,10))->everyMinute();
+
+        // Slowly cleanup some tables
         $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
         $schedule->job(new PruneEventPageUpdatesTable)->everyFifteenMinutes();
         $schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes();

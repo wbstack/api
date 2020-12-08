@@ -6,7 +6,7 @@ use App\WikiDb;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Example usage
+ * Example usage that will always provision a new DB:
  * php artisan wbs-job:handle ProvisionWikiDbJob
  */
 class ProvisionWikiDbJob extends Job
@@ -30,10 +30,12 @@ class ProvisionWikiDbJob extends Job
 
     private $dbPassword;
 
+    private $maxFree;
+
     /**
      * @return void
      */
-    public function __construct($prefix = null, $dbName = false)
+    public function __construct($prefix = null, $dbName = false, $maxFree = null)
     {
         if (preg_match('/[^A-Za-z0-9\-_]/', $prefix)) {
             throw new \InvalidArgumentException('Prefix must only contain [^A-Za-z0-9\-_], got '.$prefix);
@@ -60,6 +62,14 @@ class ProvisionWikiDbJob extends Job
 
         $this->prefix = $prefix;
         $this->dbName = $dbName;
+        $this->maxFree = $maxFree;
+    }
+
+    private function doesMaxFreeSayWeShouldStop(){
+        $wikiDbCondition = ['wiki_id' => null,'version' => $this->newSqlFile];
+        $unassignedDbs = WikiDb::where($wikiDbCondition)->count();
+        $toCreate = $this->maxFree - $unassignedDbs;
+        return $toCreate === 0;
     }
 
     /**
@@ -67,6 +77,11 @@ class ProvisionWikiDbJob extends Job
      */
     public function handle()
     {
+        // If the job is only meant to create so many DBs, then make sure we don't create too many.
+        if( $this->maxFree && $this->doesMaxFreeSayWeShouldStop() ){
+            return;
+        }
+
         $conn = DB::connection($this->dbConnection);
         $pdo = $conn->getPdo();
 
@@ -141,7 +156,7 @@ class ProvisionWikiDbJob extends Job
         //  - update the wikiDb Record on success
         //
         //  This way, if this wikiDb create fails, there is still a record of the DB that has been / is being created?
-        $wikiDb = WikiDb::create([
+        WikiDb::create([
           'name' => $this->dbName,
           'user' => $this->dbUser,
           'password' => $this->dbPassword,

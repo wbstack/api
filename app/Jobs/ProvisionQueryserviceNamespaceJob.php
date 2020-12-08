@@ -11,11 +11,12 @@ use App\QueryserviceNamespace;
 class ProvisionQueryserviceNamespaceJob extends Job
 {
     private $namespace;
+    private $maxFree;
 
     /**
      * @return void
      */
-    public function __construct($namespace = null)
+    public function __construct($namespace = null, $maxFree = null)
     {
         if ($namespace !== null && preg_match('/[^A-Za-z0-9]/', $namespace)) {
             throw new \InvalidArgumentException('$namespace must only contain [^A-Za-z0-9] or null, got '.$namespace);
@@ -28,6 +29,14 @@ class ProvisionQueryserviceNamespaceJob extends Job
         }
 
         $this->namespace = $namespace;
+        $this->maxFree = $maxFree;
+    }
+
+    private function doesMaxFreeSayWeShouldStop(){
+        $wikiDbCondition = ['wiki_id' => null,'version' => $this->newSqlFile];
+        $unassignedDbs = WikiDb::where($wikiDbCondition)->count();
+        $toCreate = $this->maxFree - $unassignedDbs;
+        return $toCreate === 0;
     }
 
     /**
@@ -35,6 +44,11 @@ class ProvisionQueryserviceNamespaceJob extends Job
      */
     public function handle()
     {
+        // If the job is only meant to create so many DBs, then make sure we don't create too many.
+        if( $this->maxFree && $this->doesMaxFreeSayWeShouldStop() ){
+            return;
+        }
+
         $properties = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'../data/RWStore.properties');
         // Currently only one, but will change at some point...
         $queryServiceHost = config('app.queryservice_host');
