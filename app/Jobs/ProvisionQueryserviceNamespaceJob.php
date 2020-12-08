@@ -33,9 +33,8 @@ class ProvisionQueryserviceNamespaceJob extends Job
     }
 
     private function doesMaxFreeSayWeShouldStop(){
-        $wikiDbCondition = ['wiki_id' => null,'version' => $this->newSqlFile];
-        $unassignedDbs = WikiDb::where($wikiDbCondition)->count();
-        $toCreate = $this->maxFree - $unassignedDbs;
+        $unassignedQueryserviceNamespaces = QueryserviceNamespace::where('wiki_id', null)->count();
+        $toCreate = $this->maxFree - $unassignedQueryserviceNamespaces;
         return $toCreate === 0;
     }
 
