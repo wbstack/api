@@ -1,12 +1,19 @@
 # api
 
-## Laravel 6.x, Version 1
+## 6x-1.1 - 8 December 2020
 
-### December 2020
+- Removed unused stuff:
+  - [admin endpoints](https://github.com/wbstack/api/commit/389ce0cfee4aa5f71a405b838c51b29c80ebc922)
+  - [interest concept](https://github.com/wbstack/api/commit/2bbde16cf2d7764ff88d4fdcdbe0aa23f63d9b12)
+  - [wiki count](https://github.com/wbstack/api/commit/41e7564aad05630064a386560ba7a4bc3ec16a19)
+- [Changed names of the 2 MediaWiki update jobs for clarity](https://github.com/wbstack/api/commit/81d6482fbf72780bea89a88535051bde0340cb52)
+- Reworked "storage pool provisioning" jobs [pt1](https://github.com/wbstack/api/commit/c259db095641660c27e5c8ef1a5c7a528e9b4a3e) [pt2](https://github.com/wbstack/api/commit/1a4c08b759b76372f997cdda6dcf350af387d05e)
 
-- 6x-1.0 - Github builds...
+## 6x-1.0 - Early December 2020
 
-## Laravel 6.x, Version 0
+- Build moved to Github, but other than that everything remains the same.
+
+## Laravel 6.x, Version 0 (Built on GCE)
 
 ### November 2020
 
