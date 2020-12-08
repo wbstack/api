@@ -21,8 +21,6 @@ $router->post('user/verifyEmail', ['uses' => 'UserVerificationTokenController@ve
 $router->post('user/forgotPassword', ['uses' => 'Auth\ForgotPasswordController@sendResetLinkEmail']);
 $router->post('user/resetPassword', ['uses' => 'Auth\ResetPasswordController@reset']);
 
-$router->post('interest/register', ['uses' => 'InterestController@create']);
-
 // Authed
 $router->group(['middleware' => ['auth:api']], function () use ($router) {
 
