@@ -6,7 +6,9 @@ use App\WikiDb;
 use App\QueryserviceNamespace;
 
 /**
- * Example usage
+ * This job runs on a cron and ensures the pools are filled that are needed for fast wiki creation
+ *
+ * Example usage:
  * php artisan wbs-job:handle EnsureStoragePoolsPopulatedJob
  */
 class EnsureStoragePoolsPopulatedJob extends Job
@@ -42,4 +44,5 @@ class EnsureStoragePoolsPopulatedJob extends Job
             }
         }
     }
+
 }

@@ -5,6 +5,8 @@ namespace App\Jobs;
 use App\WikiDb;
 
 /**
+ * TODO This job should be rewritten to generally be able to run a job across all currently running wikis
+ *
  * If you wanted to be wreckless and schedule for all of the wikis:
  * php artisan wbs-job:handle ScheduleMediawikiManualDbUpdates version,mw1.33-wbs3,mw1.33-wbs3,mw1.33-wbs4 ,
  */
