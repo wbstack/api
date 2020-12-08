@@ -39,6 +39,9 @@ class RouteServiceProvider extends ServiceProvider
         if (getenv('ROUTES_LOAD_WEB') == 1) {
             $this->mapApiRoutes();
         }
+        if (getenv('ROUTES_LOAD_SANDBOX') == 1) {
+            $this->mapSandboxRoutes();
+        }
         if (getenv('ROUTES_LOAD_BACKEND') == 1) {
             $this->mapBackendRoutes();
         }
@@ -55,6 +58,12 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::namespace($this->namespace)
              ->group(base_path('routes/api.php'));
+    }
+
+    protected function mapSandboxRoutes()
+    {
+        Route::namespace($this->namespace)
+             ->group(base_path('routes/sandbox.php'));
     }
 
     protected function mapBackendRoutes()
