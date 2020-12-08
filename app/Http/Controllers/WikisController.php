@@ -7,15 +7,6 @@ use Illuminate\Http\Request;
 
 class WikisController extends Controller
 {
-    public function count()
-    {
-        $res['success'] = true;
-        // TODO only count active?
-        $res['data'] = Wiki::count();
-
-        return response($res);
-    }
-
     public function getWikisOwnedByCurrentUser(Request $request)
     {
         // TODO FIXME, right now this returns alll of the details of the wiki managers :/

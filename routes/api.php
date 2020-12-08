@@ -1,22 +1,20 @@
 <?php
 
-/** @var Router $router */
-use Laravel\Lumen\Routing\Router;
+/** @var \Laravel\Lumen\Routing\Router $router */
 
 // GET
-$router->get('wiki/count', ['uses' => 'WikisController@count']);
 $router->get(
     'healthz',
     function() {
         return 'It\'s Alive';
     }
 );
+
 // POST
 $router->post('auth/login', ['uses' => 'Auth\LoginController@login']);
 // TODO actually use logout route in VUE app..
 $router->post('auth/logout', ['uses' => 'Auth\LoginController@logout']);
 $router->post('user/register', ['uses' => 'Auth\RegisterController@register']);
-// TODO finish converting for laravel below here
 $router->post('user/verifyEmail', ['uses' => 'UserVerificationTokenController@verify']);
 $router->post('user/forgotPassword', ['uses' => 'Auth\ForgotPasswordController@sendResetLinkEmail']);
 $router->post('user/resetPassword', ['uses' => 'Auth\ResetPasswordController@reset']);
