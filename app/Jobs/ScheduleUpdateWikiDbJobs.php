@@ -6,9 +6,9 @@ use App\WikiDb;
 
 /**
  * If you wanted to be wreckless and schedule for all of the wikis:
- * php artisan wbs-job:handle ScheduleUpdateWikiDbJobs version,mw1.33-wbs3,mw1.33-wbs3,mw1.33-wbs4 ,
+ * php artisan wbs-job:handle ScheduleMediawikiManualDbUpdates version,mw1.33-wbs3,mw1.33-wbs3,mw1.33-wbs4 ,
  */
-class ScheduleUpdateWikiDbJobs extends Job
+class ScheduleMediawikiManualDbUpdates extends Job
 {
     private $selectCol;
 
@@ -46,7 +46,7 @@ class ScheduleUpdateWikiDbJobs extends Job
 
         // And schedule a job for each of them
         foreach( $wikidbs as $wikidb ) {
-			dispatch(new UpdateWikiDbJob('id', $wikidb->id, $this->from, $this->to));
+			dispatch(new MediawikiManualDbUpdate('id', $wikidb->id, $this->from, $this->to));
 		}
     }
 }

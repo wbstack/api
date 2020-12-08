@@ -3,15 +3,23 @@
 namespace App\Jobs;
 
 use App\WikiDb;
-use Illuminate\Support\Facades\DB;
 
 /**
+ * NEW (Nov 2020) was of performing Mediawiki update.
+ * This script was written for and used for MediaWiki 1.33 -> 1.35.
+ * This script calls out to a backend custom API module in MediaWiki that runs update.php.
+ *
+ * Gotchas:
+ *  - The script and API has a timeout of  mins, so if big changes are needed it can fail...
+ *
+ * Usage:
+ *
  * wikidb id 38 is addshore-alpha
  * php artisan wbs-job:handle MediawikiUpdate wikis.id,38,mw1.34-wbs1,mw1.35-wbs1,mediawiki-135 ,
- * 
+ *
  * If you want to update any random wiki then...
  * php artisan wbs-job:handle MediawikiUpdate wiki_dbs.version,mw1.34-wbs1,mw1.34-wbs1,mw1.35-wbs1,mediawiki-135 ,
- * 
+ *
  * And loop them (10 at a time)
  * for i in {1..10}; do php artisan wbs-job:handle MediawikiUpdate wiki_dbs.version,mw1.34-wbs1,mw1.34-wbs1,mw1.35-wbs1,mediawiki-135 ,; done
  */
@@ -38,7 +46,8 @@ class MediawikiUpdate extends Job
         $this->selectValue = $selectValue;
         $this->from = $from;
         $this->to = $to;
-        $this->targetBackendHost = $targetBackendHost; // TODO this should be less specific, but will do for proof of concept
+        // TODO in an ideal world the target backend would be known by the application somehow?
+        $this->targetBackendHost = $targetBackendHost;
     }
 
     /**
@@ -53,7 +62,7 @@ class MediawikiUpdate extends Job
             ->whereNull( 'wikis.deleted_at')
             ->firstOrFail();
 
-        // Make sure the wikidb is at the expected level
+        // Make sure the wikidb is at the expected version
         if ($wikidb->version !== $this->from) {
             throw new \RuntimeException(
           'Wiki Db selected is at different version than expected. '.
@@ -64,6 +73,7 @@ class MediawikiUpdate extends Job
         $wiki = $wikidb->wiki;
         $wikiDomain = $wiki->domain;
 
+        // Make a request to the backend MW API to perform the update.
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_URL => 'http://'.$this->targetBackendHost.'-app-backend/w/api.php?action=wbstackUpdate&format=json',
@@ -90,6 +100,7 @@ class MediawikiUpdate extends Job
         $response = $response['wbstackUpdate'];
 
         // Look for "Done in" in the response to see success...
+        // This is normally the last line of update.php output
         $success = strstr( end($response['output']), "Done in " ) && $response['return'] == 0;
 
         // Update the DB version if successfull
@@ -98,6 +109,7 @@ class MediawikiUpdate extends Job
             $wikidb->save();
             // TODO update mw verison (so backend requests go to the right place?)
             // TODO update nginx so content is served from the new code too?
+            // Note: This probably actually needs nginx / something in front of services to be dynamically fetching settings etc.
         }
 
         // Output stuff (output is an array)

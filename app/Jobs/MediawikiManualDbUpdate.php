@@ -6,16 +6,17 @@ use App\WikiDb;
 use Illuminate\Support\Facades\DB;
 
 /**
- * This is possibly a legacy way of applying schema change patches that are simple to wikis.
- * If you are updating using update.php you may want to look at the MediaikiUpdate job...
- * 
+ * Legacy way of applying manual SQL patches to MediaWiki databases.
+ * This was used for the initial 1.33 updates when adding new extensions.
+ * Since then MediaWikiUpdate was created, running update.php through an API.
+ *
  * This can be run with for example:
- * php artisan wbs-job:handle UpdateWikiDbJob id,1,mw1.33-wbs1,mw1.33-wbs2 ,
+ * php artisan wbs-job:handle MediawikiManualDbUpdate id,1,mw1.33-wbs1,mw1.33-wbs2 ,
  *
  * If you wanted to be wreckless and pick any wiki:
- * php artisan wbs-job:handle UpdateWikiDbJob version,mw1.33-wbs1,mw1.33-wbs2 ,
+ * php artisan wbs-job:handle MediawikiManualDbUpdate version,mw1.33-wbs1,mw1.33-wbs2 ,
  */
-class UpdateWikiDbJob extends Job
+class MediawikiManualDbUpdate extends Job
 {
     private $selectCol;
 

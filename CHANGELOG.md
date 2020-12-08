@@ -89,8 +89,8 @@
 - 0.43 - Send UA to query service for NS creation - https://github.com/addshore/wbstack/issues/34
 - 0.42 - Don't output if a user is registered when logging in
 - 0.41 - SQL to truncate l10n & start using db version wbs3
-- 0.40 - Includes ScheduleUpdateWikiDbJobs job
-- 0.39 - UpdateWikiDbJob Job, use correct DB
+- 0.40 - Includes ScheduleMediawikiManualDbUpdates job
+- 0.39 - MediawikiManualDbUpdate Job, use correct DB
 - 0.38 - Default creation DB is now wbs2 db... (with EntitySchema)
 - 0.37 - Disallow _s in domains
 - 0.36 - line instead of info for getWiki cli
