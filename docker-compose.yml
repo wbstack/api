@@ -15,8 +15,6 @@ services:
       - redis
     environment:
       - CONTAINER_ROLE=app
-    env_file:
-      - docker-compose.api.env
   sql:
     image: mariadb:10
     environment:
