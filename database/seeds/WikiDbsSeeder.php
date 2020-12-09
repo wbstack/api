@@ -3,8 +3,11 @@
 use App\WikiDb;
 use Illuminate\Database\Seeder;
 
+
+
 class WikiDbsSeeder extends Seeder
 {
+    const MW_VERSION = 'mw1.35-wbs1';
 
     public function run()
     {
@@ -19,7 +22,7 @@ class WikiDbsSeeder extends Seeder
             'name' => 'dbname' . $index,
             'user' => 'dbuser' . $index,
             'password' => 'dbpassword' . $index,
-            'version' => 'someStaticDbVesion',
+            'version' => self::MW_VERSION,
             'prefix' => 'dbprefix' . $index,
         ];
     }

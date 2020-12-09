@@ -13,6 +13,7 @@ use App\WikiDb;
 use App\WikiDomain;
 use App\WikiManager;
 use App\WikiSetting;
+use Hackzilla\PasswordGenerator\Generator\HumanPasswordGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
@@ -20,17 +21,20 @@ use Illuminate\Support\Str;
 
 class SandboxController extends Controller {
 
-    public function create(Request $request)
+    const WIKIBASE_DOMAIN = 'wikibase.cloud';
+    const MW_VERSION = 'mw1.35-wbs1';
+    const DOT = '.';
+
+    public function create( Request $request)
     {
 
         $domain = $this->generateDomain();
 
-        return response($domain);
+        // TODO Recaptcha
+
         $wiki = null;
-        $dbAssignment = null;
-        // TODO create with some sort of owner etc?
-        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain) {
-            $wikiDbCondition = ['wiki_id'=>null,'version'=>'mw1.35-wbs1'];
+        DB::transaction(function () use (&$wiki, $domain) {
+            $wikiDbCondition = ['wiki_id'=>null,'version'=> self::MW_VERSION ];
 
             // Fail if there is not enough storage ready
             if (WikiDb::where($wikiDbCondition)->count() == 0) {
@@ -41,8 +45,8 @@ class SandboxController extends Controller {
             }
 
             $wiki = Wiki::create([
-                'sitename' => $request->input('sitename'),
-                'domain' => strtolower($request->input('domain')),
+                'sitename' => "Sandbox",
+                'domain' => strtolower($domain),
             ]);
 
             // Assign storage
@@ -63,44 +67,40 @@ class SandboxController extends Controller {
                 'value' => Str::random(64),
             ]);
 
+            WikiSetting::create([
+                'wiki_id' => $wiki->id,
+                'name' => 'wwSandboxAutoUserLogin',
+                'value' => '1',
+            ]);
+
             // Also track the domain forever in your domains table
             $wikiDomain = WikiDomain::create([
                 'domain' => $wiki->domain,
                 'wiki_id' => $wiki->id,
             ]);
-
-            $ownerAssignment = WikiManager::create([
-                'user_id' => $user->id,
-                'wiki_id' => $wiki->id,
-            ]);
-
-            // If we are local, the dev environment wont be able to run these jobs yet, so end this closure early.
-            // TODO maybe send different jobs instead? or do this in the jobs?
-            if( App::environment() === 'local' ) {
-                return;
-            }
-
-            // TODO maybe always make these run in a certain order..?
-            $this->dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
-            // Only dispatch a job to add a k8s ingress IF we are using a custom domain...
-            if (!$isSubdomain) {
-                $this->dispatch(new KubernetesIngressCreate( $wiki->id, $wiki->domain ));
-            }
         });
 
         $res['success'] = true;
         $res['message'] = 'Success!';
         $res['data'] = [
             'id' => $wiki->id,
-            'name' => $wiki->name,
             'domain' => $wiki->domain,
         ];
 
-        return response('Hello World');
+        return response($res);
     }
 
     private function generateDomain()
     {
-        return 'test.wikibase.cloud';
+        $generator = new HumanPasswordGenerator();
+
+        $generator
+        ->setWordList('/words')
+        ->setWordCount(3)
+        ->setWordSeparator('-');
+
+        $password = $generator->generatePassword();
+
+        return $password . self::DOT . self::WIKIBASE_DOMAIN;
     }
 }
