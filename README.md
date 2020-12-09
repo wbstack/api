@@ -2,6 +2,10 @@
 
 ## Developing
 
+### Initial setup
+
+`cp .env.example .env` and modify the contents accordingly.
+
 ### docker-compose
 
 You should be able to run some amount of this application in docker-compose.
