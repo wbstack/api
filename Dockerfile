@@ -39,7 +39,6 @@ COPY --chown=www-data:www-data --from=composer /tmp/src2 /var/www/html
 WORKDIR /var/www/html
 
 COPY ./start.sh /usr/local/bin/start
-RUN chmod +x /usr/local/bin/start
 
 CMD ["/usr/local/bin/start"]
 
