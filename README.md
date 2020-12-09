@@ -2,6 +2,10 @@
 
 ## Developing
 
+### Install dependencies
+
+`composer install`
+
 ### Initial setup
 
 `cp .env.example .env` and modify the contents accordingly.
