@@ -9,6 +9,8 @@ use App\WikiDomain;
 use App\WikiManager;
 use App\WikiSetting;
 use App\Jobs\MediawikiInit;
+use App\Jobs\ProvisionWikiDbJob;
+use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -101,6 +103,10 @@ class WikiController extends Controller
                 $this->dispatch(new KubernetesIngressCreate( $wiki->id, $wiki->domain ));
             }
         });
+
+        // opportunistic dispatching of jobs to make sure storage pools are topped up
+        $this->dispatch(new ProvisionWikiDbJob(null,null,10));
+        $this->dispatch(new ProvisionQueryserviceNamespaceJob(null,10));
 
         $res['success'] = true;
         $res['message'] = 'Success!';

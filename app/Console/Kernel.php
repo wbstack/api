@@ -20,10 +20,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // TODO it would be good if some of these could be opportunist & triggered rather than crons..
-
         // Make sure that the DB and QS pools are always populated somewhat.
         // This will create at most 1 new entry for each per minute...
+        // There are also jobs currently scheduled in Controllers that use up resources from these pools
+        // for more opportunistic storage repopulation
         $schedule->job(new ProvisionWikiDbJob(null,null,10))->everyMinute();
         $schedule->job(new ProvisionQueryserviceNamespaceJob(null,10))->everyMinute();
 

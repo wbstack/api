@@ -7,6 +7,8 @@ namespace App\Http\Controllers\Sandbox;
 use App\Http\Controllers\Controller;
 use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiInit;
+use App\Jobs\ProvisionWikiDbJob;
+use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
@@ -83,6 +85,10 @@ class SandboxController extends Controller {
                 'wiki_id' => $wiki->id,
             ]);
         });
+
+        // opportunistic dispatching of jobs to make sure storage pools are topped up
+        $this->dispatch(new ProvisionWikiDbJob(null,null,10));
+        $this->dispatch(new ProvisionQueryserviceNamespaceJob(null,10));
 
         $res['success'] = true;
         $res['message'] = 'Success!';
