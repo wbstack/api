@@ -16,30 +16,21 @@ class QsController extends Controller
         $returnCollection = [];
 
         DB::transaction(function () use (&$notDoneBatches, &$batches, &$returnCollection) {
-//            // Get batches that have not yet been done
-            $notDoneBatches = \App\QsBatch::where('done', 0)->with(['wiki', 'wiki.wikiQueryserviceNamespace'])->get();
-//
-//            // Find out which events batches have been generated up to for
-//            $batchesUpTo = 0;
-//            foreach($notDoneBatches as $qsBatch) {
-//                if($qsBatch->eventTo > $batchesUpTo) {
-//                    $batchesUpTo = $qsBatch->eventTo;
-//                }
-//            }
 
-            // If there are no pending batches, get the highest ID so we don't make more..
-            //if($batchesUpTo == 0) {
+            $notDoneBatches = \App\QsBatch::where('done', 0)->with(['wiki', 'wiki.wikiQueryserviceNamespace'])->get();
+
+            // Get ID of the latest batch that we have created (or 0)
             $maxIdBatch = \App\QsBatch::orderBy('id', 'desc')->first();
             if ($maxIdBatch) {
-                $batchesUpTo = $maxIdBatch->eventTo;
+                $batchesUpToEventId = $maxIdBatch->eventTo;
             } else {
-                die('sometihng went wrong 666778');
+                // If there are no batches then things just hav not really started yet
+                $batchesUpToEventId = 0;
             }
-            //}
 
-            // Get events after that point and batch by wiki_id
+            // Get events after the point that batch was created
             // TODO maybe filter by NS here?
-            $events = \App\EventPageUpdate::where('id', '>', $batchesUpTo)->get();
+            $events = \App\EventPageUpdate::where('id', '>', $batchesUpToEventId)->get();
             $wikiBatchesEntities = [];
             $lastEventId = 0;
             foreach ($events as $event) {
@@ -58,17 +49,19 @@ class QsController extends Controller
             // Inset the newly created batches into the table...
             foreach ($wikiBatchesEntities as $wikiId => $entityBatch) {
 
-                // If we already have a not done event for the same wiki
+                // If we already have a not done batch for this same wiki, then merge that into a new batch
                 foreach ($notDoneBatches as $qsBatch) {
                     if ($qsBatch->wiki_id == $wikiId) {
                         $entityBatch = array_merge($entityBatch, explode(',', $qsBatch->entityIds));
+                        // Delete the old batch
                         $qsBatch->delete();
                     }
                 }
 
+                // Insert the new batch
                 $batch = \App\QsBatch::create([
                     'done' => 0,
-                    'eventFrom' => $batchesUpTo,
+                    'eventFrom' => $batchesUpToEventId,
                     'eventTo'=> $lastEventId,
                     'wiki_id' => $wikiId,
                     'entityIds' => implode(',', array_unique($entityBatch)),
