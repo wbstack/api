@@ -94,6 +94,15 @@ class SandboxController extends Controller {
         return response($res);
     }
 
+    private function generateUnusedDomain()
+    {
+        $domain = $this->generateDomain();
+        if(!WikiDomain::whereDomain($domain)->first()){
+            return $domain;
+        }
+        return $this->generateUnusedDomain();
+    }
+
     private function generateDomain()
     {
         $generator = new HumanPasswordGenerator();
