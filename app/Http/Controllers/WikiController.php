@@ -59,12 +59,6 @@ class WikiController extends Controller
                 'domain' => strtolower($request->input('domain')),
             ]);
 
-            // Also track the domain forever in your domains table
-            $wikiDomain = WikiDomain::create([
-                'domain' => $wiki->domain,
-                'wiki_id' => $wiki->id,
-            ]);
-
             // Assign storage
             $dbAssignment = DB::table('wiki_dbs')->where($wikiDbCondition)->limit(1)->update(['wiki_id' => $wiki->id]);
             if (! $dbAssignment) {
@@ -81,6 +75,12 @@ class WikiController extends Controller
                 'wiki_id' => $wiki->id,
                 'name' => 'wgSecretKey',
                 'value' => Str::random(64),
+            ]);
+
+            // Also track the domain forever in your domains table
+            $wikiDomain = WikiDomain::create([
+                'domain' => $wiki->domain,
+                'wiki_id' => $wiki->id,
             ]);
 
             $ownerAssignment = WikiManager::create([

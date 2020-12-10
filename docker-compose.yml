@@ -6,6 +6,7 @@ services:
       - ./:/var/www/html
       - ./start.sh:/usr/local/bin/start
       - api-storage:/var/www/html/storage/
+      - ./words:/words
     ports:
       - 8082:80
     restart: always
