@@ -1,5 +1,9 @@
 # api
 
+## 6x-1.3 - 10 December 2020
+
+- Fix loading heathcheck when using sandbox only (broken in 6x-1.2)
+
 ## 6x-1.2 - 10 December 2020
 
 - Added sandbox related endpoints (hidden behind an ENV var)
