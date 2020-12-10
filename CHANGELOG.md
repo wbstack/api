@@ -1,5 +1,10 @@
 # api
 
+## 6x-1.2 - 10 December 2020
+
+- Added sandbox related endpoints (hidden behind an ENV var)
+- Fix migration script call name (broken in 6x-1.1)
+
 ## 6x-1.1 - 8 December 2020
 
 - Removed unused stuff:
