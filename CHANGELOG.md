@@ -3,6 +3,7 @@
 ## 6x-1.3 - 10 December 2020
 
 - Fix loading heathcheck when using sandbox only (broken in 6x-1.2)
+- Fix accidentally bumped composer.lock (broken in 6x-1.2)
 
 ## 6x-1.2 - 10 December 2020
 
