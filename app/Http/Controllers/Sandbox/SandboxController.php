@@ -17,6 +17,7 @@ use Hackzilla\PasswordGenerator\Generator\HumanPasswordGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class SandboxController extends Controller {
@@ -27,10 +28,13 @@ class SandboxController extends Controller {
 
     public function create( Request $request)
     {
+        $validation = [
+            'recaptcha' => 'required|captcha',
+        ];
+        $validator = Validator::make($request->all(), $validation);
+        $validator->validate();
 
         $domain = $this->generateDomain();
-
-        // TODO Recaptcha
 
         $wiki = null;
         DB::transaction(function () use (&$wiki, $domain) {
