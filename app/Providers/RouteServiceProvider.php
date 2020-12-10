@@ -35,7 +35,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
-        // In lumen this used to be in bootstrap....
+        $this->mapGeneralRoutes();
         if (getenv('ROUTES_LOAD_WEB') == 1) {
             $this->mapApiRoutes();
         }
@@ -47,13 +47,12 @@ class RouteServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Define the "api" routes for the application.
-     *
-     * These routes are typically stateless.
-     *
-     * @return void
-     */
+    protected function mapGeneralRoutes()
+    {
+        Route::namespace($this->namespace)
+             ->group(base_path('routes/general.php'));
+    }
+
     protected function mapApiRoutes()
     {
         Route::namespace($this->namespace)
