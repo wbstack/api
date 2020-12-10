@@ -95,7 +95,7 @@ class SandboxController extends Controller {
         $generator = new HumanPasswordGenerator();
 
         $generator
-        ->setWordList('/words')
+        ->setWordList(__DIR__ . '/words')
         ->setWordCount(3)
         ->setWordSeparator('-');
 
