@@ -79,7 +79,10 @@ class ProvisionQueryserviceNamespaceJob extends Job
         curl_close($curl);
 
         if ($err) {
-			throw new \RuntimeException('cURL Error #:'.$err);
+            $this->fail(
+                new \RuntimeException('cURL Error #:'.$err)
+            );
+            return;//safegaurd
         } else {
             if ($response === 'CREATED: '.$this->namespace) {
                 $qsns = QueryserviceNamespace::create([
@@ -89,8 +92,11 @@ class ProvisionQueryserviceNamespaceJob extends Job
                 ]);
                 // TODO error if $qsns is not actually created...
             } else {
-				throw new \RuntimeException('Valid response, but couldn\'t find "CREATED: " in: '.$response);
-			}
+                $this->fail(
+                    new \RuntimeException('Valid response, but couldn\'t find "CREATED: " in: '.$response)
+                );
+                return;//safegaurd
+            }
             // TODO Else log create failed?
         }
     }

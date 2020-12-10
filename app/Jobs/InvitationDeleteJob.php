@@ -20,10 +20,13 @@ class InvitationDeleteJob extends Job
     public function handle()
     {
         $invite = Invitation::where('code', $this->code)->first();
-        if ($invite) {
-            return $invite->delete();
+        if (!$invite) {
+            $invite->delete();
         } else {
-            return false;
+            $this->fail(
+                new \RuntimeException( 'Invitation not found, so can\'t delete' )
+            );
+            return;//safegaurd
         }
     }
 }

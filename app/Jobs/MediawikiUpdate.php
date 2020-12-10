@@ -64,10 +64,13 @@ class MediawikiUpdate extends Job
 
         // Make sure the wikidb is at the expected version
         if ($wikidb->version !== $this->from) {
-            throw new \RuntimeException(
-          'Wiki Db selected is at different version than expected. '.
-          'At: '.$wikidb->version.' Expected: '.$this->from
-        );
+            $this->fail(
+                new \RuntimeException(
+                    'Wiki Db selected is at different version than expected. '.
+                    'At: '.$wikidb->version.' Expected: '.$this->from
+                )
+            );
+            return;//safegaurd
         }
 
         $wiki = $wikidb->wiki;
@@ -91,7 +94,10 @@ class MediawikiUpdate extends Job
         $rawResponse = curl_exec($curl);
         $err = curl_error($curl);
         if ($err) {
-            throw new \RuntimeException('curl error for '.$wikiDomain.': '.$err);
+            $this->fail(
+                new \RuntimeException('curl error for '.$wikiDomain.': '.$err)
+            );
+            return;//safegaurd
         }
 
         curl_close($curl);
@@ -121,7 +127,10 @@ class MediawikiUpdate extends Job
 
         // Exception if really bad
         if (!$success) {
-            throw new \RuntimeException('wbstackUpdate call for '.$wikiDomain.' was not successful:'.$rawResponse);
+            $this->fail(
+                new \RuntimeException('wbstackUpdate call for '.$wikiDomain.' was not successful:'.$rawResponse)
+            );
+            return;//safegaurd
         }
     }
 }

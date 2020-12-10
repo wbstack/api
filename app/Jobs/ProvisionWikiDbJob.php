@@ -104,30 +104,38 @@ class ProvisionWikiDbJob extends Job
         // CREATE (maybe) AND USE DB
         if ($this->dbName) {
             if ($pdo->exec('CREATE DATABASE IF NOT EXISTS '.$this->dbName) === false) {
-                throw new \RuntimeException(
-                'Failed to create database with dbname: '.$this->dbName);
+                $this->fail(
+                    new \RuntimeException('Failed to create database with dbname: '.$this->dbName)
+                );
+                return;//safegaurd
             }
         } else {
             // Default to mediawiki
             $this->dbName = 'mediawiki';
         }
         if ($pdo->exec('USE '.$this->dbName) === false) {
-            throw new \RuntimeException(
-            'Failed to use database with dbname: '.$this->dbName);
+            $this->fail(
+                new \RuntimeException('Failed to use database with dbname: '.$this->dbName)
+            );
+            return;//safegaurd
         }
 
         // GRANT THE USER ACCESS TO THE DB
         // TODO more limited GRANTS...
         // TODO cant grant based on table prefix, so maybe do have seperate dbs...?
         if ($pdo->exec('GRANT ALL ON '.$this->dbName.'.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
-            throw new \RuntimeException(
-               'Failed to grant user: '.$this->dbUser);
+            $this->fail(
+                new \RuntimeException('Failed to grant user: '.$this->dbUser)
+            );
+            return;//safegaurd
         }
         // GRANT the user access to see slave status
         // GRANT REPLICATION CLIENT ON *.* TO 'mwu_36be7164b0'@'%'
         if ($pdo->exec('GRANT REPLICATION CLIENT ON *.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
-            throw new \RuntimeException(
-               'Failed to grant user: '.$this->dbUser);
+            $this->fail(
+                new \RuntimeException('Failed to grant user: '.$this->dbUser)
+            );
+            return;//safegaurd
         }
 
         // ADD THE TABLES
@@ -144,8 +152,10 @@ class ProvisionWikiDbJob extends Job
 
             // Execute each chunk of SQL...
             if ($pdo->exec($part) === false) {
-                throw new \RuntimeException(
-                'SQL execution failed for prefix '.$prefix.' SQL part: '.$part);
+                $this->fail(
+                    new \RuntimeException('SQL execution failed for prefix '.$this->prefix.' SQL part: '.$part)
+                );
+                return;//safegaurd
             }
         }
 

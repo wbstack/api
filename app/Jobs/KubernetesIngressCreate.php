@@ -103,7 +103,10 @@ class KubernetesIngressCreate extends Job
         echo 'Checking if resource exists: '.$ingress->getMetadata('name') . PHP_EOL;
         $exists = $ingresses->exists($ingress->getMetadata('name'));
         if ($exists) {
-            die('Should not already exist...');
+            $this->fail(
+                new \RuntimeException( 'Ingress already exists, but it should not' )
+            );
+            return;//safegaurd
         }
 
         echo 'Creating ingress resource' . PHP_EOL;

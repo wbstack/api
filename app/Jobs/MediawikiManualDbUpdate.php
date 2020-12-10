@@ -59,10 +59,13 @@ class MediawikiManualDbUpdate extends Job
 
         // Make sure the wikidb is at the expected level
         if ($wikidb->version !== $this->from) {
-            throw new \RuntimeException(
-          'Wiki Db selected is at different version than expected. '.
-          'At: '.$wikidb->version.' Expected: '.$this->from
-        );
+            $this->fail(
+                new \RuntimeException(
+                    'Wiki Db selected is at different version than expected. '.
+                    'At: '.$wikidb->version.' Expected: '.$this->from
+                  )
+            );
+            return;//safegaurd
         }
 
         // Get SQL statements to run
@@ -75,8 +78,10 @@ class MediawikiManualDbUpdate extends Job
 
         // Use the create database
         if ($pdo->exec('USE '.$wikidb->name) === false) {
-            throw new \RuntimeException(
-                'Failed to use database with name: '.$wikidb->name);
+            $this->fail(
+                new \RuntimeException( 'Failed to use database with name: '.$wikidb->name)
+            );
+            return;//safegaurd
         }
 
         foreach ($sqlParts as $part) {
@@ -86,8 +91,10 @@ class MediawikiManualDbUpdate extends Job
             }
             // Execute each chunk of SQL...
             if ($pdo->exec($part) === false) {
-                throw new \RuntimeException(
-            'SQL execution failed, SQL part: '.$part);
+                $this->fail(
+                    new \RuntimeException('SQL execution failed, SQL part: '.$part)
+                );
+                return;//safegaurd
             }
         }
 

@@ -17,7 +17,10 @@ class InvitationCreateJob extends Job
     {
         $test = Invitation::where('code', $this->code)->first();
         if ($test) {
-            return false;
+            $this->fail(
+                new \RuntimeException( 'Invitation code already existed' )
+            );
+            return;//safegaurd
         }
 
         return Invitation::create([
