@@ -2,14 +2,6 @@
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
-// GET
-$router->get(
-    'healthz',
-    function() {
-        return 'It\'s Alive';
-    }
-);
-
 // POST
 $router->post('auth/login', ['uses' => 'Auth\LoginController@login']);
 // TODO actually use logout route in VUE app..
