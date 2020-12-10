@@ -1,5 +1,15 @@
 # WBStack Platform API
 
+The platform API comes in a few different flavours that can be toggled using environment variables:
+
+- ROUTES_LOAD_WEB - web routes for the public facing wbstack.com usecase
+- ROUTES_LOAD_SANDBOX - web routes for the public facing sandbox usecase
+- ROUTES_LOAD_BACKEND - internal only API endpoints (non public) for all usecases
+
+This single application could likely be split up at some point.
+Everything is currently together to make use of the shared wiki management code
+and query service management code.
+
 ## Developing
 
 ### Install dependencies
