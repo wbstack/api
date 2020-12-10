@@ -1,5 +1,15 @@
 # api
 
+## 6x-1.5 - 10 December 2020
+
+- [Add more words to sandbox wordlist](https://github.com/wbstack/api/commit/587a892dea94ffa9cc0df7b6ad5c7153fa8a7446)
+- [Opportunistic storage pool population](https://github.com/wbstack/api/commit/a0e65dd63dd63bd80a244b88d8fa23cb25565269)
+- [Ensure sandbox domains are not taken](https://github.com/wbstack/api/commit/8e9db079ff398f602966a7431552c7652c33ddd9), this would have just caused errors seen by the users and not actual bad things...
+- [Recaptcha for sandbox API](https://github.com/wbstack/api/commit/39e650a313759f071042a7ce10002d1ac0a56e0d)
+- [All Jobs now fail rather than throwing exceptions](https://github.com/wbstack/api/commit/ea6f924d7f82a77082fa4f39ac82955ed5e43401)
+- [Number of page updates cleaned per job increased](https://github.com/wbstack/api/commit/c26de7b871e18dd2edb0640a8ecc87573cdb11bc)
+- [getBatches API now works when there are 0 batches](https://github.com/wbstack/api/commit/73c3cb75a9cc1e964687da4590ce19e6382278e9)
+
 ## 6x-1.4 - 10 December 2020
 
 - Fix word list for sandbox endpoint.
