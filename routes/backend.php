@@ -1,11 +1,10 @@
 <?php
 
-$router->get(
-    'healthz',
-    function() {
-        return 'It\'s Alive';
-    }
-);
+/**
+ * This route file is loaded in the RouteServiceProvider optionally when an env var is set.
+ * You'll find that service in the Providers directory.
+ * @var \Laravel\Lumen\Routing\Router $router
+ */
 
 $router->group(['prefix' => 'wiki'], function () use ($router) {
     // GET

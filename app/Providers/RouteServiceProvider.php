@@ -30,6 +30,7 @@ class RouteServiceProvider extends ServiceProvider
 
     /**
      * Define the routes for the application.
+     * These are optionally loaded based on environment variables.
      *
      * @return void
      */

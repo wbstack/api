@@ -1,6 +1,9 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
+/**
+ * This route file is loaded in the RouteServiceProvider optionally when an env var is set.
+ * You'll find that service in the Providers directory.
+ * @var \Laravel\Lumen\Routing\Router $router
+ */
 
-// TODO
 $router->post('sandbox/create', ['uses' => 'Sandbox\SandboxController@create']);
