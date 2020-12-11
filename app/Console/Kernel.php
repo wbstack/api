@@ -9,6 +9,7 @@ use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ExpireOldUserVerificationTokensJob;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Jobs\SandboxCleanupJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -31,6 +32,11 @@ class Kernel extends ConsoleKernel
         $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
         $schedule->job(new PruneEventPageUpdatesTable)->everyFifteenMinutes();
         $schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes();
+
+        // Sandbox
+        // TODO this should maybe only be run when sandbox as a whole is loaded?
+        // TODO instead of using LOAD ROUTES, we should just have different modes?
+        $schedule->job(new SandboxCleanupJob)->everyFifteenMinutes();
     }
 
     /**
