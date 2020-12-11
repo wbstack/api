@@ -47,7 +47,7 @@ class MediawikiInit extends Job
         $err = curl_error($curl);
         if ($err) {
             $this->fail(
-                new \RuntimeException('curl error for '.$this->wikiDomain.': '.$err);
+                new \RuntimeException('curl error for '.$this->wikiDomain.': '.$err)
             );
             return;//safegaurd
         }
@@ -59,7 +59,7 @@ class MediawikiInit extends Job
 
         if ($response['success'] == 0) {
             $this->fail(
-                new \RuntimeException('wbstackInit call for '.$this->wikiDomain.' was not successful:'.$rawResponse);
+                new \RuntimeException('wbstackInit call for '.$this->wikiDomain.' was not successful:'.$rawResponse)
             );
             return;//safegaurd
         }
