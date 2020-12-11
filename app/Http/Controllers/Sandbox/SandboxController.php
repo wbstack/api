@@ -9,11 +9,11 @@ use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
+use App\Jobs\MediawikiSandboxLoadData;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
 use App\WikiDomain;
-use App\WikiManager;
 use App\WikiSetting;
 use Hackzilla\PasswordGenerator\Generator\HumanPasswordGenerator;
 use Illuminate\Http\Request;
@@ -32,11 +32,13 @@ class SandboxController extends Controller {
     {
         $validation = [
             'recaptcha' => 'required|captcha',
+            // TODO validate dataSet param
         ];
         $validator = Validator::make($request->all(), $validation);
         $validator->validate();
 
         $domain = $this->generateDomain();
+        $dataSet = $request->get('dataSet');
 
         $wiki = null;
         DB::transaction(function () use (&$wiki, $domain) {
@@ -85,6 +87,12 @@ class SandboxController extends Controller {
                 'wiki_id' => $wiki->id,
             ]);
         });
+
+        // For now only schedule this job for 1 dataSet type
+        // As the extension API is dumb currently
+        if($dataSet==='library'){
+            $this->dispatch(new MediawikiSandboxLoadData($domain,$dataSet));
+        }
 
         // opportunistic dispatching of jobs to make sure storage pools are topped up
         $this->dispatch(new ProvisionWikiDbJob(null,null,10));
