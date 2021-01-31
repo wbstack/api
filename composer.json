@@ -8,6 +8,7 @@
     "license": "MIT",
     "type": "project",
     "require": {
+        "lcobucci/jwt": "3.3",
         "albertcht/invisible-recaptcha": "1.9.*",
         "firebase/php-jwt": "^5.0",
         "gluedev/laravel-stackdriver": "^0.2.2",
