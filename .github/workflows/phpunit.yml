@@ -36,6 +36,7 @@ jobs:
 
     - name: Setup
       run: |
+        sleep 2
         docker-compose exec -T api php artisan migrate:fresh
         docker-compose exec -T api php artisan passport:install
         docker-compose exec -T api php artisan db:seed
