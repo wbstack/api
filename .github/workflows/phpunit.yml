@@ -28,6 +28,7 @@ jobs:
       with:
         max_attempts: 10
         retry_wait_seconds: 1
+        timeout_seconds: 30
         command: docker-compose logs sql | grep -q "ready for connections"
 
     - name: Setup
