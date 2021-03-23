@@ -20,6 +20,8 @@ and query service management code.
 
 `cp .env.example .env` and modify the contents accordingly.
 
+`docker-compose exec api php artisan key:generate` to generate and set the APP_KEY env variable.
+
 ### docker-compose
 
 You should be able to run some amount of this application in docker-compose.
