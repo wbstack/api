@@ -12,6 +12,9 @@ class WikiSettingController extends Controller
     /**
      * Keys are API setting names
      * Values are mediawiki setting names
+     *
+     * FIXME: this list probably also needs to be kept in sync with the one in Wiki.php model
+     *
      * @var string[]
      */
     static $settingMap = [
