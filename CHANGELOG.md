@@ -1,5 +1,9 @@
 # api
 
+## 6x-1.7 - TO BE RELEASED
+
+- [Get public wiki settings from wiki/details endpoint](https://github.com/wbstack/api/pull/15)
+
 ## 6x-1.6 - 11 December 2020
 
 - [Add](https://github.com/wbstack/api/commit/8c3d6b29bd4711972da7f7c0207fc263421e1a54) and [Schedule](https://github.com/wbstack/api/commit/63c14492eea671549a72ef925fdcbfd039ba27a6) job to soft delete sandboxes
