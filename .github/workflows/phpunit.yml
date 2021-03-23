@@ -1,0 +1,40 @@
+name: PHPUnit
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Install dependencies
+      uses: php-actions/composer@v5
+      with:
+        command: install
+
+    - name: Run docker-compose setup
+      run: docker-compose up -d
+
+    - name: Wait for SQL to be ready
+      uses: nick-invision/retry@v2
+      with:
+        max_attempts: 10
+        retry_wait_seconds: 1
+        command: docker-compose logs sql | grep -q "ready for connections"
+
+    - name: Setup
+      run: |
+        docker-compose exec api php artisan migrate:fresh
+        docker-compose exec api php artisan passport:install
+        docker-compose exec api php artisan db:seed
+        docker-compose exec api php artisan key:generate
+
+    - name: PHPUnit
+      run: docker-compose exec api vendor/bin/phpunit
