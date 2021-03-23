@@ -162,8 +162,7 @@ class WikiController extends Controller
         $wiki = Wiki::where('id', $wikiId)
       ->with('wikiManagers')
       ->with('wikiDbVersion')
-      ->with('settings');
-        $wiki = $wiki->settings()->where('name', '!=', 'wgSecretKey')->first();
+      ->with('publicSettings')->first();
 
         $res['success'] = true;
         $res['data'] = $wiki;
