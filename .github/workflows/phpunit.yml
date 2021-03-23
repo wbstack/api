@@ -17,6 +17,7 @@ jobs:
     - name: Install dependencies
       uses: php-actions/composer@v5
       with:
+        php_version: 7.4
         command: install
 
     - name: Run docker-compose setup
