@@ -20,6 +20,8 @@ and query service management code.
 
 `cp .env.example .env` and modify the contents accordingly.
 
+`docker-compose exec api php artisan key:generate` to generate and set the APP_KEY env variable.
+
 ### docker-compose
 
 You should be able to run some amount of this application in docker-compose.
@@ -33,12 +35,31 @@ docker-compose up -d
 Try loading http://localhost:8070/ until the DB is up and the connection works.
 
 ```sh
+# Create the SQL tables needed
 docker-compose exec api php artisan migrate:fresh
+
+# Create some certs needed for authentication (passport is a laravel plugin)
 docker-compose exec api php artisan passport:install
+
+# Seed some useful development data
 docker-compose exec api php artisan db:seed
+
+# Generate and set the APP_KEY env variable.
+docker-compose exec api php artisan key:generate
 ```
 
 If you want to develop with the UI then simply point the UI docker-compose setup to localhost:8082
+
+### Seeded data
+
+Some data is added to the database via the laraval seeders.
+
+You can log in with these details for example.
+
+User: `a@a.a`
+Password: `a`
+
+And create a wiki.
 
 ### Testing
 

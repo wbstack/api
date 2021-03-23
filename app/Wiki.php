@@ -70,9 +70,23 @@ class Wiki extends Model
         return $this->hasOne(QueryserviceNamespace::class);
     }
 
+    // FIXME: rename to privateSettings / allSettings for clarity?
     public function settings()
     {
         return $this->hasMany(WikiSetting::class);
+    }
+
+    public function publicSettings() {
+        return $this->settings()->whereIn('name',
+        [
+            // FIXME: this list is evil and should be kept in sync with WikiSettingControler?!
+            'wgDefaultSkin',
+            'wwExtEnableConfirmAccount',
+            'wwWikibaseStringLengthString',
+            'wwWikibaseStringLengthMonolingualText',
+            'wwWikibaseStringLengthMultilang',
+        ]
+    );
     }
 
     public function wikiManagers()

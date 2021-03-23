@@ -20,17 +20,7 @@ class RegisterTest extends TestCase
 
     public function testCreate_Success()
     {
-        // TODO mock the validate call? actually validate some bits, but not captcha
-        // Validator::shouldReceive('validate')
-        // ->once()
-        // ->with()
-        // ;
-
-        // Don't send mail during the test
-        //Mail::shouldReceive('raw')->once();
-        // TODO fix this test and the assertion of once...
-        // This broke during lumen 5.7 to 5.8 upgrade
-        Mail::shouldReceive('raw');
+        Mail::shouldReceive('send')->once()->andReturnSelf();
 
         $invite = factory(Invitation::class)->create();
         $userToCreate = factory(User::class)->make();

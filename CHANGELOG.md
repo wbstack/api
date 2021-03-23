@@ -1,5 +1,15 @@
 # api
 
+## 6x-1.7 - TO BE RELEASED
+
+- [Get public wiki settings from wiki/details endpoint](https://github.com/wbstack/api/pull/15)
+
+## 6x-1.6 - 11 December 2020
+
+- [Add](https://github.com/wbstack/api/commit/8c3d6b29bd4711972da7f7c0207fc263421e1a54) and [Schedule](https://github.com/wbstack/api/commit/63c14492eea671549a72ef925fdcbfd039ba27a6) job to soft delete sandboxes
+- [Fix](https://github.com/wbstack/api/commit/bb667ca88faf1aee61d1a7dc237f6c585de3df3b) mwinit job syntax error with ;s (broken in 6x-1.5)
+- [Sandboxes can have 1 preset dataset loaded now](https://github.com/wbstack/api/commit/6e95a5075527835b2695f2bf23ba352316ef720c)
+
 ## 6x-1.5 - 10 December 2020
 
 - [Add more words to sandbox wordlist](https://github.com/wbstack/api/commit/587a892dea94ffa9cc0df7b6ad5c7153fa8a7446)

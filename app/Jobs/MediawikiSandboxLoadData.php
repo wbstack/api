@@ -2,20 +2,18 @@
 
 namespace App\Jobs;
 
-class MediawikiInit extends Job
+class MediawikiSandboxLoadData extends Job
 {
     private $wikiDomain;
-    private $username;
-    private $email;
+    private $dataSet;
 
     /**
      * @return void
      */
-    public function __construct($wikiDomain, $username, $email)
+    public function __construct($wikiDomain, $dataSet)
     {
         $this->wikiDomain = $wikiDomain;
-        $this->username = $username;
-        $this->email = $email;
+        $this->dataSet = $dataSet;
     }
 
     /**
@@ -24,16 +22,15 @@ class MediawikiInit extends Job
     public function handle()
     {
         $data = [
-            'username' => $this->username,
-            'email' => $this->email,
+            'dataSet' => $this->dataSet,
         ];
 
         $curl = curl_init();
         curl_setopt_array($curl, [
-            CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackInit&format=json',
+            CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/rest.php/wikibase-exampledata/v0/load',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
-            CURLOPT_TIMEOUT => 10,
+            CURLOPT_TIMEOUT => 10 * 60,// TODO Long 10 mins (probably shouldn't keep the request open...)
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => http_build_query($data),
@@ -47,22 +44,18 @@ class MediawikiInit extends Job
         $err = curl_error($curl);
         if ($err) {
             $this->fail(
-                new \RuntimeException('curl error for '.$this->wikiDomain.': '.$err)
+                new \RuntimeException('wikibase-exampledata/v0/load curl error for '.$this->wikiDomain.': '.$err)
             );
             return;//safegaurd
         }
 
         curl_close($curl);
 
-        $response = json_decode($rawResponse, true);
-        $response = $response['wbstackInit'];
-
-        if ($response['success'] == 0) {
+        if (!strstr($rawResponse,'Done!')) {
             $this->fail(
-                new \RuntimeException('wbstackInit call for '.$this->wikiDomain.' was not successful:'.$rawResponse)
+                new \RuntimeException('wikibase-exampledata/v0/load call for '.$this->wikiDomain.' was not successful:'.$rawResponse)
             );
             return;//safegaurd
         }
-        // Otherwise there was success (and we could get the userId if we wanted...
     }
 }
