@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  lint:
+  phpunit:
     runs-on: ubuntu-latest
     steps:
 
