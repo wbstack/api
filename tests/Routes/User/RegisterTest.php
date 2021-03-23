@@ -30,7 +30,7 @@ class RegisterTest extends TestCase
         //Mail::shouldReceive('raw')->once();
         // TODO fix this test and the assertion of once...
         // This broke during lumen 5.7 to 5.8 upgrade
-        Mail::shouldReceive('raw');
+        Mail::shouldReceive('send')->once()->andReturnSelf();
 
         $invite = factory(Invitation::class)->create();
         $userToCreate = factory(User::class)->make();
