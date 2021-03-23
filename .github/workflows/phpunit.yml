@@ -1,0 +1,46 @@
+name: PHPUnit
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Install dependencies
+      uses: php-actions/composer@v5
+      with:
+        php_version: 7.4
+        command: install
+
+    - name: Copy example .env file
+      run: cp .env.example .env
+
+    - name: Run docker-compose setup
+      run: docker-compose up -d
+
+    - name: Wait for SQL to be ready
+      uses: nick-invision/retry@v2
+      with:
+        max_attempts: 10
+        retry_wait_seconds: 1
+        timeout_seconds: 30
+        command: docker-compose logs sql | grep -q "load completed at"
+
+    - name: Setup
+      run: |
+        sleep 2
+        docker-compose exec -T api php artisan migrate:fresh
+        docker-compose exec -T api php artisan passport:install
+        docker-compose exec -T api php artisan db:seed
+        docker-compose exec -T api php artisan key:generate
+
+    - name: PHPUnit
+      run: docker-compose exec -T api vendor/bin/phpunit
