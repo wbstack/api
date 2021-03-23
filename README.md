@@ -40,6 +40,17 @@ docker-compose exec api php artisan db:seed
 
 If you want to develop with the UI then simply point the UI docker-compose setup to localhost:8082
 
+### Seeded data
+
+Some data is added to the database via the laraval seeders.
+
+You can log in with these details for example.
+
+User: `a@a.a`
+Password: `a`
+
+And create a wiki.
+
 ### Testing
 
 Currently most of the tests require the DB connection to exist.
