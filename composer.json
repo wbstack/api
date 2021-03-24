@@ -8,7 +8,6 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "lcobucci/jwt": "3.3",
         "albertcht/invisible-recaptcha": "1.9.*",
         "firebase/php-jwt": "^5.0",
         "gluedev/laravel-stackdriver": "^0.2.2",
@@ -20,8 +19,10 @@
         "laravel/cashier": "^10.1",
         "laravel/framework": "^6.0",
         "laravel/passport": "^7.4",
+        "lcobucci/jwt": "3.3",
         "maclof/kubernetes-client": "0.21.*",
         "percymamedy/laravel-dev-booter": "^1.0.0",
+        "php-http/guzzle6-adapter": "^2.0",
         "predis/predis": "~1.0",
         "spatie/laravel-cors": "^1.5",
         "superbalist/laravel-google-cloud-storage": "^2.2"
