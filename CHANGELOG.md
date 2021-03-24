@@ -4,6 +4,7 @@
 
 - [Get public wiki settings from wiki/details endpoint](https://github.com/wbstack/api/pull/15)
 - [Migrate wiki_settings value column from string to text](https://github.com/wbstack/api/pull/16)
+- [Wiki settings API can now input either internal or external setting names](https://github.com/wbstack/api/pull/20)
 
 ## 6x-1.6 - 11 December 2020
 
