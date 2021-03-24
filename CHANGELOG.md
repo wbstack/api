@@ -2,6 +2,8 @@
 
 ## 6x-1.7 - TO BE RELEASED
 
+- [Update `maclof/kubernetes-client` and thus `app/Jobs/KubernetesIngressCreate.php` (without testing)](https://github.com/wbstack/api/pull/28)
+  - If something is wrong here this could have an impact on new wikis created with custom domains.
 - [Get public wiki settings from wiki/details endpoint](https://github.com/wbstack/api/pull/15)
 - [Migrate wiki_settings value column from string to text](https://github.com/wbstack/api/pull/16)
 - [Wiki settings API can now input either internal or external setting names](https://github.com/wbstack/api/pull/20)
