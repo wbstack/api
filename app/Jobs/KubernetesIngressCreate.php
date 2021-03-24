@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use Maclof\Kubernetes\Client;
 use Maclof\Kubernetes\Models\Ingress;
+use Http\Adapter\Guzzle6\Client as Guzzle6Client;
 
 /**
  * This can be run with for example:
@@ -35,13 +36,14 @@ class KubernetesIngressCreate extends Job
 
         // Connection example from: https://github.com/maclof/kubernetes-client#using-a-service-account
         echo 'Creating k8s client' . PHP_EOL;
+        $httpClient = Guzzle6Client::createWithConfig([
+            'verify' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
+        ]);
         $client = new Client([
             // Service host per: https://kubernetes.io/docs/tasks/administer-cluster/access-cluster-api/#accessing-the-api-from-a-pod
             'master' => 'https://kubernetes.default.svc',
-            // TODO maybe these files should only exist on the job runner?
-            'ca_cert' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
             'token'   => '/var/run/secrets/kubernetes.io/serviceaccount/token',
-        ]);
+        ], null, $httpClient);
 
         $ingress = new Ingress([
             'metadata' => [
