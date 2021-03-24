@@ -20,7 +20,7 @@
         "laravel/cashier": "^10.1",
         "laravel/framework": "^6.0",
         "laravel/passport": "^7.4",
-        "maclof/kubernetes-client": "0.15.*",
+        "maclof/kubernetes-client": "0.21.*",
         "percymamedy/laravel-dev-booter": "^1.0.0",
         "predis/predis": "~1.0",
         "spatie/laravel-cors": "^1.5",
