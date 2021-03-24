@@ -26,18 +26,16 @@ jobs:
     - name: Run docker-compose setup
       run: docker-compose up -d
 
-    - name: Wait for SQL to be ready
+    - name: Setup - Keep trying to install the DBs (try for 30 seconds)
       uses: nick-invision/retry@v2
       with:
-        max_attempts: 10
+        max_attempts: 30
         retry_wait_seconds: 1
         timeout_seconds: 30
-        command: docker-compose logs sql | grep -q "load completed at"
+        command: docker-compose exec -T api php artisan migrate:fresh
 
-    - name: Setup
+    - name: Setup - Other things
       run: |
-        sleep 2
-        docker-compose exec -T api php artisan migrate:fresh
         docker-compose exec -T api php artisan passport:install
         docker-compose exec -T api php artisan db:seed
         docker-compose exec -T api php artisan key:generate
