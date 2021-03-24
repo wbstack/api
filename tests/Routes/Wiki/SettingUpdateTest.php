@@ -93,8 +93,10 @@ class SettingUpdateTest extends TestCase
         yield [ 'wwWikibaseStringLengthMultilang', 12 ];
         yield [ 'wikibaseFedPropsEnable', 'foo' ];
         yield [ 'wikibaseManifestEquivEntities', 'foo' ];
-        // TODO make this pass
-        //yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1', 'P2' ] ) ];
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1', 'P2' ] ) ];
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1' => 'P2', 'P3' => 'aa' ] ) ];
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1' => 'P2', 'aa' => 'Q2' ] ) ];
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1' => 'P2', 'P10' => 'Q2' ] ) ];
     }
 
     /**
