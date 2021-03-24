@@ -25,6 +25,8 @@ class WikiSettingController extends Controller
         'wikibaseStringLengthString' => 'wwWikibaseStringLengthString',
         'wikibaseStringLengthMonolingualText' => 'wwWikibaseStringLengthMonolingualText',
         'wikibaseStringLengthMultilang' => 'wwWikibaseStringLengthMultilang',
+        'wikibaseFedPropsEnable' => 'wikibaseFedPropsEnable',
+        'wikibaseManifestEquivEntities' => 'wikibaseManifestEquivEntities',
         ];
 
     static $settingValidation = [
@@ -33,6 +35,8 @@ class WikiSettingController extends Controller
         'wwWikibaseStringLengthString' => 'integer|between:400,2500',
         'wwWikibaseStringLengthMonolingualText' => 'integer|between:400,2500',
         'wwWikibaseStringLengthMultilang' => 'integer|between:250,2500',
+        'wikibaseFedPropsEnable' => 'boolean',
+        'wikibaseManifestEquivEntities' => 'json',
     ];
 
     /**
