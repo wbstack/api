@@ -85,6 +85,8 @@ class Wiki extends Model
             'wwWikibaseStringLengthString',
             'wwWikibaseStringLengthMonolingualText',
             'wwWikibaseStringLengthMultilang',
+            'wikibaseFedPropsEnable',
+            'wikibaseManifestEquivEntities',
         ]
     );
     }

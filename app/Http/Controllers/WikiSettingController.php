@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\WikiManager;
 use App\WikiSetting;
+use App\Rules\SettingWikibaseManifestEquivEntities;
 use Illuminate\Http\Request;
 
 class WikiSettingController extends Controller
@@ -25,15 +26,21 @@ class WikiSettingController extends Controller
         'wikibaseStringLengthString' => 'wwWikibaseStringLengthString',
         'wikibaseStringLengthMonolingualText' => 'wwWikibaseStringLengthMonolingualText',
         'wikibaseStringLengthMultilang' => 'wwWikibaseStringLengthMultilang',
+        'wikibaseFedPropsEnable' => 'wikibaseFedPropsEnable',
+        'wikibaseManifestEquivEntities' => 'wikibaseManifestEquivEntities',
         ];
 
-    static $settingValidation = [
-        'wgDefaultSkin' => 'string|in:vector,modern,timeless',
-        'wwExtEnableConfirmAccount' => 'boolean',
-        'wwWikibaseStringLengthString' => 'integer|between:400,2500',
-        'wwWikibaseStringLengthMonolingualText' => 'integer|between:400,2500',
-        'wwWikibaseStringLengthMultilang' => 'integer|between:250,2500',
-    ];
+    private function getSettingValidations() {
+        return [
+            'wgDefaultSkin' => [ 'required', 'string', 'in:vector,modern,timeless' ],
+            'wwExtEnableConfirmAccount' => [ 'required', 'boolean' ],
+            'wwWikibaseStringLengthString' => [ 'required', 'integer', 'between:400,2500' ],
+            'wwWikibaseStringLengthMonolingualText' => [ 'required', 'integer', 'between:400,2500' ],
+            'wwWikibaseStringLengthMultilang' => [ 'required', 'integer', 'between:250,2500' ],
+            'wikibaseFedPropsEnable' => [ 'required', 'boolean' ],
+            'wikibaseManifestEquivEntities' => [ 'required', 'json', new SettingWikibaseManifestEquivEntities() ],
+        ];
+    }
 
     /**
      * Historically the setting names submitted to the API and actually stored were different.
@@ -50,16 +57,16 @@ class WikiSettingController extends Controller
 
     public function update( $setting, Request $request)
     {
+        $settingValidations = $this->getSettingValidations();
+
         $request->validate([
             'wiki' => 'required|numeric',
             // Allow both internal and external setting names, see normalizeSetting
-            'setting' => 'required|string|in:' . implode( ',', array_merge( array_keys( self::$oldSettingMap ), self::$oldSettingMap ) ),
+            'setting' => 'required|string|in:' . implode( ',', array_unique( array_merge( array_keys( self::$oldSettingMap ), array_keys( $settingValidations ) ) ) ),
         ]);
         $settingName = $this->normalizeSetting( $request->input('setting') );
 
-        $request->validate([
-            'value' => 'required' . ( array_key_exists( $settingName, self::$settingValidation ) ? '|' . self::$settingValidation[$settingName] : '' ),
-        ]);
+        $request->validate([ 'value' => $settingValidations[$settingName]]);
         $value = $request->input('value');
 
         $user = $request->user();

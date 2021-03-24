@@ -55,6 +55,11 @@ class SettingUpdateTest extends TestCase
         yield [ 'wwWikibaseStringLengthString', '1000', '1000' ];
         yield [ 'wwWikibaseStringLengthMonolingualText', '1000', '1000' ];
         yield [ 'wwWikibaseStringLengthMultilang', '1000', '1000' ];
+        yield [ 'wikibaseFedPropsEnable', '1', '1' ];
+        yield [ 'wikibaseFedPropsEnable', '0', '0' ];
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [] ), json_encode( [] ) ];
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P31' => 'P1' ] ), json_encode( [ 'P31' => 'P1' ] ) ];
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P31' => 'P1', 'Q1' => 'Q1' ] ), json_encode( [ 'P31' => 'P1', 'Q1' => 'Q1' ] ) ];
     }
 
     /**
@@ -86,6 +91,12 @@ class SettingUpdateTest extends TestCase
         yield [ 'wwWikibaseStringLengthString', 12 ];
         yield [ 'wwWikibaseStringLengthMonolingualText', 12 ];
         yield [ 'wwWikibaseStringLengthMultilang', 12 ];
+        yield [ 'wikibaseFedPropsEnable', 'foo' ];
+        yield [ 'wikibaseManifestEquivEntities', 'foo' ];
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1', 'P2' ] ) ];
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1' => 'P2', 'P3' => 'aa' ] ) ];
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1' => 'P2', 'aa' => 'Q2' ] ) ];
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1' => 'P2', 'P10' => 'Q2' ] ) ];
     }
 
     /**
