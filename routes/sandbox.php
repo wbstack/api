@@ -6,4 +6,5 @@
  * @var \Laravel\Lumen\Routing\Router $router
  */
 
-$router->post('sandbox/create', ['uses' => 'Sandbox\SandboxController@create']);
+$router->post('sandbox/create', ['uses' => 'Sandbox\SandboxController@create'])
+    ->middleware('throttle:5,1');

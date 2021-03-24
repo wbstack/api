@@ -32,18 +32,7 @@ class Kernel extends HttpKernel
      *
      * @var array
      */
-    protected $middlewareGroups = [
-        'api' => [
-            // throttle, 45 requests in 1 min
-            'throttle:45,1',
-            // SHIFT, what does bindings do?
-            'bindings',
-        ],
-
-        'backend' => [
-          'backend.auth',
-        ],
-    ];
+    protected $middlewareGroups = [];
 
     /**
      * The application's route middleware.
