@@ -28,6 +28,11 @@ $factory->define(App\Invitation::class, function (Faker\Generator $faker) {
 $factory->defineAs(App\Wiki::class, 'nodb', function (Faker\Generator $faker) {
     return [
         'sitename' => $faker->name,
-        'domain' => str_replace(' ', '_', substr(strtolower($faker->unique->text), 0, 10)).'.wiki.opencura.com',
+        'domain' => str_replace(' ', '_', substr(strtolower($faker->unique->text), 0, 11)).'.wiki.opencura.com',
     ];
+});
+
+$factory->define(App\WikiManager::class, function (Faker\Generator $faker) {
+    // Attributes must be defined byt the caller
+    return [];
 });
