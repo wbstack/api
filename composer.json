@@ -16,7 +16,7 @@
         "illuminate/mail": "^6.0",
         "illuminate/redis": "^6.0",
         "intervention/image": "^2.5",
-        "laravel/cashier": "^10.1",
+        "laravel/cashier": "^12.10",
         "laravel/framework": "^6.0",
         "laravel/passport": "^7.4",
         "lcobucci/jwt": "3.3",
