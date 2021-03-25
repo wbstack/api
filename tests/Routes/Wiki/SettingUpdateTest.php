@@ -103,10 +103,12 @@ class SettingUpdateTest extends TestCase
         
         // props without mapping
         yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1', 'P2' ], 'items' => []] ) ];
-        // invalid property id
+        // invalid property id (right side)
         yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1' => 'P2', 'P3' => 'aa' ], 'items' => []] ) ];
-        // invalid property type
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1' => 'P2', 'aa' => 'Q2' ], 'items' => []] ) ];
+        // invalid property id (left side)
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1' => 'P2', 'aa' => 'P3' ], 'items' => []] ) ];
+        // invalid entity type
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'foo' => []] ) ];
         // mismatch entitytypes 
         yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1' => 'P2' ], 'items' => [ 'P10' => 'Q2' ]] ) ];
         // all entities should be of the same type 
