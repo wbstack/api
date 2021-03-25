@@ -57,9 +57,16 @@ class SettingUpdateTest extends TestCase
         yield [ 'wwWikibaseStringLengthMultilang', '1000', '1000' ];
         yield [ 'wikibaseFedPropsEnable', '1', '1' ];
         yield [ 'wikibaseFedPropsEnable', '0', '0' ];
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [] ), json_encode( [] ) ];
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P31' => 'P1' ] ), json_encode( [ 'P31' => 'P1' ] ) ];
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P31' => 'P1', 'Q1' => 'Q1' ] ), json_encode( [ 'P31' => 'P1', 'Q1' => 'Q1' ] ) ];
+
+        $emptyArrays =json_encode( ['items' => [], 'properties'=> []] );
+        yield [ 'wikibaseManifestEquivEntities', $emptyArrays, $emptyArrays ];
+        
+        $somePropsNoItems = json_encode( [ 'properties' => [ 'P31' => 'P1' ], 'items' => []] );
+        yield [ 'wikibaseManifestEquivEntities', $somePropsNoItems, $somePropsNoItems ];
+        
+        $validProps = json_encode( [ 'properties' => [ 'P31' => 'P1' ], 'items' => [ 'Q1' => 'Q1' ]] );
+        yield [ 'wikibaseManifestEquivEntities', $validProps , $validProps ];
+
     }
 
     /**
@@ -93,10 +100,17 @@ class SettingUpdateTest extends TestCase
         yield [ 'wwWikibaseStringLengthMultilang', 12 ];
         yield [ 'wikibaseFedPropsEnable', 'foo' ];
         yield [ 'wikibaseManifestEquivEntities', 'foo' ];
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1', 'P2' ] ) ];
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1' => 'P2', 'P3' => 'aa' ] ) ];
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1' => 'P2', 'aa' => 'Q2' ] ) ];
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'P1' => 'P2', 'P10' => 'Q2' ] ) ];
+        
+        // props without mapping
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1', 'P2' ], 'items' => []] ) ];
+        // invalid property id
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1' => 'P2', 'P3' => 'aa' ], 'items' => []] ) ];
+        // invalid property type
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1' => 'P2', 'aa' => 'Q2' ], 'items' => []] ) ];
+        // mismatch entitytypes 
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1' => 'P2' ], 'items' => [ 'P10' => 'Q2' ]] ) ];
+        // all entities should be of the same type 
+        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1' => 'P2' ], 'items' => [ 'Q2' => 'Q2', 'P2' => 'P2' ]] ) ];
     }
 
     /**
