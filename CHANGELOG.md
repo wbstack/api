@@ -1,5 +1,9 @@
 # api
 
+## 6x-1.8 - 26 March 2021
+
+- Add wgLogo to public settings
+
 ## 6x-1.7 - 25 March 2021
 
 - [Update `maclof/kubernetes-client` and thus `app/Jobs/KubernetesIngressCreate.php` (without testing)](https://github.com/wbstack/api/pull/28)
