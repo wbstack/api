@@ -10,6 +10,7 @@
     "require": {
         "albertcht/invisible-recaptcha": "1.9.*",
         "firebase/php-jwt": "^5.0",
+        "fruitcake/laravel-cors": "^2.0",
         "gluedev/laravel-stackdriver": "^0.2.2",
         "guzzlehttp/guzzle": "^6.0",
         "hackzilla/password-generator": "^1.5",

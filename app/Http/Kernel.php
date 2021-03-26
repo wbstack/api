@@ -14,17 +14,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
-          \Spatie\Cors\Cors::class,
-
-        // SHIFT Lumen didnt run any of these, so don't run them for us either..
-        // \App\Http\Middleware\CheckForMaintenanceMode::class,
-        // \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        // \App\Http\Middleware\TrimStrings::class,
-        // \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-
-        // SHIFT the below was giving Class 'Fideloper\Proxy\TrustProxies' not found
-        // and I don't know what it does yet, so juse remove it...
-        //\App\Http\Middleware\TrustProxies::class,
+        \Fruitcake\Cors\HandleCors::class,
     ];
 
     /**
@@ -47,21 +37,15 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
-        // Came with Laravel SHIFT, but not used yet?
-        // 'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        // 'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        // 'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
-        // 'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
 
         // https://laravel-news.com/signed-routes
         //'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
 
-        // SHIFT from Lumen
         'backend.auth' => \App\Http\Middleware\BackendAuth::class,
         //'throttle' => App\Http\Middleware\ThrottleRequests::class,
         //'auth' => App\Http\Middleware\Authenticate::class,
-        'cors' => \Spatie\Cors\Cors::class,
+        'cors' => \Fruitcake\Cors\HandleCors::class,
     ];
 
     /**
