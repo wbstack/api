@@ -11,11 +11,6 @@ class All extends Command
 
     protected $description = 'List all current invitations';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Execute the console command.
      *
@@ -26,5 +21,6 @@ class All extends Command
         foreach( Invitation::all() as $invitation ) {
             $this->line($invitation->code);
         }
+        return 0;
     }
 }

@@ -12,11 +12,6 @@ class Verify extends Command
 
     protected $description = 'Set verification state for user';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function handle()
     {
         $email = $this->argument('email');
@@ -25,7 +20,7 @@ class Verify extends Command
         $user = User::whereEmail($email)->first();
         if(!$user) {
             $this->error("User not found for $email" );
-            return;
+            return 1;
         }
 
         $user->verified = $state;
@@ -34,5 +29,6 @@ class Verify extends Command
         } else {
             $this->error( "Failed to update $email" );
         }
+        return 0;
     }
 }

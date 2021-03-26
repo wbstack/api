@@ -24,16 +24,6 @@ class Handle extends Command
     protected $description = 'Handle a job right now';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed
@@ -65,5 +55,6 @@ class Handle extends Command
             $job->handle();
             $this->info("Successfully Handled {$class} ");
         }
+        return 0;
     }
 }

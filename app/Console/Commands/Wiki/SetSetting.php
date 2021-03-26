@@ -12,11 +12,6 @@ class SetSetting extends Command
 
     protected $description = 'Set a single setting for a wiki.';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Execute the console command.
      *
@@ -33,7 +28,7 @@ class SetSetting extends Command
         $wiki = Wiki::where($wikiKey, $wikiValue)->first();
         if(!$wiki){
             $this->error('Wiki not found');
-            return;
+            return 1;
         }
         $wikiId = $wiki->id;
 
@@ -47,5 +42,6 @@ class SetSetting extends Command
             ]
         );
         $this->line("Set setting ${settingKey} to ${settingValue} for wiki id ${wikiId}");
+        return 0;
     }
 }
