@@ -2,7 +2,7 @@
 
 namespace App\Exceptions;
 
-use Exception;
+use \Throwable;
 use GlueDev\Laravel\Stackdriver\StackdriverExceptionHandler;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
