@@ -2,7 +2,8 @@
 
 ## 7x-1.0
 
-- First version using Laravel 7
+- First version using Laravel 7:
+  - Env var `MAIL_DRIVER` changes to `MAIL_MAILER`
 
 ## 6x-1.8 - 26 March 2021
 
