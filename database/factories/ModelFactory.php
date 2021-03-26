@@ -25,7 +25,7 @@ $factory->define(App\Invitation::class, function (Faker\Generator $faker) {
     ];
 });
 
-$factory->defineAs(App\Wiki::class, 'nodb', function (Faker\Generator $faker) {
+$factory->define(App\Wiki::class, function (Faker\Generator $faker) {
     return [
         'sitename' => $faker->name,
         'domain' => str_replace(' ', '_', substr(strtolower($faker->unique->text), 0, 11)).'.wiki.opencura.com',
