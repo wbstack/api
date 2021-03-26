@@ -53,17 +53,17 @@ If so, retry.
 ```
 docker-compose -f docker-compose-clean.yml exec mediawiki bash
 mv ./w/LocalSettings.php ./w/LocalSettings.php.temp
-WW_DOMAIN=maint php ./w/maintenance/install.php --dbserver sql-clean --dbuser root --dbpass toor --dbname wiki --with-extensions --pass AdminPass0 SiteName AdminName
+WBS_DOMAIN=maint php ./w/maintenance/install.php --dbserver sql-clean --dbuser root --dbpass toor --dbname wiki --with-extensions --pass AdminPass0 SiteName AdminName
 ```
 
 WHILE https://phabricator.wikimedia.org/T267809 is broken you'll then need to edit the auto generated LocalSettings.php file...
 (per the instructions in the ticket)
 
 ```
-WW_DOMAIN=maint php ./w/maintenance/update.php --quick
-WW_DOMAIN=maint php ./w/maintenance/update.php --quick
-WW_DOMAIN=maint php ./w/maintenance/update.php --quick
-WW_DOMAIN=maint php ./w/maintenance/update.php --quick
+WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
+WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
+WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
+WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
 ```
 
 **Then get the SQL from adminer:**
@@ -129,7 +129,7 @@ If so, retry.
 
 ```
 docker-compose -f docker-compose-upgrade.yml exec mediawiki bash
-WW_DOMAIN=maint php ./w/maintenance/update.php --schema sql.sql --quick
+WBS_DOMAIN=maint php ./w/maintenance/update.php --schema sql.sql --quick
 cat sql.sql
 ```
 
