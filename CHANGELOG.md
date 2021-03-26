@@ -1,5 +1,9 @@
 # api
 
+## 7x-1.0
+
+- First version using Laravel 7
+
 ## 6x-1.8 - 26 March 2021
 
 - Add wgLogo to public settings
