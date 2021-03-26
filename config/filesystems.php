@@ -1,6 +1,6 @@
 <?php
 
-return [
+$fileSystems = [
 
     /*
     |--------------------------------------------------------------------------
@@ -78,3 +78,9 @@ return [
     ],
 
 ];
+
+if (env('APP_ENV') === 'local') {
+    $fileSystems['disks']['gcs-public-static'] = $fileSystems['disks']['public'];
+}
+
+return $fileSystems;
