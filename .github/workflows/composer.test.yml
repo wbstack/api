@@ -1,4 +1,4 @@
-name: PHPUnit
+name: Composer test
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  phpunit:
+  test:
     runs-on: ubuntu-latest
     steps:
 
@@ -42,3 +42,5 @@ jobs:
 
     - name: PHPUnit
       run: docker-compose exec -T api vendor/bin/phpunit
+    - name: Psalm
+      run: docker-compose exec -T api vendor/bin/psalm
