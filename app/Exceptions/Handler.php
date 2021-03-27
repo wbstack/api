@@ -37,15 +37,4 @@ class Handler extends ExceptionHandler
         parent::report($throwable);
     }
 
-    /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $throwable
-     * @return \Illuminate\Http\Response
-     */
-    public function render($request, Throwable $throwable)
-    {
-        return parent::render($request, $throwable);
-    }
 }
