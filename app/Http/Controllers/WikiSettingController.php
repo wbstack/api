@@ -11,9 +11,11 @@ class WikiSettingController extends Controller
 {
 
     private function getSettingValidations() {
+        // FIXME: this list is evil and should be kept in sync with the model in Wiki.php?!
         return [
             'wgDefaultSkin' => [ 'required', 'string', 'in:vector,modern,timeless' ],
             'wwExtEnableConfirmAccount' => [ 'required', 'boolean' ],
+            'wwExtEnableWikibaseLexeme' => [ 'required', 'boolean' ],
             'wwWikibaseStringLengthString' => [ 'required', 'integer', 'between:400,2500' ],
             'wwWikibaseStringLengthMonolingualText' => [ 'required', 'integer', 'between:400,2500' ],
             'wwWikibaseStringLengthMultilang' => [ 'required', 'integer', 'between:250,2500' ],

@@ -80,10 +80,11 @@ class Wiki extends Model
     public function publicSettings() {
         return $this->settings()->whereIn('name',
         [
+            'wgLogo',
             // FIXME: this list is evil and should be kept in sync with WikiSettingController?!
             'wgDefaultSkin',
-            'wgLogo',
             'wwExtEnableConfirmAccount',
+            'wwExtEnableWikibaseLexeme',
             'wwWikibaseStringLengthString',
             'wwWikibaseStringLengthMonolingualText',
             'wwWikibaseStringLengthMultilang',
