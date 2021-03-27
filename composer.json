@@ -24,7 +24,6 @@
         "lcobucci/jwt": "3.3",
         "maclof/kubernetes-client": "0.21.*",
         "percymamedy/laravel-dev-booter": "^2.0.0",
-        "php-http/guzzle6-adapter": "^2.0",
         "predis/predis": "~1.0",
         "superbalist/laravel-google-cloud-storage": "^2.2"
     },
