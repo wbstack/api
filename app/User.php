@@ -96,6 +96,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function markEmailAsVerified()
     {
         $this->verified = 1;
+        return true;
     }
 
     public function sendEmailVerificationNotification()

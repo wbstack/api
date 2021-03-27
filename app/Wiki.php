@@ -55,6 +55,7 @@ class Wiki extends Model
 
     public function wikiDbVersion()
     {
+        /** @psalm-suppress InvalidArgument */
         return $this->hasOne(WikiDb::class)->select(['id', 'wiki_id', 'version']);
     }
 
@@ -95,6 +96,7 @@ class Wiki extends Model
     public function wikiManagers()
     {
         // TODO should this be hasMany ?
+        /** @psalm-suppress InvalidArgument */
         return $this->belongsToMany(User::class, 'wiki_managers')->select(['email']);
     }
 }

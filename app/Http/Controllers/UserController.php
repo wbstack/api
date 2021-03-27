@@ -38,8 +38,7 @@ class UserController extends BaseController
         }
 
         abort(404);
-
-        return response($res);
+        return response();
     }
 
     // TODO why is this needed?

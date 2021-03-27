@@ -16,8 +16,6 @@ class ProvisionWikiDbJob extends Job
     // TODO should be injected somehow?
     private $newSqlFile = 'mw1.35-wbs1';
 
-    private $dbConnection = 'mw';
-
     /**
      * @var string|null|false
      * null results in the default database being used
@@ -82,7 +80,11 @@ class ProvisionWikiDbJob extends Job
             return;
         }
 
-        $conn = DB::connection($this->dbConnection);
+        $conn = DB::connection('mw');
+        if (!$conn instanceof \Illuminate\Database\Connection) {
+            $this->fail(new \RuntimeException('Must be run on a PDO based DB connection'));
+            return;//safegaurd
+        }
         $pdo = $conn->getPdo();
 
         // TODO if a custom dbname is used, check for conflicts first...
@@ -174,4 +176,5 @@ class ProvisionWikiDbJob extends Job
           'prefix' => $this->prefix,
       ]);
     }
+
 }
