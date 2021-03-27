@@ -1,5 +1,9 @@
 # api
 
+## 6x-1.9 - 27 March 2021
+
+- Fix k8s ingress creation for custom domains
+
 ## 6x-1.8 - 26 March 2021
 
 - Add wgLogo to public settings
