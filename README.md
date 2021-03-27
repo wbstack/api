@@ -69,6 +69,21 @@ Currently most of the tests require the DB connection to exist.
 docker-compose exec api vendor/bin/phpunit
 ```
 
+#### Debugging
+
+If you get a CORS error from an API when testing, it might be due to an exception internally, resulting in a 500 response with no CORS.
+
+If you are testing a route and believe an exception is happening (returning a 500), you can disable error handling to see the trace.
+
+```php
+use \Illuminate\Foundation\Testing\Concerns\InteractsWithExceptionHandling;
+
+function someTest() {
+    $this->withoutExceptionHandling();
+    // rest of test code...
+}
+```
+
 ### Laravel IDE helper
 
 You may need to run these from within a container with a DB attached:
