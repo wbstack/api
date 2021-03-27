@@ -12,16 +12,6 @@ class Get extends Command
     protected $description = 'Get Wiki data by key and value.';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed
@@ -36,5 +26,6 @@ class Get extends Command
             ->first();
 
         $this->line($result->toJson(JSON_PRETTY_PRINT));
+        return 0;
     }
 }

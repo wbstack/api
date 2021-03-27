@@ -11,11 +11,6 @@ class Create extends Command
 
     protected $description = 'Create an invitation';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Execute the console command.
      *
@@ -31,5 +26,6 @@ class Create extends Command
         } else {
             $this->line( 'Failed to create invitation: ' . $code );
         }
+        return 0;
     }
 }

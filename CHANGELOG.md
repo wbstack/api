@@ -1,5 +1,10 @@
 # api
 
+## 7x-1.0
+
+- First version using Laravel 7:
+  - Env var `MAIL_DRIVER` changes to `MAIL_MAILER`
+
 ## 6x-1.9 - 27 March 2021
 
 - Fix k8s ingress creation for custom domains

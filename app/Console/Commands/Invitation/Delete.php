@@ -11,11 +11,6 @@ class Delete extends Command
 
     protected $description = 'Delete an invitation';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Execute the console command.
      *
@@ -31,5 +26,6 @@ class Delete extends Command
         } else {
             $this->line( 'Failed to deleted invitation: ' . $code );
         }
+        return 0;
     }
 }

@@ -4,8 +4,10 @@ namespace Tests\Routes\User;
 
 use App\User;
 use App\Invitation;
+use App\Notifications\UserCreationNotification;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
@@ -20,7 +22,7 @@ class RegisterTest extends TestCase
 
     public function testCreate_Success()
     {
-        Mail::shouldReceive('send')->once()->andReturnSelf();
+        Notification::fake();
 
         $invite = factory(Invitation::class)->create();
         $userToCreate = factory(User::class)->make();
@@ -36,6 +38,11 @@ class RegisterTest extends TestCase
         $resp->assertStatus(200)
         ->assertJsonStructure(['data' => ['email', 'id'], 'message', 'success'])
         ->assertJsonFragment(['email' => $userToCreate->email, 'success' => true]);
+
+        Notification::assertSentTo(
+            [User::whereEmail($userToCreate->email)->first()], UserCreationNotification::class
+        );
+
         // SHIFT doesnt have missingFromDatabase
         //->missingFromDatabase('invitations', ['code' => $invite->code]);
     }
