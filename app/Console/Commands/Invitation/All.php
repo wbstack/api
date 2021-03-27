@@ -18,9 +18,10 @@ class All extends Command
      */
     public function handle()
     {
-        foreach( Invitation::all() as $invitation ) {
+        foreach (Invitation::all() as $invitation) {
             $this->line($invitation->code);
         }
+
         return 0;
     }
 }

@@ -46,10 +46,9 @@ return [
         'Pragma',
     ],
 
-
     /*
-    * Preflight request will respond with value for the max age header.
-    */
+     * Preflight request will respond with value for the max age header.
+     */
     'max_age' => 60 * 60 * 24,
 
     'supports_credentials' => false,

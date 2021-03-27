@@ -37,11 +37,13 @@ class ResetPasswordController extends Controller
         $this->middleware('guest');
     }
 
-    protected function sendResetResponse() {
+    protected function sendResetResponse()
+    {
         return response()->json('Success', 200);
     }
 
-    protected function sendResetFailedResponse() {
+    protected function sendResetFailedResponse()
+    {
         return response()->json('Unauthorized', 401);
     }
 }

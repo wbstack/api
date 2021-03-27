@@ -32,9 +32,11 @@ class ProvisionQueryserviceNamespaceJob extends Job
         $this->maxFree = $maxFree;
     }
 
-    private function doesMaxFreeSayWeShouldStop(){
+    private function doesMaxFreeSayWeShouldStop()
+    {
         $unassignedQueryserviceNamespaces = QueryserviceNamespace::where('wiki_id', null)->count();
         $toCreate = $this->maxFree - $unassignedQueryserviceNamespaces;
+
         return $toCreate === 0;
     }
 
@@ -44,7 +46,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
     public function handle()
     {
         // If the job is only meant to create so many DBs, then make sure we don't create too many.
-        if( $this->maxFree && $this->doesMaxFreeSayWeShouldStop() ){
+        if ($this->maxFree && $this->doesMaxFreeSayWeShouldStop()) {
             return;
         }
 
@@ -64,8 +66,8 @@ class ProvisionQueryserviceNamespaceJob extends Job
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 10,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			// User agent is needed by the query service...
-			CURLOPT_USERAGENT => 'WBStack ProvisionQueryserviceNamespaceJob',
+            // User agent is needed by the query service...
+            CURLOPT_USERAGENT => 'WBStack ProvisionQueryserviceNamespaceJob',
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => $properties,
             CURLOPT_HTTPHEADER => [
@@ -82,7 +84,8 @@ class ProvisionQueryserviceNamespaceJob extends Job
             $this->fail(
                 new \RuntimeException('cURL Error #:'.$err)
             );
-            return;//safegaurd
+
+            return; //safegaurd
         } else {
             if ($response === 'CREATED: '.$this->namespace) {
                 $qsns = QueryserviceNamespace::create([
@@ -90,12 +93,13 @@ class ProvisionQueryserviceNamespaceJob extends Job
                     //'internalHost' => $this->internalHost,
                     'backend' => $queryServiceHost,
                 ]);
-                // TODO error if $qsns is not actually created...
+            // TODO error if $qsns is not actually created...
             } else {
                 $this->fail(
                     new \RuntimeException('Valid response, but couldn\'t find "CREATED: " in: '.$response)
                 );
-                return;//safegaurd
+
+                return; //safegaurd
             }
             // TODO Else log create failed?
         }

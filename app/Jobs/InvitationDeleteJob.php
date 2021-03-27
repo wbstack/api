@@ -6,7 +6,6 @@ use App\Invitation;
 
 class InvitationDeleteJob extends Job
 {
-
     private $code;
 
     /**
@@ -24,9 +23,10 @@ class InvitationDeleteJob extends Job
             $invite->delete();
         } else {
             $this->fail(
-                new \RuntimeException( 'Invitation not found, so can\'t delete' )
+                new \RuntimeException('Invitation not found, so can\'t delete')
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
     }
 }

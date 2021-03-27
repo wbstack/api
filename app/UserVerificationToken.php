@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\UserVerificationToken
+ * App\UserVerificationToken.
  *
  * @property int $id
  * @property int $user_id

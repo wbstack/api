@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\QueryserviceNamespace
+ * App\QueryserviceNamespace.
  *
  * @property int $id
  * @property string $namespace

@@ -48,7 +48,7 @@ return [
             ],
             'write' => [
                 'host' => [
-                    env('DB_HOST_WRITE')
+                    env('DB_HOST_WRITE'),
                 ],
             ],
             // If the sticky option is enabled and a "write" operation has been performed
@@ -77,12 +77,12 @@ return [
             // TODO one day these might be a different server...
             'read' => [
                 'host' => [
-                    env('DB_HOST_READ')
+                    env('DB_HOST_READ'),
                 ],
             ],
             'write' => [
                 'host' => [
-                    env('DB_HOST_WRITE')
+                    env('DB_HOST_WRITE'),
                 ],
             ],
             // If the sticky option is enabled and a "write" operation has been performed

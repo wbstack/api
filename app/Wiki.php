@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * App\Wiki
+ * App\Wiki.
  *
  * @property int $id
  * @property string $domain
@@ -55,7 +55,7 @@ class Wiki extends Model
 
     public function wikiDbVersion()
     {
-        /** @psalm-suppress InvalidArgument */
+        /* @psalm-suppress InvalidArgument */
         return $this->hasOne(WikiDb::class)->select(['id', 'wiki_id', 'version']);
     }
 
@@ -77,7 +77,8 @@ class Wiki extends Model
         return $this->hasMany(WikiSetting::class);
     }
 
-    public function publicSettings() {
+    public function publicSettings()
+    {
         return $this->settings()->whereIn('name',
         [
             'wgLogo',
@@ -97,7 +98,7 @@ class Wiki extends Model
     public function wikiManagers()
     {
         // TODO should this be hasMany ?
-        /** @psalm-suppress InvalidArgument */
+        /* @psalm-suppress InvalidArgument */
         return $this->belongsToMany(User::class, 'wiki_managers')->select(['email']);
     }
 }

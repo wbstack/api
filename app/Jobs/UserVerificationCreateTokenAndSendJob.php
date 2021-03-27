@@ -9,7 +9,6 @@ use App\UserVerificationToken;
 
 class UserVerificationCreateTokenAndSendJob extends Job
 {
-
     /**
      * @var User
      */
@@ -20,23 +19,25 @@ class UserVerificationCreateTokenAndSendJob extends Job
      */
     private $notificationClass;
 
-    public static function newForAccountCreation( User $user ) {
-        return new self( $user, UserCreationNotification::class );
+    public static function newForAccountCreation(User $user)
+    {
+        return new self($user, UserCreationNotification::class);
     }
 
-    public static function newForReverification( User $user ) {
-        return new self( $user, EmailReverificationNotification::class );
+    public static function newForReverification(User $user)
+    {
+        return new self($user, EmailReverificationNotification::class);
     }
 
     /**
      * @return void
      */
-    public function __construct( User $user, string $notificationClass )
+    public function __construct(User $user, string $notificationClass)
     {
         $this->user = $user;
         $this->notificationClass = $notificationClass;
-        if(!class_exists( $notificationClass )) {
-            throw new \InvalidArgumentException( "$notificationClass not found for notification" );
+        if (! class_exists($notificationClass)) {
+            throw new \InvalidArgumentException("$notificationClass not found for notification");
         }
     }
 

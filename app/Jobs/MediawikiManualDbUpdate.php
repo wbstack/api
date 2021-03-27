@@ -40,7 +40,7 @@ class MediawikiManualDbUpdate extends Job
         $this->selectValue = $selectValue;
         $this->from = $from;
         $this->to = $to;
-		// TODO logic of db update files should be kept somewhere...
+        // TODO logic of db update files should be kept somewhere...
         $updateFileName = $from.'_to_'.$to.'.sql';
         $updateFilePath = __DIR__.'/../../database/mw/updates/'.$updateFileName;
         if (! file_exists($updateFilePath)) {
@@ -65,7 +65,8 @@ class MediawikiManualDbUpdate extends Job
                     'At: '.$wikidb->version.' Expected: '.$this->from
                   )
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
 
         // Get SQL statements to run
@@ -78,9 +79,10 @@ class MediawikiManualDbUpdate extends Job
         // Use the create database
         if ($pdo->exec('USE '.$wikidb->name) === false) {
             $this->fail(
-                new \RuntimeException( 'Failed to use database with name: '.$wikidb->name)
+                new \RuntimeException('Failed to use database with name: '.$wikidb->name)
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
 
         foreach ($sqlParts as $part) {
@@ -93,7 +95,8 @@ class MediawikiManualDbUpdate extends Job
                 $this->fail(
                     new \RuntimeException('SQL execution failed, SQL part: '.$part)
                 );
-                return;//safegaurd
+
+                return; //safegaurd
             }
         }
 
@@ -103,13 +106,15 @@ class MediawikiManualDbUpdate extends Job
         // TODO log? Do something?
     }
 
-    private function getMediaWikiPDO() {
+    private function getMediaWikiPDO()
+    {
         $connection = DB::connection('mw');
-        if (!$connection instanceof \Illuminate\Database\Connection) {
+        if (! $connection instanceof \Illuminate\Database\Connection) {
             $this->fail(new \RuntimeException('Must be run on a PDO based DB connection'));
-            return;//safegaurd
+
+            return; //safegaurd
         }
-        /** @psalm-suppress UndefinedInterfaceMethod */
+        /* @psalm-suppress UndefinedInterfaceMethod */
         return $connection->getPdo();
     }
 }

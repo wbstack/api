@@ -5,7 +5,6 @@
  * You'll find that service in the Providers directory.
  * @var \Laravel\Lumen\Routing\Router $router
  */
-
 $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
 
     // POST
@@ -41,9 +40,5 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
             // TODO should wiki managers really be here?
             $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
         });
-
     });
-
-
 });
-

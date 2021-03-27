@@ -38,6 +38,7 @@ class UserController extends BaseController
         }
 
         abort(404);
+
         return response();
     }
 

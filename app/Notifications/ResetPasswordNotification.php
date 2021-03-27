@@ -2,9 +2,9 @@
 
 namespace App\Notifications;
 
-use Illuminate\Support\Facades\Lang;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Lang;
 
 class ResetPasswordNotification extends Notification
 {
@@ -64,10 +64,10 @@ class ResetPasswordNotification extends Notification
          */
         //$resetPasswordLink = url(config('app.url').route('password.reset', ['token' => $this->token, 'email' => $notifiable->getEmailForPasswordReset()], false));
         $queryPart = "?token=$this->token&email={$notifiable->getEmailForPasswordReset()}";
-        if( config('app.url') === 'http://localhost' ) {
-            $resetPasswordLink = 'http://localhost:8081/reset-password' . $queryPart;
+        if (config('app.url') === 'http://localhost') {
+            $resetPasswordLink = 'http://localhost:8081/reset-password'.$queryPart;
         } else {
-            $resetPasswordLink = 'https://wbstack.com/reset-password' . $queryPart;
+            $resetPasswordLink = 'https://wbstack.com/reset-password'.$queryPart;
         }
 
         return (new MailMessage)

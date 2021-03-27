@@ -34,7 +34,7 @@ class KubernetesIngressCreate extends Job
         // Docs for the client https://github.com/maclof/kubernetes-client
 
         // Connection example from: https://github.com/maclof/kubernetes-client#using-a-service-account
-        echo 'Creating k8s client' . PHP_EOL;
+        echo 'Creating k8s client'.PHP_EOL;
 
         $client = new Client([
             'master' => 'https://kubernetes.default.svc',
@@ -65,7 +65,7 @@ class KubernetesIngressCreate extends Job
                 'annotations' => [
                     'kubernetes.io/ingress.class' => 'nginx',
                     'nginx.ingress.kubernetes.io/force-ssl-redirect' => 'true',
-                    'cert-manager.io/cluster-issuer' => 'letsencrypt-prod'
+                    'cert-manager.io/cluster-issuer' => 'letsencrypt-prod',
                 ],
             ],
             'spec' => [
@@ -74,7 +74,7 @@ class KubernetesIngressCreate extends Job
                         'hosts' => [
                             $this->wikiDomain,
                         ],
-                        'secretName' => 'mediawiki-site-tls-' . $this->id
+                        'secretName' => 'mediawiki-site-tls-'.$this->id,
                     ],
                 ],
                 'rules' => [
@@ -97,18 +97,19 @@ class KubernetesIngressCreate extends Job
             ],
         ]);
 
-        echo 'Getting ingress resources' . PHP_EOL;
+        echo 'Getting ingress resources'.PHP_EOL;
         $ingresses = $client->ingresses();
-        echo 'Checking if resource exists: '.$ingress->getMetadata('name') . PHP_EOL;
+        echo 'Checking if resource exists: '.$ingress->getMetadata('name').PHP_EOL;
         $exists = $ingresses->exists($ingress->getMetadata('name'));
         if ($exists) {
             $this->fail(
-                new \RuntimeException( 'Ingress already exists, but it should not' )
+                new \RuntimeException('Ingress already exists, but it should not')
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
 
-        echo 'Creating ingress resource' . PHP_EOL;
+        echo 'Creating ingress resource'.PHP_EOL;
         $result = $client->ingresses()->create($ingress);
         // TODO check result
         // TODO output something?

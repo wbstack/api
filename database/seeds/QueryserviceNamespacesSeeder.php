@@ -5,7 +5,6 @@ use Illuminate\Database\Seeder;
 
 class QueryserviceNamespacesSeeder extends Seeder
 {
-
     public function run()
     {
         QueryserviceNamespace::create($this->getCreateArray(1));
@@ -14,11 +13,11 @@ class QueryserviceNamespacesSeeder extends Seeder
         QueryserviceNamespace::create($this->getCreateArray(4));
     }
 
-    private function getCreateArray($index ) {
+    private function getCreateArray($index)
+    {
         return [
-            'namespace' => 'qsnamespace' . $index,
+            'namespace' => 'qsnamespace'.$index,
             'backend' => 'someQueryserviceBackend',
         ];
     }
-
 }

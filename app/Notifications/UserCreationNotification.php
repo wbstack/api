@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Lang;
 class UserCreationNotification extends Notification
 {
     /**
-     * The email verification token
+     * The email verification token.
      *
      * @var string
      */
@@ -59,17 +59,17 @@ class UserCreationNotification extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        /**
+        /*
          * This is another point in Laravel where the default expectation of the UI living within the control of Laravel
          * bites us a bit.
          * Ideally we would be able to have the route password.reset etc actually direct to the UI VUE route
          * Then we could use the ResetPassword Notification notification too...
          * TODO this is now duplicated in a few notifications.... TODO switch on ENV instead?
          */
-        if( config('app.url') === 'http://localhost' ) {
-            $verifyEmailLink = 'http://localhost:8081/emailVerification/' . $this->token;
+        if (config('app.url') === 'http://localhost') {
+            $verifyEmailLink = 'http://localhost:8081/emailVerification/'.$this->token;
         } else {
-            $verifyEmailLink = 'https://wbstack.com/emailVerification/' . $this->token;
+            $verifyEmailLink = 'https://wbstack.com/emailVerification/'.$this->token;
         }
 
         return (new MailMessage)

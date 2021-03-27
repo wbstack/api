@@ -59,7 +59,7 @@ class MediawikiUpdate extends Job
         $wikidb = WikiDb::where($this->selectCol, $this->selectValue)
             ->select('wiki_dbs.*') // Needed to avoid confusing the update later?! =o https://stackoverflow.com/a/56141702/4746236
             ->leftJoin('wikis', 'wiki_id', '=', 'wikis.id')
-            ->whereNull( 'wikis.deleted_at')
+            ->whereNull('wikis.deleted_at')
             ->firstOrFail();
 
         // Make sure the wikidb is at the expected version
@@ -70,7 +70,8 @@ class MediawikiUpdate extends Job
                     'At: '.$wikidb->version.' Expected: '.$this->from
                 )
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
 
         $wiki = $wikidb->wiki;
@@ -82,7 +83,7 @@ class MediawikiUpdate extends Job
             CURLOPT_URL => 'http://'.$this->targetBackendHost.'-app-backend/w/api.php?action=wbstackUpdate&format=json',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
-            CURLOPT_TIMEOUT => 60*5,// Longish timeout for such things?
+            CURLOPT_TIMEOUT => 60 * 5, // Longish timeout for such things?
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_HTTPHEADER => [
@@ -97,7 +98,8 @@ class MediawikiUpdate extends Job
             $this->fail(
                 new \RuntimeException('curl error for '.$wikiDomain.': '.$err)
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
 
         curl_close($curl);
@@ -107,10 +109,10 @@ class MediawikiUpdate extends Job
 
         // Look for "Done in" in the response to see success...
         // This is normally the last line of update.php output
-        $success = strstr( end($response['output']), "Done in " ) && $response['return'] == 0;
+        $success = strstr(end($response['output']), 'Done in ') && $response['return'] == 0;
 
         // Update the DB version if successfull
-        if ( $success ) {
+        if ($success) {
             $wikidb->version = $this->to;
             $wikidb->save();
             // TODO update mw verison (so backend requests go to the right place?)
@@ -123,14 +125,15 @@ class MediawikiUpdate extends Job
         echo json_encode($response['script']).PHP_EOL;
         echo json_encode($response['return']).PHP_EOL;
         echo json_encode($wikiDomain).PHP_EOL;
-        echo json_encode("success: " . $success).PHP_EOL;
+        echo json_encode('success: '.$success).PHP_EOL;
 
         // Exception if really bad
-        if (!$success) {
+        if (! $success) {
             $this->fail(
                 new \RuntimeException('wbstackUpdate call for '.$wikiDomain.' was not successful:'.$rawResponse)
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
     }
 }

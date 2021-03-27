@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Backend;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class QsController extends Controller
 {
@@ -16,7 +16,6 @@ class QsController extends Controller
         $returnCollection = [];
 
         DB::transaction(function () use (&$notDoneBatches, &$batches, &$returnCollection) {
-
             $notDoneBatches = \App\QsBatch::where('done', 0)->with(['wiki', 'wiki.wikiQueryserviceNamespace'])->get();
 
             // Get ID of the latest batch that we have created (or 0)
@@ -35,8 +34,8 @@ class QsController extends Controller
             $lastEventId = 0;
             foreach ($events as $event) {
                 if (
-                    $event->namespace == 120 ||// item
-                    $event->namespace == 122 ||// property
+                    $event->namespace == 120 || // item
+                    $event->namespace == 122 || // property
                     $event->namespace == 146// lexeme
                 ) {
                     $wikiBatchesEntities[$event->wiki_id][] = $event->title;

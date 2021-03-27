@@ -2,9 +2,9 @@
 
 namespace App\Exceptions;
 
-use \Throwable;
 use GlueDev\Laravel\Stackdriver\StackdriverExceptionHandler;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -36,5 +36,4 @@ class Handler extends ExceptionHandler
         StackdriverExceptionHandler::report($throwable);
         parent::report($throwable);
     }
-
 }

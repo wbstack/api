@@ -49,7 +49,8 @@ class MediawikiInit extends Job
             $this->fail(
                 new \RuntimeException('curl error for '.$this->wikiDomain.': '.$err)
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
 
         curl_close($curl);
@@ -61,7 +62,8 @@ class MediawikiInit extends Job
             $this->fail(
                 new \RuntimeException('wbstackInit call for '.$this->wikiDomain.' was not successful:'.$rawResponse)
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
         // Otherwise there was success (and we could get the userId if we wanted...
     }

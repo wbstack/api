@@ -63,10 +63,12 @@ class ProvisionWikiDbJob extends Job
         $this->maxFree = $maxFree;
     }
 
-    private function doesMaxFreeSayWeShouldStop(){
-        $wikiDbCondition = ['wiki_id' => null,'version' => $this->newSqlFile];
+    private function doesMaxFreeSayWeShouldStop()
+    {
+        $wikiDbCondition = ['wiki_id' => null, 'version' => $this->newSqlFile];
         $unassignedDbs = WikiDb::where($wikiDbCondition)->count();
         $toCreate = $this->maxFree - $unassignedDbs;
+
         return $toCreate === 0;
     }
 
@@ -76,14 +78,15 @@ class ProvisionWikiDbJob extends Job
     public function handle()
     {
         // If the job is only meant to create so many DBs, then make sure we don't create too many.
-        if( $this->maxFree && $this->doesMaxFreeSayWeShouldStop() ){
+        if ($this->maxFree && $this->doesMaxFreeSayWeShouldStop()) {
             return;
         }
 
         $conn = DB::connection('mw');
-        if (!$conn instanceof \Illuminate\Database\Connection) {
+        if (! $conn instanceof \Illuminate\Database\Connection) {
             $this->fail(new \RuntimeException('Must be run on a PDO based DB connection'));
-            return;//safegaurd
+
+            return; //safegaurd
         }
         $pdo = $conn->getPdo();
 
@@ -109,7 +112,8 @@ class ProvisionWikiDbJob extends Job
                 $this->fail(
                     new \RuntimeException('Failed to create database with dbname: '.$this->dbName)
                 );
-                return;//safegaurd
+
+                return; //safegaurd
             }
         } else {
             // Default to mediawiki
@@ -119,7 +123,8 @@ class ProvisionWikiDbJob extends Job
             $this->fail(
                 new \RuntimeException('Failed to use database with dbname: '.$this->dbName)
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
 
         // GRANT THE USER ACCESS TO THE DB
@@ -129,7 +134,8 @@ class ProvisionWikiDbJob extends Job
             $this->fail(
                 new \RuntimeException('Failed to grant user: '.$this->dbUser)
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
         // GRANT the user access to see slave status
         // GRANT REPLICATION CLIENT ON *.* TO 'mwu_36be7164b0'@'%'
@@ -137,7 +143,8 @@ class ProvisionWikiDbJob extends Job
             $this->fail(
                 new \RuntimeException('Failed to grant user: '.$this->dbUser)
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
 
         // ADD THE TABLES
@@ -157,7 +164,8 @@ class ProvisionWikiDbJob extends Job
                 $this->fail(
                     new \RuntimeException('SQL execution failed for prefix '.$this->prefix.' SQL part: '.$part)
                 );
-                return;//safegaurd
+
+                return; //safegaurd
             }
         }
 
@@ -176,5 +184,4 @@ class ProvisionWikiDbJob extends Job
           'prefix' => $this->prefix,
       ]);
     }
-
 }

@@ -26,6 +26,7 @@ class Get extends Command
             ->first();
 
         $this->line($result->toJson(JSON_PRETTY_PRINT));
+
         return 0;
     }
 }

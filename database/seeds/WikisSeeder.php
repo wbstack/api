@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 
 class WikisSeeder extends Seeder
 {
-
     public function run()
     {
         // Just create one for now
@@ -35,5 +34,4 @@ class WikisSeeder extends Seeder
             'wiki_id' => $wiki->id,
         ]);
     }
-
 }

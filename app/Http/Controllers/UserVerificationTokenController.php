@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use Illuminate\Http\Request;
-use App\UserVerificationToken;
 use App\Jobs\UserVerificationCreateTokenAndSendJob;
+use App\User;
+use App\UserVerificationToken;
+use Illuminate\Http\Request;
 
 /**
- * Verification of user emails
+ * Verification of user emails.
  */
 class UserVerificationTokenController extends Controller
 {
@@ -25,6 +25,7 @@ class UserVerificationTokenController extends Controller
             // User already verified
             $res['success'] = true;
             $res['message'] = 'Already Verified!';
+
             return response($res);
         }
 
@@ -34,6 +35,7 @@ class UserVerificationTokenController extends Controller
 
         $res['success'] = true;
         $res['message'] = 'Successfully Verified!';
+
         return response($res);
     }
 
@@ -44,15 +46,16 @@ class UserVerificationTokenController extends Controller
         if ($user->verified) {
             $res['success'] = true;
             $res['message'] = 'Already verified';
+
             return response($res);
         }
 
         // TODO why is this handle? Why not queue?
-        ( UserVerificationCreateTokenAndSendJob::newForReverification( $user ) )->handle();
+        (UserVerificationCreateTokenAndSendJob::newForReverification($user))->handle();
 
         $res['success'] = true;
         $res['message'] = 'Email sent!';
-        return response($res);
 
+        return response($res);
     }
 }

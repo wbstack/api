@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\EventPageUpdate
+ * App\EventPageUpdate.
  *
  * @property int $id
  * @property int $wiki_id

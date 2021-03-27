@@ -9,7 +9,7 @@
 // GET
 $router->get(
     'healthz',
-    function() {
+    function () {
         return 'It\'s Alive';
     }
 );

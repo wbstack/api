@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\User;
-use App\Jobs\UserCreateJob;
-use Illuminate\Http\Request;
-use App\Jobs\InvitationDeleteJob;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Validator;
+use App\Jobs\InvitationDeleteJob;
+use App\Jobs\UserCreateJob;
 use App\Jobs\UserVerificationCreateTokenAndSendJob;
+use App\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
@@ -34,7 +34,7 @@ class RegisterController extends Controller
             if ($request->input('invite')) {
                 ( new InvitationDeleteJob($request->input('invite')) )->handle();
             }
-            ( UserVerificationCreateTokenAndSendJob::newForAccountCreation($user) )->handle();
+            (UserVerificationCreateTokenAndSendJob::newForAccountCreation($user))->handle();
         });
 
         if ($user === null) {

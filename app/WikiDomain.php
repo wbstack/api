@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\WikiDomain
+ * App\WikiDomain.
  *
  * @property int $id
  * @property string $domain

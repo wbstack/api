@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\QsBatch
+ * App\QsBatch.
  *
  * @property int $id
  * @property int $eventFrom

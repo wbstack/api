@@ -3,19 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\KubernetesIngressCreate;
+use App\Jobs\MediawikiInit;
+use App\Jobs\ProvisionQueryserviceNamespaceJob;
+use App\Jobs\ProvisionWikiDbJob;
+use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
 use App\WikiDomain;
 use App\WikiManager;
 use App\WikiSetting;
-use App\Jobs\MediawikiInit;
-use App\Jobs\ProvisionWikiDbJob;
-use App\Jobs\ProvisionQueryserviceNamespaceJob;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\QueryserviceNamespace;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class WikiController extends Controller
 {
@@ -24,8 +24,8 @@ class WikiController extends Controller
         $user = $request->user();
 
         $submittedDomain = $request->input('domain');
-        $isSubdomain = preg_match( '/.wiki\.opencura\.com$/', $submittedDomain );
-        if ( $isSubdomain ) {
+        $isSubdomain = preg_match('/.wiki\.opencura\.com$/', $submittedDomain);
+        if ($isSubdomain) {
             // .wiki.opencura.com is 18 characters long
             // if we want at least 5 chars for the site sub domain
             // that is 23 length
@@ -46,7 +46,7 @@ class WikiController extends Controller
         $dbAssignment = null;
         // TODO create with some sort of owner etc?
         DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain) {
-            $wikiDbCondition = ['wiki_id'=>null,'version'=>'mw1.35-wbs1'];
+            $wikiDbCondition = ['wiki_id'=>null, 'version'=>'mw1.35-wbs1'];
 
             // Fail if there is not enough storage ready
             if (WikiDb::where($wikiDbCondition)->count() == 0) {
@@ -92,21 +92,21 @@ class WikiController extends Controller
 
             // If we are local, the dev environment wont be able to run these jobs yet, so end this closure early.
             // TODO maybe send different jobs instead? or do this in the jobs?
-            if( App::environment() === 'local' ) {
+            if (App::environment() === 'local') {
                 return;
             }
 
             // TODO maybe always make these run in a certain order..?
             $this->dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
             // Only dispatch a job to add a k8s ingress IF we are using a custom domain...
-            if (!$isSubdomain) {
-                $this->dispatch(new KubernetesIngressCreate( $wiki->id, $wiki->domain ));
+            if (! $isSubdomain) {
+                $this->dispatch(new KubernetesIngressCreate($wiki->id, $wiki->domain));
             }
         });
 
         // opportunistic dispatching of jobs to make sure storage pools are topped up
-        $this->dispatch(new ProvisionWikiDbJob(null,null,10));
-        $this->dispatch(new ProvisionQueryserviceNamespaceJob(null,10));
+        $this->dispatch(new ProvisionWikiDbJob(null, null, 10));
+        $this->dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
 
         $res['success'] = true;
         $res['message'] = 'Success!';
@@ -119,7 +119,8 @@ class WikiController extends Controller
         return response($res);
     }
 
-    public function delete(Request $request) {
+    public function delete(Request $request)
+    {
         $user = $request->user();
 
         $request->validate([
@@ -130,13 +131,13 @@ class WikiController extends Controller
         $userId = $user->id;
 
         // Check that the requesting user manages the wiki
-        if( WikiManager::where( 'user_id', $userId )->where( 'wiki_id', $wikiId )->count() !== 1 ) {
+        if (WikiManager::where('user_id', $userId)->where('wiki_id', $wikiId)->count() !== 1) {
             // The deletion was requested by a user that does not manage the wiki
             return response()->json('Unauthorized', 401);
         }
 
         // Delete the wiki
-        Wiki::find( $wikiId )->delete();
+        Wiki::find($wikiId)->delete();
 
         // Return a success
         return response()->json('Success', 200);

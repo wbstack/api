@@ -8,7 +8,7 @@ class InvitationCreateJob extends Job
 {
     private $code;
 
-    public function __construct( string $code)
+    public function __construct(string $code)
     {
         $this->code = strtolower($code);
     }
@@ -18,9 +18,10 @@ class InvitationCreateJob extends Job
         $test = Invitation::where('code', $this->code)->first();
         if ($test) {
             $this->fail(
-                new \RuntimeException( 'Invitation code already existed' )
+                new \RuntimeException('Invitation code already existed')
             );
-            return;//safegaurd
+
+            return; //safegaurd
         }
 
         return Invitation::create([

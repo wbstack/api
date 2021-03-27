@@ -6,10 +6,10 @@ use App\User;
 use App\Wiki;
 use App\WikiManager;
 use App\WikiSetting;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\Routes\Traits\PostRequestNeedAuthentication;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class SettingUpdateTest extends TestCase
 {
@@ -48,31 +48,31 @@ class SettingUpdateTest extends TestCase
           ->assertStatus(401);
     }
 
-    public function provideValidSettings() {
-        yield [ 'wgDefaultSkin', 'vector', 'vector' ];
-        yield [ 'wwExtEnableConfirmAccount', '1', '1' ];
-        yield [ 'wwExtEnableConfirmAccount', '0', '0' ];
-        yield [ 'wwWikibaseStringLengthString', '1000', '1000' ];
-        yield [ 'wwWikibaseStringLengthMonolingualText', '1000', '1000' ];
-        yield [ 'wwWikibaseStringLengthMultilang', '1000', '1000' ];
-        yield [ 'wikibaseFedPropsEnable', '1', '1' ];
-        yield [ 'wikibaseFedPropsEnable', '0', '0' ];
+    public function provideValidSettings()
+    {
+        yield ['wgDefaultSkin', 'vector', 'vector'];
+        yield ['wwExtEnableConfirmAccount', '1', '1'];
+        yield ['wwExtEnableConfirmAccount', '0', '0'];
+        yield ['wwWikibaseStringLengthString', '1000', '1000'];
+        yield ['wwWikibaseStringLengthMonolingualText', '1000', '1000'];
+        yield ['wwWikibaseStringLengthMultilang', '1000', '1000'];
+        yield ['wikibaseFedPropsEnable', '1', '1'];
+        yield ['wikibaseFedPropsEnable', '0', '0'];
 
-        $emptyArrays =json_encode( ['items' => [], 'properties'=> []] );
-        yield [ 'wikibaseManifestEquivEntities', $emptyArrays, $emptyArrays ];
-        
-        $somePropsNoItems = json_encode( [ 'properties' => [ 'P31' => 'P1' ], 'items' => []] );
-        yield [ 'wikibaseManifestEquivEntities', $somePropsNoItems, $somePropsNoItems ];
-        
-        $validProps = json_encode( [ 'properties' => [ 'P31' => 'P1' ], 'items' => [ 'Q1' => 'Q1' ]] );
-        yield [ 'wikibaseManifestEquivEntities', $validProps , $validProps ];
+        $emptyArrays = json_encode(['items' => [], 'properties'=> []]);
+        yield ['wikibaseManifestEquivEntities', $emptyArrays, $emptyArrays];
 
+        $somePropsNoItems = json_encode(['properties' => ['P31' => 'P1'], 'items' => []]);
+        yield ['wikibaseManifestEquivEntities', $somePropsNoItems, $somePropsNoItems];
+
+        $validProps = json_encode(['properties' => ['P31' => 'P1'], 'items' => ['Q1' => 'Q1']]);
+        yield ['wikibaseManifestEquivEntities', $validProps, $validProps];
     }
 
     /**
      * @dataProvider provideValidSettings
      */
-    public function testValidSetting( $settingName, $settingValue, $expectedStored )
+    public function testValidSetting($settingName, $settingValue, $expectedStored)
     {
         $user = factory(User::class)->create(['verified' => true]);
         $wiki = factory(Wiki::class, 'nodb')->create();
@@ -86,39 +86,40 @@ class SettingUpdateTest extends TestCase
             ])
             ->assertStatus(200);
 
-          $this->assertSame(
+        $this->assertSame(
             $expectedStored,
               WikiSetting::whereWikiId($wiki->id)->whereName($settingName)->first()->value
           );
     }
 
-    public function provideValidSettingsBadValues() {
-        yield [ 'wgDefaultSkin', 'foo' ];
-        yield [ 'wwExtEnableConfirmAccount', 'foo' ];
-        yield [ 'wwWikibaseStringLengthString', 12 ];
-        yield [ 'wwWikibaseStringLengthMonolingualText', 12 ];
-        yield [ 'wwWikibaseStringLengthMultilang', 12 ];
-        yield [ 'wikibaseFedPropsEnable', 'foo' ];
-        yield [ 'wikibaseManifestEquivEntities', 'foo' ];
-        
+    public function provideValidSettingsBadValues()
+    {
+        yield ['wgDefaultSkin', 'foo'];
+        yield ['wwExtEnableConfirmAccount', 'foo'];
+        yield ['wwWikibaseStringLengthString', 12];
+        yield ['wwWikibaseStringLengthMonolingualText', 12];
+        yield ['wwWikibaseStringLengthMultilang', 12];
+        yield ['wikibaseFedPropsEnable', 'foo'];
+        yield ['wikibaseManifestEquivEntities', 'foo'];
+
         // props without mapping
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1', 'P2' ], 'items' => []] ) ];
+        yield ['wikibaseManifestEquivEntities', json_encode(['properties' => ['P1', 'P2'], 'items' => []])];
         // invalid property id (right side)
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1' => 'P2', 'P3' => 'aa' ], 'items' => []] ) ];
+        yield ['wikibaseManifestEquivEntities', json_encode(['properties' => ['P1' => 'P2', 'P3' => 'aa'], 'items' => []])];
         // invalid property id (left side)
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1' => 'P2', 'aa' => 'P3' ], 'items' => []] ) ];
+        yield ['wikibaseManifestEquivEntities', json_encode(['properties' => ['P1' => 'P2', 'aa' => 'P3'], 'items' => []])];
         // invalid entity type
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'foo' => []] ) ];
-        // mismatch entitytypes 
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1' => 'P2' ], 'items' => [ 'P10' => 'Q2' ]] ) ];
-        // all entities should be of the same type 
-        yield [ 'wikibaseManifestEquivEntities', json_encode( [ 'properties' => [ 'P1' => 'P2' ], 'items' => [ 'Q2' => 'Q2', 'P2' => 'P2' ]] ) ];
+        yield ['wikibaseManifestEquivEntities', json_encode(['foo' => []])];
+        // mismatch entitytypes
+        yield ['wikibaseManifestEquivEntities', json_encode(['properties' => ['P1' => 'P2'], 'items' => ['P10' => 'Q2']])];
+        // all entities should be of the same type
+        yield ['wikibaseManifestEquivEntities', json_encode(['properties' => ['P1' => 'P2'], 'items' => ['Q2' => 'Q2', 'P2' => 'P2']])];
     }
 
     /**
      * @dataProvider provideValidSettingsBadValues
      */
-    public function testValidSettingBadValues( $settingName, $settingValue )
+    public function testValidSettingBadValues($settingName, $settingValue)
     {
         $user = factory(User::class)->create(['verified' => true]);
 
@@ -131,5 +132,4 @@ class SettingUpdateTest extends TestCase
             ->assertStatus(422)
             ->assertJsonStructure(['errors' => ['value']]);
     }
-
 }

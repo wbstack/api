@@ -187,7 +187,7 @@ return [
 
         PercyMamedy\LaravelDevBooter\ServiceProvider::class,
 
-        Intervention\Image\ImageServiceProvider::class
+        Intervention\Image\ImageServiceProvider::class,
     ],
 
     // TODO maybe this should only be in dev?

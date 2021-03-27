@@ -52,6 +52,7 @@ class Dispatch extends Command
             dispatch($job);
             $this->info("Successfully Dispatch {$class} ");
         }
+
         return 0;
     }
 }

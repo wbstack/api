@@ -2,14 +2,14 @@
 
 namespace App\Console;
 
+use App\Jobs\ExpireOldUserVerificationTokensJob;
+use App\Jobs\ProvisionQueryserviceNamespaceJob;
+use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\PruneEventPageUpdatesTable;
 use App\Jobs\PruneQueryserviceBatchesTable;
-use Illuminate\Console\Scheduling\Schedule;
-use App\Jobs\ProvisionWikiDbJob;
-use App\Jobs\ProvisionQueryserviceNamespaceJob;
-use App\Jobs\ExpireOldUserVerificationTokensJob;
-use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Jobs\SandboxCleanupJob;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
@@ -25,8 +25,8 @@ class Kernel extends ConsoleKernel
         // This will create at most 1 new entry for each per minute...
         // There are also jobs currently scheduled in Controllers that use up resources from these pools
         // for more opportunistic storage repopulation
-        $schedule->job(new ProvisionWikiDbJob(null,null,10))->everyMinute();
-        $schedule->job(new ProvisionQueryserviceNamespaceJob(null,10))->everyMinute();
+        $schedule->job(new ProvisionWikiDbJob(null, null, 10))->everyMinute();
+        $schedule->job(new ProvisionQueryserviceNamespaceJob(null, 10))->everyMinute();
 
         // Slowly cleanup some tables
         $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();

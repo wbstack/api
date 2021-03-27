@@ -3,8 +3,6 @@
 use App\WikiDb;
 use Illuminate\Database\Seeder;
 
-
-
 class WikiDbsSeeder extends Seeder
 {
     const MW_VERSION = 'mw1.35-wbs1';
@@ -17,14 +15,14 @@ class WikiDbsSeeder extends Seeder
         WikiDb::create($this->getCreateArray(4));
     }
 
-    private function getCreateArray($index ) {
+    private function getCreateArray($index)
+    {
         return [
-            'name' => 'dbname' . $index,
-            'user' => 'dbuser' . $index,
-            'password' => 'dbpassword' . $index,
+            'name' => 'dbname'.$index,
+            'user' => 'dbuser'.$index,
+            'password' => 'dbpassword'.$index,
             'version' => self::MW_VERSION,
-            'prefix' => 'dbprefix' . $index,
+            'prefix' => 'dbprefix'.$index,
         ];
     }
-
 }

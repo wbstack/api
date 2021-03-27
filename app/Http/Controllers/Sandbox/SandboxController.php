@@ -1,15 +1,11 @@
 <?php
 
-
 namespace App\Http\Controllers\Sandbox;
 
-
 use App\Http\Controllers\Controller;
-use App\Jobs\KubernetesIngressCreate;
-use App\Jobs\MediawikiInit;
-use App\Jobs\ProvisionWikiDbJob;
-use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\MediawikiSandboxLoadData;
+use App\Jobs\ProvisionQueryserviceNamespaceJob;
+use App\Jobs\ProvisionWikiDbJob;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
@@ -17,18 +13,17 @@ use App\WikiDomain;
 use App\WikiSetting;
 use Hackzilla\PasswordGenerator\Generator\HumanPasswordGenerator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class SandboxController extends Controller {
-
+class SandboxController extends Controller
+{
     const WIKIBASE_DOMAIN = 'wikibase.cloud';
     const MW_VERSION = 'mw1.35-wbs1';
     const DOT = '.';
 
-    public function create( Request $request)
+    public function create(Request $request)
     {
         $validation = [
             'recaptcha' => 'required|captcha',
@@ -42,7 +37,7 @@ class SandboxController extends Controller {
 
         $wiki = null;
         DB::transaction(function () use (&$wiki, $domain) {
-            $wikiDbCondition = ['wiki_id'=>null,'version'=> self::MW_VERSION ];
+            $wikiDbCondition = ['wiki_id'=>null, 'version'=> self::MW_VERSION];
 
             // Fail if there is not enough storage ready
             if (WikiDb::where($wikiDbCondition)->count() == 0) {
@@ -53,7 +48,7 @@ class SandboxController extends Controller {
             }
 
             $wiki = Wiki::create([
-                'sitename' => "Sandbox",
+                'sitename' => 'Sandbox',
                 'domain' => strtolower($domain),
             ]);
 
@@ -90,13 +85,13 @@ class SandboxController extends Controller {
 
         // For now only schedule this job for 1 dataSet type
         // As the extension API is dumb currently
-        if($dataSet==='library'){
-            $this->dispatch(new MediawikiSandboxLoadData($domain,$dataSet));
+        if ($dataSet === 'library') {
+            $this->dispatch(new MediawikiSandboxLoadData($domain, $dataSet));
         }
 
         // opportunistic dispatching of jobs to make sure storage pools are topped up
-        $this->dispatch(new ProvisionWikiDbJob(null,null,10));
-        $this->dispatch(new ProvisionQueryserviceNamespaceJob(null,10));
+        $this->dispatch(new ProvisionWikiDbJob(null, null, 10));
+        $this->dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
 
         $res['success'] = true;
         $res['message'] = 'Success!';
@@ -111,9 +106,10 @@ class SandboxController extends Controller {
     private function generateUnusedDomain()
     {
         $domain = $this->generateDomain();
-        if(!WikiDomain::whereDomain($domain)->first()){
+        if (! WikiDomain::whereDomain($domain)->first()) {
             return $domain;
         }
+
         return $this->generateUnusedDomain();
     }
 
@@ -122,12 +118,12 @@ class SandboxController extends Controller {
         $generator = new HumanPasswordGenerator();
 
         $generator
-        ->setWordList(__DIR__ . '/words')
+        ->setWordList(__DIR__.'/words')
         ->setWordCount(3)
         ->setWordSeparator('-');
 
         $password = $generator->generatePassword();
 
-        return $password . self::DOT . self::WIKIBASE_DOMAIN;
+        return $password.self::DOT.self::WIKIBASE_DOMAIN;
     }
 }

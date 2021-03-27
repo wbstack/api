@@ -55,6 +55,7 @@ class Handle extends Command
             $job->handle();
             $this->info("Successfully Handled {$class} ");
         }
+
         return 0;
     }
 }

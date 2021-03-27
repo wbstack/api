@@ -5,13 +5,13 @@ namespace App;
 use App\Notifications\ResetPasswordNotification;
 use http\Exception\RuntimeException;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Laravel\Cashier\Billable;
 use Laravel\Passport\HasApiTokens;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
- * App\User
+ * App\User.
  *
  * @property int $id
  * @property string $email
@@ -90,12 +90,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasVerifiedEmail()
     {
-        return (bool)$this->verified;
+        return (bool) $this->verified;
     }
 
     public function markEmailAsVerified()
     {
         $this->verified = 1;
+
         return true;
     }
 
@@ -113,6 +114,4 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->email;
     }
-
-
 }

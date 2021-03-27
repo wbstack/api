@@ -8,13 +8,11 @@ use Illuminate\Auth\Middleware\Authenticate as Middleware;
 
 class Authenticate extends Middleware
 {
-
     public function handle($request, Closure $next, ...$guards)
     {
-        try{
+        try {
             $this->authenticate($request, $guards);
-        }
-        catch( AuthenticationException $e ) {
+        } catch (AuthenticationException $e) {
             // The "Unauthenticated." message is relied on by the UI to detect logged out state and cleanup its data
             // If this changes then the UI also needs to change..
             return response()->json([

@@ -5,7 +5,6 @@ use Illuminate\Database\Seeder;
 
 class InvitationsSeeder extends Seeder
 {
-
     public function run()
     {
         Invitation::create(['code' => 'invite1']);
@@ -13,5 +12,4 @@ class InvitationsSeeder extends Seeder
         Invitation::create(['code' => 'invite3']);
         factory(App\Invitation::class, 3)->create();
     }
-
 }

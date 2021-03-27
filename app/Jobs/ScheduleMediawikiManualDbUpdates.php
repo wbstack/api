@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\WikiDb;
 
 /**
- * TODO This job should be rewritten to generally be able to run a job across all currently running wikis
+ * TODO This job should be rewritten to generally be able to run a job across all currently running wikis.
  *
  * If you wanted to be wreckless and schedule for all of the wikis:
  * php artisan wbs-job:handle ScheduleMediawikiManualDbUpdates version,mw1.33-wbs3,mw1.33-wbs3,mw1.33-wbs4 ,
@@ -43,12 +43,12 @@ class ScheduleMediawikiManualDbUpdates extends Job
     public function handle()
     {
         // Get the Wikidbs we are operating on
-		// TODO one day this will want to be batched?
+        // TODO one day this will want to be batched?
         $wikidbs = WikiDb::where($this->selectCol, $this->selectValue)->get();
 
         // And schedule a job for each of them
-        foreach( $wikidbs as $wikidb ) {
-			dispatch(new MediawikiManualDbUpdate('id', $wikidb->id, $this->from, $this->to));
-		}
+        foreach ($wikidbs as $wikidb) {
+            dispatch(new MediawikiManualDbUpdate('id', $wikidb->id, $this->from, $this->to));
+        }
     }
 }

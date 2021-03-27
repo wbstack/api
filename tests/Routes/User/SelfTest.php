@@ -3,10 +3,10 @@
 namespace Tests\Routes\User;
 
 use App\User;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\Routes\Traits\PostRequestNeedAuthentication;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class SelfTest extends TestCase
 {
