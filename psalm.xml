@@ -10,6 +10,7 @@
         <directory name="app"/>
         <ignoreFiles>
             <directory name="vendor"/>
+            <file name="app/Providers/BroadcastServiceProvider.php"/>
         </ignoreFiles>
     </projectFiles>
 <plugins><pluginClass class="Psalm\LaravelPlugin\Plugin"/></plugins></psalm>
