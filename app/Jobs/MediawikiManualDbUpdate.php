@@ -73,8 +73,7 @@ class MediawikiManualDbUpdate extends Job
         $prefixedSql = str_replace('<<prefix>>', $wikidb->prefix, $rawSql);
         $sqlParts = explode("\n\n", $prefixedSql);
 
-        // Connect to the mediawiki server
-        $pdo = DB::connection('mw')->getPdo();
+        $pdo = $this->getMediaWikiPDO();
 
         // Use the create database
         if ($pdo->exec('USE '.$wikidb->name) === false) {
@@ -102,5 +101,15 @@ class MediawikiManualDbUpdate extends Job
         $wikidb->save();
 
         // TODO log? Do something?
+    }
+
+    private function getMediaWikiPDO() {
+        $connection = DB::connection('mw');
+        if (!$connection instanceof \Illuminate\Database\Connection) {
+            $this->fail(new \RuntimeException('Must be run on a PDO based DB connection'));
+            return;//safegaurd
+        }
+        /** @psalm-suppress UndefinedInterfaceMethod */
+        return $connection->getPdo();
     }
 }

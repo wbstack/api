@@ -7,6 +7,7 @@ use App\WikiSetting;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
+use Illuminate\Contracts\Filesystem\Cloud;
 
 class WikiLogoController extends Controller
 {
@@ -35,8 +36,12 @@ class WikiLogoController extends Controller
             return response()->json('Unauthorized', 401);
         }
 
-        // Get the disk we use to store logos
+        // Get the cloudy disk we use to store logos
         $disk = Storage::disk('gcs-public-static');
+        if ( !$disk instanceof Cloud ) {
+            return response()->json('Invalid storage (not cloud)', 500);
+        }
+
         // Get a directory for storing all things relating to this site
         // TODO should be in the site model? maybe?
         $siteDir = md5( $wikiId . md5( $wikiId ) );
