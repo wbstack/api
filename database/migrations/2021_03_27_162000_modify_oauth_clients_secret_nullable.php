@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
  * For passport public clients, not that we are using this feature right now...
  * https://github.com/laravel/passport/blob/66b9088993f1be9a4a95129b61dca951e04223ff/UPGRADE.md#public-clients
  */
-class ModifyWikiSettingsValueLength extends Migration
+class ModifyOauthClientsSecretNullable extends Migration
 {
     public function up()
     {
