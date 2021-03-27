@@ -28,7 +28,7 @@ class UserVerificationTokenController extends Controller
             return response($res);
         }
 
-        $user->verified = true;
+        $user->verified = 1;
         $user->save();
         $token->delete();
 
