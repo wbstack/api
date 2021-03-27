@@ -10,26 +10,6 @@ use Illuminate\Http\Request;
 class WikiSettingController extends Controller
 {
 
-    /**
-     * An map of old setting names used externally to the internal names we now use.
-     * See normalizeSetting
-     * Use of the old names (the keys here) should be deprecated
-     * We can remove this once we update the UI to not used them any more.
-     *
-     * FIXME: this list probably also needs to be kept in sync with the one in Wiki.php model
-     *
-     * @var string[]
-     */
-    static $oldSettingMap = [
-        'skin' => 'wgDefaultSkin',
-        'extConfirmAccount' => 'wwExtEnableConfirmAccount',
-        'wikibaseStringLengthString' => 'wwWikibaseStringLengthString',
-        'wikibaseStringLengthMonolingualText' => 'wwWikibaseStringLengthMonolingualText',
-        'wikibaseStringLengthMultilang' => 'wwWikibaseStringLengthMultilang',
-        'wikibaseFedPropsEnable' => 'wikibaseFedPropsEnable',
-        'wikibaseManifestEquivEntities' => 'wikibaseManifestEquivEntities',
-        ];
-
     private function getSettingValidations() {
         return [
             'wgDefaultSkin' => [ 'required', 'string', 'in:vector,modern,timeless' ],
@@ -42,19 +22,6 @@ class WikiSettingController extends Controller
         ];
     }
 
-    /**
-     * Historically the setting names submitted to the API and actually stored were different.
-     * We want to standardize these to make things easier to work with.
-     * (especially now we are also retrieving these settings)
-     * So now accept both the old external names and internal names, but internally convert to the internal names.
-     */
-    private function normalizeSetting( $setting ) {
-        if ( array_key_exists( $setting, self::$oldSettingMap ) ) {
-            $setting = self::$oldSettingMap[$setting];
-        }
-        return $setting;
-    }
-
     public function update( $setting, Request $request)
     {
         $settingValidations = $this->getSettingValidations();
@@ -62,9 +29,9 @@ class WikiSettingController extends Controller
         $request->validate([
             'wiki' => 'required|numeric',
             // Allow both internal and external setting names, see normalizeSetting
-            'setting' => 'required|string|in:' . implode( ',', array_unique( array_merge( array_keys( self::$oldSettingMap ), array_keys( $settingValidations ) ) ) ),
+            'setting' => 'required|string|in:' . implode( ',', array_keys( $settingValidations ) ),
         ]);
-        $settingName = $this->normalizeSetting( $request->input('setting') );
+        $settingName = $request->input('setting');
 
         $request->validate([ 'value' => $settingValidations[$settingName]]);
         $value = $request->input('value');
