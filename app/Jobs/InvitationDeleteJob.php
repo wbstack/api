@@ -20,7 +20,7 @@ class InvitationDeleteJob extends Job
     public function handle()
     {
         $invite = Invitation::where('code', $this->code)->first();
-        if (!$invite) {
+        if ($invite) {
             $invite->delete();
         } else {
             $this->fail(
