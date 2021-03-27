@@ -35,6 +35,7 @@ class KubernetesIngressCreate extends Job
 
         // Connection example from: https://github.com/maclof/kubernetes-client#using-a-service-account
         echo 'Creating k8s client' . PHP_EOL;
+
         $client = new Client([
             'master' => 'https://kubernetes.default.svc',
             'ca_cert' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
