@@ -1,9 +1,15 @@
 # api
 
-## 7x-1.0
+## 7x-1.0 - 28 March 2021
 
+Has migrations to run!
+
+- Update PHP from 7.3 to 7.4
 - First version using Laravel 7:
   - Env var `MAIL_DRIVER` changes to `MAIL_MAILER`
+- Updated code handling auth (`laravel/passport`)
+- Added `wwExtEnableWikibaseLexeme` as a public setting
+- Removed legacy wiki setting names
 
 ## 6x-1.9 - 27 March 2021
 
@@ -14,6 +20,8 @@
 - Add wgLogo to public settings
 
 ## 6x-1.7 - 25 March 2021
+
+Has migrations to run!
 
 - [Update `maclof/kubernetes-client` and thus `app/Jobs/KubernetesIngressCreate.php` (without testing)](https://github.com/wbstack/api/pull/28)
   - If something is wrong here this could have an impact on new wikis created with custom domains.
