@@ -13,7 +13,7 @@
         "firebase/php-jwt": "^5.0",
         "fruitcake/laravel-cors": "^2.0",
         "gluedev/laravel-stackdriver": "^0.2.2",
-        "guzzlehttp/guzzle": "^6.0",
+        "guzzlehttp/guzzle": "^7.3",
         "hackzilla/password-generator": "^1.5",
         "illuminate/mail": "^7.0",
         "illuminate/redis": "^7.0",
