@@ -56,9 +56,16 @@ class MediawikiInit extends Job
         curl_close($curl);
 
         $response = json_decode($rawResponse, true);
-        $response = $response['wbstackInit'];
 
-        if ($response['success'] == 0) {
+        if (!array_key_exists('wbstackInit', $response)) {
+            $this->fail(
+                new \RuntimeException('wbstackInit call for '.$this->wikiDomain.'. No wbstackInit key in response: '.$rawResponse)
+            );
+
+            return; //safegaurd
+        }
+
+        if ($response['wbstackInit']['success'] == 0) {
             $this->fail(
                 new \RuntimeException('wbstackInit call for '.$this->wikiDomain.' was not successful:'.$rawResponse)
             );
