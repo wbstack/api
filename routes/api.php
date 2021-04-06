@@ -35,6 +35,7 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
             $router->post('create', ['uses' => 'WikiController@create']);
             $router->post('delete', ['uses' => 'WikiController@delete']);
             $router->post('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
+            $router->post('name',['uses'=> 'WikiController@setName']);
             $router->post('logo/update', ['uses' => 'WikiLogoController@update']);
             $router->post('setting/{setting}/update', ['uses' => 'WikiSettingController@update']);
             // TODO should wiki managers really be here?

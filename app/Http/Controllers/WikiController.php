@@ -15,6 +15,7 @@ use App\WikiSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class WikiController extends Controller
@@ -169,5 +170,27 @@ class WikiController extends Controller
         $res['data'] = $wiki;
 
         return response($res);
+    }
+    // Set Name Done with Validation and Verification
+    public function setName(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'wiki' => ['required','integer'],
+            'name' => ['required','min:3','string']
+        ]);
+        if ($validator->fails()){
+            return $validator->errors();
+        }
+        $wikiQuery = Wiki::where('id',request('wiki'));
+        $wikiRes = $wikiQuery->get();
+        if ($wikiRes->isEmpty()) 
+            return response(['success'=>false,'error'=>"wiki doesn't exit in the database"]);
+        else
+        {
+            $res = $wikiQuery->update([
+                'sitename'=>request('name')
+            ]);
+            return response(['success'=>true,'updated_wiki_name'=>request('name')]);
+        }
     }
 }

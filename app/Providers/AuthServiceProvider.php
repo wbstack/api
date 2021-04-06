@@ -24,7 +24,14 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-
+        /**
+         * Added those passport routes for further documentation
+         * you can see laravel/passport offical docs
+         * to see the added routes run `docker-compose exec api php artisan route:list | grep oauth`
+         */
+        Passport::routes();
+        Passport::tokensExpireIn(now()->addDays(15));
+        Passport::refreshTokensExpireIn(now()->addDays(30));
         Passport::personalAccessTokensExpireIn(now()->addDays(30));
     }
 }
