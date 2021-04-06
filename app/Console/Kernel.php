@@ -37,9 +37,9 @@ class Kernel extends ConsoleKernel
         // TODO this should maybe only be run when sandbox as a whole is loaded?
         // TODO instead of using LOAD ROUTES, we should just have different modes?
         $schedule->job(new SandboxCleanupJob)->everyFifteenMinutes();
-        // activate this when you implement the best practice logout method 
-        // $schedule->command('passport:purge')->dailyAt('08:00');
 
+        // Fiverr: activate this when you implement the best practice logout method 
+        // $schedule->command('passport:purge')->dailyAt('08:00');
     }
 
     /**

@@ -123,18 +123,16 @@ class WikiController extends Controller
     public function delete(Request $request)
     {
         $user = $request->user();
+        $wikiId = $request->input('wiki');
 
         $request->validate([
             'wiki' => 'required|numeric',
         ]);
 
-        $wikiId = $request->input('wiki');
-        $userId = $user->id;
-
         // Check that the requesting user manages the wiki
-        if (WikiManager::where('user_id', $userId)->where('wiki_id', $wikiId)->count() !== 1) {
-            // The deletion was requested by a user that does not manage the wiki
-            return response()->json('Unauthorized', 401);
+        // TODO should be middleware?
+        if (WikiManager::where('user_id', $user->id)->where('wiki_id', $wikiId)->count() !== 1) {
+            return response()->json('Unauthorized', 403);
         }
 
         // Delete the wiki
@@ -148,17 +146,12 @@ class WikiController extends Controller
     public function getWikiDetailsForIdForOwner(Request $request)
     {
         $user = $request->user();
-
         $wikiId = $request->input('wiki');
 
-        // TODO general check to make sure current user can manage the wiki
-        // this should probably be middle ware?
-        // TODO only do 1 query where instead of 2?
-        $test = WikiManager::where('user_id', $user->id)
-      ->where('wiki_id', $wikiId)
-      ->first();
-        if (! $test) {
-            abort(403);
+        // Check that the requesting user manages the wiki
+        // TODO should be middleware?
+        if (WikiManager::where('user_id', $user->id)->where('wiki_id', $wikiId)->count() !== 1) {
+            return response()->json('Unauthorized', 403);
         }
 
         $wiki = Wiki::where('id', $wikiId)
@@ -171,26 +164,31 @@ class WikiController extends Controller
 
         return response($res);
     }
-    // Set Name Done with Validation and Verification
+
     public function setName(Request $request)
     {
-        $validator = Validator::make($request->all(),[
+        $request->validate([
             'wiki' => ['required','integer'],
             'name' => ['required','min:3','string']
         ]);
-        if ($validator->fails()){
-            return $validator->errors();
+
+        $user = $request->user();
+        $wikiId = $request->input('wiki');
+        $name = $request->input('name');
+
+        // Check that the requesting user manages the wiki
+        // TODO should be middleware?
+        if (WikiManager::where('user_id', $user->id)->where('wiki_id', $wikiId)->count() !== 1) {
+            return response()->json('Unauthorized', 403);
         }
-        $wikiQuery = Wiki::where('id',request('wiki'));
+
+        $wikiQuery = Wiki::where('id',$wikiId);
         $wikiRes = $wikiQuery->get();
-        if ($wikiRes->isEmpty()) 
-            return response(['success'=>false,'error'=>"wiki doesn't exit in the database"]);
-        else
-        {
-            $res = $wikiQuery->update([
-                'sitename'=>request('name')
-            ]);
-            return response(['success'=>true,'updated_wiki_name'=>request('name')]);
+        if ($wikiRes->isEmpty()) {
+            return response(['success'=>false,'error'=>"wiki doesn't exist in the database"]);
+        }else {
+            $wikiQuery->update(['sitename'=>$name]);
+            return response(['success'=>true,'updated_wiki_name'=>$name]);
         }
     }
 }
