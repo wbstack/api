@@ -10597,26 +10597,26 @@
         },
         {
             "name": "psalm/plugin-laravel",
-            "version": "v1.4.2",
+            "version": "v1.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/psalm/psalm-plugin-laravel.git",
-                "reference": "baf53624a2647a887eee3b43e87f4f44f64eb6e7"
+                "reference": "d00e50e15fa1ef85a55400084f679cc3eb70bd5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/psalm/psalm-plugin-laravel/zipball/baf53624a2647a887eee3b43e87f4f44f64eb6e7",
-                "reference": "baf53624a2647a887eee3b43e87f4f44f64eb6e7",
+                "url": "https://api.github.com/repos/psalm/psalm-plugin-laravel/zipball/d00e50e15fa1ef85a55400084f679cc3eb70bd5d",
+                "reference": "d00e50e15fa1ef85a55400084f679cc3eb70bd5d",
                 "shasum": ""
             },
             "require": {
-                "barryvdh/laravel-ide-helper": "^2.8.0",
+                "barryvdh/laravel-ide-helper": ">=2.8.0 <2.9.2",
                 "ext-simplexml": "*",
-                "illuminate/container": "5.8.* || ^6.0 || ^7.0 || ^8.0",
-                "illuminate/contracts": "5.8.* || ^6.0 || ^7.0 || ^8.0",
-                "illuminate/database": "5.8.* || ^6.0 || ^7.0 || ^8.0",
-                "illuminate/http": "5.8.* || ^6.0 || ^7.0 || ^8.0",
-                "illuminate/support": "5.8.* || ^6.0 || ^7.0 || ^8.0",
+                "illuminate/container": "^6.0 || ^7.0 || ^8.0",
+                "illuminate/contracts": "^6.0 || ^7.0 || ^8.0",
+                "illuminate/database": "^6.0 || ^7.0 || ^8.0",
+                "illuminate/http": "^6.0 || ^7.0 || ^8.0",
+                "illuminate/support": "^6.0 || ^7.0 || ^8.0",
                 "orchestra/testbench": "^3.8 || ^4.0 || ^5.0 || ^6.0",
                 "php": "^7.3|^8",
                 "vimeo/psalm": "^4.0"
@@ -10654,7 +10654,7 @@
                 }
             ],
             "description": "A Laravel plugin for Psalm",
-            "time": "2020-12-07T14:56:40+00:00"
+            "time": "2021-04-07T17:38:56+00:00"
         },
         {
             "name": "sebastian/cli-parser",
