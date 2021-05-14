@@ -7773,16 +7773,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v5.2.5",
+            "version": "v5.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "298a08ddda623485208506fcee08817807a251dd"
+                "reference": "76546cbeddd0a9540b4e4e57eddeec3e9bb444a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/298a08ddda623485208506fcee08817807a251dd",
-                "reference": "298a08ddda623485208506fcee08817807a251dd",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/76546cbeddd0a9540b4e4e57eddeec3e9bb444a5",
+                "reference": "76546cbeddd0a9540b4e4e57eddeec3e9bb444a5",
                 "shasum": ""
             },
             "require": {
@@ -7841,7 +7841,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-06T07:59:01+00:00"
+            "time": "2021-04-29T20:47:09+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -10584,16 +10584,16 @@
         },
         {
             "name": "psalm/plugin-laravel",
-            "version": "v1.4.4",
+            "version": "v1.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/psalm/psalm-plugin-laravel.git",
-                "reference": "e6e34b75cc1f0cacd82bedfc68627d95e5d11f3a"
+                "reference": "2b7fe4581a35cefcc656ba61664903a3950a675a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/psalm/psalm-plugin-laravel/zipball/e6e34b75cc1f0cacd82bedfc68627d95e5d11f3a",
-                "reference": "e6e34b75cc1f0cacd82bedfc68627d95e5d11f3a",
+                "url": "https://api.github.com/repos/psalm/psalm-plugin-laravel/zipball/2b7fe4581a35cefcc656ba61664903a3950a675a",
+                "reference": "2b7fe4581a35cefcc656ba61664903a3950a675a",
                 "shasum": ""
             },
             "require": {
@@ -10641,7 +10641,7 @@
                 }
             ],
             "description": "A Laravel plugin for Psalm",
-            "time": "2021-04-17T20:19:18+00:00"
+            "time": "2021-05-01T21:05:01+00:00"
         },
         {
             "name": "sebastian/cli-parser",
