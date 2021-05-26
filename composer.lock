@@ -2266,16 +2266,16 @@
         },
         {
             "name": "laravel/cashier",
-            "version": "v12.13.1",
+            "version": "v12.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/cashier-stripe.git",
-                "reference": "532089a487dd09c6fa5adaf9c0088715a7623e48"
+                "reference": "beea7ed0ef282cbb9885ea37c2035637b939104a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/cashier-stripe/zipball/532089a487dd09c6fa5adaf9c0088715a7623e48",
-                "reference": "532089a487dd09c6fa5adaf9c0088715a7623e48",
+                "url": "https://api.github.com/repos/laravel/cashier-stripe/zipball/beea7ed0ef282cbb9885ea37c2035637b939104a",
+                "reference": "beea7ed0ef282cbb9885ea37c2035637b939104a",
                 "shasum": ""
             },
             "require": {
@@ -2336,7 +2336,7 @@
                 "laravel",
                 "stripe"
             ],
-            "time": "2021-05-11T20:52:30+00:00"
+            "time": "2021-05-25T16:32:09+00:00"
         },
         {
             "name": "laravel/framework",
@@ -5287,16 +5287,16 @@
         },
         {
             "name": "stripe/stripe-php",
-            "version": "v7.78.0",
+            "version": "v7.79.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "6ec33fa8e9de2322be93d28dfd685661c67ca549"
+                "reference": "e17e85bc13dfa531bdfb3d3719d3810431d104f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/6ec33fa8e9de2322be93d28dfd685661c67ca549",
-                "reference": "6ec33fa8e9de2322be93d28dfd685661c67ca549",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/e17e85bc13dfa531bdfb3d3719d3810431d104f9",
+                "reference": "e17e85bc13dfa531bdfb3d3719d3810431d104f9",
                 "shasum": ""
             },
             "require": {
@@ -5340,7 +5340,7 @@
                 "payment processing",
                 "stripe"
             ],
-            "time": "2021-05-05T23:55:32+00:00"
+            "time": "2021-05-19T19:30:23+00:00"
         },
         {
             "name": "superbalist/flysystem-google-storage",
@@ -6162,16 +6162,16 @@
         },
         {
             "name": "symfony/http-kernel",
-            "version": "v5.2.8",
+            "version": "v5.2.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-kernel.git",
-                "reference": "c3cb71ee7e2d3eae5fe1001f81780d6a49b37937"
+                "reference": "eb540ef6870dbf33c92e372cfb869ebf9649e6cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/c3cb71ee7e2d3eae5fe1001f81780d6a49b37937",
-                "reference": "c3cb71ee7e2d3eae5fe1001f81780d6a49b37937",
+                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/eb540ef6870dbf33c92e372cfb869ebf9649e6cb",
+                "reference": "eb540ef6870dbf33c92e372cfb869ebf9649e6cb",
                 "shasum": ""
             },
             "require": {
@@ -6267,7 +6267,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-05-12T13:27:53+00:00"
+            "time": "2021-05-19T12:23:45+00:00"
         },
         {
             "name": "symfony/mime",
@@ -7523,16 +7523,16 @@
         },
         {
             "name": "symfony/translation",
-            "version": "v5.2.8",
+            "version": "v5.2.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/translation.git",
-                "reference": "445caa74a5986f1cc9dd91a2975ef68fa7cb2068"
+                "reference": "61af68dba333e2d376a325a29c2a3f2a605b4876"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation/zipball/445caa74a5986f1cc9dd91a2975ef68fa7cb2068",
-                "reference": "445caa74a5986f1cc9dd91a2975ef68fa7cb2068",
+                "url": "https://api.github.com/repos/symfony/translation/zipball/61af68dba333e2d376a325a29c2a3f2a605b4876",
+                "reference": "61af68dba333e2d376a325a29c2a3f2a605b4876",
                 "shasum": ""
             },
             "require": {
@@ -7609,7 +7609,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-05-07T13:41:16+00:00"
+            "time": "2021-05-16T13:07:46+00:00"
         },
         {
             "name": "symfony/translation-contracts",
