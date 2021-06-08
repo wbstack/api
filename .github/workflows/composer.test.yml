@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@master
 
     - name: Install dependencies
-      uses: php-actions/composer@v5
+      uses: php-actions/composer@v6
       with:
         php_version: 7.4
         command: install
