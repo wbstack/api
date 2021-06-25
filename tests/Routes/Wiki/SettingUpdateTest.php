@@ -7,12 +7,16 @@ use App\Wiki;
 use App\WikiManager;
 use App\WikiSetting;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\Routes\Traits\PostRequestNeedAuthentication;
 use Tests\TestCase;
+use Database\Factories\UserFactory;
 
 class SettingUpdateTest extends TestCase
 {
+    use HasFactory;
+
     protected $route = 'wiki/setting/foo/update';
 
     use DatabaseTransactions;
@@ -23,7 +27,7 @@ class SettingUpdateTest extends TestCase
     {
         $settingName = 'iDoNotExistAsASetting';
 
-        $user = factory(User::class)->create(['verified' => true]);
+        $user = UserFactory::factory()->create(['verified' => true]);
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [
             'wiki' => 1,

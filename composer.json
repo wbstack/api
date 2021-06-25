@@ -8,35 +8,41 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "albertcht/invisible-recaptcha": "1.9.*",
-        "doctrine/dbal": "^2.0",
-        "firebase/php-jwt": "^5.0",
+        "albertcht/invisible-recaptcha": "^1.9",
+        "doctrine/dbal": "^3.1",
+        "firebase/php-jwt": "^5.4",
         "fruitcake/laravel-cors": "^2.0",
-        "gluedev/laravel-stackdriver": "^0.2.2",
         "guzzlehttp/guzzle": "^7.3",
-        "hackzilla/password-generator": "^1.5",
-        "illuminate/mail": "^7.0",
-        "illuminate/redis": "^7.0",
+        "gluedev/laravel-stackdriver": "dev-develop#7fb3e78ce949dd341b5418f876c3ff74d8c1ff92",
+        "hackzilla/password-generator": "^1.6",
+        "illuminate/mail": "^8.48",
+        "illuminate/redis": "^8.48",
         "intervention/image": "^2.5",
-        "laravel/cashier": "^12.10",
-        "laravel/framework": "^7.0",
-        "laravel/passport": "~9.0",
-        "laravel/ui": "^2.0",
-        "lcobucci/jwt": "3.3.3",
-        "maclof/kubernetes-client": "0.21.*",
-        "percymamedy/laravel-dev-booter": "^2.0.0",
-        "predis/predis": "~1.0",
+        "laravel/cashier": "^13.2",
+        "laravel/framework": "^8.48",
+        "laravel/passport": "^10.1",
+        "laravel/ui": "^3.3",
+        "lcobucci/jwt": "^4.1",
+        "maclof/kubernetes-client": "^0.21.0",
+        "percymamedy/laravel-dev-booter": "^3.0",
+        "predis/predis": "^1.1",
         "superbalist/laravel-google-cloud-storage": "^2.2"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^2.7",
-        "fzaninotto/faker": "~1.4",
+        "barryvdh/laravel-ide-helper": "^2.10",
+        "fzaninotto/faker": "^1.9",
         "matt-allan/laravel-code-style": "^0.6.0",
-        "mockery/mockery": "~1.0",
-        "phpunit/phpunit": "~9.5",
+        "mockery/mockery": "^1.4",
+        "phpunit/phpunit": "^9.5",
         "psalm/plugin-laravel": "^1.4",
-        "vimeo/psalm": "^4.6"
+        "vimeo/psalm": "^4.8"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/toban/laravel-stackdriver"
+        }
+    ],
     "autoload": {
         "classmap": [
             "database/seeds",

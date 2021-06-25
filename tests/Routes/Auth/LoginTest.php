@@ -17,7 +17,7 @@ class LoginTest extends TestCase
     public function testLoginFail_noExistingUser()
     {
         // This random user probably doesn't exist in the db
-        $user = factory(User::class)->make();
+        $user = User::factory()->make();
         $this->json('POST', $this->route, ['email' => $user->email, 'password' => 'anyPassword'])
         ->assertStatus(401);
     }
