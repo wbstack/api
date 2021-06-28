@@ -84,7 +84,12 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->notify(new ResetPasswordNotification($token));
     }
 
-    public function managesWikis()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     *
+     * @psalm-return \Illuminate\Database\Eloquent\Relations\BelongsToMany<Wiki>
+     */
+    public function managesWikis(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Wiki::class, 'wiki_managers');
     }

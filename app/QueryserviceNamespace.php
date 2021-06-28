@@ -38,7 +38,12 @@ class QueryserviceNamespace extends Model
         'backend',
     ];
 
-    public function wiki()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     *
+     * @psalm-return \Illuminate\Database\Eloquent\Relations\BelongsTo<Wiki>
+     */
+    public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Wiki::class);
     }

@@ -32,7 +32,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
         $this->maxFree = $maxFree;
     }
 
-    private function doesMaxFreeSayWeShouldStop()
+    private function doesMaxFreeSayWeShouldStop(): bool
     {
         $unassignedQueryserviceNamespaces = QueryserviceNamespace::where('wiki_id', null)->count();
         $toCreate = $this->maxFree - $unassignedQueryserviceNamespaces;

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class QsController extends Controller
 {
-    public function getBatches(Request $request)
+    public function getBatches(Request $request): \Illuminate\Http\Response
     {
         $notDoneBatches = null;
         $batches = [];
@@ -97,7 +97,7 @@ class QsController extends Controller
         return response(collect($returnCollection));
     }
 
-    public function markBatchesDone(Request $request)
+    public function markBatchesDone(Request $request): \Illuminate\Http\Response
     {
         $rawBatches = $request->input('batches');
         $batches = explode(',', $rawBatches);
@@ -109,7 +109,7 @@ class QsController extends Controller
         return response(1);
     }
 
-    public function markBatchesFailed(Request $request)
+    public function markBatchesFailed(Request $request): \Illuminate\Http\Response
     {
         $rawBatches = $request->input('batches');
         $batches = explode(',', $rawBatches);

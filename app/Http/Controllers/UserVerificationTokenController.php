@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
  */
 class UserVerificationTokenController extends Controller
 {
-    public function verify(Request $request)
+    public function verify(Request $request): \Illuminate\Http\Response
     {
         $request->validate([
             'token' => 'required|exists:user_verification_tokens,token',
@@ -39,7 +39,7 @@ class UserVerificationTokenController extends Controller
         return response($res);
     }
 
-    public function createAndSendForUser(Request $request)
+    public function createAndSendForUser(Request $request): \Illuminate\Http\Response
     {
         $user = $request->user();
 

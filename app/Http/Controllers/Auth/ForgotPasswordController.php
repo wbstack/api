@@ -30,12 +30,12 @@ class ForgotPasswordController extends Controller
         $this->middleware('guest');
     }
 
-    protected function sendResetLinkResponse()
+    protected function sendResetLinkResponse(): \Illuminate\Http\JsonResponse
     {
         return response()->json('Success', 200);
     }
 
-    protected function sendResetLinkFailedResponse()
+    protected function sendResetLinkFailedResponse(): \Illuminate\Http\JsonResponse
     {
         return response()->json('Unauthorized', 401);
     }

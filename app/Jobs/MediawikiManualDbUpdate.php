@@ -106,6 +106,9 @@ class MediawikiManualDbUpdate extends Job
         // TODO log? Do something?
     }
 
+    /**
+     * @return \PDO|null
+     */
     private function getMediaWikiPDO()
     {
         $connection = DB::connection('mw');

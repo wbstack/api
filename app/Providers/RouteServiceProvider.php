@@ -48,25 +48,25 @@ class RouteServiceProvider extends ServiceProvider
         }
     }
 
-    protected function mapGeneralRoutes()
+    protected function mapGeneralRoutes(): void
     {
         Route::namespace($this->namespace)
              ->group(base_path('routes/general.php'));
     }
 
-    protected function mapApiRoutes()
+    protected function mapApiRoutes(): void
     {
         Route::namespace($this->namespace)
              ->group(base_path('routes/api.php'));
     }
 
-    protected function mapSandboxRoutes()
+    protected function mapSandboxRoutes(): void
     {
         Route::namespace($this->namespace)
              ->group(base_path('routes/sandbox.php'));
     }
 
-    protected function mapBackendRoutes()
+    protected function mapBackendRoutes(): void
     {
         Route::prefix('backend')
              ->namespace($this->namespace.'\Backend')

@@ -23,7 +23,7 @@ class SandboxController extends Controller
     const MW_VERSION = 'mw1.35-wbs1';
     const DOT = '.';
 
-    public function create(Request $request)
+    public function create(Request $request): \Illuminate\Http\Response
     {
         $validation = [
             'recaptcha' => 'required|captcha',
@@ -113,7 +113,7 @@ class SandboxController extends Controller
         return $this->generateUnusedDomain();
     }
 
-    private function generateDomain()
+    private function generateDomain(): string
     {
         $generator = new HumanPasswordGenerator();
 
