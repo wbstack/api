@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f9b47f65792997265e2e8fe4d4d10756",
+    "content-hash": "5646983e2b3db4415367eb4f041c93c6",
     "packages": [
         {
             "name": "albertcht/invisible-recaptcha",
@@ -8516,16 +8516,16 @@
         },
         {
             "name": "barryvdh/laravel-ide-helper",
-            "version": "v2.10.0",
+            "version": "v2.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barryvdh/laravel-ide-helper.git",
-                "reference": "73b1012b927633a1b4cd623c2e6b1678e6faef08"
+                "reference": "8d8302ff6adb55f8b844c798b8b1ffdee142f7e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barryvdh/laravel-ide-helper/zipball/73b1012b927633a1b4cd623c2e6b1678e6faef08",
-                "reference": "73b1012b927633a1b4cd623c2e6b1678e6faef08",
+                "url": "https://api.github.com/repos/barryvdh/laravel-ide-helper/zipball/8d8302ff6adb55f8b844c798b8b1ffdee142f7e5",
+                "reference": "8d8302ff6adb55f8b844c798b8b1ffdee142f7e5",
                 "shasum": ""
             },
             "require": {
@@ -8598,7 +8598,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-04-09T06:17:55+00:00"
+            "time": "2021-03-15T19:22:08+00:00"
         },
         {
             "name": "barryvdh/reflection-docblock",
@@ -10846,20 +10846,20 @@
         },
         {
             "name": "psalm/plugin-laravel",
-            "version": "v1.4.6",
+            "version": "v1.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/psalm/psalm-plugin-laravel.git",
-                "reference": "1ff7fd2a0dd843a8e2254768b9b1274b377f429f"
+                "reference": "11f6fd4bc5703ff69a688429150a9569ab100505"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/psalm/psalm-plugin-laravel/zipball/1ff7fd2a0dd843a8e2254768b9b1274b377f429f",
-                "reference": "1ff7fd2a0dd843a8e2254768b9b1274b377f429f",
+                "url": "https://api.github.com/repos/psalm/psalm-plugin-laravel/zipball/11f6fd4bc5703ff69a688429150a9569ab100505",
+                "reference": "11f6fd4bc5703ff69a688429150a9569ab100505",
                 "shasum": ""
             },
             "require": {
-                "barryvdh/laravel-ide-helper": "^2.9.2",
+                "barryvdh/laravel-ide-helper": ">=2.8.0 <2.9.2",
                 "ext-simplexml": "*",
                 "illuminate/container": "^6.0 || ^7.0 || ^8.0",
                 "illuminate/contracts": "^6.0 || ^7.0 || ^8.0",
@@ -10903,7 +10903,7 @@
                 }
             ],
             "description": "A Laravel plugin for Psalm",
-            "time": "2021-06-09T17:55:44+00:00"
+            "time": "2021-06-10T05:24:57+00:00"
         },
         {
             "name": "sebastian/cli-parser",
