@@ -27,7 +27,7 @@ class SettingUpdateTest extends TestCase
     {
         $settingName = 'iDoNotExistAsASetting';
 
-        $user = UserFactory::factory()->create(['verified' => true]);
+        $user = User::factory()->create(['verified' => true]);
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [
             'wiki' => 1,
@@ -42,7 +42,7 @@ class SettingUpdateTest extends TestCase
     {
         $settingName = 'wwExtEnableConfirmAccount';
 
-        $user = factory(User::class)->create(['verified' => true]);
+        $user = User::factory()->create(['verified' => true]);
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [
             'wiki' => 99856,
@@ -78,9 +78,9 @@ class SettingUpdateTest extends TestCase
      */
     public function testValidSetting($settingName, $settingValue, $expectedStored)
     {
-        $user = factory(User::class)->create(['verified' => true]);
-        $wiki = factory(Wiki::class, 'nodb')->create();
-        $manager = factory(WikiManager::class)->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+        $user = User::factory()->create(['verified' => true]);
+        $wiki = Wiki::factory('nodb')->create();
+        $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [
@@ -125,7 +125,7 @@ class SettingUpdateTest extends TestCase
      */
     public function testValidSettingBadValues($settingName, $settingValue)
     {
-        $user = factory(User::class)->create(['verified' => true]);
+        $user = User::factory()->create(['verified' => true]);
 
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [

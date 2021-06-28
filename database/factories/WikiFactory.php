@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\User;
+use App\Wiki;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class UserFactory extends Factory
+class WikiFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = User::class;
+    protected $model = Wiki::class;
 
     /**
      * Define the model's default state.
@@ -22,9 +22,9 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'password' => $this->faker->password(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'verified' => $this->faker->boolean(),
+            'sitename' => $this->faker->text(5),
+            'domain' => $this->faker->domainName,
+            'deleted_at' => $this->faker->dateTime
         ];
     }
 }

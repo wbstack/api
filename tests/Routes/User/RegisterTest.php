@@ -23,8 +23,8 @@ class RegisterTest extends TestCase
     {
         Notification::fake();
 
-        $invite = factory(Invitation::class)->create();
-        $userToCreate = factory(User::class)->make();
+        $invite = Invitation::factory()->create();
+        $userToCreate = User::factory()->make();
 
         putenv('PHPUNIT_RECAPTCHA_CHECK=0');
         $resp = $this->json('POST', $this->route, [
@@ -48,8 +48,8 @@ class RegisterTest extends TestCase
 
     public function testCreate_EmailAlreadyTaken()
     {
-        $invite = factory(Invitation::class)->create();
-        $user = factory(User::class)->create();
+        $invite = Invitation::factory()->create();
+        $user = User::factory()->create();
         $this->json('POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
@@ -62,7 +62,7 @@ class RegisterTest extends TestCase
     public function testCreate_NoInvitation()
     {
         $this->markTestSkipped('Fixme');
-        $user = factory(User::class)->make();
+        $user = User::factory()->make();
         $this->json('POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
@@ -74,8 +74,8 @@ class RegisterTest extends TestCase
     public function testCreate_NoToken()
     {
         putenv('PHPUNIT_RECAPTCHA_CHECK=1');
-        $invite = factory(Invitation::class)->create();
-        $user = factory(User::class)->make();
+        $invite = Invitation::factory()->create();
+        $user = User::factory()->make();
         $this->json('POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
@@ -94,7 +94,7 @@ class RegisterTest extends TestCase
 
     public function testCreate_BadInvitation()
     {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->json('POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
@@ -106,7 +106,7 @@ class RegisterTest extends TestCase
 
     public function testCreate_BadEmail()
     {
-        $invite = factory(Invitation::class)->create();
+        $invite = Invitation::factory()->create();
         $this->json('POST', $this->route, [
           'email' => 'notAnEmail',
           'password' => 'anyPassword',

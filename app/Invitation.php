@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * App\Invitation.
@@ -22,6 +23,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Invitation extends Model
 {
+    use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *

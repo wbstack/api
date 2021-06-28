@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\User;
+use App\Invitation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class UserFactory extends Factory
+class InvitationFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = User::class;
+    protected $model = Invitation::class;
 
     /**
      * Define the model's default state.
@@ -22,9 +22,7 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'password' => $this->faker->password(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'verified' => $this->faker->boolean(),
+            'code' => $this->faker->text(10)
         ];
     }
 }

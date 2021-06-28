@@ -10,6 +10,6 @@ class InvitationsSeeder extends Seeder
         Invitation::create(['code' => 'invite1']);
         Invitation::create(['code' => 'invite2']);
         Invitation::create(['code' => 'invite3']);
-        factory(App\Invitation::class, 3)->create();
+        App\Invitation::factory()->create();
     }
 }
