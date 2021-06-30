@@ -9,7 +9,12 @@ use Illuminate\Http\Request;
 
 class WikiSettingController extends Controller
 {
-    private function getSettingValidations()
+    /**
+     * @return (SettingWikibaseManifestEquivEntities|string)[][]
+     *
+     * @psalm-return array{wgDefaultSkin: array{0: 'required', 1: 'string', 2: 'in:vector,modern,timeless'}, wwExtEnableConfirmAccount: array{0: 'required', 1: 'boolean'}, wwExtEnableWikibaseLexeme: array{0: 'required', 1: 'boolean'}, wwWikibaseStringLengthString: array{0: 'required', 1: 'integer', 2: 'between:400,2500'}, wwWikibaseStringLengthMonolingualText: array{0: 'required', 1: 'integer', 2: 'between:400,2500'}, wwWikibaseStringLengthMultilang: array{0: 'required', 1: 'integer', 2: 'between:250,2500'}, wikibaseFedPropsEnable: array{0: 'required', 1: 'boolean'}, wikibaseManifestEquivEntities: array{0: 'required', 1: 'json', 2: SettingWikibaseManifestEquivEntities}}
+     */
+    private function getSettingValidations(): array
     {
         // FIXME: this list is evil and should be kept in sync with the model in Wiki.php?!
         return [
@@ -24,6 +29,9 @@ class WikiSettingController extends Controller
         ];
     }
 
+    /**
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     */
     public function update($setting, Request $request)
     {
         $settingValidations = $this->getSettingValidations();

@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * App\WikiManager.
@@ -26,6 +27,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class WikiManager extends Model
 {
+    use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -37,18 +40,28 @@ class WikiManager extends Model
     ];
 
     // TODO remove these relationships if they are not used...
-    public function wiki()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     *
+     * @psalm-return \Illuminate\Database\Eloquent\Relations\BelongsTo<Wiki>
+     */
+    public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Wiki::class);
     }
 
-    public function user()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     *
+     * @psalm-return \Illuminate\Database\Eloquent\Relations\BelongsTo<User>
+     */
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function email()
+    public function email(): void
     {
-        $this->user()->email;
+        $this->user()->get(['email'])->first();
     }
 }

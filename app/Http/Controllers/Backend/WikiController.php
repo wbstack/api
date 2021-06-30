@@ -10,7 +10,7 @@ class WikiController extends Controller
 {
     private static $with = ['wikiDb', 'wikiQueryserviceNamespace', 'settings'];
 
-    public function getWikiForDomain(Request $request)
+    public function getWikiForDomain(Request $request): \Illuminate\Http\Response
     {
         $domain = $request->input('domain');
 

@@ -19,12 +19,12 @@ class UserVerificationCreateTokenAndSendJob extends Job
      */
     private $notificationClass;
 
-    public static function newForAccountCreation(User $user)
+    public static function newForAccountCreation(User $user): self
     {
         return new self($user, UserCreationNotification::class);
     }
 
-    public static function newForReverification(User $user)
+    public static function newForReverification(User $user): self
     {
         return new self($user, EmailReverificationNotification::class);
     }

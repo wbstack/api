@@ -7,7 +7,7 @@ use Carbon\Carbon;
 
 class PruneQueryserviceBatchesTable extends Job
 {
-    public function handle()
+    public function handle(): void
     {
         // TODO possibly have some sort of user output...
         QsBatch::where('done', 1)

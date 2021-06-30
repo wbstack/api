@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class WikiManagersController extends Controller
 {
-    public function getManagersOfWiki(Request $request)
+    public function getManagersOfWiki(Request $request): \Illuminate\Http\Response
     {
         $user = $request->user();
 

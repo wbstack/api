@@ -16,6 +16,9 @@ class InvitationDeleteJob extends Job
         $this->code = strtolower($code);
     }
 
+    /**
+     * @return void
+     */
     public function handle()
     {
         $invite = Invitation::where('code', $this->code)->first();

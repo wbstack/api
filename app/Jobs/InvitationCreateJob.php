@@ -13,6 +13,9 @@ class InvitationCreateJob extends Job
         $this->code = strtolower($code);
     }
 
+    /**
+     * @return Invitation|null
+     */
     public function handle()
     {
         $test = Invitation::where('code', $this->code)->first();

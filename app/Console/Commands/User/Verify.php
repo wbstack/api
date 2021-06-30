@@ -11,7 +11,7 @@ class Verify extends Command
 
     protected $description = 'Set verification state for user';
 
-    public function handle()
+    public function handle(): int
     {
         $email = $this->argument('email');
         $state = (int) $this->argument('verificationState');

@@ -17,14 +17,14 @@ class LoginTest extends TestCase
     public function testLoginFail_noExistingUser()
     {
         // This random user probably doesn't exist in the db
-        $user = factory(User::class)->make();
+        $user = User::factory()->make();
         $this->json('POST', $this->route, ['email' => $user->email, 'password' => 'anyPassword'])
         ->assertStatus(401);
     }
 
     public function testLoginFail_badPassword()
     {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->json('POST', $this->route, ['email' => $user->email, 'password' => 'someOtherPassword'])
         ->assertStatus(401);
     }
@@ -32,7 +32,7 @@ class LoginTest extends TestCase
     public function testLoginSuccess()
     {
         $password = 'apassword';
-        $user = factory(User::class)->create(['password' => password_hash($password, PASSWORD_DEFAULT)]);
+        $user = User::factory()->create(['password' => password_hash($password, PASSWORD_DEFAULT)]);
         $response = $this->json('POST', $this->route, ['email' => $user->email, 'password' => $password]);
         $response->assertStatus(200);
         $response->assertJsonStructure(['user' => ['email'], 'token']);

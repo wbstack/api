@@ -13,12 +13,12 @@ class LoginController extends Controller
     use ThrottlesLogins;
 
     // Used by ThrottlesLogins
-    protected function username()
+    protected function username(): string
     {
         return 'email';
     }
 
-    public function login(Request $request)
+    public function login(Request $request): ?\Illuminate\Http\JsonResponse
     {
         // Validation
         $rules = [

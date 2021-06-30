@@ -19,13 +19,7 @@ class Delete extends Command
     public function handle()
     {
         $code = trim($this->argument('code'));
-        $jobResult = (new InvitationDeleteJob($code))->handle();
-
-        if ($jobResult) {
-            $this->line('Successfully deleted invitation: '.$code);
-        } else {
-            $this->line('Failed to deleted invitation: '.$code);
-        }
+        (new InvitationDeleteJob($code))->handle();
 
         return 0;
     }

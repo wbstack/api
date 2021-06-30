@@ -26,6 +26,9 @@ class UserController extends BaseController
         $this->request = $request;
     }
 
+    /**
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
     public function getSelf(Request $request)
     {
         $user = $request->user();
@@ -44,7 +47,12 @@ class UserController extends BaseController
 
     // TODO why is this needed?
     // TODO the model used by the frontend stuff should just not have the password...
-    protected function convertUserForOutput(User $user)
+    /**
+     * @return (int|string)[]
+     *
+     * @psalm-return array{id: int, email: string, verified: int}
+     */
+    protected function convertUserForOutput(User $user): array
     {
         return [
             'id' => $user->id,

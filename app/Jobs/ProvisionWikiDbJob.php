@@ -63,7 +63,7 @@ class ProvisionWikiDbJob extends Job
         $this->maxFree = $maxFree;
     }
 
-    private function doesMaxFreeSayWeShouldStop()
+    private function doesMaxFreeSayWeShouldStop(): bool
     {
         $wikiDbCondition = ['wiki_id' => null, 'version' => $this->newSqlFile];
         $unassignedDbs = WikiDb::where($wikiDbCondition)->count();

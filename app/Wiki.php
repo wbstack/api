@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * App\Wiki.
@@ -37,7 +38,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Wiki extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -55,24 +56,41 @@ class Wiki extends Model
 
     public function wikiDbVersion()
     {
-        /* @psalm-suppress InvalidArgument */
+        /**
+         * @psalm-suppress InvalidArgument
+         */
         return $this->hasOne(WikiDb::class)->select(['id', 'wiki_id', 'version']);
     }
 
     // TODO these should just be on the backend model? =] Or marked as a private relationship or something?
     // OR some sort of access control needs to be done..
-    public function wikiDb()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     *
+     * @psalm-return \Illuminate\Database\Eloquent\Relations\HasOne<WikiDb>
+     */
+    public function wikiDb(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(WikiDb::class);
     }
 
-    public function wikiQueryserviceNamespace()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     *
+     * @psalm-return \Illuminate\Database\Eloquent\Relations\HasOne<QueryserviceNamespace>
+     */
+    public function wikiQueryserviceNamespace(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(QueryserviceNamespace::class);
     }
 
     // FIXME: rename to privateSettings / allSettings for clarity?
-    public function settings()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     *
+     * @psalm-return \Illuminate\Database\Eloquent\Relations\HasMany<WikiSetting>
+     */
+    public function settings(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(WikiSetting::class);
     }
@@ -98,7 +116,9 @@ class Wiki extends Model
     public function wikiManagers()
     {
         // TODO should this be hasMany ?
-        /* @psalm-suppress InvalidArgument */
+        /**
+         * @psalm-suppress InvalidArgument
+         */
         return $this->belongsToMany(User::class, 'wiki_managers')->select(['email']);
     }
 }

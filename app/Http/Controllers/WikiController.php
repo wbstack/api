@@ -19,7 +19,7 @@ use Illuminate\Support\Str;
 
 class WikiController extends Controller
 {
-    public function create(Request $request)
+    public function create(Request $request): \Illuminate\Http\Response
     {
         $user = $request->user();
 
@@ -119,7 +119,7 @@ class WikiController extends Controller
         return response($res);
     }
 
-    public function delete(Request $request)
+    public function delete(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
 
@@ -144,7 +144,7 @@ class WikiController extends Controller
     }
 
     // TODO should this just be get wiki?
-    public function getWikiDetailsForIdForOwner(Request $request)
+    public function getWikiDetailsForIdForOwner(Request $request): \Illuminate\Http\Response
     {
         $user = $request->user();
 

@@ -15,6 +15,8 @@ class WikiLogoController extends Controller
      * It would be beneficial to have a bit of atomicness here?
      * Right now WgLogo is always the same path when set, so if we start writing new files but die we still end up updating the site.
      * Fine for now but...
+     *
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
      */
     public function update(Request $request)
     {

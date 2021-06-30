@@ -28,12 +28,12 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param  \Throwable  $throwable
+     * @param  \Throwable  $e
      * @return void
      */
-    public function report(Throwable $throwable)
+    public function report(Throwable $e)
     {
-        StackdriverExceptionHandler::report($throwable);
-        parent::report($throwable);
+        StackdriverExceptionHandler::report($e);
+        parent::report($e);
     }
 }

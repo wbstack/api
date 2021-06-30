@@ -18,7 +18,7 @@ class SelfTest extends TestCase
 
     public function testGet()
     {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->actingAs($user, 'api')
           ->post($this->route)
           ->assertStatus(200);
