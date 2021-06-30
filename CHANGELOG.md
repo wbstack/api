@@ -1,5 +1,9 @@
 # api
 
+## 8x.1.0 - 30 June 2021
+
+- First 8.0 release
+
 ## 7x-1.1 - 23 June 2021
 
 - [Fix Undefined index: wbstackInit in Jobs/MediawikiInit.php](https://github.com/wbstack/api/commit/c091b3c2a66766b1762024c9f74c6278df888c7c)
