@@ -82,11 +82,11 @@ class WikiController extends Controller
 
             // Enable elasticsearch for new wikis by default
             // T285541
-            WikiSetting::create([
-                'wiki_id' => $wiki->id,
-                'name' => 'wwExtEnableElasticSearch',
-                'value' => true,
-            ]);
+//             WikiSetting::create([
+//                 'wiki_id' => $wiki->id,
+//                 'name' => 'wwExtEnableElasticSearch',
+//                 'value' => true,
+//             ]);
 
             // Also track the domain forever in your domains table
             $wikiDomain = WikiDomain::create([
@@ -117,7 +117,7 @@ class WikiController extends Controller
         $this->dispatch(new ProvisionWikiDbJob(null, null, 10));
         $this->dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
 
-        $this->dispatch(new ElasticSearchIndexInit($wiki->domain));
+//        $this->dispatch(new ElasticSearchIndexInit($wiki->domain));
 
         $res['success'] = true;
         $res['message'] = 'Success!';
