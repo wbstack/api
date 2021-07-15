@@ -6,6 +6,7 @@ use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ProvisionWikiDbJob;
+use App\Jobs\ElasticSearchIndexInit;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
@@ -79,6 +80,14 @@ class WikiController extends Controller
                 'value' => Str::random(64),
             ]);
 
+            // Enable elasticsearch for new wikis by default
+            // T285541
+//             WikiSetting::create([
+//                 'wiki_id' => $wiki->id,
+//                 'name' => 'wwExtEnableElasticSearch',
+//                 'value' => true,
+//             ]);
+
             // Also track the domain forever in your domains table
             $wikiDomain = WikiDomain::create([
                 'domain' => $wiki->domain,
@@ -107,6 +116,8 @@ class WikiController extends Controller
         // opportunistic dispatching of jobs to make sure storage pools are topped up
         $this->dispatch(new ProvisionWikiDbJob(null, null, 10));
         $this->dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
+
+//        $this->dispatch(new ElasticSearchIndexInit($wiki->domain));
 
         $res['success'] = true;
         $res['message'] = 'Success!';
