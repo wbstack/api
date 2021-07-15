@@ -1,5 +1,10 @@
 # api
 
+## 8x.1.1 - 15 July 2021
+
+- Minor laravel bump
+- Add job to add elastic indexes
+
 ## 8x.1.0 - 30 June 2021
 
 - First 8.0 release
