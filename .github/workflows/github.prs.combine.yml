@@ -123,10 +123,18 @@ jobs:
           git pull origin $sourcebranches --no-edit
           git push origin $COMBINE_BRANCH_NAME --force-with-lease
       # Creates a PR with the new combined branch
-      - uses: gr2m/create-or-update-pull-request-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_PLUSW }}
+      - uses: actions/github-script@v4.0.2
+        name: Create Combined Pull Request
         with:
-          title: "Combined PR for prefix: ${{ github.event.inputs.branchPrefix }}"
-          body: "This PR was created by the Combine PRs action by combining the following PRs:\n${{ steps.fetch-branch-names.outputs.prs-string }}"
-          branch: "${{ github.event.inputs.combineBranchName }}"
+          github-token: ${{secrets.GH_TOKEN_PLUSW}}
+          script: |
+            const prString = `${{ steps.fetch-branch-names.outputs.prs-string }}`;
+            const body = 'This PR was created by the Combine PRs action by combining the following PRs:\n' + prString;
+            await github.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Combined PR for prefix: ${{ github.event.inputs.branchPrefix }}',
+              head: '${{ github.event.inputs.combineBranchName }}',
+              base: '${{ steps.fetch-branch-names.outputs.base-branch }}',
+              body: body
+            });
