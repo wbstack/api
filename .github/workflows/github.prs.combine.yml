@@ -83,15 +83,12 @@ jobs:
                 }
               }
             }
-
             if (branches.length == 0) {
               core.setFailed('No PRs/branches matched criteria');
               return;
             }
-
             core.setOutput('base-branch', base_branch);
             core.setOutput('prs-string', prs.join('\n'));
-
             combined = branches.join(' ')
             console.log('Combined: ' + combined);
             return combined
@@ -107,17 +104,14 @@ jobs:
           BRANCHES_TO_COMBINE: ${{ steps.fetch-branch-names.outputs.result }}
           COMBINE_BRANCH_NAME: ${{ github.event.inputs.combineBranchName }}
         run: |
-          echo "${{steps.fetch-branch-names.outputs.result}}"
+          echo "$BRANCHES_TO_COMBINE"
           sourcebranches="${BRANCHES_TO_COMBINE%\"}"
           sourcebranches="${sourcebranches#\"}"
-
           basebranch="${BASE_BRANCH%\"}"
           basebranch="${basebranch#\"}"
-
           git config pull.rebase false
           git config user.name github-actions
           git config user.email github-actions@github.com
-
           git branch $COMBINE_BRANCH_NAME $basebranch
           git checkout $COMBINE_BRANCH_NAME
           git pull origin $sourcebranches --no-edit
@@ -125,10 +119,12 @@ jobs:
       # Creates a PR with the new combined branch
       - uses: actions/github-script@v4.0.2
         name: Create Combined Pull Request
+        env:
+          PRS_STRING: ${{ steps.fetch-branch-names.outputs.prs-string }}
         with:
           github-token: ${{secrets.GH_TOKEN_PLUSW}}
           script: |
-            const prString = `${{ steps.fetch-branch-names.outputs.prs-string }}`;
+            const prString = process.env.PRS_STRING;
             const body = 'This PR was created by the Combine PRs action by combining the following PRs:\n' + prString;
             await github.pulls.create({
               owner: context.repo.owner,
