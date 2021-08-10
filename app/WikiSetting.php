@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * App\WikiSetting.
@@ -27,6 +28,11 @@ use Illuminate\Database\Eloquent\Model;
  */
 class WikiSetting extends Model
 {
+    use HasFactory;
+
+    public const wwExtEnableElasticSearch = 'wwExtEnableElasticSearch';
+    public const wwExtEnableWikibaseLexeme = 'wwExtEnableWikibaseLexeme';
+
     /**
      * The attributes that are mass assignable.
      *
