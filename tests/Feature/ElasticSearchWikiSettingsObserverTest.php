@@ -34,6 +34,12 @@ class ElasticSearchWikiSettingsObserverTest extends TestCase
             ]
         );
 
+        Queue::assertPushed(ElasticSearchIndexInit::class, function ($job) use ( $wiki ) {
+            return $job->uniqueId() === $wiki->domain;
+        });
+
+        Queue::assertPushed(ElasticSearchIndexInit::class, 1);
+
         WikiSetting::factory()->create(
             [
                 'wiki_id' => $wiki->id,
@@ -42,9 +48,8 @@ class ElasticSearchWikiSettingsObserverTest extends TestCase
             ]
         );
 
-        Queue::assertPushed(ElasticSearchIndexInit::class, function ($job) use ( $wiki ) {
-            return $job->uniqueId() === $wiki->domain;
-        });
+        // lexeme requires an update too
+        Queue::assertPushed(ElasticSearchIndexInit::class, 2);
     }
 
     public function testGivenElasticSearchDisabled_createLexemeSetting()
@@ -65,6 +70,8 @@ class ElasticSearchWikiSettingsObserverTest extends TestCase
             ]
         );
 
+        Queue::assertNothingPushed();
+
         WikiSetting::factory()->create(
             [
                 'wiki_id' => $wiki->id,
@@ -76,7 +83,7 @@ class ElasticSearchWikiSettingsObserverTest extends TestCase
         Queue::assertNotPushed(ElasticSearchIndexInit::class);
     }
 
-    public function testGivenLexemeEnabled_enableElasticSearch()
+    public function testGivenLexemeEnabled_enableElasticSearchTriggersIndex()
     {
         Queue::fake();
 
@@ -109,6 +116,8 @@ class ElasticSearchWikiSettingsObserverTest extends TestCase
                 'value' => '1',
             ]
         );
+
+        Queue::assertPushed(ElasticSearchIndexInit::class, 1);
             
         Queue::assertPushed(ElasticSearchIndexInit::class, function ($job) use ( $wiki ) {
             return $job->uniqueId() === $wiki->domain;
@@ -196,5 +205,27 @@ class ElasticSearchWikiSettingsObserverTest extends TestCase
         );
             
         Queue::assertNothingPushed();
+    }
+
+
+    public function testCreatesIndexByDefault()
+    {
+        Queue::fake();
+
+        $user = User::factory()->create(['verified' => true]);
+        $wiki = Wiki::factory()->create();
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+
+        WikiSetting::factory()->create(
+            [
+                'wiki_id' => $wiki->id,
+                'name' => WikiSetting::wwExtEnableElasticSearch,
+                'value' => '1'
+            ]
+        );
+
+        Queue::assertPushed(ElasticSearchIndexInit::class, function ($job) use ( $wiki ) {
+            return $job->uniqueId() === $wiki->domain;
+        });
     }
 }
