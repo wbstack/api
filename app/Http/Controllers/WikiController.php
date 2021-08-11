@@ -117,7 +117,12 @@ class WikiController extends Controller
         $this->dispatch(new ProvisionWikiDbJob(null, null, 10));
         $this->dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
 
-//        $this->dispatch(new ElasticSearchIndexInit($wiki->domain));
+        // Will trigger indexing job
+        WikiSetting::create([
+            'name' => WikiSetting::wwExtEnableElasticSearch,
+            'wiki_id' => $wiki->id,
+            'value' => '1'
+        ]);
 
         $res['success'] = true;
         $res['message'] = 'Success!';
