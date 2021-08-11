@@ -23,8 +23,7 @@ class WikiFactory extends Factory
     {
         return [
             'sitename' => $this->faker->text(5),
-            'domain' => $this->faker->domainName,
-            'deleted_at' => $this->faker->dateTime
+            'domain' => $this->faker->domainName
         ];
     }
 }
