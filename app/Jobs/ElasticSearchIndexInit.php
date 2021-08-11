@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Jobs;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 
-class ElasticSearchIndexInit extends Job
+class ElasticSearchIndexInit extends Job implements ShouldBeUnique
 {
     private $wikiDomain;
 
@@ -12,6 +13,16 @@ class ElasticSearchIndexInit extends Job
     public function __construct($wikiDomain)
     {
         $this->wikiDomain = $wikiDomain;
+    }
+
+    /**
+     * The unique ID of the job.
+     *
+     * @return string
+     */
+    public function uniqueId()
+    {
+        return $this->wikiDomain;
     }
 
     /**
