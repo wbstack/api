@@ -44,9 +44,7 @@ class WikiLogoController extends Controller
         }
 
         // Get a directory for storing all things relating to this site
-        // TODO should be in the site model? maybe?
-        $siteDir = md5($wikiId.md5($wikiId));
-        $logosDir = 'sites/'.$siteDir.'/logos';
+        $logosDir = self::getLogosDirectory($wikiId);
 
         // Delete the old raw file if it was already there
         $rawFilePath = $logosDir.'/raw.png';
@@ -113,5 +111,13 @@ class WikiLogoController extends Controller
         $res['url'] = $logoUrl;
 
         return response($res);
+    }
+
+    /**
+     * Get logo directory path
+     */
+    public static function getLogosDirectory( int $wikiId ): string {
+        $siteDir = md5($wikiId.md5($wikiId));
+        return 'sites/'.$siteDir.'/logos';
     }
 }
