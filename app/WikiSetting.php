@@ -32,6 +32,7 @@ class WikiSetting extends Model
 
     public const wwExtEnableElasticSearch = 'wwExtEnableElasticSearch';
     public const wwExtEnableWikibaseLexeme = 'wwExtEnableWikibaseLexeme';
+    public const wgSecretKey = 'wgSecretKey';
 
     /**
      * The attributes that are mass assignable.
