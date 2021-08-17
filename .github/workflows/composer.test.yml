@@ -24,7 +24,7 @@ jobs:
       run: cp .env.example .env
 
     - name: Run docker-compose setup
-      run: docker-compose up -d
+      run: docker-compose -f docker-compose.yml -f docker-compose.integration.yml up -d
 
     - name: Setup - Keep trying to install the DBs (try for 30 seconds)
       uses: nick-invision/retry@v2.4.1
@@ -44,3 +44,6 @@ jobs:
       run: docker-compose exec -T api vendor/bin/phpunit
     - name: Psalm
       run: docker-compose exec -T api vendor/bin/psalm
+
+    - name: Run elasticsearch index deletion integration test
+      run: docker-compose exec -e RUN_PHPUNIT_INTEGRATION_TEST=1 -e ELASTICSEARCH_HOST=elasticsearch.svc:9200 -T api vendor/bin/phpunit tests/Jobs/Integration/ElasticSearchIndexDeleteTest.php
