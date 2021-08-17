@@ -3,6 +3,8 @@
 namespace App\Jobs;
 
 use App\QueryserviceNamespace;
+use App\Http\Curl\CurlRequest;
+use App\Http\Curl\HttpRequest;
 
 /**
  * Example usage
@@ -12,12 +14,15 @@ class ProvisionQueryserviceNamespaceJob extends Job
 {
     private $namespace;
     private $maxFree;
+    private $request;
 
     /**
      * @return void
      */
-    public function __construct($namespace = null, $maxFree = null)
+    public function __construct($namespace = null, $maxFree = null, HttpRequest $request = null)
     {
+        $this->request = $request ?? new CurlRequest();
+
         if ($namespace !== null && preg_match('/[^A-Za-z0-9]/', $namespace)) {
             throw new \InvalidArgumentException('$namespace must only contain [^A-Za-z0-9] or null, got '.$namespace);
         }
@@ -57,11 +62,12 @@ class ProvisionQueryserviceNamespaceJob extends Job
         // Replace the namespace in the properties file
         $properties = str_replace('REPLACE_NAMESPACE', $this->namespace, $properties);
 
-        $curl = curl_init();
-        curl_setopt_array($curl, [
+        $url = $queryServiceHost.'/bigdata/namespace';
+
+        $this->request->setOptions([
             // TODO when there are multiple hosts, this will need to be different?
             // OR go through the gateway?
-            CURLOPT_URL => $queryServiceHost.'/bigdata/namespace',
+            CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 10,
@@ -75,31 +81,33 @@ class ProvisionQueryserviceNamespaceJob extends Job
             ],
         ]);
 
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
+        $response = $this->request->execute(); 
+        $err = $this->request->error();
 
-        curl_close($curl);
-
+        $this->request->close();
         if ($err) {
-            $this->fail(
-                new \RuntimeException('cURL Error #:'.$err)
-            );
-
-            return; //safegaurd
+            $this->fail( new \RuntimeException('cURL Error #:'.$err) );
+            return;
         } else {
             if ($response === 'CREATED: '.$this->namespace) {
                 $qsns = QueryserviceNamespace::create([
                     'namespace' => $this->namespace,
-                    //'internalHost' => $this->internalHost,
+                    //'internalHost' => $this->internalHost, TODO is this required?
                     'backend' => $queryServiceHost,
                 ]);
             // TODO error if $qsns is not actually created...
+            } else if( $response === 'EXISTS: ' .$this->namespace ) {
+                $qsns = QueryserviceNamespace::updateOrCreate([
+                    'namespace' => $this->namespace,
+                    //'internalHost' => $this->internalHost, TODO is this required?
+                    'backend' => $queryServiceHost,
+                ]);
             } else {
                 $this->fail(
-                    new \RuntimeException('Valid response, but couldn\'t find "CREATED: " in: '.$response)
+                    new \RuntimeException('Valid response, but couldn\'t find "CREATED or EXISTS: " in: '.$response)
                 );
 
-                return; //safegaurd
+                return;
             }
             // TODO Else log create failed?
         }
