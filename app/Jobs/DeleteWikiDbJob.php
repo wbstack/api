@@ -52,7 +52,7 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
 
         // DELETE the database
         if ($pdo->exec('DROP DATABASE '.$wikiDB->name) === false) {
-            $this->fail( new \RuntimeException('Failed to create database with dbname: '.$wikiDB->name) );
+            $this->fail( new \RuntimeException('Failed to drop database with dbname: '.$wikiDB->name) );
             // let it pass through and try to delete the user too
         }
 
