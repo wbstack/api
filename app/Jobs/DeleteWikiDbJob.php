@@ -57,7 +57,7 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
         }
 
         if ($pdo->exec('DROP USER '.$wikiDB->user) === false) {
-            $this->fail( new \RuntimeException('Failed to delete user for dbname: '.$wikiDB->name) );
+            $this->fail( new \RuntimeException('Failed to drop user: '.$wikiDB->user) );
             return;
         }
 
