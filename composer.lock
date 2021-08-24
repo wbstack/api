@@ -2545,16 +2545,16 @@
         },
         {
             "name": "laravel/cashier",
-            "version": "v13.4.4",
+            "version": "v13.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/cashier-stripe.git",
-                "reference": "137452fbb003cd1996c3c37994c389c3bd1f5676"
+                "reference": "becf98716bc83e5c7d5e771266652fbff0c2354f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/cashier-stripe/zipball/137452fbb003cd1996c3c37994c389c3bd1f5676",
-                "reference": "137452fbb003cd1996c3c37994c389c3bd1f5676",
+                "url": "https://api.github.com/repos/laravel/cashier-stripe/zipball/becf98716bc83e5c7d5e771266652fbff0c2354f",
+                "reference": "becf98716bc83e5c7d5e771266652fbff0c2354f",
                 "shasum": ""
             },
             "require": {
@@ -2621,20 +2621,20 @@
                 "issues": "https://github.com/laravel/cashier/issues",
                 "source": "https://github.com/laravel/cashier"
             },
-            "time": "2021-08-17T14:52:45+00:00"
+            "time": "2021-08-24T15:51:55+00:00"
         },
         {
             "name": "laravel/framework",
-            "version": "v8.55.0",
+            "version": "v8.56.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "997e2aa23e9103137715018ae926c52f8a1703f2"
+                "reference": "d700f336dc672dcbfe46db05d4e5fe9347b3a5b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/997e2aa23e9103137715018ae926c52f8a1703f2",
-                "reference": "997e2aa23e9103137715018ae926c52f8a1703f2",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/d700f336dc672dcbfe46db05d4e5fe9347b3a5b6",
+                "reference": "d700f336dc672dcbfe46db05d4e5fe9347b3a5b6",
                 "shasum": ""
             },
             "require": {
@@ -2789,7 +2789,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2021-08-17T14:13:34+00:00"
+            "time": "2021-08-24T13:46:30+00:00"
         },
         {
             "name": "laravel/passport",
@@ -6235,16 +6235,16 @@
         },
         {
             "name": "stripe/stripe-php",
-            "version": "v7.93.0",
+            "version": "v7.94.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "c739cf6841bb3498e23bd52ecfadfcb21c521a14"
+                "reference": "03cd6b5c1c4fc9087ddd1dd046457bff274294d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/c739cf6841bb3498e23bd52ecfadfcb21c521a14",
-                "reference": "c739cf6841bb3498e23bd52ecfadfcb21c521a14",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/03cd6b5c1c4fc9087ddd1dd046457bff274294d6",
+                "reference": "03cd6b5c1c4fc9087ddd1dd046457bff274294d6",
                 "shasum": ""
             },
             "require": {
@@ -6290,9 +6290,9 @@
             ],
             "support": {
                 "issues": "https://github.com/stripe/stripe-php/issues",
-                "source": "https://github.com/stripe/stripe-php/tree/v7.93.0"
+                "source": "https://github.com/stripe/stripe-php/tree/v7.94.0"
             },
-            "time": "2021-08-11T18:48:54+00:00"
+            "time": "2021-08-19T14:15:27+00:00"
         },
         {
             "name": "superbalist/flysystem-google-storage",
