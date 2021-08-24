@@ -1,0 +1,19 @@
+version: '2'
+services:
+  wdqs:
+    image: ghcr.io/wbstack/queryservice:0.3.6_0.6
+    volumes:
+      - query-service-data:/wdqs/data
+    environment:
+      - WIKIBASE_HOST=default.web.mw.localhost:8080
+      - WDQS_HOST=wdqs.mw.localhost
+      - WDQS_PORT=9999
+      - WDQS_ENTITY_NAMESPACES=120,122,146
+      - WIKIBASE_SCHEME=http
+    restart: unless-stopped
+    command: /runBlazegraph.sh
+    hostname: wdqs.mw.localhost
+    expose:
+        - 9999
+volumes:
+  query-service-data:
