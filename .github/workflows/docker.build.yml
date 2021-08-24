@@ -18,7 +18,7 @@ jobs:
       -
         name: Docker meta
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v3.4.1
+        uses: crazy-max/ghaction-docker-meta@v3.5.0
         with:
           images: ghcr.io/${{ github.repository }}
       -
@@ -45,7 +45,7 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       -
         name: Build and push
-        uses: docker/build-push-action@v2.6.1
+        uses: docker/build-push-action@v2.7.0
         with:
           context: .
           file: ./Dockerfile
