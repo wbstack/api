@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\QueryserviceNamespace;
 use App\Http\Curl\CurlRequest;
 use App\Http\Curl\HttpRequest;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Example usage
@@ -92,24 +93,22 @@ class ProvisionQueryserviceNamespaceJob extends Job
             if ($response === 'CREATED: '.$this->namespace) {
                 $qsns = QueryserviceNamespace::create([
                     'namespace' => $this->namespace,
-                    //'internalHost' => $this->internalHost, TODO is this required?
                     'backend' => $queryServiceHost,
                 ]);
             // TODO error if $qsns is not actually created...
             } else if( $response === 'EXISTS: ' .$this->namespace ) {
-                $qsns = QueryserviceNamespace::updateOrCreate([
-                    'namespace' => $this->namespace,
-                    //'internalHost' => $this->internalHost, TODO is this required?
-                    'backend' => $queryServiceHost,
-                ]);
+                Log::error(__METHOD__ . ": The namespace: {$this->namespace} already exists");
+                $this->fail(
+                    new \RuntimeException("The namespace: {$this->namespace} already exists. response: " . $response)
+                );
+                return;                
             } else {
                 $this->fail(
-                    new \RuntimeException('Valid response, but couldn\'t find "CREATED or EXISTS: " in: '.$response)
+                    new \RuntimeException('Valid response, but couldn\'t find "CREATED: " in: '.$response)
                 );
 
                 return;
             }
-            // TODO Else log create failed?
         }
     }
 }

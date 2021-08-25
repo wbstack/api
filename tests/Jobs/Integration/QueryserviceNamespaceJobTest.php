@@ -24,12 +24,15 @@ class QueryserviceNamespaceJobTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function testIntegrationCreate()
-    {
+    public function setUp(): void {
+        parent::setUp();
         if ( !getenv('RUN_PHPUNIT_INTEGRATION_TEST') ) {
             $this->markTestSkipped('No blazegraph instance to connect to');
-        }
+        }  
+    }
 
+    public function testIntegrationCreate()
+    {
         // both jobs should pass
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never()) ->method('fail');
