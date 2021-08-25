@@ -53,10 +53,9 @@ class CreateTest extends TestCase
             WikiSetting::where( [ 'name' => WikiSetting::wgSecretKey, 'wiki_id' => $id ] )->count()
         );
 
-        // will get flipped by the job
         $this->assertSame(
             1, 
-            WikiSetting::where( [ 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => false, 'wiki_id' => $id ] )->count()
+            WikiSetting::where( [ 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true, 'wiki_id' => $id ] )->count()
         );
 
 

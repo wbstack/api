@@ -76,7 +76,7 @@ class WikiController extends Controller
             // Docs: https://www.mediawiki.org/wiki/Manual:$wgSecretKey
             WikiSetting::create([
                 'wiki_id' => $wiki->id,
-                'name' => 'wgSecretKey',
+                'name' => WikiSetting::wgSecretKey,
                 'value' => Str::random(64),
             ]);
 
@@ -84,8 +84,8 @@ class WikiController extends Controller
             // T285541
             WikiSetting::create([
                 'wiki_id' => $wiki->id,
-                'name' => 'wwExtEnableElasticSearch',
-                'value' => false,
+                'name' => WikiSetting::wwExtEnableElasticSearch,
+                'value' => true,
             ]);
 
             // Also track the domain forever in your domains table
