@@ -80,7 +80,7 @@ class WikiController extends Controller
                 'value' => Str::random(64),
             ]);
 
-            // Create elasticsearch setting to be updated once ElasticSearch has been initialized
+            // Create the enabled elasticsearch setting
             // T285541
             WikiSetting::create([
                 'wiki_id' => $wiki->id,
