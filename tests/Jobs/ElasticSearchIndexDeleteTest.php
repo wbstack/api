@@ -10,6 +10,8 @@ use App\WikiManager;
 use App\WikiSetting;
 use App\Wiki;
 use App\Jobs\ElasticSearchIndexDelete;
+use App\WikiDb;
+use Illuminate\Contracts\Queue\Job;
 
 class ElasticSearchIndexDeleteTest extends TestCase
 {
@@ -17,6 +19,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
 
     private $wiki;
     private $user;
+    private $wikiDb;
 
     public function setUp(): void {
         parent::setUp();
@@ -31,11 +34,15 @@ class ElasticSearchIndexDeleteTest extends TestCase
                 'value' => true
             ]
         );
+        $this->wikiDb = WikiDb::factory()->create([
+            'wiki_id' => $this->wiki->id
+        ]);
     }
 
     public function testDeletesElasticSearchIndex()
     {
-        $wikiBaseName = 'site1.localhost';
+        $this->wiki->delete();
+        $wikiBaseName = $this->wikiDb->name;
 
         $mockResponse = "index\n" . "{$wikiBaseName}_content_blabla\n" . "{$wikiBaseName}_general_bla\n";
         $mockJsonSuccess = '{"acknowledged" : true}';
@@ -49,7 +56,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
             ->method('setOptions')
             ->withConsecutive( 
             [[
-                CURLOPT_URL => getenv('ELASTICSEARCH_HOST').'/_cat/indices/'.$this->wiki->domain.'*?v&s=index&h=index',
+                CURLOPT_URL => getenv('ELASTICSEARCH_HOST').'/_cat/indices/'.$this->wikiDb->name.'*?v&s=index&h=index',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 10,
@@ -57,16 +64,20 @@ class ElasticSearchIndexDeleteTest extends TestCase
                 CURLOPT_CUSTOMREQUEST => 'GET',
             ]],
             [[
-                CURLOPT_URL => getenv('ELASTICSEARCH_HOST').'/'.$this->wiki->domain.'*',
+                CURLOPT_URL => getenv('ELASTICSEARCH_HOST').'/'.$this->wikiDb->name.'*',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
-                CURLOPT_TIMEOUT => 10,
+                CURLOPT_TIMEOUT => 60,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'DELETE',
             ]]);
         
 
-        $job = new ElasticSearchIndexDelete($this->wiki->domain, $this->wiki->id, $request);
+        $mockJob = $this->createMock(Job::class);
+        $mockJob->expects($this->never())->method('fail');
+
+        $job = new ElasticSearchIndexDelete( $this->wiki->id, $request );
+        $job->setJob($mockJob);
         $job->handle();
 
         // feature should get disabled
@@ -74,6 +85,82 @@ class ElasticSearchIndexDeleteTest extends TestCase
              1, 
              WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => false])->count()
         );
+    }
+
+    /**
+	 * @dataProvider failureProvider
+	 */
+    public function testFailure( $request, string $expectedFailure, $mockResponse, $settingStateInDatabase, $deleteWiki = true )
+    {
+        if ( $deleteWiki ) {
+            $this->wiki->delete();
+        }
+
+        $expectedFailure = str_replace('<WIKI_ID>', $this->wiki->id, $expectedFailure);
+        $expectedFailure = str_replace('<WIKI_DB_NAME>', $this->wikiDb->name, $expectedFailure);
+
+        $mockJob = $this->createMock(Job::class);
+        $mockJob->expects($this->once())
+                ->method('fail')
+                ->with(new \RuntimeException($expectedFailure));
+
+        $request->method('execute')
+            ->willReturnOnConsecutiveCalls( ...$mockResponse );
+
+        $job = new ElasticSearchIndexDelete($this->wiki->id, $request);
+        $job->setJob($mockJob);
+        $job->handle();
+        
+        $this->assertSame(
+             1, 
+             WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => $settingStateInDatabase])->count()
+        );
+
+    }
+
+    public function failureProvider() {
+
+        $mockResponse = "index\n" . "some_index_content_blabla\n" . "some_index_general_bla\n";
+        $mockJsonSuccess = '{"acknowledged" : true}';
+        $mockFailure = '{"acknowledged" : false}';
+
+        yield [
+            $this->createMock(HttpRequest::class),
+            'ElasticSearchIndexDelete job for <WIKI_ID> was not successful: {"acknowledged" : false}',
+            [ $mockResponse, $mockFailure ],
+            true
+        ];
+
+        yield [
+            $this->createMock(HttpRequest::class),
+            'ElasticSearchIndexDelete job for <WIKI_ID> was not successful: <html>',
+            [ $mockResponse, '<html>' ],
+            true
+        ];
+
+        if ( getenv('ELASTICSEARCH_HOST') ) {
+            yield [
+                $this->createMock(HttpRequest::class),
+                'Response looks weird when querying http://'.getenv('ELASTICSEARCH_HOST').'/_cat/indices/<WIKI_DB_NAME>*?v&s=index&h=index',
+                [ "<html>asdasd\n\nasdasd", $mockJsonSuccess ],
+                true
+            ];
+        }
+
+        yield [
+            $this->createMock(HttpRequest::class),
+            'No index to remove for <WIKI_ID>',
+            ["index\n", $mockJsonSuccess ],
+            false
+        ];
+
+        yield [
+            $this->createMock(HttpRequest::class),
+            'ElasticSearchIndexDelete job for <WIKI_ID> but that wiki is not marked as deleted.',
+            [$mockResponse, $mockJsonSuccess ],
+            true,
+            false // will not delete the wiki
+        ];
     }
 
 }

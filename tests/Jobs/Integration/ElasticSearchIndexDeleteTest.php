@@ -10,6 +10,8 @@ use App\WikiSetting;
 use App\Wiki;
 use App\Jobs\ElasticSearchIndexDelete;
 use App\Http\Curl\CurlRequest;
+use App\WikiDb;
+use Illuminate\Contracts\Queue\Job;
 
 /**
  * This is only meant to run when services is started with 
@@ -65,17 +67,17 @@ class ElasticSearchIndexDeleteTest extends TestCase
 
         $ELASTICSEARCH_HOST=getenv('ELASTICSEARCH_HOST');
 
-        $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/someotherdomain_general_first?pretty", 'PUT');
+        $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/someotherdbname_general_first?pretty", 'PUT');
         $this->assertTrue($response['acknowledged']);
 
         // create some dummy index to delete
-        $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/test_domain_general_first?pretty", 'PUT');
+        $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/test_db_name_general_first?pretty", 'PUT');
         $this->assertTrue($response['acknowledged']);
-        $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/test_domain_content_first?pretty", 'PUT');
+        $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/test_db_name_content_first?pretty", 'PUT');
         $this->assertTrue($response['acknowledged']);
 
         $this->user = User::factory()->create(['verified' => true]);
-        $this->wiki = Wiki::factory()->create(['domain' => 'test_domain']);
+        $this->wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
         WikiSetting::factory()->create(
             [
@@ -84,26 +86,35 @@ class ElasticSearchIndexDeleteTest extends TestCase
                 'value' => false
             ]
         );
+        WikiDb::factory()->create([
+            'wiki_id' => $this->wiki->id,
+            'name' => 'test_db_name'
+        ]);
 
-        $job = new ElasticSearchIndexDelete($this->wiki->domain, $this->wiki->id);
+        $this->wiki->delete();
+
+        $mockJob = $this->createMock(Job::class);
+        $mockJob->expects($this->never())->method('fail');
+        $job = new ElasticSearchIndexDelete( $this->wiki->id);
+        $job->setJob($mockJob);
         $job->handle();
 
         // feature should get disabled
         $this->assertNull( WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->first());
 
         // first index should be gone
-        $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/test_domain_content_first?pretty");
+        $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/test_db_name_content_first?pretty");
         $this->assertSame($response['status'], 404);
 
         // second index should be gone
-        $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/test_domain_general_first?pretty");
+        $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/test_db_name_general_first?pretty");
         $this->assertSame($response['status'], 404);
 
         // the other domain should still exist
-        $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/someotherdomain_general_first?pretty");
-        $this->assertNotNull($response['someotherdomain_general_first']);
+        $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/someotherdbname_general_first?pretty");
+        $this->assertNotNull($response['someotherdbname_general_first']);
 
-        $this->makeRequest("http://$ELASTICSEARCH_HOST/someotherdomain_general_first?pretty", 'DELETE');
+        $this->makeRequest("http://$ELASTICSEARCH_HOST/someotherdbname_general_first?pretty", 'DELETE');
 
     }
 

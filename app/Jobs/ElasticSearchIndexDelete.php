@@ -5,10 +5,10 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\WikiSetting;
 use App\Http\Curl\CurlRequest;
 use App\Http\Curl\HttpRequest;
+use App\Wiki;
 
 class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
 {
-    private $wikiDomain;
     private $wikiId;
 
     private $request;
@@ -16,9 +16,8 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
     /**
      * @return void
      */
-    public function __construct( string $wikiDomain, int $wikiId, HttpRequest $request = null )
+    public function __construct( int $wikiId, HttpRequest $request = null )
     {
-        $this->wikiDomain = $wikiDomain;
         $this->wikiId = $wikiId;
         $this->request = $request ?? new CurlRequest();
     }
@@ -30,7 +29,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
      */
     public function uniqueId()
     {
-        return $this->wikiDomain;
+        return strval($this->wikiId);
     }
 
     /**
@@ -38,17 +37,32 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
      */
     public function handle()
     {
-        $setting = WikiSetting::where([ 'wiki_id' => $this->wikiId, 'name' => WikiSetting::wwExtEnableElasticSearch, ])->first();
+        $wiki = Wiki::withTrashed()->where( [ 'id' => $this->wikiId ] )->with('settings')->with('wikiDb')->first();
 
-        // job got triggered but no setting in database
-        if ( $setting === null ) {
-            $this->fail(
-                new \RuntimeException('wbstackElasticSearchDelete call for '.$this->wikiDomain.' was triggered but not setting available.')
-            );
-
+        if ( !$wiki ) {
+            $this->fail( new \RuntimeException('ElasticSearchIndexDelete job for '.$this->wikiId.' was triggered but no wiki available.') );
             return;
         }
-        $elasticSearchBaseName = $this->wikiDomain;
+
+        if ( !$wiki->deleted_at ) {
+            $this->fail( new \RuntimeException('ElasticSearchIndexDelete job for '.$this->wikiId.' but that wiki is not marked as deleted.') );
+            return;
+        }
+
+        $setting = $wiki->settings()->where([ 'name' => WikiSetting::wwExtEnableElasticSearch, ])->first();
+        if ( !$setting ) {
+            $this->fail( new \RuntimeException('ElasticSearchIndexDelete job for '.$this->wikiId.' was triggered but no setting available') );
+            return;
+        }
+
+        $wikiDB = $wiki->wikiDb()->first();
+        if ( !$wikiDB ) {
+            $this->fail( new \RuntimeException('ElasticSearchIndexDelete job for '.$this->wikiId.' was triggered but no WikiDb available') );
+            $setting->update( [  'value' => false  ] );
+            return;
+        }
+        
+        $elasticSearchBaseName = $wikiDB->name;
         $elasticSearchHost = getenv('ELASTICSEARCH_HOST');
         
         if( !$elasticSearchHost ) {
@@ -56,8 +70,8 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
             return;
         }
 
-        $url = $elasticSearchHost."/_cat/indices/{$elasticSearchBaseName}*?v&s=index&h=index";
-                
+        // Make an initial request to see if there is anything
+        $url = $elasticSearchHost."/_cat/indices/{$elasticSearchBaseName}*?v&s=index&h=index"; 
         $this->request->setOptions( 
             [
                 CURLOPT_URL => $url,
@@ -72,11 +86,8 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
         $rawResponse = $this->request->execute();
         $err = $this->request->error();
         
-        if ($err ) {
-            $this->fail(
-                new \RuntimeException('curl error for '.$this->wikiDomain.': '.$err)
-            );
-
+        if ( $err ) {
+            $this->fail( new \RuntimeException('curl error for '.$this->wikiId.': '.$err) );
             return;
         }
 
@@ -93,10 +104,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
             // update setting to be disabled
             $setting->update( [  'value' => false ] );
 
-            $this->fail(
-                new \RuntimeException("No index to remove for {$this->wikiDomain}")
-            );
-
+            $this->fail( new \RuntimeException("No index to remove for {$this->wikiId}") );
             return;
         }
 
@@ -104,19 +112,14 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
 
         // make sure response is formatted correctly
         if ($indexHeader !== 'index') {
-            $this->fail(
-                new \RuntimeException("Response looks weird when querying {$url}")
-            );
-
+            $this->fail( new \RuntimeException("Response looks weird when querying {$url}") );
             return;
         }
 
         // So there are some indices to delete for the wiki
         //
         // make a request to the elasticsearch cluster using DELETE
-        // use cirrusSearch baseName to delete indexes
-        //
-        // TODO should probably use the wiki_id instead as basename
+        // use cirrusSearch baseName to delete indices
         $url = $elasticSearchHost."/{$elasticSearchBaseName}*";
 
         $this->request->reset();
@@ -126,7 +129,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
-                CURLOPT_TIMEOUT => 10,
+                CURLOPT_TIMEOUT => 60,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'DELETE',
             ]
@@ -137,20 +140,15 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
         $this->request->close();
 
         if ($err ) {
-            $this->fail(
-                new \RuntimeException('curl error for '.$this->wikiDomain.': '.$err)
-            );
+            $this->fail( new \RuntimeException('curl error for '.$this->wikiId.': '.$err) );
 
             return;
         }
 
         $response = json_decode($rawResponse, true);
 
-        if (!array_key_exists('acknowledged', $response) || $response['acknowledged'] !== true) {
-            $this->fail(
-                new \RuntimeException('wbstackElasticSearchDelete call for '.$this->wikiDomain.' was not successful:'.$rawResponse)
-            );
-
+        if ( !is_array($response) || !array_key_exists('acknowledged', $response) || $response['acknowledged'] !== true) {
+            $this->fail( new \RuntimeException('ElasticSearchIndexDelete job for '.$this->wikiId.' was not successful: '.$rawResponse) );
             return;
         }
 
