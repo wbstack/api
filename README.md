@@ -20,8 +20,6 @@ and query service management code.
 
 `cp .env.example .env` and modify the contents accordingly.
 
-`docker-compose exec api php artisan key:generate` to generate and set the APP_KEY env variable.
-
 ### docker-compose
 
 You should be able to run some amount of this application in docker-compose.
@@ -32,7 +30,15 @@ Though the experience is not that refined...
 docker-compose up -d
 ```
 
-Try loading http://localhost:8070/ until the DB is up and the connection works.
+### Migrations  
+
+Run everything in one go ...
+
+```sh
+docker-compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install && php artisan db:seed && php artisan key:generate'
+```
+
+Or each command separately ...
 
 ```sh
 # Create the SQL tables needed
@@ -47,6 +53,8 @@ docker-compose exec api php artisan db:seed
 # Generate and set the APP_KEY env variable.
 docker-compose exec api php artisan key:generate
 ```
+
+Try loading http://localhost:8070/ until the DB is up and the connection works.
 
 If you want to develop with the UI then simply point the UI docker-compose setup to localhost:8082
 
