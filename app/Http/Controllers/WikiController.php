@@ -118,7 +118,7 @@ class WikiController extends Controller
         $this->dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
 
         // dispatch elasticsearch init job to enable the feature
-        $this->dispatch(new ElasticSearchIndexInit($wiki->domain, $wiki->id));
+        $this->dispatch(new ElasticSearchIndexInit($wiki->id));
 
         $res['success'] = true;
         $res['message'] = 'Success!';
