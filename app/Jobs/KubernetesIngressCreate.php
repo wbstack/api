@@ -26,6 +26,10 @@ class KubernetesIngressCreate extends Job
         $this->wikiDomain = $wikiDomain;
     }
 
+    public static function getKubernetesIngressName( $wikiId ): string {
+        return 'mediawiki-site-' . $wikiId;
+    }
+
     /**
      * @return void
      */
@@ -52,7 +56,7 @@ class KubernetesIngressCreate extends Job
                  * So, just use the ID number here
                  * We can add a label showing the domain and allowing selection.
                  */
-                'name' => 'mediawiki-site-'.$this->id,
+                'name' => self::getKubernetesIngressName($this->id),
                 'namespace' => 'default',
                 'labels' => [
                     'wbstack-wiki-id' => strval($this->id),
