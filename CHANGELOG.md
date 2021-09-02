@@ -1,6 +1,10 @@
 # api
 
-## 8x.1.4 -  September 2021
+## 8x.1.5 -  September 2021
+
+- [Fix ElasticSearchIndexInit error checking](https://github.com/wbstack/api/pull/184)
+
+**8x.1.4* - 2 September 2021, Not ideal
 
 - [Add CURLOPT_TIMEOUT_ELASTICSEARCH_INIT](https://github.com/wbstack/api/pull/183)
 
