@@ -1,14 +1,18 @@
 # api
 
-## 8x.1.5 -  September 2021
+## 8x.1.6 - 2 September 2021
+
+- [Fix ApiWbStackElasticSearchInit does not contain success](https://github.com/wbstack/api/pull/185)
+
+**8x.1.5** - 2 September 2021, broken in some way
 
 - [Fix ElasticSearchIndexInit error checking](https://github.com/wbstack/api/pull/184)
 
-**8x.1.4* - 2 September 2021, Not ideal
+**8x.1.4** - 2 September 2021, broken in some way
 
 - [Add CURLOPT_TIMEOUT_ELASTICSEARCH_INIT](https://github.com/wbstack/api/pull/183)
 
-**8x.1.3** - 2 September 2021, Not ideal
+**8x.1.3** - 2 September 2021, broken in some way
 
 - [MediawikiInit job timeout increase (10-60 seconds)](https://github.com/wbstack/api/pull/180)
 - FIX [ElasticSearchIndexInit job curl issues](https://github.com/wbstack/api/pull/182)
