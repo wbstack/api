@@ -1,6 +1,6 @@
 # api
 
-## 8x.1.2 - X August 2021
+## 8x.1.2 - 2 September 2021
 
 - [Laravel 8.5.1 to 8.5.2](https://github.com/wbstack/api/pull/140)
 - [Enable elastic search on new wikis (calling `wbstackElasticSearchInit` on creation)](https://github.com/wbstack/api/pull/147)
