@@ -10,15 +10,13 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
 {
     private $wikiId;
-    private $request;
 
     /**
      * @return void
      */
-    public function __construct( $wikiId, HttpRequest $request = null)
+    public function __construct( $wikiId )
     {
         $this->wikiId = $wikiId;
-        $this->request = $request ?? new CurlRequest();
     }
 
     /**
@@ -34,7 +32,7 @@ class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
     /**
      * @return void
      */
-    public function handle()
+    public function handle( HttpRequest $request )
     {
         $qsNamespace = QueryserviceNamespace::whereWikiId($this->wikiId)->first();
 
@@ -43,13 +41,13 @@ class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
             return;
         }
 
-        $queryServiceHost = config('app.queryservice_host');
+        $url = $qsNamespace->backend . '/bigdata/namespace/' . $qsNamespace->namespace;
 
-        $this->request->setOptions([
-            CURLOPT_URL => $queryServiceHost.'/bigdata/namespace/' . $qsNamespace->namespace ,
+        $request->setOptions([
+            CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
-            CURLOPT_TIMEOUT => 10,
+            CURLOPT_TIMEOUT => getenv('CURLOPT_TIMEOUT_DELETE_QUERYSERVICE_NAMESPACE') ?: 100,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             // User agent is needed by the query service...
             CURLOPT_USERAGENT => 'WBStack DeleteQueryserviceNamespaceJob',
@@ -59,10 +57,10 @@ class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
             ],
         ]);
 
-        $response = $this->request->execute(); 
-        $err = $this->request->error();
+        $response = $request->execute();
+        $err = $request->error();
 
-        $this->request->close();
+        $request->close();
 
         if ($err) {
             $this->fail( new \RuntimeException('cURL Error #:'.$err) );
@@ -70,16 +68,10 @@ class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
         } else {
             if ($response === 'DELETED: '.$qsNamespace->namespace) {
 
-                QueryserviceNamespace::where([
-                    'namespace' => $qsNamespace->namespace,
-                    'backend' => $queryServiceHost,
-                ])->delete();
+                $qsNamespace->delete();
 
             } else {
-                $this->fail(
-                    new \RuntimeException('Valid response, but couldn\'t find "DELETED: " in: '.$response)
-                );
-
+                $this->fail( new \RuntimeException('Valid response, but couldn\'t find "DELETED: " in: '.$response) );
                 return;
             }
         }

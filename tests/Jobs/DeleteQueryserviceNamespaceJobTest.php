@@ -34,6 +34,8 @@ class DeleteQueryserviceNamespaceJobTest extends TestCase
 
         DB::table('queryservice_namespaces')->where(['id'=>$dbRow->id])->limit(1)->update(['wiki_id' => $wiki->id]);
 
+        putenv('CURLOPT_TIMEOUT_DELETE_QUERYSERVICE_NAMESPACE=1234');
+
         $mockResponse = 'DELETED: '.$namespace;
         $request = $this->createMock(HttpRequest::class);
         $request->expects($this->exactly(1))
@@ -44,10 +46,10 @@ class DeleteQueryserviceNamespaceJobTest extends TestCase
             ->method('setOptions')
             ->with( 
             [ 
-                CURLOPT_URL => $host.'/bigdata/namespace/' . $namespace,
+                CURLOPT_URL => $dbRow->backend.'/bigdata/namespace/' . $namespace,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
-                CURLOPT_TIMEOUT => 10,
+                CURLOPT_TIMEOUT => 1234,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 // User agent is needed by the query service...
                 CURLOPT_USERAGENT => 'WBStack DeleteQueryserviceNamespaceJob',
@@ -58,8 +60,8 @@ class DeleteQueryserviceNamespaceJobTest extends TestCase
             ]);
 
         
-        $job = new DeleteQueryserviceNamespaceJob($wiki->id, $request);
-        $job->handle();
+        $job = new DeleteQueryserviceNamespaceJob($wiki->id);
+        $job->handle( $request );
 
         $this->assertSame(
              0, 
@@ -77,9 +79,9 @@ class DeleteQueryserviceNamespaceJobTest extends TestCase
         $request->expects($this->never())
             ->method('execute');
 
-        $job = new DeleteQueryserviceNamespaceJob(123, $request);
+        $job = new DeleteQueryserviceNamespaceJob(123);
         $job->setJob($mockJob);
-        $job->handle();
+        $job->handle($request);
     }
 
 
@@ -98,9 +100,9 @@ class DeleteQueryserviceNamespaceJobTest extends TestCase
         $request->expects($this->never())
             ->method('execute');
 
-        $job = new DeleteQueryserviceNamespaceJob($wiki->id, $request);
+        $job = new DeleteQueryserviceNamespaceJob($wiki->id);
         $job->setJob($mockJob);
-        $job->handle();
+        $job->handle($request);
     }
 
 }

@@ -13,6 +13,7 @@ use App\WikiManager;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 /**
  * This is only meant to run when services is started with 
@@ -23,6 +24,7 @@ use Illuminate\Contracts\Queue\Job;
 class QueryserviceNamespaceJobTest extends TestCase
 {
     use DatabaseTransactions;
+    use DispatchesJobs;
 
     public function setUp(): void {
         parent::setUp();
@@ -44,7 +46,7 @@ class QueryserviceNamespaceJobTest extends TestCase
         $namespace = 'testnamespace';
         $job = new ProvisionQueryserviceNamespaceJob($namespace);
         $job->setJob($mockJob);
-        $job->handle();
+        $this->dispatchNow($job);
 
         DB::table('queryservice_namespaces')->where(['namespace'=>$namespace])->limit(1)->update(['wiki_id' => $wiki->id]);
 
@@ -54,7 +56,7 @@ class QueryserviceNamespaceJobTest extends TestCase
 
         $job = new DeleteQueryserviceNamespaceJob($wiki->id);
         $job->setJob($mockJob);
-        $job->handle();
+        $this->dispatchNow($job);
 
         $this->assertNull(
             QueryserviceNamespace::whereWikiId($wiki->id)->first()
