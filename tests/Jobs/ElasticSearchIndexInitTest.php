@@ -58,7 +58,7 @@ class ElasticSearchIndexInitTest extends TestCase
         $mockResponse = [
             'warnings' => [],
             'wbstackElasticSearchInit' => [
-                "success" => 1,
+                "return" => 0,
                 "output" => [
                     '\tCreating index...ok' // successfully created some index
                 ]
@@ -105,7 +105,7 @@ class ElasticSearchIndexInitTest extends TestCase
         $mockResponse = [
             'warnings' => [],
             'wbstackElasticSearchInit' => [
-                "success" => 1,
+                "return" => 0,
                 "output" => [
                     '\t\tValidating ' . $this->wikiDb->name . '_general alias...ok'
                 ]
@@ -176,14 +176,14 @@ class ElasticSearchIndexInitTest extends TestCase
         $mockResponse = [
             'warnings' => [],
             'wbstackElasticSearchInit' => [
-                "success" => 0,
+                "return" => 0,
                 "output" => []
             ]
         ];
 
         yield [
             $this->createMock(HttpRequest::class),
-            'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"success":0,"output":[]}}',
+            'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"return":0,"output":[]}}',
             $mockResponse
         ];
 
@@ -195,10 +195,10 @@ class ElasticSearchIndexInitTest extends TestCase
             $mockResponse
         ];
 
-        $mockResponse['wbstackElasticSearchInit']['success'] = 1;
+        $mockResponse['wbstackElasticSearchInit']['return'] = 1;
         yield [
             $this->createMock(HttpRequest::class),
-            'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"success":1,"output":[]}}',
+            'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"return":1,"output":[]}}',
             $mockResponse
         ];
 

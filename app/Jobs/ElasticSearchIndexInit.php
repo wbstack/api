@@ -92,7 +92,7 @@ class ElasticSearchIndexInit extends Job implements ShouldBeUnique
             return;
         }
 
-        if ( !array_key_exists('success', $response['wbstackElasticSearchInit']) || $response['wbstackElasticSearchInit']['success'] == 0) {
+        if ( !array_key_exists('return', $response['wbstackElasticSearchInit']) || $response['wbstackElasticSearchInit']['return'] !== 0) {
             $this->fail( new \RuntimeException('wbstackElasticSearchInit call for '.$this->wikiId.' was not successful:'.$rawResponse) );
             $setting->update( [  'value' => false  ] );
             return;
