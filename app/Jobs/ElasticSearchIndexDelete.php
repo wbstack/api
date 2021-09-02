@@ -3,7 +3,6 @@
 namespace App\Jobs;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\WikiSetting;
-use App\Http\Curl\CurlRequest;
 use App\Http\Curl\HttpRequest;
 use App\Wiki;
 
@@ -11,15 +10,12 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
 {
     private $wikiId;
 
-    private $request;
-
     /**
      * @return void
      */
-    public function __construct( int $wikiId, HttpRequest $request = null )
+    public function __construct( int $wikiId)
     {
         $this->wikiId = $wikiId;
-        $this->request = $request ?? new CurlRequest();
     }
 
     /**
@@ -35,7 +31,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
     /**
      * @return void
      */
-    public function handle()
+    public function handle( HttpRequest $request )
     {
         $wiki = Wiki::withTrashed()->where( [ 'id' => $this->wikiId ] )->with('settings')->with('wikiDb')->first();
 
@@ -72,7 +68,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
 
         // Make an initial request to see if there is anything
         $url = $elasticSearchHost."/_cat/indices/{$elasticSearchBaseName}*?v&s=index&h=index"; 
-        $this->request->setOptions( 
+        $request->setOptions( 
             [
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
@@ -83,8 +79,8 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
             ]
         );
 
-        $rawResponse = $this->request->execute();
-        $err = $this->request->error();
+        $rawResponse = $request->execute();
+        $err = $request->error();
         
         if ( $err ) {
             $this->fail( new \RuntimeException('curl error for '.$this->wikiId.': '.$err) );
@@ -122,9 +118,9 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
         // use cirrusSearch baseName to delete indices
         $url = $elasticSearchHost."/{$elasticSearchBaseName}*";
 
-        $this->request->reset();
+        $request->reset();
 
-        $this->request->setOptions( 
+        $request->setOptions( 
             [
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
@@ -135,9 +131,9 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
             ]
         );
 
-        $rawResponse = $this->request->execute();
-        $err = $this->request->error();
-        $this->request->close();
+        $rawResponse = $request->execute();
+        $err = $request->error();
+        $request->close();
 
         if ($err ) {
             $this->fail( new \RuntimeException('curl error for '.$this->wikiId.': '.$err) );

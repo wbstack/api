@@ -12,6 +12,7 @@ use App\Jobs\ElasticSearchIndexDelete;
 use App\Http\Curl\CurlRequest;
 use App\WikiDb;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 /**
  * This is only meant to run when services is started with 
@@ -26,6 +27,7 @@ use Illuminate\Contracts\Queue\Job;
 class ElasticSearchIndexDeleteTest extends TestCase
 {
     use DatabaseTransactions;
+    use DispatchesJobs;
 
     private $wiki;
     private $user;
@@ -97,7 +99,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
         $mockJob->expects($this->never())->method('fail');
         $job = new ElasticSearchIndexDelete( $this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle();
+        $this->dispatchNow($job);
 
         // feature should get disabled
         $this->assertNull( WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->first());

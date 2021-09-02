@@ -76,9 +76,9 @@ class ElasticSearchIndexDeleteTest extends TestCase
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
-        $job = new ElasticSearchIndexDelete( $this->wiki->id, $request );
+        $job = new ElasticSearchIndexDelete( $this->wiki->id );
         $job->setJob($mockJob);
-        $job->handle();
+        $job->handle( $request );
 
         // feature should get disabled
         $this->assertSame(
@@ -107,9 +107,9 @@ class ElasticSearchIndexDeleteTest extends TestCase
         $request->method('execute')
             ->willReturnOnConsecutiveCalls( ...$mockResponse );
 
-        $job = new ElasticSearchIndexDelete($this->wiki->id, $request);
+        $job = new ElasticSearchIndexDelete($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle();
+        $job->handle( $request );
         
         $this->assertSame(
              1, 
