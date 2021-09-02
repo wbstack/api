@@ -113,12 +113,12 @@ class WikiController extends Controller
             }
         });
 
+        // dispatch elasticsearch init job to enable the feature
+        $this->dispatch(new ElasticSearchIndexInit($wiki->id));
+        
         // opportunistic dispatching of jobs to make sure storage pools are topped up
         $this->dispatch(new ProvisionWikiDbJob(null, null, 10));
         $this->dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
-
-        // dispatch elasticsearch init job to enable the feature
-        $this->dispatch(new ElasticSearchIndexInit($wiki->id));
 
         $res['success'] = true;
         $res['message'] = 'Success!';
