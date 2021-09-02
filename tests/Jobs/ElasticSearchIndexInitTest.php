@@ -12,10 +12,14 @@ use App\WikiSetting;
 use App\Wiki;
 use Illuminate\Contracts\Queue\Job;
 use App\WikiDb;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Support\Facades\DB;
+use PHPUnit\TextUI\RuntimeException;
 
 class ElasticSearchIndexInitTest extends TestCase
 {
     use DatabaseTransactions;
+    use DispatchesJobs;
 
     private $wiki;
     private $wikiDb;
@@ -34,9 +38,19 @@ class ElasticSearchIndexInitTest extends TestCase
                 'value' => true
             ]
         );
+
         $this->wikiDb = WikiDb::factory()->create([
             'wiki_id' => $this->wiki->id
         ]);
+    }
+
+    public function testDispatching() {
+        $mockJob = $this->createMock(Job::class);
+        $job = new ElasticSearchIndexInit($this->wiki->id);
+        $job->setJob($mockJob);
+        $mockJob->expects($this->once())
+            ->method('fail');
+        $this->dispatchNow($job);
     }
 
     public function testSuccess()
@@ -58,9 +72,9 @@ class ElasticSearchIndexInitTest extends TestCase
                 ->method('fail')
                 ->withAnyParameters();
 
-        $job = new ElasticSearchIndexInit($this->wiki->id, $request);
+        $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle();
+        $job->handle($request);
 
         // feature should get enabled
         $this->assertSame(
@@ -88,9 +102,9 @@ class ElasticSearchIndexInitTest extends TestCase
                 ->method('fail')
                 ->withAnyParameters();
 
-        $job = new ElasticSearchIndexInit($this->wiki->id, $request);
+        $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle();
+        $job->handle($request);
 
         // feature should get enabled
         $this->assertSame(
@@ -105,8 +119,8 @@ class ElasticSearchIndexInitTest extends TestCase
         $request = $this->createMock(HttpRequest::class);
         $request->expects( $this->never() )->method('execute');
 
-        $job = new ElasticSearchIndexInit($this->wiki->id, $request);
-        $job->handle();
+        $job = new ElasticSearchIndexInit($this->wiki->id);
+        $job->handle($request);
     }
 
     /**
@@ -122,9 +136,9 @@ class ElasticSearchIndexInitTest extends TestCase
                 
         $request->method('execute')->willReturn(json_encode($mockResponse));
 
-        $job = new ElasticSearchIndexInit($this->wiki->id, $request);
+        $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle();
+        $job->handle($request);
         
 
         $this->assertSame(

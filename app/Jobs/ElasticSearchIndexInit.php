@@ -11,15 +11,13 @@ use App\Wiki;
 class ElasticSearchIndexInit extends Job implements ShouldBeUnique
 {
     private $wikiId;
-    private $request;
 
     /**
      * @return void
      */
-    public function __construct( int $wikiId, HttpRequest $request = null )
+    public function __construct( int $wikiId )
     {
         $this->wikiId = $wikiId;
-        $this->request = $request ?? new CurlRequest();
     }
 
     /**
@@ -35,7 +33,7 @@ class ElasticSearchIndexInit extends Job implements ShouldBeUnique
     /**
      * @return void
      */
-    public function handle()
+    public function handle( HttpRequest $request )
     {
         $wiki = Wiki::whereId( $this->wikiId )->with('settings')->with('wikiDb')->first();
 
@@ -60,7 +58,7 @@ class ElasticSearchIndexInit extends Job implements ShouldBeUnique
             return;
         }
         
-        $this->request->setOptions( 
+        $request->setOptions(
             [
                 CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json',
                 CURLOPT_RETURNTRANSFER => true,
@@ -75,8 +73,8 @@ class ElasticSearchIndexInit extends Job implements ShouldBeUnique
             ]
         );
 
-        $rawResponse = $this->request->execute();
-        $err = $this->request->error();
+        $rawResponse = $request->execute();
+        $err = $request->error();
 
         if ($err) {
             $this->fail( new \RuntimeException('curl error for '.$this->wikiId.': '.$err) );
@@ -84,17 +82,17 @@ class ElasticSearchIndexInit extends Job implements ShouldBeUnique
             return;
         }
 
-        $this->request->close();
+        $request->close();
 
         $response = json_decode($rawResponse, true);
 
-        if (!array_key_exists('wbstackElasticSearchInit', $response)) {
+        if ( !is_array($response) || !array_key_exists('wbstackElasticSearchInit', $response) ) {
             $this->fail( new \RuntimeException('wbstackElasticSearchInit call for '.$this->wikiId.'. No wbstackElasticSearchInit key in response: '.$rawResponse) );
             $setting->update( [  'value' => false  ] );
             return;
         }
 
-        if ($response['wbstackElasticSearchInit']['success'] == 0) {
+        if ( !array_key_exists('success', $response['wbstackElasticSearchInit']) || $response['wbstackElasticSearchInit']['success'] == 0) {
             $this->fail( new \RuntimeException('wbstackElasticSearchInit call for '.$this->wikiId.' was not successful:'.$rawResponse) );
             $setting->update( [  'value' => false  ] );
             return;
