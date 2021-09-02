@@ -60,7 +60,7 @@ class ElasticSearchIndexInitTest extends TestCase
             'wbstackElasticSearchInit' => [
                 "return" => 0,
                 "output" => [
-                    '\tCreating index...ok' // successfully created some index
+                    "\tCreating index...ok" // successfully created some index
                 ]
             ]
         ];
@@ -107,7 +107,7 @@ class ElasticSearchIndexInitTest extends TestCase
             'wbstackElasticSearchInit' => [
                 "return" => 0,
                 "output" => [
-                    '\t\tValidating ' . $this->wikiDb->name . '_general alias...ok'
+                    "\t\tValidating {$this->wikiDb->name}_general alias...ok"
                 ]
             ]
         ];

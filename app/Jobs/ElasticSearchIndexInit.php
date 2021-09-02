@@ -103,13 +103,13 @@ class ElasticSearchIndexInit extends Job implements ShouldBeUnique
         $enableElasticSearchFeature = false;
 
         // occurs a couple of times when newly created
-        if ( in_array( "\\tCreating index...ok",  $output ) ) {
+        if ( in_array( "\tCreating index...ok",  $output ) ) {
 
             // newly created index succeeded, turn on the wiki setting
             $enableElasticSearchFeature = true;
 
         // occurs on a successful update run
-        } else if ( in_array( "\\t\\tValidating {$wikiDB->name}_general alias...ok", $output ) ) {
+        } else if ( in_array( "\t\tValidating {$wikiDB->name}_general alias...ok", $output ) ) {
 
             // script ran and update was successful, make sure feature is enabled
             $enableElasticSearchFeature = true;
