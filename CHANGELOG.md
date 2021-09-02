@@ -1,11 +1,15 @@
 # api
 
-## 8x.1.3 - 2 September 2021
+## 8x.1.4 -  September 2021
+
+- [Add CURLOPT_TIMEOUT_ELASTICSEARCH_INIT](https://github.com/wbstack/api/pull/183)
+
+**8x.1.3** - 2 September 2021, Not ideal
 
 - [MediawikiInit job timeout increase (10-60 seconds)](https://github.com/wbstack/api/pull/180)
 - FIX [ElasticSearchIndexInit job curl issues](https://github.com/wbstack/api/pull/182)
 
-**8x.1.2** - 2 September 2021 Broken https://github.com/wbstack/api/issues/181
+**8x.1.2** - 2 September 2021, Broken https://github.com/wbstack/api/issues/181
 
 - [Laravel 8.5.1 to 8.5.2](https://github.com/wbstack/api/pull/140)
 - [Enable elastic search on new wikis (calling `wbstackElasticSearchInit` on creation)](https://github.com/wbstack/api/pull/147)
