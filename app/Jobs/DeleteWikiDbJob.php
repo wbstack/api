@@ -5,9 +5,11 @@ namespace App\Jobs;
 use App\WikiDb;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use PDOException;
+use App\Wiki;
 
 /**
- * Deletes the created Database, User and WikiDB relation for a wiki 
+ * Prepends the MW Database, User with `deleted_` prefix and deletes WikiDB relation for a wiki 
  */
 class DeleteWikiDbJob extends Job implements ShouldBeUnique
 {
@@ -36,6 +38,19 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
      */
     public function handle()
     {
+
+        $wiki = Wiki::withTrashed()->where(['id' => $this->wikiId])->first();
+
+        if( !$wiki ) {
+            $this->fail(new \RuntimeException("Wiki not found for {$this->wikiId}"));
+            return;
+        }
+
+        if( !$wiki->deleted_at ) {
+            $this->fail(new \RuntimeException("Wiki {$this->wikiId} is not marked for deletion."));
+            return;
+        }
+
         $wikiDB = WikiDb::whereWikiId( $this->wikiId )->first();
 
         if( !$wikiDB ) {
@@ -48,19 +63,35 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
             $this->fail(new \RuntimeException('Must be run on a PDO based DB connection'));
             return;
         }
+
         $pdo = $conn->getPdo();
+        $sm = $conn->getDoctrineSchemaManager();
+        $tableNames = $sm->listTableNames();
 
-        // DELETE the database
-        if ($pdo->exec('DROP DATABASE '.$wikiDB->name) === false) {
-            $this->fail( new \RuntimeException('Failed to drop database with dbname: '.$wikiDB->name) );
-            // let it pass through and try to delete the user too
-        }
+        $deletedDatabaseName = 'deleted_' . $wikiDB->name;
 
-        if ($pdo->exec('DROP USER '.$wikiDB->user) === false) {
-            $this->fail( new \RuntimeException('Failed to drop user: '.$wikiDB->user) );
+        try {
+            $pdo->beginTransaction();
+            $pdo->exec('SET GLOBAL FOREIGN_KEY_CHECKS=0;');
+
+            // Create the new database
+            $pdo->exec(sprintf('CREATE DATABASE %s', $deletedDatabaseName));
+
+            foreach($tableNames as $table) {
+                $pdo->exec(sprintf('RENAME TABLE %s.%s TO %s.%s', $wikiDB->name, $table, $deletedDatabaseName, $table));
+            }
+
+            $pdo->exec(sprintf('RENAME USER %s TO %s', $wikiDB->user, 'deleted_' . $wikiDB->user ));
+
+            $pdo->exec('SET GLOBAL FOREIGN_KEY_CHECKS=1;');
+            $pdo->commit();
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            $this->fail( new \RuntimeException('Failed to soft-soft delete '.$wikiDB->name . ': ' . $e->getMessage()) );
             return;
         }
 
         $wikiDB->delete();
+
     }
 }
