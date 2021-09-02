@@ -67,6 +67,23 @@ class ElasticSearchIndexInitTest extends TestCase
         $request = $this->createMock(HttpRequest::class);
         $request->method('execute')->willReturn(json_encode($mockResponse));
 
+        putenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT=1234');
+
+        $request->expects($this->once())
+            ->method('setOptions')
+            ->with([
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_TIMEOUT => 1234,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_HTTPHEADER => [
+                    'content-type: application/x-www-form-urlencoded',
+                    'host: '.$this->wiki->domain,
+                ]
+        ]);
+
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())
                 ->method('fail')
