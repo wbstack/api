@@ -1,17 +1,35 @@
 <?php
 
 namespace App\Jobs;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use App\WikiSetting;
+use App\Http\Curl\CurlRequest;
+use App\Http\Curl\HttpRequest;
+use Illuminate\Support\Facades\Log;
+use App\Wiki;
 
-class ElasticSearchIndexInit extends Job
+class ElasticSearchIndexInit extends Job implements ShouldBeUnique
 {
-    private $wikiDomain;
+    private $wikiId;
+    private $request;
 
     /**
      * @return void
      */
-    public function __construct($wikiDomain)
+    public function __construct( int $wikiId, HttpRequest $request = null )
     {
-        $this->wikiDomain = $wikiDomain;
+        $this->wikiId = $wikiId;
+        $this->request = $request ?? new CurlRequest();
+    }
+
+    /**
+     * The unique ID of the job.
+     *
+     * @return string
+     */
+    public function uniqueId()
+    {
+        return strval($this->wikiId);
     }
 
     /**
@@ -19,48 +37,91 @@ class ElasticSearchIndexInit extends Job
      */
     public function handle()
     {
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_TIMEOUT => 10,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_HTTPHEADER => [
-                'content-type: application/x-www-form-urlencoded',
-                'host: '.$this->wikiDomain,
-            ],
-        ]);
+        $wiki = Wiki::whereId( $this->wikiId )->with('settings')->with('wikiDb')->first();
 
-        $rawResponse = curl_exec($curl);
-        $err = curl_error($curl);
-        if ($err) {
-            $this->fail(
-                new \RuntimeException('curl error for '.$this->wikiDomain.': '.$err)
-            );
-
-            return; //safegaurd
+        // job got triggered but no wiki
+        if ( !$wiki ) {
+            $this->fail( new \RuntimeException('wbstackElasticSearchInit call for '.$this->wikiId.' was triggered but not wiki available.') );
+            return;
         }
 
-        curl_close($curl);
+        $setting = $wiki->settings()->where([ 'name' => WikiSetting::wwExtEnableElasticSearch, ])->first();
+        // job got triggered but no setting
+        if ( !$setting ) {
+            $this->fail( new \RuntimeException('wbstackElasticSearchInit call for '.$this->wikiId.' was triggered but not setting available') );
+            return;
+        }
+
+        $wikiDB = $wiki->wikiDb()->first();
+        // no wikiDB around
+        if ( !$wikiDB ) {
+            $this->fail( new \RuntimeException('wbstackElasticSearchInit call for '.$this->wikiId.' was triggered but not WikiDb available') );
+            $setting->update( [  'value' => false  ] );
+            return;
+        }
+        
+        $this->request->setOptions( 
+            [
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_TIMEOUT => 60, // This could potentially take a bit longer
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_HTTPHEADER => [
+                    'content-type: application/x-www-form-urlencoded',
+                    'host: '.$wiki->domain,
+                ]
+            ]
+        );
+
+        $rawResponse = $this->request->execute();
+        $err = $this->request->error();
+
+        if ($err) {
+            $this->fail( new \RuntimeException('curl error for '.$this->wikiId.': '.$err) );
+            $setting->update( [  'value' => false  ] );
+            return;
+        }
+
+        $this->request->close();
 
         $response = json_decode($rawResponse, true);
 
         if (!array_key_exists('wbstackElasticSearchInit', $response)) {
-            $this->fail(
-                new \RuntimeException('wbstackElasticSearchInit call for '.$this->wikiDomain.'. No wbstackElasticSearchInit key in response: '.$rawResponse)
-            );
-
-            return; //safegaurd
+            $this->fail( new \RuntimeException('wbstackElasticSearchInit call for '.$this->wikiId.'. No wbstackElasticSearchInit key in response: '.$rawResponse) );
+            $setting->update( [  'value' => false  ] );
+            return;
         }
 
         if ($response['wbstackElasticSearchInit']['success'] == 0) {
-            $this->fail(
-                new \RuntimeException('wbstackElasticSearchInit call for '.$this->wikiDomain.' was not successful:'.$rawResponse)
-            );
-
-            return; //safegaurd
+            $this->fail( new \RuntimeException('wbstackElasticSearchInit call for '.$this->wikiId.' was not successful:'.$rawResponse) );
+            $setting->update( [  'value' => false  ] );
+            return;
         }
+
+        $output = $response['wbstackElasticSearchInit']['output'];
+
+        $enableElasticSearchFeature = false;
+
+        // occurs a couple of times when newly created
+        if ( in_array( "\tCreating index...ok",  $output ) ) {
+
+            // newly created index succeeded, turn on the wiki setting
+            $enableElasticSearchFeature = true;
+
+        // occurs on a successful update run
+        } else if ( in_array( "\t\tValidating {$wikiDB->name}_general alias...ok", $output ) ) {
+
+            // script ran and update was successful, make sure feature is enabled
+            $enableElasticSearchFeature = true;
+        } else {
+
+            Log::error(__METHOD__ . ": Job finished but didn't create or update, something is weird");
+            $this->fail( new \RuntimeException('wbstackElasticSearchInit call for '.$this->wikiId.' was not successful:' . $rawResponse ) );
+        }
+
+        $setting->update( [  'value' => $enableElasticSearchFeature  ] );
+
     }
 }

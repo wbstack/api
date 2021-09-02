@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Wiki;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\WikiDb;
 
-class WikiFactory extends Factory
+class WikiDbFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Wiki::class;
+    protected $model = WikiDb::class;
 
     /**
      * Define the model's default state.
@@ -22,8 +22,11 @@ class WikiFactory extends Factory
     public function definition()
     {
         return [
-            'sitename' => $this->faker->text(5),
-            'domain' => $this->faker->domainName
+            'name' => $this->faker->text(5),
+            'prefix' => $this->faker->text(5),
+            'user' => 'root',
+            'password' => 'toor',
+            'version' => 'seeded'
         ];
     }
 }

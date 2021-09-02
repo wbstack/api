@@ -76,17 +76,17 @@ class WikiController extends Controller
             // Docs: https://www.mediawiki.org/wiki/Manual:$wgSecretKey
             WikiSetting::create([
                 'wiki_id' => $wiki->id,
-                'name' => 'wgSecretKey',
+                'name' => WikiSetting::wgSecretKey,
                 'value' => Str::random(64),
             ]);
 
-            // Enable elasticsearch for new wikis by default
+            // Create the enabled elasticsearch setting
             // T285541
-//             WikiSetting::create([
-//                 'wiki_id' => $wiki->id,
-//                 'name' => 'wwExtEnableElasticSearch',
-//                 'value' => true,
-//             ]);
+            WikiSetting::create([
+                'wiki_id' => $wiki->id,
+                'name' => WikiSetting::wwExtEnableElasticSearch,
+                'value' => true,
+            ]);
 
             // Also track the domain forever in your domains table
             $wikiDomain = WikiDomain::create([
@@ -117,7 +117,8 @@ class WikiController extends Controller
         $this->dispatch(new ProvisionWikiDbJob(null, null, 10));
         $this->dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
 
-//        $this->dispatch(new ElasticSearchIndexInit($wiki->domain));
+        // dispatch elasticsearch init job to enable the feature
+        $this->dispatch(new ElasticSearchIndexInit($wiki->id));
 
         $res['success'] = true;
         $res['message'] = 'Success!';
