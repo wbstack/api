@@ -1,5 +1,11 @@
 # api
 
+## 8x.1.2 - X August 2021
+
+- [Laravel 8.5.1 to 8.5.2](https://github.com/wbstack/api/pull/140)
+- [Enable elastic search on new wikis (calling `wbstackElasticSearchInit` on creation)](https://github.com/wbstack/api/pull/147)
+- [Add K8s ingress deletion job (not called yet)](https://github.com/wbstack/api/pull/161)
+
 ## 8x.1.1 - 15 July 2021
 
 - Minor laravel bump
