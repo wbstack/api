@@ -32,7 +32,7 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
      */
     public function uniqueId()
     {
-        return $this->wikiId;
+        return strval($this->wikiId);
     }
 
     /**
@@ -42,13 +42,14 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
     {
         $wiki = Wiki::withTrashed()->where('id', $this->wikiId )->first();
 
-        if( !$wiki->deleted_at ) {
-            $this->fail(new \RuntimeException("Wiki {$this->wikiId} is not deleted, but job got dispatched."));
-            return;
-        }
 
         if( !$wiki ) {
             $this->fail(new \RuntimeException("Wiki not found for {$this->wikiId}"));
+            return;
+        }
+
+        if( !$wiki->deleted_at ) {
+            $this->fail(new \RuntimeException("Wiki {$this->wikiId} is not deleted, but job got dispatched."));
             return;
         }
 
@@ -60,11 +61,8 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
             $this->fail(new \RuntimeException("There are still resources allocated."));
             return;
         }
-        
-        // if no settings there shouldn't be a need
-        $needToDeleteLogosDir = $wiki->settings()->whereIn('name', array(WikiSetting::wgFavicon, WikiSetting::wgLogo))->count() > 0;
 
-        if ( $needToDeleteLogosDir && !$this->deleteLogosDirectory( $wiki->id) ) {
+        if ( !$this->deleteSiteDirectory( $wiki->id) ) {
             $this->fail(new \RuntimeException("Failed deleting logos directory."));
             return;
         }
@@ -76,14 +74,14 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
         $wiki->forceDelete();
     }
 
-    public function deleteLogosDirectory( int $wiki_id ): bool {
+    public function deleteSiteDirectory( int $wiki_id ): bool {
         $disk = Storage::disk('gcs-public-static');
         if (! $disk instanceof Cloud) {
             $this->fail(new \RuntimeException("Invalid storage (not cloud)."));
             return false;
         }
 
-        $directory = WikiLogoController::getLogosDirectory( $wiki_id );
+        $directory = Wiki::getSiteDirectory( $wiki_id );
         if ( $disk->exists($directory) ) {
             return $disk->deleteDirectory($directory);
         } else {

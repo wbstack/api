@@ -121,4 +121,19 @@ class Wiki extends Model
          */
         return $this->belongsToMany(User::class, 'wiki_managers')->select(['email']);
     }
+
+    /**
+     * Get logo directory path
+     */
+    public static function getLogosDirectory( int $wiki_id ): string {
+        return self::getSiteDirectory( $wiki_id ) . '/logos';
+    }
+
+    /**
+     * Get site directory path
+     */
+    public static function getSiteDirectory( int $wiki_id ): string {
+        $siteDir = md5($wiki_id.md5($wiki_id));
+        return 'sites/'.$siteDir;
+    }
 }

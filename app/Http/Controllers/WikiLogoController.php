@@ -8,6 +8,7 @@ use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use App\Wiki;
 
 class WikiLogoController extends Controller
 {
@@ -44,7 +45,7 @@ class WikiLogoController extends Controller
         }
 
         // Get a directory for storing all things relating to this site
-        $logosDir = self::getLogosDirectory($wikiId);
+        $logosDir = Wiki::getLogosDirectory($wikiId);
 
         // Delete the old raw file if it was already there
         $rawFilePath = $logosDir.'/raw.png';
@@ -111,13 +112,5 @@ class WikiLogoController extends Controller
         $res['url'] = $logoUrl;
 
         return response($res);
-    }
-
-    /**
-     * Get logo directory path
-     */
-    public static function getLogosDirectory( int $wikiId ): string {
-        $siteDir = md5($wikiId.md5($wikiId));
-        return 'sites/'.$siteDir.'/logos';
     }
 }

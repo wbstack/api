@@ -18,6 +18,11 @@ class DeleteWikiFinalizeJobTest extends TestCase
 {
     use DatabaseTransactions;
 
+    public function setUp(): void {
+        parent::setUp();
+        Storage::fake('gcs-public-static');
+    }
+
     public function testDeleteWiki()
     {
         $user = User::factory()->create(['verified' => true]);
@@ -79,19 +84,18 @@ class DeleteWikiFinalizeJobTest extends TestCase
 
     public function testDeletesFiles()
     {
-        Storage::fake('gcs-public-static');
 
         $user = User::factory()->create(['verified' => true]);
         $wiki = Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->timestamp ] );
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $setting = WikiSetting::create(['wiki_id' => $wiki->id, 'name' => WikiSetting::wgFavicon, 'value' => false]);
 
-        $logoDir = WikiLogoController::getLogosDirectory($wiki->id);
+        $siteDir = Wiki::getSiteDirectory($wiki->id);
 
         Storage::disk('gcs-public-static')
-            ->makeDirectory($logoDir);
+            ->makeDirectory($siteDir);
 
-        Storage::disk('gcs-public-static')->assertExists($logoDir);
+        Storage::disk('gcs-public-static')->assertExists($siteDir);
 
         $job = new DeleteWikiFinalizeJob( $wiki->id );
         $job->handle();
@@ -101,7 +105,7 @@ class DeleteWikiFinalizeJobTest extends TestCase
         $this->assertNull( WikiManager::whereId($manager->id)->first() );
         $this->assertNull( WikiSetting::whereId($setting->id)->first() );
 
-        // logos dir gone
-        Storage::disk('gcs-public-static')->assertMissing($logoDir);
+        // site dir gone
+        Storage::disk('gcs-public-static')->assertMissing($siteDir);
     }
 }
