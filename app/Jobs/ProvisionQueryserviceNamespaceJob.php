@@ -15,15 +15,12 @@ class ProvisionQueryserviceNamespaceJob extends Job
 {
     private $namespace;
     private $maxFree;
-    private $request;
 
     /**
      * @return void
      */
-    public function __construct($namespace = null, $maxFree = null, HttpRequest $request = null)
+    public function __construct($namespace = null, $maxFree = null)
     {
-        $this->request = $request ?? new CurlRequest();
-
         if ($namespace !== null && preg_match('/[^A-Za-z0-9]/', $namespace)) {
             throw new \InvalidArgumentException('$namespace must only contain [^A-Za-z0-9] or null, got '.$namespace);
         }
@@ -49,7 +46,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
     /**
      * @return void
      */
-    public function handle()
+    public function handle( HttpRequest $request )
     {
         // If the job is only meant to create so many DBs, then make sure we don't create too many.
         if ($this->maxFree && $this->doesMaxFreeSayWeShouldStop()) {
@@ -65,7 +62,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
 
         $url = $queryServiceHost.'/bigdata/namespace';
 
-        $this->request->setOptions([
+        $request->setOptions([
             // TODO when there are multiple hosts, this will need to be different?
             // OR go through the gateway?
             CURLOPT_URL => $url,
@@ -82,10 +79,10 @@ class ProvisionQueryserviceNamespaceJob extends Job
             ],
         ]);
 
-        $response = $this->request->execute(); 
-        $err = $this->request->error();
+        $response = $request->execute();
+        $err = $request->error();
 
-        $this->request->close();
+        $request->close();
         if ($err) {
             $this->fail( new \RuntimeException('cURL Error #:'.$err) );
             return;

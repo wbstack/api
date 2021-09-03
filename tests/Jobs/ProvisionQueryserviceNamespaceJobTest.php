@@ -47,8 +47,8 @@ class ProvisionQueryserviceNamespaceJobTest extends TestCase
             ]);
 
         
-        $job = new ProvisionQueryserviceNamespaceJob($namespace, null, $request);
-        $job->handle();
+        $job = new ProvisionQueryserviceNamespaceJob($namespace, null);
+        $job->handle($request);
 
         $this->assertSame(
              1, 
@@ -76,8 +76,8 @@ class ProvisionQueryserviceNamespaceJobTest extends TestCase
             'backend' => 'asdf',
         ]);
 
-        $job = new ProvisionQueryserviceNamespaceJob($namespace, 1, $request);
-        $job->handle();
+        $job = new ProvisionQueryserviceNamespaceJob($namespace, 1);
+        $job->handle($request);
 
         $this->assertSame(
              0, 
