@@ -45,5 +45,7 @@ jobs:
     - name: Psalm
       run: docker-compose exec -T api vendor/bin/psalm
 
+    - name: Run elasticsearch index deletion integration test
+      run: docker-compose exec -e RUN_PHPUNIT_INTEGRATION_TEST=1 -e ELASTICSEARCH_HOST=elasticsearch.svc:9200 -T api vendor/bin/phpunit tests/Jobs/Integration/ElasticSearchIndexDeleteTest.php
     - name: Run blazegraph integration test
       run: docker-compose exec -e RUN_PHPUNIT_INTEGRATION_TEST=1 -T api vendor/bin/phpunit tests/Jobs/Integration/QueryserviceNamespaceJobTest.php

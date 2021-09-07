@@ -58,7 +58,7 @@ class ElasticSearchIndexInitTest extends TestCase
         $mockResponse = [
             'warnings' => [],
             'wbstackElasticSearchInit' => [
-                "success" => 1,
+                "return" => 0,
                 "output" => [
                     "\tCreating index...ok" // successfully created some index
                 ]
@@ -66,6 +66,23 @@ class ElasticSearchIndexInitTest extends TestCase
         ];
         $request = $this->createMock(HttpRequest::class);
         $request->method('execute')->willReturn(json_encode($mockResponse));
+
+        putenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT=1234');
+
+        $request->expects($this->once())
+            ->method('setOptions')
+            ->with([
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_TIMEOUT => 1234,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_HTTPHEADER => [
+                    'content-type: application/x-www-form-urlencoded',
+                    'host: '.$this->wiki->domain,
+                ]
+        ]);
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())
@@ -88,7 +105,7 @@ class ElasticSearchIndexInitTest extends TestCase
         $mockResponse = [
             'warnings' => [],
             'wbstackElasticSearchInit' => [
-                "success" => 1,
+                "return" => 0,
                 "output" => [
                     "\t\tValidating {$this->wikiDb->name}_general alias...ok"
                 ]
@@ -159,14 +176,14 @@ class ElasticSearchIndexInitTest extends TestCase
         $mockResponse = [
             'warnings' => [],
             'wbstackElasticSearchInit' => [
-                "success" => 0,
+                "return" => 0,
                 "output" => []
             ]
         ];
 
         yield [
             $this->createMock(HttpRequest::class),
-            'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"success":0,"output":[]}}',
+            'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"return":0,"output":[]}}',
             $mockResponse
         ];
 
@@ -178,13 +195,12 @@ class ElasticSearchIndexInitTest extends TestCase
             $mockResponse
         ];
 
-        $mockResponse['wbstackElasticSearchInit']['success'] = 1;
+        $mockResponse['wbstackElasticSearchInit']['return'] = 1;
         yield [
             $this->createMock(HttpRequest::class),
-            'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"success":1,"output":[]}}',
+            'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"return":1,"output":[]}}',
             $mockResponse
         ];
-
     }
 
 }

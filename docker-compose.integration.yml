@@ -15,5 +15,18 @@ services:
     hostname: wdqs.mw.localhost
     expose:
         - 9999
+
+  elasticsearch:
+      image: wikibase/elasticsearch:6.5.4-wmde.1
+      restart: unless-stopped
+      ports:
+        - 9200:9200
+      networks:
+        default:
+          aliases:
+          - elasticsearch.svc
+      environment:
+        discovery.type: single-node
+        ES_JAVA_OPTS: "-Xms512m -Xmx512m"
 volumes:
   query-service-data:
