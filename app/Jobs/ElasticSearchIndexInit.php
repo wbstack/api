@@ -63,7 +63,7 @@ class ElasticSearchIndexInit extends Job implements ShouldBeUnique
                 CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
-                CURLOPT_TIMEOUT => 60, // This could potentially take a bit longer
+                CURLOPT_TIMEOUT => getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT') ?: 100, // This could potentially take a bit longer
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_HTTPHEADER => [
@@ -92,7 +92,7 @@ class ElasticSearchIndexInit extends Job implements ShouldBeUnique
             return;
         }
 
-        if ( !array_key_exists('success', $response['wbstackElasticSearchInit']) || $response['wbstackElasticSearchInit']['success'] == 0) {
+        if ( !array_key_exists('return', $response['wbstackElasticSearchInit']) || $response['wbstackElasticSearchInit']['return'] !== 0) {
             $this->fail( new \RuntimeException('wbstackElasticSearchInit call for '.$this->wikiId.' was not successful:'.$rawResponse) );
             $setting->update( [  'value' => false  ] );
             return;
