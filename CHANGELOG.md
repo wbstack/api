@@ -1,5 +1,9 @@
 # api
 
+## 8x.1.4 - Untagged
+
+- [Add a Job (not called yet) to delete elasticsearch indexes](https://github.com/wbstack/api/pull/152)
+
 ## 8x.1.3 - 2 September 2021
 
 - [MediawikiInit job timeout increase (10-60 seconds)](https://github.com/wbstack/api/pull/180)
