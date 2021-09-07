@@ -73,7 +73,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
-                CURLOPT_TIMEOUT => 10,
+                CURLOPT_TIMEOUT => getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_DELETE_CHECK') ?: 10,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
             ]
@@ -125,7 +125,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
-                CURLOPT_TIMEOUT => 60,
+                CURLOPT_TIMEOUT => getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_DELETE_DELETE') ?: 60,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'DELETE',
             ]
