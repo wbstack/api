@@ -29,6 +29,13 @@ class WikisSeeder extends Seeder
             'name' => 'wgSecretKey',
             'value' => Str::random(64),
         ]);
+
+        WikiSetting::create([
+            'wiki_id' => $wiki->id,
+            'name' => WikiSetting::wwExtEnableElasticSearch,
+            'value' => true,
+        ]);
+
         WikiManager::create([
             'user_id' => DB::table('users')->where(['email'=>'adamshorland@gmail.com'])->limit(1)->get()->pop()->id,
             'wiki_id' => $wiki->id,

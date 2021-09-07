@@ -201,7 +201,6 @@ class ElasticSearchIndexInitTest extends TestCase
             'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"return":1,"output":[]}}',
             $mockResponse
         ];
-
     }
 
 }

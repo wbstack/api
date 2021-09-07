@@ -1,5 +1,9 @@
 # api
 
+## 8x.1.8 - Untagged
+
+- [Add a Job (not called yet) to delete elasticsearch indexes](https://github.com/wbstack/api/pull/152)
+
 ## 8x.1.7 - 2 September 2021
 
 - Revert ElasticSearchIndexInit error checking tabs
