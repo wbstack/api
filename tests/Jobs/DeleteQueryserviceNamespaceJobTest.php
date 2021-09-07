@@ -73,7 +73,7 @@ class DeleteQueryserviceNamespaceJobTest extends TestCase
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())
         ->method('fail')
-        ->with(new \RuntimeException("Namespace for wiki 123 not found."));
+        ->with(new \RuntimeException("Wiki not found for 123"));
 
         $request = $this->createMock(HttpRequest::class);
         $request->expects($this->never())

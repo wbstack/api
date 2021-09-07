@@ -6,6 +6,7 @@ use App\QueryserviceNamespace;
 use App\Http\Curl\CurlRequest;
 use App\Http\Curl\HttpRequest;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use App\Wiki;
 
 class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
 {
@@ -34,6 +35,18 @@ class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
      */
     public function handle( HttpRequest $request )
     {
+        $wiki = Wiki::withTrashed()->where(['id' => $this->wikiId])->first();
+
+        if( !$wiki ) {
+            $this->fail(new \RuntimeException("Wiki not found for {$this->wikiId}"));
+            return;
+        }
+
+        if( !$wiki->deleted_at ) {
+            $this->fail(new \RuntimeException("Wiki {$this->wikiId} is not marked for deletion."));
+            return;
+        }
+        
         $qsNamespace = QueryserviceNamespace::whereWikiId($this->wikiId)->first();
 
         if( !$qsNamespace ) {
