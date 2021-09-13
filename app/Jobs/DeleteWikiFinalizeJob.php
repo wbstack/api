@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\WikiLogoController;
 use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use App\Helper\ElasticSearchHelper;
+use App\Http\Curl\HttpRequest;
 
 class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
 {
@@ -38,7 +40,7 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
     /**
      * @return void
      */
-    public function handle()
+    public function handle( HttpRequest $request )
     {
         $wiki = Wiki::withTrashed()->where('id', $this->wikiId )->first();
 
@@ -53,17 +55,38 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
             return;
         }
 
-        $qsNamespace = $wiki->wikiQueryserviceNamespace()->first();
         $wikiDB = $wiki->wikiDb()->first();
 
+        if( $wikiDB ) {
+            try{
+                $elasticSearchBaseName = $wikiDB->name;
+                $elasticSearchHost = getenv('ELASTICSEARCH_HOST');
+                $elasticSearchHelper = new ElasticSearchHelper($elasticSearchHost, $elasticSearchBaseName);
 
-        if( $wikiDB || $qsNamespace ) {
-            $this->fail(new \RuntimeException("There are still resources allocated."));
+                if( $elasticSearchHelper->hasIndices( $request ) ) {
+                    throw new \RuntimeException("Elasticsearch indices with basename {$elasticSearchBaseName} still exists");
+                }
+            } catch(\RuntimeException $exception) {
+                $this->fail($exception);
+                return;
+            }
+
+            $this->fail(new \RuntimeException("WikiDb for ${$wiki->id} still exists"));
+            return;
+        }
+
+        // close the curl session
+        $request->close();
+
+        $qsNamespace = $wiki->wikiQueryserviceNamespace()->first();
+
+        if( $qsNamespace ) {
+            $this->fail(new \RuntimeException("Queryservice namespace for {$wiki->id} still exists"));
             return;
         }
 
         if ( !$this->deleteSiteDirectory( $wiki->id) ) {
-            $this->fail(new \RuntimeException("Failed deleting logos directory."));
+            $this->fail(new \RuntimeException("Failed deleting site directory."));
             return;
         }
 

@@ -77,7 +77,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
         $mockJob->expects($this->never())->method('fail');
 
         $job = new ElasticSearchIndexDelete( $this->wiki->id );
-        $job->setJob($mockJob);
+        $job->setJob( $mockJob );
         $job->handle( $request );
 
         // feature should get disabled
@@ -146,13 +146,6 @@ class ElasticSearchIndexDeleteTest extends TestCase
                 true
             ];
         }
-
-        yield [
-            $this->createMock(HttpRequest::class),
-            'No index to remove for <WIKI_ID>',
-            ["index\n", $mockJsonSuccess ],
-            false
-        ];
 
         yield [
             $this->createMock(HttpRequest::class),
