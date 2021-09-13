@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use PDOException;
 use App\Wiki;
+use Carbon\Carbon;
 
 /**
  * Prepends the MW Database, User with `deleted_` prefix and deletes WikiDB relation for a wiki 
@@ -68,24 +69,30 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
         $sm = $conn->getDoctrineSchemaManager();
         $tableNames = $sm->listTableNames();
 
-        $deletedDatabaseName = 'deleted_' . $wikiDB->name;
+        $timestamp = Carbon::now()->timestamp;
+        $deletedDatabaseName = "deleted_{$timestamp}_{$this->wikiId}";
 
         try {
             $pdo->beginTransaction();
-            $pdo->exec('SET GLOBAL FOREIGN_KEY_CHECKS=0;');
 
             // Create the new database
             $pdo->exec(sprintf('CREATE DATABASE %s', $deletedDatabaseName));
 
+            // iterate over each table and replace the prefix
+            // and move it to the deleted database by using RENAME TABLE
             foreach($tableNames as $table) {
-                $pdo->exec(sprintf('RENAME TABLE %s.%s TO %s.%s', $wikiDB->name, $table, $deletedDatabaseName, $table));
+                $replacedCount = 0;
+                $tableWithoutPrefix = str_replace($wikiDB->prefix . '_', '', $table, $replacedCount );
+                if ($replacedCount !== 1) {
+                    throw new \RuntimeException("Did not find prefix '{$wikiDB->prefix}' in tablename '{$table}' ");
+                }
+                $pdo->exec(sprintf('RENAME TABLE %s.%s TO %s.%s', $wikiDB->name, $table, $deletedDatabaseName, $tableWithoutPrefix));
             }
 
-            $pdo->exec(sprintf('RENAME USER %s TO %s', $wikiDB->user, 'deleted_' . $wikiDB->user ));
+            $pdo->exec(sprintf('DROP USER %s', $wikiDB->user ));
 
-            $pdo->exec('SET GLOBAL FOREIGN_KEY_CHECKS=1;');
             $pdo->commit();
-        } catch (PDOException $e) {
+        } catch (\Throwable $e) {
             $pdo->rollBack();
             $this->fail( new \RuntimeException('Failed to soft-soft delete '.$wikiDB->name . ': ' . $e->getMessage()) );
             return;

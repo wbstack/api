@@ -19,32 +19,38 @@ class DeleteWikiJobTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function tearDown(): void {
+    private $wiki;
+
+    protected function setUp(): void {
         parent::setUp();
-        $conn = DB::connection('mw');
-        $pdo = $conn->getPdo();
-        $pdo->exec('DROP DATABASE IF EXISTS the_test_database');
-        $pdo->exec('DROP DATABASE IF EXISTS deleted_the_test_database');
+        DB::connection('mysql')->getPdo()->exec('DROP DATABASE IF EXISTS the_test_database');
+    }
+
+    private function getExpectedDeletedDatabaseName( $wiki ): string {
+        return "deleted_1631534400_" . $wiki->id;
     }
 
     public function testDeletesWiki()
     {
-        $user = User::factory()->create(['verified' => true]);
-        $wiki = Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->timestamp ] );
-        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+        Carbon::setTestNow(Carbon::create(2021, 9, 13, 12));
 
-        $prefix = 'great_job';
+        $user = User::factory()->create(['verified' => true]);
+        $this->wiki = Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->timestamp ] );
+        WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $user->id]);
+
+        $prefix = 'prefix';
         $databaseName = 'the_test_database';
-        $expectedDeletedName = 'deleted_' . $databaseName;
-        $job = new ProvisionWikiDbJob('great_job', $databaseName, null);
+        $expectedDeletedName = $this->getExpectedDeletedDatabaseName( $this->wiki );
+        $job = new ProvisionWikiDbJob('prefix', $databaseName, null);
         $job->handle();
 
         WikiDb::where([
             'name' => $databaseName,
             'prefix' => $prefix,
-        ])->first()->update(['wiki_id' => $wiki->id]);
+        ])->first()->update(['wiki_id' => $this->wiki->id]);
 
-        $this->assertNotNull( WikiDb::where([ 'wiki_id' => $wiki->id ])->first() );
+        $wikiDB = WikiDb::where([ 'wiki_id' => $this->wiki->id ])->first();
+        $this->assertNotNull( $wikiDB );
 
         $conn = DB::connection('mw');
         $sm = $conn->getDoctrineSchemaManager();
@@ -54,13 +60,13 @@ class DeleteWikiJobTest extends TestCase
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
-        $job = new DeleteWikiDbJob( $wiki->id );
+        $job = new DeleteWikiDbJob( $this->wiki->id );
         $job->setJob($mockJob);
         $job->handle();
 
         $databases = $sm->listDatabases();
 
-        $this->assertNull( WikiDb::where([ 'wiki_id' => $wiki->id ])->first() );
+        $this->assertNull( WikiDb::where([ 'wiki_id' => $this->wiki->id ])->first() );
 
         // Both databases now exist, nothing has been dropped
         $this->assertContains( $expectedDeletedName, $databases);
@@ -68,15 +74,17 @@ class DeleteWikiJobTest extends TestCase
         $this->assertCount(85, $initialTables);
         $this->assertCount(0, $sm->listTableNames());
 
+        // Tables now live in the deleted database
+        $result = $pdo->query(sprintf('SELECT * FROM %s.interwiki', $expectedDeletedName))->fetchAll();
+        $this->assertCount(66, $result);
+
+        // cleanup test deleted database
+        $sm->dropDatabase($this->getExpectedDeletedDatabaseName( $this->wiki ));
+
         // Tables no longer exist in the old one
         $this->expectException(PDOException::class);
-        $this->expectExceptionMessage("SQLSTATE[42S02]: Base table or view not found: 1146 Table 'the_test_database.great_job_interwiki' doesn't exist");
-        $result = $pdo->exec(sprintf('SELECT * FROM %s.%s_interwiki', $databaseName, $prefix));
-
-        // Tables now live in the deleted database
-        $result = $pdo->exec(sprintf('SELECT * FROM %s.%s_interwiki', $expectedDeletedName, $prefix));
-        $this->assertSame(0, $result);
-
+        $this->expectExceptionMessage("SQLSTATE[42S02]: Base table or view not found: 1146 Table 'the_test_database.prefix_interwiki' doesn't exist");
+        $pdo->exec(sprintf('SELECT * FROM %s.%s_interwiki', $databaseName, $wikiDB->prefix ));
     }
 
     /**
