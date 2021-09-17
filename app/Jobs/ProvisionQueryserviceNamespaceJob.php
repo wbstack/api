@@ -3,6 +3,9 @@
 namespace App\Jobs;
 
 use App\QueryserviceNamespace;
+use App\Http\Curl\CurlRequest;
+use App\Http\Curl\HttpRequest;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Example usage
@@ -43,7 +46,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
     /**
      * @return void
      */
-    public function handle()
+    public function handle( HttpRequest $request )
     {
         // If the job is only meant to create so many DBs, then make sure we don't create too many.
         if ($this->maxFree && $this->doesMaxFreeSayWeShouldStop()) {
@@ -57,11 +60,12 @@ class ProvisionQueryserviceNamespaceJob extends Job
         // Replace the namespace in the properties file
         $properties = str_replace('REPLACE_NAMESPACE', $this->namespace, $properties);
 
-        $curl = curl_init();
-        curl_setopt_array($curl, [
+        $url = $queryServiceHost.'/bigdata/namespace';
+
+        $request->setOptions([
             // TODO when there are multiple hosts, this will need to be different?
             // OR go through the gateway?
-            CURLOPT_URL => $queryServiceHost.'/bigdata/namespace',
+            CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 10,
@@ -75,33 +79,33 @@ class ProvisionQueryserviceNamespaceJob extends Job
             ],
         ]);
 
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
+        $response = $request->execute();
+        $err = $request->error();
 
-        curl_close($curl);
-
+        $request->close();
         if ($err) {
-            $this->fail(
-                new \RuntimeException('cURL Error #:'.$err)
-            );
-
-            return; //safegaurd
+            $this->fail( new \RuntimeException('cURL Error #:'.$err) );
+            return;
         } else {
             if ($response === 'CREATED: '.$this->namespace) {
                 $qsns = QueryserviceNamespace::create([
                     'namespace' => $this->namespace,
-                    //'internalHost' => $this->internalHost,
                     'backend' => $queryServiceHost,
                 ]);
             // TODO error if $qsns is not actually created...
+            } else if( $response === 'EXISTS: ' .$this->namespace ) {
+                Log::error(__METHOD__ . ": The namespace: {$this->namespace} already exists");
+                $this->fail(
+                    new \RuntimeException("The namespace: {$this->namespace} already exists. response: " . $response)
+                );
+                return;                
             } else {
                 $this->fail(
                     new \RuntimeException('Valid response, but couldn\'t find "CREATED: " in: '.$response)
                 );
 
-                return; //safegaurd
+                return;
             }
-            // TODO Else log create failed?
         }
     }
 }
