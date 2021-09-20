@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\WikiDb;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\DatabaseManager;
 
 /**
  * Example usage that will always provision a new DB:
@@ -75,14 +76,15 @@ class ProvisionWikiDbJob extends Job
     /**
      * @return void
      */
-    public function handle()
+    public function handle( DatabaseManager $manager )
     {
         // If the job is only meant to create so many DBs, then make sure we don't create too many.
         if ($this->maxFree && $this->doesMaxFreeSayWeShouldStop()) {
             return;
         }
 
-        $conn = DB::connection('mw');
+        $manager->purge('mw');
+        $conn = $manager->connection('mw');
         if (! $conn instanceof \Illuminate\Database\Connection) {
             $this->fail(new \RuntimeException('Must be run on a PDO based DB connection'));
 
@@ -183,5 +185,7 @@ class ProvisionWikiDbJob extends Job
           'version' => $this->newSqlFile,
           'prefix' => $this->prefix,
       ]);
+
+      $manager->purge('mw');
     }
 }

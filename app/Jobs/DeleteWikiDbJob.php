@@ -3,11 +3,10 @@
 namespace App\Jobs;
 
 use App\WikiDb;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use PDOException;
 use App\Wiki;
 use Carbon\Carbon;
+use Illuminate\Database\DatabaseManager;
 
 /**
  * Prepends the MW Database, User with `deleted_` prefix and deletes WikiDB relation for a wiki 
@@ -37,9 +36,8 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
     /**
      * @return void
      */
-    public function handle()
+    public function handle( DatabaseManager $manager )
     {
-
         $wiki = Wiki::withTrashed()->where(['id' => $this->wikiId])->first();
 
         if( !$wiki ) {
@@ -59,20 +57,45 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
             return;
         }
 
-        $conn = DB::connection('mw');
-        if (! $conn instanceof \Illuminate\Database\Connection) {
-            $this->fail(new \RuntimeException('Must be run on a PDO based DB connection'));
-            return;
-        }
-
-        $pdo = $conn->getPdo();
-        $sm = $conn->getDoctrineSchemaManager();
-        $tableNames = $sm->listTableNames();
-
-        $timestamp = Carbon::now()->timestamp;
-        $deletedDatabaseName = "deleted_{$timestamp}_{$this->wikiId}";
-
         try {
+
+            $manager->purge('mw');
+            $conn = $manager->connection('mw');
+
+            if (! $conn instanceof \Illuminate\Database\Connection) {
+               throw new \RuntimeException('Must be run on a PDO based DB connection');
+            }
+    
+            $pdo = $conn->getPdo();
+            $timestamp = Carbon::now()->timestamp;
+            $deletedDatabaseName = "deleted_{$timestamp}_{$this->wikiId}";
+    
+            if ($pdo->exec('USE '.$wikiDB->name) === false) {
+                throw new \RuntimeException('Failed to use database with dbname: '.$wikiDB->name);
+            }
+    
+
+            $tables = [];
+            $result = $pdo->query('SHOW TABLES')->fetchAll();
+            /*
+            ^ array:2 [
+            "Tables_in_<database_name>" => "<table_name>"
+            0 => "<table_name>"
+            ]
+            */
+            foreach($result as $table) {
+                $values = array_unique(array_values($table));
+                if(count($values) !== 1) {
+                    throw new \RuntimeException("Tried getting table names for wikiDB {$wikiDB->name} but failed");
+                }
+    
+                $tables[] = $values[0];
+            }
+
+            if( empty($tables) ) {
+                throw new \RuntimeException("Tried getting table names for wikiDB {$wikiDB->name} but did not find any");
+            }
+
             $pdo->beginTransaction();
 
             // Create the new database
@@ -80,7 +103,8 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
 
             // iterate over each table and replace the prefix
             // and move it to the deleted database by using RENAME TABLE
-            foreach($tableNames as $table) {
+            foreach($tables as $table) {
+
                 $replacedCount = 0;
                 $tableWithoutPrefix = str_replace($wikiDB->prefix . '_', '', $table, $replacedCount );
                 if ($replacedCount !== 1) {
@@ -93,12 +117,16 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
 
             $pdo->commit();
         } catch (\Throwable $e) {
+            
             $pdo->rollBack();
+
+            $manager->purge('mw');
             $this->fail( new \RuntimeException('Failed to soft-soft delete '.$wikiDB->name . ': ' . $e->getMessage()) );
             return;
+            
         }
 
         $wikiDB->delete();
-
+        $manager->purge('mw');
     }
 }
