@@ -26,8 +26,10 @@ class CurlRequest implements HttpRequest
     }
 
     public function close() {
-        curl_close($this->handle);
-        $this->handle = null;
+        if( $this->handle ) {
+            curl_close($this->handle);
+            $this->handle = null;
+        }
     }
 
     public function reset() {
