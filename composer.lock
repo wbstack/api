@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5646983e2b3db4415367eb4f041c93c6",
+    "content-hash": "759660dbe78fe688b1364b33f1b8db8a",
     "packages": [
         {
             "name": "albertcht/invisible-recaptcha",
@@ -1438,6 +1438,11 @@
                 "reference": "7fb3e78ce949dd341b5418f876c3ff74d8c1ff92",
                 "shasum": ""
             },
+            "archive": {
+                "exclude": [
+                    "storage/screenshots"
+                ]
+            },
             "require": {
                 "google/cloud-error-reporting": "^0.16.2",
                 "google/cloud-logging": "^1.14",
@@ -1470,11 +1475,6 @@
                 "psr-4": {
                     "GlueDev\\Laravel\\Stackdriver\\Tests\\": "tests"
                 }
-            },
-            "archive": {
-                "exclude": [
-                    "storage/screenshots"
-                ]
             },
             "license": [
                 "MIT"
@@ -13357,6 +13357,67 @@
             "time": "2021-07-28T10:34:58+00:00"
         },
         {
+            "name": "timacdonald/log-fake",
+            "version": "1.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/timacdonald/log-fake.git",
+                "reference": "dd53ca0be53428e93b5638a4e820dd86084efba2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/timacdonald/log-fake/zipball/dd53ca0be53428e93b5638a4e820dd86084efba2",
+                "reference": "dd53ca0be53428e93b5638a4e820dd86084efba2",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/config": "~5.6.0 || ~5.7.0 || ~5.8.0 || ^6.0 || ^7.0 || ^8.0",
+                "illuminate/container": "~5.6.0 || ~5.7.0 || ~5.8.0 || ^6.0 || ^7.0 || ^8.0",
+                "illuminate/support": "~5.6.0 || ~5.7.0 || ~5.8.0 || ^6.0 || ^7.0 || ^8.0",
+                "php": "^7.1 || ^8.0",
+                "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
+                "psr/log": "^1.0"
+            },
+            "require-dev": {
+                "ergebnis/composer-normalize": "^2.0",
+                "infection/infection": "^0.18.2",
+                "phpstan/phpstan": "^0.12",
+                "timacdonald/php-style": "dev-master",
+                "vimeo/psalm": "^4.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "TiMacDonald\\Log\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tim MacDonald",
+                    "email": "hello@timacdonald.me",
+                    "homepage": "https://timacdonald.me"
+                }
+            ],
+            "description": "A drop in fake logger for testing with the Laravel framework.",
+            "keywords": [
+                "fake",
+                "laravel",
+                "log",
+                "logger",
+                "testing"
+            ],
+            "support": {
+                "docs": "https://github.com/timacdonald/log-fake/blob/master/readme.md",
+                "issues": "https://github.com/timacdonald/log-fake/issues",
+                "source": "https://github.com/timacdonald/log-fake/releases/latest"
+            },
+            "time": "2021-02-05T01:02:45+00:00"
+        },
+        {
             "name": "vimeo/psalm",
             "version": "4.10.0",
             "source": {
@@ -13521,5 +13582,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.0.0"
 }

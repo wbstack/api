@@ -25,7 +25,7 @@ class WikiController extends Controller
         $user = $request->user();
 
         $submittedDomain = $request->input('domain');
-        $isSubdomain = preg_match('/.wiki\.opencura\.com$/', $submittedDomain);
+        $isSubdomain = $this->isSubDomain( $submittedDomain );
         if ($isSubdomain) {
             // .wiki.opencura.com is 18 characters long
             // if we want at least 5 chars for the site sub domain
@@ -155,6 +155,7 @@ class WikiController extends Controller
         return response()->json('Success', 200);
     }
 
+
     // TODO should this just be get wiki?
     public function getWikiDetailsForIdForOwner(Request $request): \Illuminate\Http\Response
     {
@@ -181,5 +182,9 @@ class WikiController extends Controller
         $res['data'] = $wiki;
 
         return response($res);
+    }
+
+    public static function isSubDomain( string $domain ): bool {
+        return preg_match('/.wiki\.opencura\.com$/', $domain ) === 1;
     }
 }
