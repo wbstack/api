@@ -16,12 +16,7 @@ class WikiController extends Controller
 
         // XXX: this same logic is in quickstatements.php and platform api WikiController backend
 
-        // TODO don't do the localhost checks when in production? :)
-        if (substr($domain, -10, 10) === '.localhost') {
-            // localhost development, with a full domain prefixing .localhost
-            // eg. wiki.addshore.com.localhost
-            $result = Wiki::where('domain', substr($domain, 0, -10))->with(self::$with)->first();
-        } elseif ($domain === 'localhost' || $domain === 'mediawiki') {
+        if ($domain === 'localhost' || $domain === 'mediawiki') {
             // If just using localhost then just get the first undeleted wiki
             $result = Wiki::with(self::$with)->first();
         } else {
