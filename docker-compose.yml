@@ -18,7 +18,7 @@ services:
     environment:
       - CONTAINER_ROLE=app
   sql:
-    image: mariadb:10
+    image: mariadb:10.5.12
     environment:
       MYSQL_ROOT_PASSWORD: imarootpassword
       MYSQL_DATABASE: apidb
