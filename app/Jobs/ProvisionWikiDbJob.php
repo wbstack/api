@@ -149,6 +149,17 @@ class ProvisionWikiDbJob extends Job
             return; //safegaurd
         }
 
+        // GRANT the user access to see slave status 
+        // Mariadb versions > 10.5.9 https://mariadb.com/kb/en/grant/#replica-monitor
+        // GRANT REPLICATION MONITOR ON *.* TO 'mwu_36be7164b0'@'%'
+        if ($pdo->exec('GRANT REPLICA MONITOR ON *.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
+            $this->fail(
+                new \RuntimeException('Failed to grant REPLICATION MONITOR to user: '.$this->dbUser)
+            );
+
+            return; //safegaurd
+        }
+
         // ADD THE TABLES
         // Get SQL statements to run
         $rawSql = file_get_contents(__DIR__.'/../../database/mw/new/'.$this->newSqlFile.'.sql');
