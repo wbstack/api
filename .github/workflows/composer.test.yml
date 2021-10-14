@@ -8,6 +8,11 @@ on:
 
 jobs:
   test:
+    strategy:
+      fail-fast: false
+      matrix:
+        databaseImageName: [ 'mariadb:10.5.9', 'mariadb:10.5.12' ]
+
     runs-on: ubuntu-latest
     steps:
 
@@ -24,6 +29,8 @@ jobs:
       run: cp .env.example .env
 
     - name: Run docker-compose setup
+      env:
+        DATABASE_IMAGE_NAME: ${{ matrix.databaseImageName }}
       run: docker-compose -f docker-compose.yml -f docker-compose.integration.yml up -d
 
     - name: Setup - Keep trying to install the DBs (try for 30 seconds)

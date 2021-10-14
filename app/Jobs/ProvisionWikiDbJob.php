@@ -139,14 +139,42 @@ class ProvisionWikiDbJob extends Job
 
             return; //safegaurd
         }
-        // GRANT the user access to see slave status
-        // GRANT REPLICATION CLIENT ON *.* TO 'mwu_36be7164b0'@'%'
-        if ($pdo->exec('GRANT REPLICATION CLIENT ON *.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
-            $this->fail(
-                new \RuntimeException('Failed to grant user: '.$this->dbUser)
-            );
 
-            return; //safegaurd
+        // Figure out the SQL version
+        $stmt = $pdo->query("SELECT version() AS version");
+        $fullVersion = $stmt->fetch()['version']; // "10.5.12-MariaDB-log"
+        preg_match('/^(\d+\.\d+\.\d+)(?!\d).*?$/', $fullVersion, $versionMatches); // [ 0 => '10.5.12-MariaDB-log', 1 => '10.5.12' ]
+        $sqlVersion = $versionMatches[1]; // '10.5.12'
+        $aboveMariaDb1059 = version_compare($sqlVersion,'10.5.9'); // 1 = higher, 0 = same, -1 = lower
+        $aboveMariaDb1052 = version_compare($sqlVersion,'10.5.2'); // 1 = higher, 0 = same, -1 = lower
+
+        if($aboveMariaDb1052 >= 0 && $aboveMariaDb1059 == -1) {
+            $this->fail(
+                new \RuntimeException('Can not succeed on MariaDB versions between 10.5.2 and 10.5.9')
+            );
+        }
+        if($aboveMariaDb1059 == -1) {
+            // GRANT the user access to see slave status
+            // GRANT REPLICATION CLIENT ON *.* TO 'mwu_36be7164b0'@'%'
+            if ($pdo->exec('GRANT REPLICATION CLIENT ON *.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
+                $this->fail(
+                    new \RuntimeException('Failed to grant user: '.$this->dbUser)
+                );
+
+                return;
+            }
+        }
+        if($aboveMariaDb1059 >= 0) {
+            // GRANT the user access to see slave status 
+            // Mariadb versions > 10.5.9 https://mariadb.com/kb/en/grant/#replica-monitor
+            // GRANT REPLICA MONITOR ON *.* TO 'mwu_36be7164b0'@'%'
+            if ($pdo->exec('GRANT REPLICA MONITOR ON *.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
+                $this->fail(
+                    new \RuntimeException('Failed to grant REPLICA MONITOR to user: '.$this->dbUser)
+                );
+
+                return;
+            }
         }
 
         // ADD THE TABLES

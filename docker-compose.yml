@@ -18,7 +18,7 @@ services:
     environment:
       - CONTAINER_ROLE=app
   sql:
-    image: mariadb:10
+    image: "${DOCKER_DATABASE_IMAGE_NAME}"
     environment:
       MYSQL_ROOT_PASSWORD: imarootpassword
       MYSQL_DATABASE: apidb
