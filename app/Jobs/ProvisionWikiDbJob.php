@@ -161,19 +161,19 @@ class ProvisionWikiDbJob extends Job
                     new \RuntimeException('Failed to grant user: '.$this->dbUser)
                 );
 
-                return; //safegaurd
+                return;
             }
         }
         if($aboveMariaDb1059 >= 0) {
             // GRANT the user access to see slave status 
             // Mariadb versions > 10.5.9 https://mariadb.com/kb/en/grant/#replica-monitor
-            // GRANT REPLICATION MONITOR ON *.* TO 'mwu_36be7164b0'@'%'
+            // GRANT REPLICA MONITOR ON *.* TO 'mwu_36be7164b0'@'%'
             if ($pdo->exec('GRANT REPLICA MONITOR ON *.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
                 $this->fail(
-                    new \RuntimeException('Failed to grant REPLICATION MONITOR to user: '.$this->dbUser)
+                    new \RuntimeException('Failed to grant REPLICA MONITOR to user: '.$this->dbUser)
                 );
 
-                return; //safegaurd
+                return;
             }
         }
 
