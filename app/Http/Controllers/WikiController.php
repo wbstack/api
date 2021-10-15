@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Config;
 
 class WikiController extends Controller
 {
@@ -24,14 +25,17 @@ class WikiController extends Controller
     {
         $user = $request->user();
 
+        $subDomainSuffix = Config::get('wbstack.subdomain_suffix');
         $submittedDomain = $request->input('domain');
-        $isSubdomain = preg_match('/.wiki\.opencura\.com$/', $submittedDomain);
+        $isSubdomain = preg_match('/' . preg_quote( $subDomainSuffix ) . '$/', $submittedDomain);
         if ($isSubdomain) {
-            // .wiki.opencura.com is 18 characters long
-            // if we want at least 5 chars for the site sub domain
-            // that is 23 length
+            $subDomainSuffixLength = strlen($subDomainSuffix);
+            $requiredSubdomainPrefixChars = 5;
+            // We want at least 5 chars for the site sub domain
             // This also stops things like mail. www. pop. ETC...
-            $domainRequirements = 'required|unique:wikis|unique:wiki_domains|min:23|regex:/^[a-z0-9-]+\.wiki\.opencura\.com$/';
+            // TODO add a real disallow list for various wanted subdomains
+            $requiredLength = $requiredSubdomainPrefixChars + $subDomainSuffixLength;
+            $domainRequirements = 'required|unique:wikis|unique:wiki_domains|min:' . $requiredLength . '|regex:/^[a-z0-9-]+' . preg_quote( $subDomainSuffix ) . '$/';
         } else {
             $domainRequirements = 'required|unique:wikis|unique:wiki_domains|min:4|regex:/[a-z0-9-]+\.[a-z]+$/';
         }
