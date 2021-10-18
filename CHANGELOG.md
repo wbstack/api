@@ -1,8 +1,11 @@
 # api
 
-## 8x.1.8 - Untagged
+## 8x.1.8 - 18 October 2021
 
 - [Add a Job (not called yet) to delete elasticsearch indexes](https://github.com/wbstack/api/pull/152)
+- [Add a Job (not called yet) to delete blazegraph namespaces](https://github.com/wbstack/api/pull/155)
+- [Configurable subdomain for use on wiki creation (was hardcoded to *.wiki.opencura.com)](https://github.com/wbstack/api/pull/217)
+- [Adjust to work with MariaDB 10.5.9+ (and 10.5.2-). There is a gap where wiki creation will not correctly work!](https://github.com/wbstack/api/pull/216)
 
 ## 8x.1.7 - 2 September 2021
 
