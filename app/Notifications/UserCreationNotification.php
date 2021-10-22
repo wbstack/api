@@ -66,11 +66,7 @@ class UserCreationNotification extends Notification
          * Then we could use the ResetPassword Notification notification too...
          * TODO this is now duplicated in a few notifications.... TODO switch on ENV instead?
          */
-        if (config('app.url') === 'http://localhost') {
-            $verifyEmailLink = 'http://localhost:8081/emailVerification/'.$this->token;
-        } else {
-            $verifyEmailLink = 'https://wbstack.com/emailVerification/'.$this->token;
-        }
+        $verifyEmailLink = config('app.url') . '/emailVerification/'.$this->token;
 
         return (new MailMessage)
             ->subject(Lang::get('Account Creation Notification'))

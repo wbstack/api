@@ -62,13 +62,8 @@ class ResetPasswordNotification extends Notification
          * Ideally we would be able to have the route password.reset etc actually direct to the UI VUE route
          * Then we could use the ResetPassword Notification notification too...
          */
-        //$resetPasswordLink = url(config('app.url').route('password.reset', ['token' => $this->token, 'email' => $notifiable->getEmailForPasswordReset()], false));
         $queryPart = "?token=$this->token&email={$notifiable->getEmailForPasswordReset()}";
-        if (config('app.url') === 'http://localhost') {
-            $resetPasswordLink = 'http://localhost:8081/reset-password'.$queryPart;
-        } else {
-            $resetPasswordLink = 'https://wbstack.com/reset-password'.$queryPart;
-        }
+        $resetPasswordLink = config('app.url').'/reset-password'.$queryPart;
 
         return (new MailMessage)
             ->subject(Lang::get('Reset Password Notification'))
