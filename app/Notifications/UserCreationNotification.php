@@ -59,14 +59,7 @@ class UserCreationNotification extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        /*
-         * This is another point in Laravel where the default expectation of the UI living within the control of Laravel
-         * bites us a bit.
-         * Ideally we would be able to have the route password.reset etc actually direct to the UI VUE route
-         * Then we could use the ResetPassword Notification notification too...
-         * TODO this is now duplicated in a few notifications.... TODO switch on ENV instead?
-         */
-        $verifyEmailLink = config('app.url') . '/emailVerification/'.$this->token;
+        $verifyEmailLink = config('wbstack.ui_url') . '/emailVerification/'.$this->token;
 
         return (new MailMessage)
             ->subject(Lang::get('Account Creation Notification'))
