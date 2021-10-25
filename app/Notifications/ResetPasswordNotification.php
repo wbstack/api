@@ -56,14 +56,8 @@ class ResetPasswordNotification extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        /**
-         * This is another point in Laravel where the default expectation of the UI living within the control of Laravel
-         * bites us a bit.
-         * Ideally we would be able to have the route password.reset etc actually direct to the UI VUE route
-         * Then we could use the ResetPassword Notification notification too...
-         */
         $queryPart = "?token=$this->token&email={$notifiable->getEmailForPasswordReset()}";
-        $resetPasswordLink = config('app.url').'/reset-password'.$queryPart;
+        $resetPasswordLink = config('wbstack.ui_url').'/reset-password'.$queryPart;
 
         return (new MailMessage)
             ->subject(Lang::get('Reset Password Notification'))
