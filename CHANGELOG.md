@@ -1,5 +1,10 @@
 # api
 
+## 8x.1.9 - 25 October 2021
+
+- Package updates, including laravel/framework from 8.64.0 to 8.67.0
+- Use new wbstack uiurl for email notification links
+
 ## 8x.1.8 - 18 October 2021
 
 - [Add a Job (not called yet) to delete elasticsearch indexes](https://github.com/wbstack/api/pull/152)
