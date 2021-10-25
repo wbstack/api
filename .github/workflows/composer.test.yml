@@ -34,7 +34,7 @@ jobs:
       run: docker-compose -f docker-compose.yml -f docker-compose.integration.yml up -d
 
     - name: Setup - Keep trying to install the DBs (try for 30 seconds)
-      uses: nick-invision/retry@v2.5.0
+      uses: nick-invision/retry@v2.5.1
       with:
         max_attempts: 30
         retry_wait_seconds: 1
