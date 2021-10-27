@@ -59,6 +59,8 @@ WBS_DOMAIN=maint php ./w/maintenance/install.php --dbserver sql-clean --dbuser r
 WHILE https://phabricator.wikimedia.org/T267809 is broken you'll then need to edit the auto generated LocalSettings.php file...
 (per the instructions in the ticket)
 
+Note: while following this procedure for MW 1.36, `WikibaseEdtf` caused `install.php` to fail with `--with-extensions`. As a workaround we specified all other extensions manually with `--extensions`, since it doesn't seem to add any tables itself and enabled it manually afterwards in LocalSettings.php (just like Wikibase)
+
 ```
 WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
 WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
