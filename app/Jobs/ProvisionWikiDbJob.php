@@ -167,8 +167,9 @@ class ProvisionWikiDbJob extends Job
         if($aboveMariaDb1059 >= 0) {
             // GRANT the user access to see slave status 
             // Mariadb versions > 10.5.9 https://mariadb.com/kb/en/grant/#replica-monitor
-            // GRANT REPLICA MONITOR ON *.* TO 'mwu_36be7164b0'@'%'
-            if ($pdo->exec('GRANT REPLICA MONITOR ON *.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
+            // https://mariadb.com/docs/reference/mdb/privileges/BINLOG_MONITOR/ required to query "SHOW MASTER STATUS"
+            // GRANT REPLICA MONITOR, BINLOG MONITOR ON *.* TO 'mwu_36be7164b0'@'%'
+            if ($pdo->exec('GRANT REPLICA MONITOR, BINLOG MONITOR ON *.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
                 $this->fail(
                     new \RuntimeException('Failed to grant REPLICA MONITOR to user: '.$this->dbUser)
                 );
