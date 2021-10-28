@@ -86,6 +86,7 @@ WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
      - Remove SET statements
      - Update the sql file in cleanSql.php
      - Run cleanSql.php over the file
+     - Manually add the prefix string to any FOREIGN KEY statements
  - Compare the resulting schemas to see what has changed... (use https://www.diffchecker.com/ ?)
 
 **Cleanup the setup:**
