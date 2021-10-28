@@ -222,7 +222,7 @@ CREATE TABLE `<<prefix>>_echo_push_subscription` (
   `eps_provider` tinyint(3) unsigned NOT NULL,
   `eps_updated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `eps_data` blob DEFAULT NULL,
-  `eps_topic` tinyint(3) unsigned DEFAULT NULL,
+  `eps_topic` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`eps_id`),
   UNIQUE KEY `eps_token_sha256` (`eps_token_sha256`),
   KEY `eps_provider` (`eps_provider`),
