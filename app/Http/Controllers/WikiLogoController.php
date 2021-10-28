@@ -8,6 +8,7 @@ use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use App\Wiki;
 
 class WikiLogoController extends Controller
 {
@@ -44,9 +45,7 @@ class WikiLogoController extends Controller
         }
 
         // Get a directory for storing all things relating to this site
-        // TODO should be in the site model? maybe?
-        $siteDir = md5($wikiId.md5($wikiId));
-        $logosDir = 'sites/'.$siteDir.'/logos';
+        $logosDir = Wiki::getLogosDirectory($wikiId);
 
         // Delete the old raw file if it was already there
         $rawFilePath = $logosDir.'/raw.png';
