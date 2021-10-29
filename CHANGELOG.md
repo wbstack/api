@@ -3,6 +3,9 @@
 ## 8x.2.0 - 29 October 2021
 
 - Add 1.36 dump and make new wikis/wikidb use the new schema
+- Add DeleteWikiFinalizeJob - currently not set to be run
+- Give BINLOG MONITOR to new provisioned wiki-dbs - MariaDB was updated
+- Bump some dependencies and github actions
 
 ## 8x.1.9 - 25 October 2021
 
