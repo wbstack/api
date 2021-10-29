@@ -214,6 +214,12 @@ CREATE TABLE `<<prefix>>_echo_push_provider` (
   PRIMARY KEY (`epp_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
+CREATE TABLE `<<prefix>>_echo_push_topic` (
+  `ept_id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
+  `ept_text` tinyblob NOT NULL,
+  PRIMARY KEY (`ept_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=binary;
+
 CREATE TABLE `<<prefix>>_echo_push_subscription` (
   `eps_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `eps_user` int(10) unsigned NOT NULL,
@@ -229,14 +235,8 @@ CREATE TABLE `<<prefix>>_echo_push_subscription` (
   KEY `eps_topic` (`eps_topic`),
   KEY `echo_push_subscription_user_id` (`eps_user`),
   KEY `echo_push_subscription_token` (`eps_token`(10)),
-  CONSTRAINT `echo_push_subscription_ibfk_1` FOREIGN KEY (`eps_provider`) REFERENCES `echo_push_provider` (`epp_id`),
-  CONSTRAINT `echo_push_subscription_ibfk_2` FOREIGN KEY (`eps_topic`) REFERENCES `echo_push_topic` (`ept_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=binary;
-
-CREATE TABLE `<<prefix>>_echo_push_topic` (
-  `ept_id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
-  `ept_text` tinyblob NOT NULL,
-  PRIMARY KEY (`ept_id`)
+  CONSTRAINT `echo_push_subscription_ibfk_1` FOREIGN KEY (`eps_provider`) REFERENCES `<<prefix>>_echo_push_provider` (`epp_id`),
+  CONSTRAINT `echo_push_subscription_ibfk_2` FOREIGN KEY (`eps_topic`) REFERENCES `<<prefix>>_echo_push_topic` (`ept_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
 CREATE TABLE `<<prefix>>_echo_target_page` (

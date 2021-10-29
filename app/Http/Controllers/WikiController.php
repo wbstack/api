@@ -51,7 +51,8 @@ class WikiController extends Controller
         $dbAssignment = null;
         // TODO create with some sort of owner etc?
         DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain) {
-            $wikiDbCondition = ['wiki_id'=>null, 'version'=>'mw1.35-wbs1'];
+            $dbVersion = Config::get('wbstack.wiki_db_use_version');
+            $wikiDbCondition = ['wiki_id'=>null, 'version'=>$dbVersion];
 
             // Fail if there is not enough storage ready
             if (WikiDb::where($wikiDbCondition)->count() == 0) {

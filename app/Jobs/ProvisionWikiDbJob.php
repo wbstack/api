@@ -14,8 +14,7 @@ class ProvisionWikiDbJob extends Job
 {
     private $prefix;
 
-    // TODO should be injected somehow?
-    private $newSqlFile = 'mw1.35-wbs1';
+    private $newSqlFile;
 
     /**
      * @var string|null|false
@@ -62,6 +61,7 @@ class ProvisionWikiDbJob extends Job
         $this->prefix = $prefix;
         $this->dbName = $dbName;
         $this->maxFree = $maxFree;
+        $this->newSqlFile = config('wbstack.wiki_db_provision_version');
     }
 
     private function doesMaxFreeSayWeShouldStop(): bool
