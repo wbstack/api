@@ -22,13 +22,9 @@ class MediawikiInitTest extends TestCase
         $this->email = "some@email.com";
     }
 
-    public function testFatalErrorIsHandled()
-    {
-        $mockResponse = 'oh no';
-
+    private function getMockRequest( string $mockResponse ): HttpRequest {
         $request = $this->createMock(HttpRequest::class);
-        $request->method('execute')->willReturn(json_encode($mockResponse));
-
+        $request->method('execute')->willReturn($mockResponse);
 
         $request->expects($this->once())
             ->method('setOptions')
@@ -51,10 +47,42 @@ class MediawikiInitTest extends TestCase
                 ]
             );
 
+        return $request;
+    }
+
+    public function testSuccess()
+    {
+        $mockResponse = [
+            'warnings' => [],
+            'wbstackInit' => [
+                "success" => 1,
+                "output" => []
+            ]
+        ];
+
+        $mockResponseString = json_encode($mockResponse);
+        $request = $this->getMockRequest( $mockResponseString );
+
+        $mockJob = $this->createMock(Job::class);
+        $mockJob->expects($this->never())
+                ->method('fail')
+                ->withAnyParameters();
+
+        $job = new MediawikiInit( $this->wikiDomain, $this->username, $this->email );
+        $job->setJob($mockJob);
+        $job->handle($request);
+    }
+
+    public function testFatalErrorIsHandled()
+    {
+        $mockResponse = 'oh no';
+
+        $request = $this->getMockRequest($mockResponse);
+
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())
                 ->method('fail')
-                ->with(new \RuntimeException('wbstackInit call for some.domain.com. No wbstackInit key in response: "' . $mockResponse . '"'));
+                ->with(new \RuntimeException('wbstackInit call for some.domain.com. No wbstackInit key in response: ' . $mockResponse ));
 
         $job = new MediawikiInit( $this->wikiDomain, $this->username, $this->email );
         $job->setJob($mockJob);
