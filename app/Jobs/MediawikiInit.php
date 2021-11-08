@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Jobs;
+use App\Http\Curl\HttpRequest;
 
 class MediawikiInit extends Job
 {
@@ -21,15 +22,14 @@ class MediawikiInit extends Job
     /**
      * @return void
      */
-    public function handle()
+    public function handle( HttpRequest $request )
     {
         $data = [
             'username' => $this->username,
             'email' => $this->email,
         ];
 
-        $curl = curl_init();
-        curl_setopt_array($curl, [
+        $request->setOptions([
             CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackInit&format=json',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
@@ -43,8 +43,10 @@ class MediawikiInit extends Job
             ],
         ]);
 
-        $rawResponse = curl_exec($curl);
-        $err = curl_error($curl);
+        $rawResponse = $request->execute(); 
+        $err = $request->error();
+        $request->close();
+
         if ($err) {
             $this->fail(
                 new \RuntimeException('curl error for '.$this->wikiDomain.': '.$err)
@@ -53,11 +55,9 @@ class MediawikiInit extends Job
             return; //safegaurd
         }
 
-        curl_close($curl);
-
         $response = json_decode($rawResponse, true);
 
-        if (!array_key_exists('wbstackInit', $response)) {
+        if ( !is_array($response) || !array_key_exists('wbstackInit', $response) ) {
             $this->fail(
                 new \RuntimeException('wbstackInit call for '.$this->wikiDomain.'. No wbstackInit key in response: '.$rawResponse)
             );
