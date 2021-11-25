@@ -19,7 +19,8 @@ class DeleteTest extends TestCase
         $this->artisan('wbs-wiki:delete', [
             'key' => 'sitename',
             'value' => $wikiName,
-        ]);
+        ])
+            ->expectsOutput(Delete::SUCCESS);
 
         $this->assertSoftDeleted($wiki);
     }
