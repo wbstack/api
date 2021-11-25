@@ -188,6 +188,7 @@ return [
         PercyMamedy\LaravelDevBooter\ServiceProvider::class,
 
         Intervention\Image\ImageServiceProvider::class,
+        Laravel\Tinker\TinkerServiceProvider::class,
     ],
 
     // TODO maybe this should only be in dev?
