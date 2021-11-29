@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   mediawiki:
-    image: ghcr.io/wbstack/mediawiki:main
+    image: mw-137-fp
     volumes:
       - ./maintWikWiki.json:/var/www/html/w/maintWikWiki.json
     environment:
