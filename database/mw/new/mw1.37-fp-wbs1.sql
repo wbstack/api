@@ -215,6 +215,7 @@ CREATE TABLE `<<prefix>>_echo_push_provider` (
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
 
 -- this table needs to exist before the foreign key constraint below
+
 CREATE TABLE `<<prefix>>_echo_push_topic` (
   `ept_id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
   `ept_text` tinyblob NOT NULL,
