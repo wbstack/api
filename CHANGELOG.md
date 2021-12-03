@@ -1,5 +1,12 @@
 # api
 
+## 8x.3.0 - 3 December 2021
+
+ - DB updates 1.37 (with fed props)
+ - Add laravel/tinker
+ - Add artisan command to soft delete a wiki
+ - laravel/framework from 8.68.1 to 8.70.1
+
 ## 8x.2.0 - 29 October 2021
 
 - Add 1.36 dump and make new wikis/wikidb use the new schema
