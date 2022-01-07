@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Example usage
- * php artisan wbs-job:handle ProvisionQueryserviceNamespaceJob
+ * php artisan job:dispatchNow ProvisionQueryserviceNamespaceJob
  */
 class ProvisionQueryserviceNamespaceJob extends Job
 {
