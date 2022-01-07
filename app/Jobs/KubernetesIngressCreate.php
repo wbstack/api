@@ -7,7 +7,7 @@ use Maclof\Kubernetes\Models\Ingress;
 
 /**
  * This can be run with for example:
- * php artisan wbs-job:handle KubernetesIngressCreate 999999999,wiki.addshore.com ,
+ * php artisan job:dispatchNow KubernetesIngressCreate 999999999 wiki.addshore.com
  *
  * If you need to cleanup a test run of this you need to remove the ingress and the related secret
  */

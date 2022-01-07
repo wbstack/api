@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\DB;
  * Since then MediaWikiUpdate was created, running update.php through an API.
  *
  * This can be run with for example:
- * php artisan wbs-job:handle MediawikiManualDbUpdate id,1,mw1.33-wbs1,mw1.33-wbs2 ,
+ * php artisan job:dispatchNow MediawikiManualDbUpdate id 1 mw1.33-wbs1 mw1.33-wbs2
  *
  * If you wanted to be wreckless and pick any wiki:
- * php artisan wbs-job:handle MediawikiManualDbUpdate version,mw1.33-wbs1,mw1.33-wbs2 ,
+ * php artisan job:dispatchNow MediawikiManualDbUpdate version mw1.33-wbs1 mw1.33-wbs2
  */
 class MediawikiManualDbUpdate extends Job
 {

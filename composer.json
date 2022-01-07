@@ -24,6 +24,7 @@
         "laravel/ui": "^3.3",
         "lcobucci/jwt": "^4.1",
         "maclof/kubernetes-client": "^0.21.0",
+        "mxl/laravel-job": "^1.2",
         "percymamedy/laravel-dev-booter": "^3.0",
         "predis/predis": "^1.1",
         "superbalist/laravel-google-cloud-storage": "^2.2"
