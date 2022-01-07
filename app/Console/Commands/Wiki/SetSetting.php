@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class SetSetting extends Command
 {
-    protected $signature = 'wbs-wiki:setSetting {wikiKey} {wikiValue} {settingKey} {settingValue}';
+    protected $signature = 'wbs-wiki:setSetting {wikiKey} {wikiValue} {settingKey} {settingValue?}';
 
     protected $description = 'Set a single setting for a wiki.';
 
@@ -22,7 +22,10 @@ class SetSetting extends Command
         $wikiKey = trim($this->argument('wikiKey'));
         $wikiValue = trim($this->argument('wikiValue'));
         $settingKey = trim($this->argument('settingKey'));
-        $settingValue = trim($this->argument('settingValue'));
+        $settingValue = $this->argument('settingValue');
+        if(is_string($settingValue)) {
+            $settingValue = trim($settingValue);
+        }
 
         // TODO don't select the timestamps and redundant info for the settings?
         $wiki = Wiki::where($wikiKey, $wikiValue)->first();
@@ -33,7 +36,16 @@ class SetSetting extends Command
         }
         $wikiId = $wiki->id;
 
-        $setting = WikiSetting::updateOrCreate(
+        if($settingValue === null) {
+            WikiSetting::where([
+                'wiki_id' => $wiki->id,
+                'name' => $settingKey,
+            ])->delete();
+            $this->line("Deleted setting ${settingKey} for wiki id ${wikiId}");
+            return;
+        }
+
+        WikiSetting::updateOrCreate(
             [
                 'wiki_id' => $wiki->id,
                 'name' => $settingKey,

@@ -100,6 +100,7 @@ class Wiki extends Model
         return $this->settings()->whereIn('name',
         [
             'wgLogo',
+            'wgReadOnly',
             // FIXME: this list is evil and should be kept in sync with WikiSettingController?!
             'wgDefaultSkin',
             'wwExtEnableConfirmAccount',

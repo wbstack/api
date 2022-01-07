@@ -16,7 +16,7 @@ class WikiSettingController extends Controller
      */
     private function getSettingValidations(): array
     {
-        // FIXME: this list is evil and should be kept in sync with the model in Wiki.php?!
+        // FIXME: this list is evil and should be kept in sync with the model in Wiki.php?! (mostly)
         return [
             'wgDefaultSkin' => ['required', 'string', 'in:vector,modern,timeless'],
             'wwExtEnableConfirmAccount' => ['required', 'boolean'],
