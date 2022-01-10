@@ -18,7 +18,6 @@
         "illuminate/mail": "^8.48",
         "illuminate/redis": "^8.48",
         "intervention/image": "^2.5",
-        "laravel/cashier": "^13.2",
         "laravel/framework": "^8.48",
         "laravel/passport": "^10.1",
         "laravel/tinker": "^2.6",

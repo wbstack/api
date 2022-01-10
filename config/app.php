@@ -181,9 +181,6 @@ return [
          * Imported from LUMEN
          */
         AlbertCht\InvisibleReCaptcha\InvisibleReCaptchaServiceProvider::class,
-        // The cors service provider is apparently meant to be loaded automagically
-        // but it doesnt seem to be working...
-        //Laravel\Cashier\CashierServiceProvider::class
 
         PercyMamedy\LaravelDevBooter\ServiceProvider::class,
 
