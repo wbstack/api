@@ -31,7 +31,7 @@ class DeleteWikiJobTest extends TestCase
     }
 
     private function getExpectedDeletedDatabaseName( $wiki ): string {
-        return "deleted_1631534400_" . $wiki->id;
+        return "mwdb_deleted_1631534400_" . $wiki->id;
     }
 
     private function getResultValues( $resultRows ) {
