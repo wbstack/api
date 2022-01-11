@@ -68,7 +68,7 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
     
             $pdo = $conn->getPdo();
             $timestamp = Carbon::now()->timestamp;
-            $deletedDatabaseName = "deleted_{$timestamp}_{$this->wikiId}";
+            $deletedDatabaseName = "mwdb_deleted_{$timestamp}_{$this->wikiId}";
     
             if ($pdo->exec('USE '.$wikiDB->name) === false) {
                 throw new \RuntimeException('Failed to use database with dbname: '.$wikiDB->name);
