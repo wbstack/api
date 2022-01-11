@@ -14,7 +14,15 @@ and query service management code.
 
 ### Install dependencies
 
-`composer install`
+Make sure the `xml` and `curl` php extensions are instealled. E.g. on Ubuntu:
+```
+sudo apt install php-xml php-curl
+```
+
+Install the php dependencies:
+```
+composer install
+```
 
 Alternatively you can use docker to run composer
 `docker run --rm --interactive --tty --volume $PWD:/app --user $(id -u):$(id -g) composer install`
