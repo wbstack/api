@@ -46,6 +46,15 @@ class DeleteWikiDispatcherJobTest extends TestCase
 
     public function testDeleteDispatcher()
     {
+        $wikiDB = WikiDb::create([
+            'name' => 'mwdb_asdasfasfasf',
+            'user' => 'asdasd',
+            'password' => 'asdasfasfasf',
+            'version' => 'asdasdasdas',
+            'prefix' => 'asdasd',
+            'wiki_id' => $this->wiki->id
+        ]);
+
         Bus::fake();
 
         $mockJob = $this->createMock(Job::class);
@@ -53,9 +62,10 @@ class DeleteWikiDispatcherJobTest extends TestCase
         $job->setJob($mockJob);
         $job->handle();
 
+
         Bus::assertChained([
             new KubernetesIngressDeleteJob( $this->wiki->id ),
-            //new DeleteWikiDbJob($this->wiki->id),
+            new DeleteWikiDbJob($this->wiki->id),
             new DeleteWikiFinalizeJob($this->wiki->id)
         ]);
     }
@@ -121,7 +131,6 @@ class DeleteWikiDispatcherJobTest extends TestCase
             new DeleteQueryserviceNamespaceJob( $namespace->id ),
             new ElasticSearchIndexDelete( $this->wiki->id ),
             new KubernetesIngressDeleteJob( $this->wiki->id ),
-            //new DeleteWikiDbJob($this->wiki->id),
             new DeleteWikiFinalizeJob($this->wiki->id)
         ]);
     }
