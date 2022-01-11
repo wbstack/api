@@ -16,6 +16,9 @@ and query service management code.
 
 `composer install`
 
+Alternatively you can use docker to run composer
+`docker run --rm --interactive --tty --volume $PWD:/app --user $(id -u):$(id -g) composer install`
+
 ### Initial setup
 
 `cp .env.example .env` and modify the contents accordingly.
