@@ -10,6 +10,7 @@ use App\WikiSetting;
 use App\QueryserviceNamespace;
 use App\Http\Controllers\WikiController;
 use App\WikiDb;
+use Illuminate\Support\Facades\Config;
 
 class DeleteWikiDispatcherJob extends Job
 {    
@@ -18,7 +19,9 @@ class DeleteWikiDispatcherJob extends Job
      */
     public function handle()
     {
-        $deleteCutoff = Carbon::now()->subDays(30);
+        $deleteCutoff = Carbon::now()->subDays(
+            Config::get('wbstack.wiki_hard_delete_threshold')
+        );
         $wikis = Wiki::withTrashed()->whereDate( 'deleted_at', '<=', $deleteCutoff )->get();
 
         if( !$wikis->count() ) {
