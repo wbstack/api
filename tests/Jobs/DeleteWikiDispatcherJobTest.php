@@ -25,6 +25,7 @@ use Illuminate\Support\Str;
 use App\Jobs\ProvisionWikiDbJob;
 use App\WikiDb;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Config;
 
 class DeleteWikiDispatcherJobTest extends TestCase
 {
@@ -137,7 +138,7 @@ class DeleteWikiDispatcherJobTest extends TestCase
 
     public function testActuallyRunningJobsThatDelete()
     {
-        $this->wiki->update(['domain' => 'asdasdaf.wiki.opencura.com']);
+        $this->wiki->update(['domain' => 'asdasdaf' . Config::get('wbstack.subdomain_suffix')]);
         
         // create db to be deleted
         $job = new ProvisionWikiDbJob('great_job', 'the_test_database', null);
