@@ -30,12 +30,18 @@ class SetWikiLogo extends Job
      */
     public function handle()
     {
+        if (!file_exists($this->logoPath)) {
+            $this->fail(new \InvalidArgumentException("Logo not found at '{$this->logoPath}'"));
+            return;
+        }
+
         $wikis = Wiki::where($this->wikiKey, $this->wikiValue);
         if ($wikis->count() === 0) {
-            $this->fail(new \RuntimeException("Wiki not found for {$this->wikiKey}:{$this->wikiValue}"));
+            $this->fail(new \RuntimeException("Wiki not found for key={$this->wikiKey} and value={$this->wikiValue}"));
             return;
-        } elseif ($wikis->count() > 1) {
-            $this->fail(new \RuntimeException("Wiki not found for {$this->wikiKey}:{$this->wikiValue}"));
+        }
+        elseif ($wikis->count() > 1) {
+            $this->fail(new \RuntimeException("Multiple Wikis matched for key={$this->wikiKey} and value={$this->wikiValue}"));
             return;
         }
 
@@ -45,7 +51,18 @@ class SetWikiLogo extends Job
         echo "Wiki sitename: {$wiki->sitename}\n";
         echo "Wiki domain: {$wiki->domain}\n";
         echo "logoPath: {$this->logoPath}\n";
-        
+
+        // // Get the cloudy disk we use to store logos
+        // $storage = Storage::disk('gcs-public-static');
+        // if (! $storage instanceof Cloud) {
+        //     return response()->json('Invalid storage (not cloud)', 500);
+        // }
+
+        // // Get a directory for storing all things relating to this site
+        // $logosDir = Wiki::getLogosDirectory($wiki->id);
+        // // Upload the local image to the cloud storage
+        // $storage::putFile($logosDir, new File($this->logoPath))
+
         return; //safegaurd
     }
 }
