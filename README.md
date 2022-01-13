@@ -19,11 +19,9 @@ It is recommened to install the php dependencies via a composer docker container
 docker run --rm -it -v $PWD:/app -u $(id -u):$(id -g) composer install
 ```
 
-
-Alternatively, you can run `composer` on your local machine but make sure the `xml` and `curl` php extensions are installed. For example, on Ubuntu:
+Alternatively, you can run `composer` on your local machine (ignoring platform requirements):
 ```
-sudo apt install php-xml php-curl
-composer install
+composer install --ignore-platform-reqs
 ```
 
 ### Initial setup
