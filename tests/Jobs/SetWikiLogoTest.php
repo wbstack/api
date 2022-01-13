@@ -2,22 +2,15 @@
 
 namespace Tests\Jobs;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\TestCase;
-use App\Http\Curl\HttpRequest;
-use App\Jobs\DeleteQueryserviceNamespaceJob;
-use App\QueryserviceNamespace;
-use Illuminate\Support\Facades\DB;
-use App\WikiManager;
 use App\WikiSetting;
-use App\User;
 use App\Wiki;
-use Carbon\Carbon;
-use Illuminate\Contracts\Queue\Job;
 use App\Jobs\SetWikiLogo;
+use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Tests\TestCase;
 
 
 class SetWikiLogoTest extends TestCase
@@ -70,7 +63,6 @@ class SetWikiLogoTest extends TestCase
         $logo = Image::make($storage->path('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png'));
         $this->assertSame(135, $logo->height());
         $this->assertSame(135, $logo->width());
-
     }
 
     public function testLogoResize64()
@@ -88,12 +80,22 @@ class SetWikiLogoTest extends TestCase
     public function testSettingsSet()
     {
         $storage = Storage::disk('gcs-public-static');
-        // delete the 135.png file form the cloud storage
+        // delete the logo files form the cloud storage
         $storage->delete('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png');
+        $storage->delete('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/64.ico');
 
         $this->assertJobSucceeds('id', 1, __DIR__ . "/logo_200x200.png");
-        $wikiSetting = WikiSetting::firstWhere('id', 1);
-        var_dump($wikiSetting); die;
-        $this->assertSame($storage->path('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png'), $wikiSetting->wgLogo);
+
+        // get the wgLogo setting
+        $wiki = Wiki::firstWhere('id', 1);
+        $wgLogoSetting = $wiki->settings()->where(['name' => WikiSetting::wgLogo])->first()->value;
+        $wgFaviconSetting = $wiki->settings()->where(['name' => WikiSetting::wgFavicon])->first()->value;
+        
+        # TODO: mock out the call to time() in the unit under test?
+        $expectedLogoURL = $storage->url('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png') . '?u=' . time();
+        $expectedFaviconURL = $storage->url('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/64.ico') . '?u=' . time();
+
+        $this->assertSame($expectedLogoURL, $wgLogoSetting);
+        $this->assertSame($expectedFaviconURL, $wgFaviconSetting);
     }
 }

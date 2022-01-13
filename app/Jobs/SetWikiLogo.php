@@ -3,11 +3,11 @@
 namespace App\Jobs;
 
 use App\Wiki;
+use App\WikiSetting;
 use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\File;
 use Intervention\Image\Facades\Image;
-use App\WikiSetting;
 
 /**
  * This can be run with for example:
@@ -52,12 +52,7 @@ class SetWikiLogo extends Job
 
         $wiki = $wikis->first();
 
-        // echo "Wiki ID:{$wiki->id}\n";
-        // echo "Wiki sitename: {$wiki->sitename}\n";
-        // echo "Wiki domain: {$wiki->domain}\n";
-        // echo "logoPath: {$this->logoPath}\n";
-
-        // // Get the cloudy disk we use to store logos
+        // Get the cloud disk we use to store logos
         $storage = Storage::disk('gcs-public-static');
         if (!$storage instanceof Cloud) {
             # TODO: Use a more specific exception?
@@ -65,7 +60,7 @@ class SetWikiLogo extends Job
             return;
         }
 
-        // Get a directory for storing all things relating to this site
+        // Get the directory for storing this site's logos
         $logosDir = Wiki::getLogosDirectory($wiki->id);
         // Upload the local image to the cloud storage
         $storage->putFileAs($logosDir, new File($this->logoPath), "raw.png");
@@ -80,7 +75,7 @@ class SetWikiLogo extends Job
             Image::make($storage->path($logosDir . "/raw.png"))->resize(135, 135)->stream()->detach()
         );
 
-        // Store a favicon
+        // Store a conversion for the favicon
         $faviconPath = $logosDir . '/64.ico';
         if ($storage->exists($faviconPath)) {
             $storage->delete($faviconPath);
@@ -98,21 +93,16 @@ class SetWikiLogo extends Job
         $faviconUrl .= '?u=' . time();
 
         // Docs: https://www.mediawiki.org/wiki/Manual:$wgLogo
-        // WikiSetting::create(['wiki_id' => $wiki->id, 'name' => WikiSetting::wgLogo, 'value' => $logoUrl]);
         WikiSetting::updateOrCreate(
             ['wiki_id' => $wiki->id, 'name' => WikiSetting::wgLogo],
             ['value' => $logoUrl]
         );
 
-        // WikiSetting::updateOrCreate(
-        //     [
-        //         'wiki_id' => $wikiId,
-        //         'name' => 'wgLogo',
-        //     ],
-        //     [
-        //         'value' => $logoUrl,
-        //     ]
-        // );
+        // Docs: https://www.mediawiki.org/wiki/Manual:$wgLogo
+        WikiSetting::updateOrCreate(
+            ['wiki_id' => $wiki->id, 'name' => WikiSetting::wgFavicon],
+            ['value' => $faviconUrl]
+        );
 
         return; //safegaurd
     }
