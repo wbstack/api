@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Wiki|null $wiki
+ * @method static \Database\Factories\WikiDbFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDb newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDb newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDb query()

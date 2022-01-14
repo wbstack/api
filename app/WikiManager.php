@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\User $user
  * @property-read \App\Wiki $wiki
+ * @method static \Database\Factories\WikiManagerFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiManager newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiManager newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiManager query()
