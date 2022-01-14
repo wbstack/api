@@ -40,7 +40,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
         $unassignedQueryserviceNamespaces = QueryserviceNamespace::where('wiki_id', null)->count();
         $toCreate = $this->maxFree - $unassignedQueryserviceNamespaces;
 
-        return $toCreate === 0;
+        return $toCreate <= 0;
     }
 
     /**
