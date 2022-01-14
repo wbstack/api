@@ -7,8 +7,8 @@ use App\WikiSetting;
 use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\File;
-use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Storage;
 
 /**
  * This can be run with for example:

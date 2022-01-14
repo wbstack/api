@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SetWikiLogo;
+use App\Wiki;
 use App\WikiManager;
 use App\WikiSetting;
-use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
-use App\Wiki;
-use App\Jobs\SetWikiLogo;
 
 class WikiLogoController extends Controller
 {
