@@ -25,7 +25,7 @@ class DeleteWikiDispatcherJob extends Job
         $wikis = Wiki::withTrashed()->whereDate( 'deleted_at', '<=', $deleteCutoff )->get();
 
         if( !$wikis->count() ) {
-            Log::info( __METHOD__ . ": Found no soft deleted wikis. exiting.");
+            Log::info( __METHOD__ . ": Found no soft deleted wikis over threshold. exiting.");
             return;
         }
 
