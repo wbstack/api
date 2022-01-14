@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\Wiki;
+use App\Jobs\SetWikiLogo;
 
 class WikiLogoController extends Controller
 {
@@ -38,78 +39,83 @@ class WikiLogoController extends Controller
             return response()->json('Unauthorized', 401);
         }
 
-        // Get the cloudy disk we use to store logos
-        $disk = Storage::disk('gcs-public-static');
-        if (! $disk instanceof Cloud) {
-            return response()->json('Invalid storage (not cloud)', 500);
-        }
+        ( new SetWikiLogo('wikiId', $wikiId, $request->file('logo')->getRealPath()) )->handle(); 
 
-        // Get a directory for storing all things relating to this site
-        $logosDir = Wiki::getLogosDirectory($wikiId);
+        // // Get the cloudy disk we use to store logos
+        // $disk = Storage::disk('gcs-public-static');
+        // if (! $disk instanceof Cloud) {
+        //     return response()->json('Invalid storage (not cloud)', 500);
+        // }
 
-        // Delete the old raw file if it was already there
-        $rawFilePath = $logosDir.'/raw.png';
-        if ($disk->exists($rawFilePath)) {
-            $disk->delete($rawFilePath);
-        }
+        // // Get a directory for storing all things relating to this site
+        // $logosDir = Wiki::getLogosDirectory($wikiId);
 
-        // Store the raw file uploaded by the user
-        $request->file('logo')->storeAs(
-            $logosDir,
-            'raw.png',
-            'gcs-public-static'
-        );
+        // // Delete the old raw file if it was already there
+        // $rawFilePath = $logosDir.'/raw.png';
+        // if ($disk->exists($rawFilePath)) {
+        //     $disk->delete($rawFilePath);
+        // }
 
-        // Store a conversion for the actual site logo
-        $reducedPath = $logosDir.'/135.png';
-        if ($disk->exists($reducedPath)) {
-            $disk->delete($reducedPath);
-        }
-        $disk->writeStream(
-            $reducedPath,
-            Image::make($request->file('logo')->getRealPath())->resize(135, 135)->stream()->detach()
-        );
+        // // Store the raw file uploaded by the user
+        // $request->file('logo')->storeAs(
+        //     $logosDir,
+        //     'raw.png',
+        //     'gcs-public-static'
+        // );
 
-        // And a favicon
-        $faviconPath = $logosDir.'/64.ico';
-        if ($disk->exists($faviconPath)) {
-            $disk->delete($faviconPath);
-        }
-        $disk->writeStream(
-            $faviconPath,
-            Image::make($request->file('logo')->getRealPath())->encode('ico')->resize(64, 64)->stream()->detach()
-        );
+        // // Store a conversion for the actual site logo
+        // $reducedPath = $logosDir.'/135.png';
+        // if ($disk->exists($reducedPath)) {
+        //     $disk->delete($reducedPath);
+        // }
+        // $disk->writeStream(
+        //     $reducedPath,
+        //     Image::make($request->file('logo')->getRealPath())->resize(135, 135)->stream()->detach()
+        // );
 
-        // Get the urls
-        $logoUrl = $disk->url($reducedPath);
-        $faviconUrl = $disk->url($faviconPath);
-        // Append the time to the url so that client caches will be invalidated
-        $logoUrl .= '?u='.time();
-        $faviconUrl .= '?u='.time();
+        // // And a favicon
+        // $faviconPath = $logosDir.'/64.ico';
+        // if ($disk->exists($faviconPath)) {
+        //     $disk->delete($faviconPath);
+        // }
+        // $disk->writeStream(
+        //     $faviconPath,
+        //     Image::make($request->file('logo')->getRealPath())->encode('ico')->resize(64, 64)->stream()->detach()
+        // );
 
-        // Docs: https://www.mediawiki.org/wiki/Manual:$wgLogo
-        WikiSetting::updateOrCreate(
-            [
-                'wiki_id' => $wikiId,
-                'name' => 'wgLogo',
-            ],
-            [
-                'value' => $logoUrl,
-            ]
-        );
-        // Docs: https://www.mediawiki.org/wiki/Manual:$wgFavicon
-        WikiSetting::updateOrCreate(
-            [
-                'wiki_id' => $wikiId,
-                'name' => 'wgFavicon',
-            ],
-            [
-                'value' => $faviconUrl,
-            ]
-        );
+        // // Get the urls
+        // $logoUrl = $disk->url($reducedPath);
+        // $faviconUrl = $disk->url($faviconPath);
+        // // Append the time to the url so that client caches will be invalidated
+        // $logoUrl .= '?u='.time();
+        // $faviconUrl .= '?u='.time();
+
+        // // Docs: https://www.mediawiki.org/wiki/Manual:$wgLogo
+        // WikiSetting::updateOrCreate(
+        //     [
+        //         'wiki_id' => $wikiId,
+        //         'name' => 'wgLogo',
+        //     ],
+        //     [
+        //         'value' => $logoUrl,
+        //     ]
+        // );
+        // // Docs: https://www.mediawiki.org/wiki/Manual:$wgFavicon
+        // WikiSetting::updateOrCreate(
+        //     [
+        //         'wiki_id' => $wikiId,
+        //         'name' => 'wgFavicon',
+        //     ],
+        //     [
+        //         'value' => $faviconUrl,
+        //     ]
+        // );
+
+        $wiki = Wiki::find($wikiId);
+        $wgLogoSetting = $wiki->settings()->where(['name' => WikiSetting::wgLogo])->first()->value;
 
         $res['success'] = true;
-        $res['url'] = $logoUrl;
+        $res['url'] = $wgLogoSetting;
 
         return response($res);
     }
