@@ -70,7 +70,7 @@ class ProvisionWikiDbJob extends Job
         $unassignedDbs = WikiDb::where($wikiDbCondition)->count();
         $toCreate = $this->maxFree - $unassignedDbs;
 
-        return $toCreate === 0;
+        return $toCreate <= 0;
     }
 
     /**

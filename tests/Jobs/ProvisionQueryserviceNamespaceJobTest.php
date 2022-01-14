@@ -75,6 +75,10 @@ class ProvisionQueryserviceNamespaceJobTest extends TestCase
             'namespace' => 'derp',
             'backend' => 'asdf',
         ]);
+        QueryserviceNamespace::create([
+            'namespace' => 'derp2',
+            'backend' => 'asdf2',
+        ]);
 
         $job = new ProvisionQueryserviceNamespaceJob($namespace, 1);
         $job->handle($request);
