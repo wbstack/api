@@ -129,7 +129,7 @@ class DeleteWikiDispatcherJobTest extends TestCase
         });
 
         Bus::assertChained([
-            new DeleteQueryserviceNamespaceJob( $namespace->id ),
+            new DeleteQueryserviceNamespaceJob( $this->wiki->id ),
             new ElasticSearchIndexDelete( $this->wiki->id ),
             new KubernetesIngressDeleteJob( $this->wiki->id ),
             new DeleteWikiFinalizeJob($this->wiki->id)
