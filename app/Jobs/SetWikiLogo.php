@@ -5,8 +5,9 @@ namespace App\Jobs;
 use App\Wiki;
 use App\WikiSetting;
 use Illuminate\Contracts\Filesystem\Cloud;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
 /**
@@ -40,13 +41,18 @@ class SetWikiLogo extends Job
             return;
         }
 
-        $wikis = Wiki::where($this->wikiKey, $this->wikiValue);
-        if ($wikis->count() === 0) {
-            $this->fail(new \InvalidArgumentException("Wiki not found for key={$this->wikiKey} and value={$this->wikiValue}"));
-            return;
-        }
-        elseif ($wikis->count() > 1) {
-            $this->fail(new \InvalidArgumentException("Multiple Wikis matched for key={$this->wikiKey} and value={$this->wikiValue}"));
+        try {
+            $wikis = Wiki::where($this->wikiKey, $this->wikiValue);
+            if ($wikis->count() === 0) {
+                $this->fail(new \InvalidArgumentException("Wiki not found for key={$this->wikiKey} and value={$this->wikiValue}"));
+                return;
+            }
+            elseif ($wikis->count() > 1) {
+                $this->fail(new \InvalidArgumentException("Multiple Wikis matched for key={$this->wikiKey} and value={$this->wikiValue}"));
+                return;
+            }
+        } catch(QueryException $e) {
+            $this->fail(new \InvalidArgumentException("Invalid key ({$this->wikiKey}) or value ({$this->wikiValue})"));
             return;
         }
 
@@ -63,10 +69,7 @@ class SetWikiLogo extends Job
         // Get the directory for storing this site's logos
         $logosDir = Wiki::getLogosDirectory($wiki->id);
         $rawPath = $logosDir . "/raw.png";
-        // Delete the raw.png file if it exists
-        if ($storage->exists($rawPath)) {
-            $storage->delete($rawPath);
-        }
+
         // Upload the local image to the cloud storage
         $storage->putFileAs($logosDir, new File($this->logoPath), "raw.png");
 

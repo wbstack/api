@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Tests\TestCase;
 
-
 class SetWikiLogoTest extends TestCase
 {
     use DatabaseTransactions;
@@ -38,30 +37,24 @@ class SetWikiLogoTest extends TestCase
         $this->dispatchNow($job);
     }
 
-    public function testInvalidLogoPath()
+    /**
+     * @dataProvider invalidProvider
+     */
+    public function testSetLogoFails( $wikiKey, $wikiValue, $logoPath )
     {
-        $this->assertJobFails('id', 1, "/path/to/logo");
-    }
-
-    public function provider()
-    {
-        return [
-            # $wikiKey, $wikiValue, $logoPath
-            ['id', 1, __DIR__ . "/logo_200x200.png"],
-            ['domain', 'seededsite.nodomain.dev', __DIR__ . "/logo_200x200.png" ]
-        ];
+        $storage = Storage::fake('gcs-public-static');
+        $this->assertJobFails($wikiKey, $wikiValue, $logoPath);
+        $this->assertFalse($storage->exists('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/raw.png'));
     }
 
     /**
-     * @dataProvider provider
+     * @dataProvider validProvider
      */
-    public function testValidLogo( $wikiKey, $wikiValue, $logoPath )
+    public function testSetLogoSucceeds( $wikiKey, $wikiValue, $logoPath )
     {
         $wiki = Wiki::firstWhere($wikiKey, $wikiValue);
-        $storage = Storage::disk('gcs-public-static');
-        // clean up the logos directory
-        $storage->deleteDirectory('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos');
-        
+        $storage = Storage::fake('gcs-public-static');
+
         $this->assertJobSucceeds($wikiKey, $wikiValue, $logoPath);
         $this->assertTrue($storage->exists('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/raw.png'));
         // check logo resized to 135
@@ -74,9 +67,9 @@ class SetWikiLogoTest extends TestCase
         $this->assertSame(64, $logo->width());
 
         // get the wgLogo setting
-        $wgLogoSetting = $wiki->settings()->where(['name' => WikiSetting::wgLogo])->first()->value;
-        $wgFaviconSetting = $wiki->settings()->where(['name' => WikiSetting::wgFavicon])->first()->value;
-        
+        $wgLogoSetting = $wiki->settings()->firstWhere(['name' => WikiSetting::wgLogo])->value;
+        $wgFaviconSetting = $wiki->settings()->firstWhere(['name' => WikiSetting::wgFavicon])->value;
+
         # TODO: mock out the call to time() in the unit under test?
         $expectedLogoURL = $storage->url('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png') . '?u=' . time();
         $expectedFaviconURL = $storage->url('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/64.ico') . '?u=' . time();
@@ -85,4 +78,27 @@ class SetWikiLogoTest extends TestCase
         $this->assertSame($expectedFaviconURL, $wgFaviconSetting);
     }
 
+    public function validProvider()
+    {
+        return [
+            # $wikiKey, $wikiValue, $logoPath
+            ['id', 1, __DIR__ . "/../Data/logo_200x200.png"],
+            ['domain', 'seededsite.nodomain.dev', __DIR__ . "/../Data/logo_200x200.png" ]
+        ];
+    }
+
+    public function invalidProvider()
+    {
+        # $wikiKey, $wikiValue, $logoPath
+        return [
+            # id doesn't exist
+            ['id', 999, __DIR__ . "/../Data/logo_200x200.png"],
+            # logo path doesn't exist
+            ['id', 1, "/invalid/logo/path.png"],
+            # domain doesn't exist
+            ['domain', 'non.existant.dev', __DIR__ . "/../Data/logo_200x200.png" ],
+            # invalid key
+            ['wikiid', 1, __DIR__ . "/../Data/logo_200x200.png"],
+        ];
+    }
 }
