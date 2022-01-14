@@ -43,51 +43,37 @@ class SetWikiLogoTest extends TestCase
         $this->assertJobFails('id', 1, "/path/to/logo");
     }
 
-    public function testValidLogoPath()
+    public function provider()
     {
-        $wikiId = 1;
-        $storage = Storage::disk('gcs-public-static');
-        // delete the raw.png file form the cloud storage
-        $storage->delete('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/raw.png');
-        $this->assertJobSucceeds('id', $wikiId, __DIR__ . "/logo_200x200.png");
-        $this->assertTrue($storage->exists('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/raw.png'));
+        return [
+            # $wikiKey, $wikiValue, $logoPath
+            ['id', 1, __DIR__ . "/logo_200x200.png"],
+            ['domain', 'seededsite.nodomain.dev', __DIR__ . "/logo_200x200.png" ]
+        ];
     }
 
-    public function testLogoResize135()
+    /**
+     * @dataProvider provider
+     */
+    public function testValidLogo( $wikiKey, $wikiValue, $logoPath )
     {
+        $wiki = Wiki::firstWhere($wikiKey, $wikiValue);
         $storage = Storage::disk('gcs-public-static');
-        // delete the 135.png file form the cloud storage
-        $storage->delete('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png');
+        // clean up the logos directory
+        $storage->deleteDirectory('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos');
         
-        $this->assertJobSucceeds('id', 1, __DIR__ . "/logo_200x200.png");
+        $this->assertJobSucceeds($wikiKey, $wikiValue, $logoPath);
+        $this->assertTrue($storage->exists('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/raw.png'));
+        // check logo resized to 135
         $logo = Image::make($storage->path('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png'));
         $this->assertSame(135, $logo->height());
         $this->assertSame(135, $logo->width());
-    }
-
-    public function testLogoResize64()
-    {
-        $storage = Storage::disk('gcs-public-static');
-        // delete the 64.ico file form the cloud storage
-        $storage->delete('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/64.ico');
-
-        $this->assertJobSucceeds('id', 1, __DIR__ . "/logo_200x200.png");
+        // check favicon resized to 64
         $logo = Image::make($storage->path('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/64.ico'));
         $this->assertSame(64, $logo->height());
         $this->assertSame(64, $logo->width());
-    }
-
-    public function testSettingsSet()
-    {
-        $storage = Storage::disk('gcs-public-static');
-        // delete the logo files form the cloud storage
-        $storage->delete('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png');
-        $storage->delete('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/64.ico');
-
-        $this->assertJobSucceeds('id', 1, __DIR__ . "/logo_200x200.png");
 
         // get the wgLogo setting
-        $wiki = Wiki::firstWhere('id', 1);
         $wgLogoSetting = $wiki->settings()->where(['name' => WikiSetting::wgLogo])->first()->value;
         $wgFaviconSetting = $wiki->settings()->where(['name' => WikiSetting::wgFavicon])->first()->value;
         
@@ -98,4 +84,5 @@ class SetWikiLogoTest extends TestCase
         $this->assertSame($expectedLogoURL, $wgLogoSetting);
         $this->assertSame($expectedFaviconURL, $wgFaviconSetting);
     }
+
 }

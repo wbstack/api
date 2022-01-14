@@ -62,6 +62,11 @@ class SetWikiLogo extends Job
 
         // Get the directory for storing this site's logos
         $logosDir = Wiki::getLogosDirectory($wiki->id);
+        $rawPath = $logosDir . "/raw.png";
+        // Delete the raw.png file if it exists
+        if ($storage->exists($rawPath)) {
+            $storage->delete($rawPath);
+        }
         // Upload the local image to the cloud storage
         $storage->putFileAs($logosDir, new File($this->logoPath), "raw.png");
 
