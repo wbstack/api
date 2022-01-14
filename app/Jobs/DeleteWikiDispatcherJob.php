@@ -38,7 +38,7 @@ class DeleteWikiDispatcherJob extends Job
 
             // if there is a namespace add the job for that
             if( $namespace ) {
-                $jobs[] = new DeleteQueryserviceNamespaceJob( $namespace->id );
+                $jobs[] = new DeleteQueryserviceNamespaceJob( $wiki->id );
             }
 
             $elasticSearchSetting = WikiSetting::where([
