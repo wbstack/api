@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\User[] $wikiManagers
  * @property-read int|null $wiki_managers_count
  * @property-read \App\QueryserviceNamespace|null $wikiQueryserviceNamespace
+ * @method static \Database\Factories\WikiFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki newQuery()
  * @method static \Illuminate\Database\Query\Builder|\App\Wiki onlyTrashed()

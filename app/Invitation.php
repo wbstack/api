@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $code
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Database\Factories\InvitationFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Invitation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Invitation newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Invitation query()
