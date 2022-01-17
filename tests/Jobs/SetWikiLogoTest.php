@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Tests\TestCase;
+use ErrorException;
 
 class SetWikiLogoTest extends TestCase
 {
@@ -55,7 +56,22 @@ class SetWikiLogoTest extends TestCase
         $wiki = Wiki::firstWhere($wikiKey, $wikiValue);
         $storage = Storage::fake('gcs-public-static');
 
+        // get the previous logo and favicon settings
+        try {
+            $previousLogoSettingURL = parse_url($wiki->settings()->firstWhere(['name' => WikiSetting::wgLogo])->value);
+        } catch (ErrorException $e) {
+            $previousLogoSettingURL = null;
+        }
+        try {
+            $previousFaviconSettingURL = parse_url($wiki->settings()->firstWhere(['name' => WikiSetting::wgFavicon])->value);
+        } catch (ErrorException $e) {
+            $previousFaviconSettingURL = null;
+        }
+
+        // run the job and assert it succeeds
         $this->assertJobSucceeds($wikiKey, $wikiValue, $logoPath);
+
+        // check logo is uploaded
         $this->assertTrue($storage->exists('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/raw.png'));
         // check logo resized to 135
         $logo = Image::make($storage->path('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png'));
@@ -66,16 +82,17 @@ class SetWikiLogoTest extends TestCase
         $this->assertSame(64, $logo->height());
         $this->assertSame(64, $logo->width());
 
-        // get the wgLogo setting
-        $wgLogoSetting = $wiki->settings()->firstWhere(['name' => WikiSetting::wgLogo])->value;
-        $wgFaviconSetting = $wiki->settings()->firstWhere(['name' => WikiSetting::wgFavicon])->value;
+        // get the current logo and favicon settings
+        $currentLogoSettingURL = parse_url($wiki->settings()->firstWhere(['name' => WikiSetting::wgLogo])->value);
+        $currentFaviconSettingURL = parse_url($wiki->settings()->firstWhere(['name' => WikiSetting::wgFavicon])->value);
 
-        # TODO: mock out the call to time() in the unit under test?
-        $expectedLogoURL = $storage->url('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png') . '?u=' . time();
-        $expectedFaviconURL = $storage->url('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/64.ico') . '?u=' . time();
+        // check the settings have been updated
+        $this->assertNotEquals($previousLogoSettingURL, $currentLogoSettingURL);
+        $this->assertNotEquals($previousFaviconSettingURL, $currentFaviconSettingURL);
 
-        $this->assertSame($expectedLogoURL, $wgLogoSetting);
-        $this->assertSame($expectedFaviconURL, $wgFaviconSetting);
+        // check the URL paths are correct
+        $this->assertSame('/storage/sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png', $currentLogoSettingURL['path']);
+        $this->assertSame('/storage/sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/64.ico', $currentFaviconSettingURL['path']);
     }
 
     public function validProvider()
