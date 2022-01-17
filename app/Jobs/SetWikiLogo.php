@@ -112,6 +112,6 @@ class SetWikiLogo extends Job
             ['value' => $faviconUrl]
         );
 
-        return; //safegaurd
+        return; //safeguard
     }
 }
