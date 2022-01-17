@@ -11,9 +11,11 @@ use Intervention\Image\Facades\Image;
 use Storage;
 
 /**
- * This can be run with for example:
- * php artisan wbs-job:handle SetWikiLogo "domain,wiki.addshore.com,/path/to/logo.png" ,
- * php artisan wbs-job:handle SetWikiLogo "id,1234,/path/to/logo.png" ,
+ * This can be run with the artisan job command, for example:
+ * php artisan job:dispatchNow SetWikiLogo domain wiki.addshore.com /path/to/logo.png
+ * php artisan job:dispatchNow SetWikiLogo id 1234 /path/to/logo.png
+ * 
+ * NOTE: This job needs to be run as the correct user if run via artisan (instead of via the UI)
  */
 class SetWikiLogo extends Job
 {
