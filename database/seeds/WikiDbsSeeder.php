@@ -2,11 +2,10 @@
 
 use App\WikiDb;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Config;
 
 class WikiDbsSeeder extends Seeder
 {
-    const MW_VERSION = 'mw1.35-wbs1';
-
     public function run()
     {
         WikiDb::create($this->getCreateArray(1));
@@ -21,7 +20,7 @@ class WikiDbsSeeder extends Seeder
             'name' => 'dbname'.$index,
             'user' => 'dbuser'.$index,
             'password' => 'dbpassword'.$index,
-            'version' => self::MW_VERSION,
+            'version' => Config::get('wbstack.wiki_db_use_version'),
             'prefix' => 'dbprefix'.$index,
         ];
     }
