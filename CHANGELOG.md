@@ -26,6 +26,10 @@
 - [Configurable subdomain for use on wiki creation (was hardcoded to *.wiki.opencura.com)](https://github.com/wbstack/api/pull/217)
 - [Adjust to work with MariaDB 10.5.9+ (and 10.5.2-). There is a gap where wiki creation will not correctly work!](https://github.com/wbstack/api/pull/216)
 
+## 8x.1.7.1  - 17 January 2022
+
+- BACKPORT [Enable setting a read only setting for a wiki](https://github.com/wbstack/api/pull/301)
+
 ## 8x.1.7 - 2 September 2021
 
 - Revert ElasticSearchIndexInit error checking tabs
