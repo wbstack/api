@@ -79,7 +79,8 @@ $fileSystems = [
 
 ];
 
-if (env('APP_ENV') === 'local') {
+
+if (env('APP_ENV') === 'local' || env('APP_ENV') === 'testing') {
     $fileSystems['disks']['gcs-public-static'] = $fileSystems['disks']['public'];
 }
 
