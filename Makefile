@@ -1,5 +1,5 @@
 #shellcheck disable=code
-.PHONY: test-and-migrate migrate test
+.PHONY: test-fresh init test
 
 # Example: make test FILTER=tests/Jobs/ElasticSearchIndexInitTest.php
 test:
