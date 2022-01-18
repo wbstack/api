@@ -5,7 +5,7 @@
 test:
 	docker-compose exec api vendor/bin/phpunit ${FILTER}
 
-migrate:
+init:
 	docker-compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install && php artisan db:seed && php artisan key:generate'
 
 test-fresh: init test
