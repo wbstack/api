@@ -40,7 +40,15 @@ class DeleteWikiDispatcherJobTest extends TestCase
 
     private function getWiki( $daysSinceDelete = 30 ): Wiki {
         $user = User::factory()->create(['verified' => true]);
-        $wiki = Wiki::factory()->create( [ 'deleted_at' => $daysSinceDelete > 0 ? Carbon::now()->subDays($daysSinceDelete)->timestamp : null ] );
+        $wiki = Wiki::factory()->create(
+            [
+                'deleted_at' => $daysSinceDelete > 0 ? Carbon::now()->subDays($daysSinceDelete)->timestamp : null,
+
+                // new wikis are seeded as subdomains.
+                // changes this to test k8s ingress delete gets dispatched
+                'domain' => $user->id . '_DeleteWikiDispatcherJobTest.php'
+
+            ] );
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         return $wiki;
     }
@@ -86,7 +94,7 @@ class DeleteWikiDispatcherJobTest extends TestCase
         $job->handle();
 
         Log::assertLogged('info', function ($message, $context) {
-            return Str::contains($message, 'Found no soft deleted wikis. exiting.');
+            return Str::contains($message, 'Found no soft deleted wikis over threshold. exiting.');
         });
 
         Bus::assertNotDispatched(KubernetesIngressDeleteJob::class);
