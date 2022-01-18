@@ -8,4 +8,4 @@ test:
 migrate:
 	docker-compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install && php artisan db:seed && php artisan key:generate'
 
-test-and-migrate: migrate test
+test-fresh: init test
