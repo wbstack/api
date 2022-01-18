@@ -111,16 +111,16 @@ class SetWikiLogoTest extends TestCase
     public function validProvider()
     {
         # $wikiKey, $wikiValue, $logoPath
-        yield ['id', 42, __DIR__ . "/../Data/logo_200x200.png"];
-        yield ['domain', 'example.test.dev', __DIR__ . "/../Data/logo_200x200.png"];
+        yield ['id', 42, __DIR__ . "/../data/logo_200x200.png"];
+        yield ['domain', 'example.test.dev', __DIR__ . "/../data/logo_200x200.png"];
     }
 
     public function invalidProvider()
     {
         # $wikiKey, $wikiValue, $logoPath
-        yield "id doesn't exist" => ['id', 999, __DIR__ . "/../Data/logo_200x200.png"];
+        yield "id doesn't exist" => ['id', 999, __DIR__ . "/../data/logo_200x200.png"];
         yield "logo path doesn't exist" => ['id', 1, "/invalid/logo/path.png"];
-        yield "domain doesn't exist" => ['domain', 'non.existant.dev', __DIR__ . "/../Data/logo_200x200.png"];
-        yield "invalid key" => ['wikiid', 1, __DIR__ . "/../Data/logo_200x200.png"];
+        yield "domain doesn't exist" => ['domain', 'non.existant.dev', __DIR__ . "/../data/logo_200x200.png"];
+        yield "invalid key" => ['wikiid', 1, __DIR__ . "/../data/logo_200x200.png"];
     }
 }
