@@ -18,7 +18,7 @@ class SetWikiLogoTest extends TestCase
     use DatabaseTransactions;
     use DispatchesJobs;
 
-    public function assertJobFails(string $wikiKey, string $wikiValue, string $logoPath)
+    private function assertJobFails(string $wikiKey, string $wikiValue, string $logoPath)
     {
         $mockJob = $this->createMock(Job::class);
         $job = new SetWikiLogo($wikiKey, $wikiValue, $logoPath);
@@ -28,7 +28,7 @@ class SetWikiLogoTest extends TestCase
         $this->dispatchNow($job);
     }
 
-    public function assertJobSucceeds(string $wikiKey, string $wikiValue, string $logoPath)
+    private function assertJobSucceeds(string $wikiKey, string $wikiValue, string $logoPath)
     {
         $mockJob = $this->createMock(Job::class);
         $job = new SetWikiLogo($wikiKey, $wikiValue, $logoPath);

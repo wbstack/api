@@ -23,9 +23,6 @@ class SetWikiLogo extends Job
     private $wikiValue;
     private $logoPath;
 
-    /**
-     * @return void
-     */
     public function __construct(string $wikiKey, string $wikiValue, string $logoPath)
     {
         $this->wikiKey = $wikiKey;
@@ -33,10 +30,7 @@ class SetWikiLogo extends Job
         $this->logoPath = $logoPath;
     }
 
-    /**
-     * @return void
-     */
-    public function handle()
+    public function handle(): void
     {
         if (!file_exists($this->logoPath)) {
             $this->fail(new \InvalidArgumentException("Logo not found at '{$this->logoPath}'"));
@@ -108,7 +102,7 @@ class SetWikiLogo extends Job
             ['value' => $logoUrl]
         );
 
-        // Docs: https://www.mediawiki.org/wiki/Manual:$wgLogo
+        // Docs: https://www.mediawiki.org/wiki/Manual:$wgFavicon
         WikiSetting::updateOrCreate(
             ['wiki_id' => $wiki->id, 'name' => WikiSetting::wgFavicon],
             ['value' => $faviconUrl]
