@@ -2,16 +2,19 @@
 
 namespace Tests\Jobs;
 
-use App\WikiSetting;
-use App\Wiki;
 use App\Jobs\SetWikiLogo;
+use App\User;
+use App\Wiki;
+use App\WikiManager;
+use App\WikiSetting;
+use ErrorException;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Tests\TestCase;
-use ErrorException;
+use Psalm\Type\Union;
 
 class SetWikiLogoTest extends TestCase
 {
@@ -41,20 +44,30 @@ class SetWikiLogoTest extends TestCase
     /**
      * @dataProvider invalidProvider
      */
-    public function testSetLogoFails( $wikiKey, $wikiValue, $logoPath )
+    public function testSetLogoFails($wikiKey, $wikiValue, $logoPath)
     {
         $storage = Storage::fake('gcs-public-static');
         $this->assertJobFails($wikiKey, $wikiValue, $logoPath);
-        $this->assertFalse($storage->exists('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/raw.png'));
+
+        if ($wikiKey === 'id') {
+            $logoDir = Wiki::getLogosDirectory($wikiValue);
+            $storage->assertMissing($logoDir . '/raw.png');
+        }
     }
 
     /**
      * @dataProvider validProvider
      */
-    public function testSetLogoSucceeds( $wikiKey, $wikiValue, $logoPath )
+    public function testSetLogoSucceeds($wikiKey, $wikiValue, $logoPath)
     {
-        $wiki = Wiki::firstWhere($wikiKey, $wikiValue);
+        // create user and wiki for this test
+        $user = User::factory()->create(['verified' => true]);
+        $wiki = Wiki::factory('nodb')->create([$wikiKey => $wikiValue]);
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+
+        // $wiki = Wiki::firstWhere($wikiKey, $wikiValue);
         $storage = Storage::fake('gcs-public-static');
+        $logoDir = Wiki::getLogosDirectory($wiki->id);
 
         // get the previous logo and favicon settings
         try {
@@ -72,13 +85,13 @@ class SetWikiLogoTest extends TestCase
         $this->assertJobSucceeds($wikiKey, $wikiValue, $logoPath);
 
         // check logo is uploaded
-        $this->assertTrue($storage->exists('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/raw.png'));
+        $storage->assertExists($logoDir . '/raw.png');
         // check logo resized to 135
-        $logo = Image::make($storage->path('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png'));
+        $logo = Image::make($storage->path($logoDir . '/135.png'));
         $this->assertSame(135, $logo->height());
         $this->assertSame(135, $logo->width());
         // check favicon resized to 64
-        $logo = Image::make($storage->path('sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/64.ico'));
+        $logo = Image::make($storage->path($logoDir . '/64.ico'));
         $this->assertSame(64, $logo->height());
         $this->assertSame(64, $logo->width());
 
@@ -91,31 +104,23 @@ class SetWikiLogoTest extends TestCase
         $this->assertNotEquals($previousFaviconSettingURL, $currentFaviconSettingURL);
 
         // check the URL paths are correct
-        $this->assertSame('/storage/sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/135.png', $currentLogoSettingURL['path']);
-        $this->assertSame('/storage/sites/bc7235a51e34c1d3ebfddeb538c20c71/logos/64.ico', $currentFaviconSettingURL['path']);
+        $this->assertStringEndsWith($logoDir . '/135.png', $currentLogoSettingURL['path']);
+        $this->assertStringEndsWith($logoDir . '/64.ico', $currentFaviconSettingURL['path']);
     }
 
     public function validProvider()
     {
-        return [
-            # $wikiKey, $wikiValue, $logoPath
-            ['id', 1, __DIR__ . "/../Data/logo_200x200.png"],
-            ['domain', 'seededsite.nodomain.dev', __DIR__ . "/../Data/logo_200x200.png" ]
-        ];
+        # $wikiKey, $wikiValue, $logoPath
+        yield ['id', 42, __DIR__ . "/../Data/logo_200x200.png"];
+        yield ['domain', 'example.test.dev', __DIR__ . "/../Data/logo_200x200.png"];
     }
 
     public function invalidProvider()
     {
         # $wikiKey, $wikiValue, $logoPath
-        return [
-            # id doesn't exist
-            ['id', 999, __DIR__ . "/../Data/logo_200x200.png"],
-            # logo path doesn't exist
-            ['id', 1, "/invalid/logo/path.png"],
-            # domain doesn't exist
-            ['domain', 'non.existant.dev', __DIR__ . "/../Data/logo_200x200.png" ],
-            # invalid key
-            ['wikiid', 1, __DIR__ . "/../Data/logo_200x200.png"],
-        ];
+        yield "id doesn't exist" => ['id', 999, __DIR__ . "/../Data/logo_200x200.png"];
+        yield "logo path doesn't exist" => ['id', 1, "/invalid/logo/path.png"];
+        yield "domain doesn't exist" => ['domain', 'non.existant.dev', __DIR__ . "/../Data/logo_200x200.png"];
+        yield "invalid key" => ['wikiid', 1, __DIR__ . "/../Data/logo_200x200.png"];
     }
 }

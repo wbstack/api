@@ -14,7 +14,7 @@ use Storage;
  * This can be run with the artisan job command, for example:
  * php artisan job:dispatchNow SetWikiLogo domain wiki.addshore.com /path/to/logo.png
  * php artisan job:dispatchNow SetWikiLogo id 1234 /path/to/logo.png
- * 
+ *
  * NOTE: This job needs to be run as the correct user if run via artisan (instead of via the UI)
  */
 class SetWikiLogo extends Job
@@ -34,22 +34,22 @@ class SetWikiLogo extends Job
     {
         if (!file_exists($this->logoPath)) {
             $this->fail(new \InvalidArgumentException("Logo not found at '{$this->logoPath}'"));
-            return;
+            return;  //safeguard
         }
 
         try {
             $wikis = Wiki::where($this->wikiKey, $this->wikiValue);
             if ($wikis->count() === 0) {
                 $this->fail(new \InvalidArgumentException("Wiki not found for key={$this->wikiKey} and value={$this->wikiValue}"));
-                return;
+                return;  //safeguard
             }
             elseif ($wikis->count() > 1) {
                 $this->fail(new \InvalidArgumentException("Multiple Wikis matched for key={$this->wikiKey} and value={$this->wikiValue}"));
-                return;
+                return;  //safeguard
             }
         } catch(QueryException $e) {
             $this->fail(new \InvalidArgumentException("Invalid key ({$this->wikiKey}) or value ({$this->wikiValue})"));
-            return;
+            return;  //safeguard
         }
 
         $wiki = $wikis->first();
@@ -59,7 +59,7 @@ class SetWikiLogo extends Job
         if (!$storage instanceof Cloud) {
             # TODO: Use a more specific exception?
             $this->fail(new \RuntimeException("Invalid storage (not cloud)"));
-            return;
+            return;  //safeguard
         }
 
         // Get the directory for storing this site's logos
@@ -107,7 +107,5 @@ class SetWikiLogo extends Job
             ['wiki_id' => $wiki->id, 'name' => WikiSetting::wgFavicon],
             ['value' => $faviconUrl]
         );
-
-        return; //safeguard
     }
 }
