@@ -21,11 +21,15 @@ class WikiFactory extends Factory
      */
     public function definition()
     {
-        $subDomainSuffix = config('wbstack.subdomain_suffix');
+        $sitename = $this->faker->unique->text(30);
+        $sitename = strtolower($sitename);
+        $sitename = str_replace(' ', '_', $sitename);
+        $sitename = str_replace('.', '', $sitename);
+        $domain = $sitename . config('wbstack.subdomain_suffix');
 
         return [
-            'sitename' => $this->faker->name,
-            'domain' => str_replace(' ', '_', substr(strtolower($this->faker->unique->text), 0, 11)).$subDomainSuffix,
+            'sitename' => $sitename,
+            'domain' => $domain,
         ];
     }
 }
