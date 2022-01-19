@@ -24,9 +24,12 @@ class DeleteWikiJobTest extends TestCase
     use DispatchesJobs;
 
     private $wiki;
+    protected $connectionsToTransact = ['mysql', 'mw'];
 
     protected function setUp(): void {
         parent::setUp();
+        DB::delete( "DELETE FROM wiki_dbs WHERE name='the_test_database';" );
+        DB::delete( "DELETE FROM wiki_dbs WHERE name='the_test_database_not_to_be_deleted';" );
         DB::connection('mysql')->getPdo()->exec('DROP DATABASE IF EXISTS the_test_database; DROP DATABASE IF EXISTS the_test_database_not_to_be_deleted');
     }
 
