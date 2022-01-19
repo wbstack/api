@@ -6,5 +6,6 @@ Homestead.yaml
 .php_cs.cache
 .phpunit.result.cache
 /storage/*.key
+/public/storage
 _ide_helper.php
 _ide_helper_models.php
