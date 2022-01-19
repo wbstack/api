@@ -1,5 +1,5 @@
 #shellcheck disable=code
-.PHONY: test-fresh init test
+.PHONY: test-fresh init test lint
 
 # Example: make test FILTER=tests/Jobs/ElasticSearchIndexInitTest.php
 test:
@@ -9,3 +9,6 @@ init:
 	docker-compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install && php artisan db:seed && php artisan key:generate'
 
 test-fresh: init test
+
+lint:
+	docker-compose exec -T api vendor/bin/psalm
