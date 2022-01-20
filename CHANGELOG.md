@@ -1,5 +1,12 @@
 # api
 
+## 8x.4.0 - 20 January 2022
+
+ - Introduce SetWikiLogo Job
+ - Fix bug in provisioning wikidbs and queryservice namespaces
+ - Replace custom artisan job execution with mxl/laravel-job
+ - Enable setting a read only setting for a wiki
+
 ## 8x.3.0 - 3 December 2021
 
  - DB updates 1.37 (with fed props)
