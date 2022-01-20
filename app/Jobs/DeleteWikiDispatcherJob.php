@@ -13,7 +13,7 @@ use App\WikiDb;
 use Illuminate\Support\Facades\Config;
 
 class DeleteWikiDispatcherJob extends Job
-{    
+{
     /**
      * @return void
      */
@@ -46,7 +46,7 @@ class DeleteWikiDispatcherJob extends Job
                 'name' => WikiSetting::wwExtEnableElasticSearch,
                 'value' => true
             ])->first();
-            
+
             // if elasticsearch is enabled, add the job for that
             if( $elasticSearchSetting ) {
                 $jobs[] = new ElasticSearchIndexDelete( $wiki->id );
@@ -74,10 +74,9 @@ class DeleteWikiDispatcherJob extends Job
                 ...$jobs
             ])->catch(function (Throwable $e ) use ( $wiki ) {
                 Log::error( __METHOD__ . "An error occured when deleting {$wiki->id}: " . $e->getMessage());
-                $this->fail($e);
             })->dispatch();
 
         }
-   
+
     }
 }
