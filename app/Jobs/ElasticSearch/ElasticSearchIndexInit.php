@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Jobs\ElasticSearch;
+
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use App\WikiSetting;
+use App\Http\Curl\CurlRequest;
+use App\Http\Curl\HttpRequest;
+use Illuminate\Support\Facades\Log;
+use App\Wiki;
+use App\Jobs\Job;
+
+class ElasticSearchIndexInit extends CirrusSearchJob
+{
+    function apiModule(): string {
+        return 'wbstackElasticSearchInit';
+    }
+
+    public function handleResponse( string $rawResponse, $error ): void
+    {
+        $response = json_decode( $rawResponse, true );
+
+        if( !$this->validateOrFailRequest($response, $rawResponse, $error) ) {
+            $this->setting->update( [  'value' => false  ] );
+            Log::warning( __METHOD__ . ": Failed initializing elasticsearch. Disabling the setting." );
+            return;
+        }
+
+        $output = $response[$this->apiModule()]['output'];
+
+        $enableElasticSearchFeature = false;
+
+        // occurs a couple of times when newly created
+        if ( in_array( "\tCreating index...ok",  $output ) ) {
+
+            // newly created index succeeded, turn on the wiki setting
+            $enableElasticSearchFeature = true;
+
+        // occurs on a successful update run
+        } else if ( in_array( "\t\tValidating {$this->wikiDB->name}_general alias...ok", $output ) ) {
+
+            // script ran and update was successful, make sure feature is enabled
+            $enableElasticSearchFeature = true;
+        } else {
+
+            Log::error(__METHOD__ . ": Job finished but didn't create or update, something is weird");
+            $this->fail( new \RuntimeException($this->apiModule() . ' call for '.$this->wikiId.' was not successful:' . $rawResponse ) );
+        }
+
+        $this->setting->update( [  'value' => $enableElasticSearchFeature  ] );
+    }
+
+    protected function getRequestTimeout(): int {
+        return getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT') !== false 
+            ? intval(getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT')) : parent::getRequestTimeout();
+    }
+}

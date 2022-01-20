@@ -7,7 +7,7 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\User;
 use Illuminate\Support\Facades\Queue;
-use App\Jobs\ElasticSearchIndexInit;
+use App\Jobs\ElasticSearch\ElasticSearchIndexInit;
 use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\MediawikiInit;
 use App\WikiSetting;
