@@ -36,6 +36,7 @@
         "mockery/mockery": "^1.4",
         "phpunit/phpunit": "^9.5",
         "psalm/plugin-laravel": "^1.4",
+        "timacdonald/log-fake": "^1.9",
         "vimeo/psalm": "^4.8"
     },
     "repositories": [
@@ -79,7 +80,10 @@
         },
         "preferred-install": "dist",
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true

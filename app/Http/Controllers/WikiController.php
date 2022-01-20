@@ -27,7 +27,8 @@ class WikiController extends Controller
 
         $subDomainSuffix = Config::get('wbstack.subdomain_suffix');
         $submittedDomain = $request->input('domain');
-        $isSubdomain = preg_match('/' . preg_quote( $subDomainSuffix ) . '$/', $submittedDomain);
+        $isSubdomain = $this->isSubDomain( $submittedDomain, $subDomainSuffix );
+
         if ($isSubdomain) {
             $subDomainSuffixLength = strlen($subDomainSuffix);
             $requiredSubdomainPrefixChars = 5;
@@ -186,5 +187,10 @@ class WikiController extends Controller
         $res['data'] = $wiki;
 
         return response($res);
+    }
+
+    public static function isSubDomain( string $domain, string $subDomainSuffix = null  ): bool {
+        $subDomainSuffix = $subDomainSuffix ?? Config::get('wbstack.subdomain_suffix');
+        return preg_match('/' . preg_quote( $subDomainSuffix ) . '$/', $domain) === 1;
     }
 }
