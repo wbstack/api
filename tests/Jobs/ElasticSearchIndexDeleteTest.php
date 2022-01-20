@@ -4,6 +4,7 @@ namespace Tests\Jobs;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 use App\Http\Curl\HttpRequest;
 use App\WikiManager;
@@ -23,6 +24,9 @@ class ElasticSearchIndexDeleteTest extends TestCase
 
     public function setUp(): void {
         parent::setUp();
+
+        //clean up the database
+        DB::delete( "DELETE FROM wikis WHERE id>1;" );
 
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
@@ -54,7 +58,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
 
         $request->expects($this->exactly(2))
             ->method('setOptions')
-            ->withConsecutive( 
+            ->withConsecutive(
             [[
                 CURLOPT_URL => getenv('ELASTICSEARCH_HOST').'/_cat/indices/'.$this->wikiDb->name.'*?v&s=index&h=index',
                 CURLOPT_RETURNTRANSFER => true,
@@ -71,7 +75,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'DELETE',
             ]]);
-        
+
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
@@ -82,7 +86,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
 
         // feature should get disabled
         $this->assertSame(
-             1, 
+             1,
              WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => false])->count()
         );
     }
@@ -110,9 +114,9 @@ class ElasticSearchIndexDeleteTest extends TestCase
         $job = new ElasticSearchIndexDelete($this->wiki->id);
         $job->setJob($mockJob);
         $job->handle( $request );
-        
+
         $this->assertSame(
-             1, 
+             1,
              WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => $settingStateInDatabase])->count()
         );
 

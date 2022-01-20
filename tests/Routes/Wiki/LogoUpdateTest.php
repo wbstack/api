@@ -8,6 +8,7 @@ use App\WikiManager;
 use App\WikiSetting;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Tests\TestCase;
@@ -15,6 +16,13 @@ use Tests\TestCase;
 class LogoUpdateTest extends TestCase
 {
     use HasFactory;
+
+    public function setUp() : void
+    {
+        parent::setUp();
+        //clean up the database
+        DB::delete( "DELETE FROM wikis WHERE id>1;" );
+    }
 
     public function testUpdate()
     {

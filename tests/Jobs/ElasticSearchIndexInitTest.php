@@ -28,6 +28,9 @@ class ElasticSearchIndexInitTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
+        //clean up the database
+        DB::delete( "DELETE FROM wikis WHERE id>1;" );
+
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
@@ -95,7 +98,7 @@ class ElasticSearchIndexInitTest extends TestCase
 
         // feature should get enabled
         $this->assertSame(
-             1, 
+             1,
              WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
         );
     }
@@ -125,7 +128,7 @@ class ElasticSearchIndexInitTest extends TestCase
 
         // feature should get enabled
         $this->assertSame(
-             1, 
+             1,
              WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
         );
     }
@@ -150,16 +153,15 @@ class ElasticSearchIndexInitTest extends TestCase
         $mockJob->expects($this->once())
                 ->method('fail')
                 ->with(new \RuntimeException(str_replace('<WIKI_ID>', $this->wiki->id, $expectedFailure)));
-                
+
         $request->method('execute')->willReturn(json_encode($mockResponse));
 
         $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
         $job->handle($request);
-        
 
         $this->assertSame(
-             0, 
+             0,
              WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
         );
     }

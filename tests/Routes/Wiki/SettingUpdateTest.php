@@ -8,6 +8,7 @@ use App\WikiManager;
 use App\WikiSetting;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\DB;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\Routes\Traits\PostRequestNeedAuthentication;
 use Tests\TestCase;
@@ -22,6 +23,14 @@ class SettingUpdateTest extends TestCase
     use DatabaseTransactions;
     use OptionsRequestAllowed;
     use PostRequestNeedAuthentication;
+
+    public function setUp() : void
+    {
+        parent::setUp();
+
+        //clean up the database
+        DB::delete( "DELETE FROM wikis WHERE id>1;" );
+    }
 
     public function testSetInvalidSetting()
     {
