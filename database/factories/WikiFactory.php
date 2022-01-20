@@ -21,7 +21,7 @@ class WikiFactory extends Factory
      */
     public function definition()
     {
-        $sitename = $this->faker->unique->text(30);
+        $sitename = $this->faker->unique()->text(30);
         $sitename = strtolower($sitename);
         $sitename = str_replace(' ', '_', $sitename);
         $sitename = str_replace('.', '', $sitename);
