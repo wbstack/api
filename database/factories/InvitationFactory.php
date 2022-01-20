@@ -22,7 +22,7 @@ class InvitationFactory extends Factory
     public function definition()
     {
         return [
-            'code' => $this->faker->unique->text(20)
+            'code' => $this->faker->unique()->text(20)
         ];
     }
 }

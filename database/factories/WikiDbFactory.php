@@ -22,8 +22,8 @@ class WikiDbFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->unique->text(5),
-            'prefix' => $this->faker->unique->text(5),
+            'name' => $this->faker->unique()->text(5),
+            'prefix' => $this->faker->unique()->text(5),
             'user' => 'root',
             'password' => 'toor',
             'version' => 'seeded'

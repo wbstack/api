@@ -22,8 +22,8 @@ class WikiManagerFactory extends Factory
     public function definition()
     {
         return [
-            'user_id' => $this->faker->unique->randomNumber(),
-            'wiki_id' => $this->faker->unique->randomNumber()
+            'user_id' => $this->faker->unique()->randomNumber(),
+            'wiki_id' => $this->faker->unique()->randomNumber()
         ];
     }
 }
