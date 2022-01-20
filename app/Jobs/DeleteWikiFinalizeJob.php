@@ -14,6 +14,8 @@ use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\Helper\ElasticSearchHelper;
 use App\Http\Curl\HttpRequest;
+use App\Helper\StorageHelper;
+use Illuminate\Contracts\Filesystem\Filesystem;
 
 class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
 {
@@ -40,10 +42,9 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
     /**
      * @return void
      */
-    public function handle( HttpRequest $request )
+    public function handle( HttpRequest $request, StorageHelper $storageHelper )
     {
         $wiki = Wiki::withTrashed()->where('id', $this->wikiId )->first();
-
 
         if( !$wiki ) {
             $this->fail(new \RuntimeException("Wiki not found for {$this->wikiId}"));
@@ -85,7 +86,7 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
             return;
         }
 
-        if ( !$this->deleteSiteDirectory( $wiki->id) ) {
+        if ( !$this->deleteSiteDirectory( $wiki->id, $storageHelper->getPublicStatic()) ) {
             $this->fail(new \RuntimeException("Failed deleting site directory."));
             return;
         }
@@ -97,8 +98,7 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
         $wiki->forceDelete();
     }
 
-    public function deleteSiteDirectory( int $wiki_id ): bool {
-        $disk = Storage::disk('gcs-public-static');
+    public function deleteSiteDirectory( int $wiki_id, Filesystem $disk ): bool {
         if (! $disk instanceof Cloud) {
             $this->fail(new \RuntimeException("Invalid storage (not cloud)."));
             return false;

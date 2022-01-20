@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Routes\Auth;
+namespace Tests\Jobs;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\WikiLogoController;
 use App\Http\Curl\HttpRequest;
 use Illuminate\Contracts\Queue\Job;
+use App\Helper\StorageHelper;
 
 class DeleteWikiFinalizeJobTest extends TestCase
 {
@@ -36,7 +37,7 @@ class DeleteWikiFinalizeJobTest extends TestCase
         $request->expects($this->never())->method('execute');
 
         $job = new DeleteWikiFinalizeJob( $wiki->id );
-        $job->handle($request);
+        $job->handle($request, new StorageHelper());
 
         $this->assertNull( Wiki::withTrashed()->where('id', $wiki->id)->first() );
         $this->assertNull( WikiManager::whereId($manager->id)->first() );
@@ -72,7 +73,7 @@ class DeleteWikiFinalizeJobTest extends TestCase
 
         $job = new DeleteWikiFinalizeJob( $wiki->id );
         $job->setJob($mockJob);
-        $job->handle($request);
+        $job->handle($request, new StorageHelper());
 
         // TODO should this dispatch the deletion job if some resources still existed?
 
@@ -95,7 +96,7 @@ class DeleteWikiFinalizeJobTest extends TestCase
         $request->expects($this->never())->method('execute');
 
         $job = new DeleteWikiFinalizeJob( $wiki->id );
-        $job->handle($request);
+        $job->handle($request, new StorageHelper());
 
         // should not get deleted when deleted_at is not set to something.
         $this->assertNotNull( Wiki::withTrashed()->where('id', $wiki->id)->first() );
@@ -122,7 +123,7 @@ class DeleteWikiFinalizeJobTest extends TestCase
         $request->expects($this->never())->method('execute');
 
         $job = new DeleteWikiFinalizeJob( $wiki->id );
-        $job->handle($request);
+        $job->handle($request, new StorageHelper());
 
         // deletion happened
         $this->assertNull( Wiki::withTrashed()->where('id', $wiki->id)->first() );

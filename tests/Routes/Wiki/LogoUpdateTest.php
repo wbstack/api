@@ -11,6 +11,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Tests\TestCase;
+use App\Helper\StorageHelper;
 
 class LogoUpdateTest extends TestCase
 {
@@ -18,7 +19,7 @@ class LogoUpdateTest extends TestCase
 
     public function testUpdate()
     {
-        $storage = Storage::fake('gcs-public-static');
+        $storage = (new StorageHelper())->getPublicStatic();
         $file = UploadedFile::fake()->createWithContent("logo_200x200.png", file_get_contents(__DIR__ . "/../../data/logo_200x200.png"));
 
         $user = User::factory()->create(['verified' => true]);
@@ -32,13 +33,15 @@ class LogoUpdateTest extends TestCase
                 ['wiki' => $wiki->id, 'logo' => $file]
             );
 
+        // check response successful
+        $response->assertStatus(200);
+
         $expectedRawPath = Wiki::getLogosDirectory($wiki->id) . '/raw.png';
         $expectedLogoPath = Wiki::getLogosDirectory($wiki->id) . '/135.png';
         $expectedFaviconPath = Wiki::getLogosDirectory($wiki->id) . '/64.ico';
         $expectedLogoURL = $wiki->settings()->firstWhere(['name' => WikiSetting::wgLogo])->value;
 
         // check response is correct
-        $response->assertStatus(200);
         $response->assertJson(['url' => $expectedLogoURL]);
 
         // check raw logo uploaded

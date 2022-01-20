@@ -8,5 +8,6 @@ return [
 
     'wiki_db_provision_version' => env('WBSTACK_WIKI_DB_PROVISION_VERSION', 'mw1.37-fp-wbs1'),
     'wiki_db_use_version' => env('WBSTACK_WIKI_DB_USE_VERSION', 'mw1.37-fp-wbs1'),
+    'wiki_public_static_storage' => env("WBSTACK_PUBLIC_STATIC_STORAGE", 'gcs-public-static')
 
 ];

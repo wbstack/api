@@ -7,6 +7,7 @@ use App\Wiki;
 use App\WikiManager;
 use App\WikiSetting;
 use Illuminate\Http\Request;
+use App\Helper\StorageHelper;
 
 class WikiLogoController extends Controller
 {
@@ -17,7 +18,7 @@ class WikiLogoController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(Request $request, StorageHelper $storageHelper)
     {
         $request->validate([
             'wiki' => 'required|numeric',
@@ -37,7 +38,7 @@ class WikiLogoController extends Controller
         }
 
         // run the job to set the wiki logo
-        ( new SetWikiLogo('id', $wikiId, $request->file('logo')->getRealPath()) )->handle();
+        ( new SetWikiLogo('id', $wikiId, $request->file('logo')->getRealPath()) )->handle($storageHelper);
 
         // get the logo URL from the settings
         $wiki = Wiki::find($wikiId);

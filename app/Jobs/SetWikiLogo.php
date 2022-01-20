@@ -9,6 +9,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\File;
 use Intervention\Image\Facades\Image;
 use Storage;
+use App\Helper\StorageHelper;
 
 /**
  * This can be run with the artisan job command, for example:
@@ -30,7 +31,7 @@ class SetWikiLogo extends Job
         $this->logoPath = $logoPath;
     }
 
-    public function handle(): void
+    public function handle( StorageHelper $storageHelper ): void
     {
         if (!file_exists($this->logoPath)) {
             $this->fail(new \InvalidArgumentException("Logo not found at '{$this->logoPath}'"));
@@ -55,7 +56,7 @@ class SetWikiLogo extends Job
         $wiki = $wikis->first();
 
         // Get the cloud disk we use to store logos
-        $storage = Storage::disk('gcs-public-static');
+        $storage = $storageHelper->getPublicStatic();
         if (!$storage instanceof Cloud) {
             # TODO: Use a more specific exception?
             $this->fail(new \RuntimeException("Invalid storage (not cloud)"));

@@ -34,4 +34,13 @@ class AppServiceProvider extends ServiceProvider
     {
         //
     }
+
+     /**
+     * All of the container singletons that should be registered.
+     *
+     * @var array
+     */
+    public $singletons = [
+        StorageHelper::class => StorageHelper::class,
+    ];
 }
