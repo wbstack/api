@@ -30,7 +30,6 @@ class MigrationWikiCreate extends Job
     private $email;
 
     private $prefix;
-    private $newSqlFile;
     private $dbName;
     private $dbUser;
     private $dbPassword;
@@ -50,7 +49,6 @@ class MigrationWikiCreate extends Job
         $this->dbPassword = substr(bin2hex(random_bytes(48)), 0, 14);
         $this->prefix = 'mwt_'.substr(bin2hex(random_bytes(48)), 0, 10);
         $this->dbName = 'mwdb_'.substr(bin2hex(random_bytes(48)), 0, 10);
-        $this->newSqlFile = config('wbstack.wiki_db_provision_version');
     }
 
     /**
@@ -58,10 +56,11 @@ class MigrationWikiCreate extends Job
      */
     public function handle( DatabaseManager $manager )
     {
-        $user = User::where('email', $this->email)->get();
+        $userCollection = User::where('email', $this->email)->get();
+        $user = $userCollection->first();
 
-        if ($user->count() !== 1) {
-            $this->fail( new \RuntimeException('Error: there were '.$user->count().' users found with `email`: '.$this->email) );
+        if ($userCollection->count() !== 1) {
+            $this->fail( new \RuntimeException('Error: there were '.$userCollection->count().' users found with `email`: '.$this->email) );
             return;
         }
 
@@ -72,14 +71,15 @@ class MigrationWikiCreate extends Job
 
         $wikiDetails = json_decode(file_get_contents($this->wikiDetailsFilepath));
 
-        $wikiDb = $this->createWikiDb($manager);
+        $wikiDb = $this->createWikiDb($manager, $wikiDetails);
         $this->createWiki($user, $wikiDetails, $wikiDb);
     }
 
     /**
+     * @param DatabaseManager $manager
      * @return WikiDb
      */
-    private function createWikiDb($manager) {
+    private function createWikiDb($manager, $wikiDetails) {
         $manager->purge('mw');
         $conn = $manager->connection('mw');
         if (! $conn instanceof \Illuminate\Database\Connection) {
@@ -93,7 +93,7 @@ class MigrationWikiCreate extends Job
             'name' => $this->dbName,
             'user' => $this->dbUser,
             'password' => $this->dbPassword,
-            'version' => $this->newSqlFile,
+            'version' => $wikiDetails->wiki_db->version,
             'prefix' => $this->prefix,
         ]);
 
@@ -106,20 +106,15 @@ class MigrationWikiCreate extends Job
      * @return void
      */
     private function createWiki($user, $wikiDetails, $wikiDb) {
-        DB::transaction(function () use ($user, $wikiDetails, &$wiki, &$dbAssignment) {
-            $dbVersion = Config::get('wbstack.wiki_db_use_version');
-            $wikiDbCondition = ['wiki_id'=>null, 'version'=>$dbVersion];
-
+        DB::transaction(function () use ($user, $wikiDetails, $wikiDb) {
             $wiki = Wiki::create([
                 'sitename' => $wikiDetails->sitename,
                 'domain' => strtolower($wikiDetails->domain),
             ]);
 
-            // Assign storage
-            $dbAssignment = DB::table('wiki_dbs')->where($wikiDbCondition)->limit(1)->update(['wiki_id' => $wiki->id]);
-            if (! $dbAssignment) {
-                abort(503, 'Database ready, but failed to assign');
-            }
+            $wikiDb->wiki_id = $wiki->id;
+            $wikiDb->save();
+
             $nsAssignment = DB::table('queryservice_namespaces')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
             if (! $nsAssignment) {
                 abort(503, 'QS Namespace ready, but failed to assign');
