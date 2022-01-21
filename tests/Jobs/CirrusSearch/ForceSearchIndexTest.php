@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Jobs\ElasticSearch;
+namespace Tests\Jobs\CirrusSearch;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
-use App\Jobs\ElasticSearch\ElasticSearchIndexInit;
+use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Http\Curl\HttpRequest;
 use App\WikiManager;
 use App\WikiSetting;
@@ -15,8 +15,8 @@ use App\WikiDb;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\TextUI\RuntimeException;
-use App\Jobs\ElasticSearch\QueueSearchIndexBatches;
-use App\Jobs\ElasticSearch\ForceSearchIndex;
+use App\Jobs\CirrusSearch\QueueSearchIndexBatches;
+use App\Jobs\CirrusSearch\ForceSearchIndex;
 use Illuminate\Support\Facades\Bus;
 use Queue;
 
@@ -109,7 +109,7 @@ class ForceSearchIndexTest extends TestCase
                 ->method('fail')
                 ->withAnyParameters();
 
-        $job = new ForceSearchIndex($this->wiki->id, $fromId, $toId);
+        $job = new ForceSearchIndex('id', $this->wiki->id, $fromId, $toId);
         $job->setJob($mockJob);
         $job->handle($request);
     }

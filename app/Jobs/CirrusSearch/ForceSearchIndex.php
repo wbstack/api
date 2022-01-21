@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Jobs\ElasticSearch;
+namespace App\Jobs\CirrusSearch;
 
 use Illuminate\Support\Facades\Log;
+use App\Wiki;
 
 /**
  * 
@@ -10,17 +11,19 @@ use Illuminate\Support\Facades\Log;
  * 
  * Example:
  * 
- * php artisan job:dispatchNow ElasticSearch\\ForceSearchIndex 1 0 1000 ,
+ * php artisan job:dispatchNow CirrusSearch\\ForceSearchIndex id 1 0 1000
  */
 class ForceSearchIndex extends CirrusSearchJob
 {
     private $fromId;
     private $toId;
 
-    public function __construct( int $wikiId, int $fromId, int $toId  ) {
+    public function __construct( string $selectCol, $selectValue, int $fromId, int $toId  ) {
+        $wiki = Wiki::where($selectCol, $selectValue)->firstOrFail();
+
         $this->fromId = $fromId;
         $this->toId = $toId;
-        parent::__construct($wikiId);
+        parent::__construct($wiki->id);
     }
     public function fromId(): int {
         return $this->fromId;

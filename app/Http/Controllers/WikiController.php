@@ -6,7 +6,7 @@ use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ProvisionWikiDbJob;
-use App\Jobs\ElasticSearch\ElasticSearchIndexInit;
+use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;

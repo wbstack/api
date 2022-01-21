@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\ElasticSearch;
+namespace App\Jobs\CirrusSearch;
 
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\WikiSetting;

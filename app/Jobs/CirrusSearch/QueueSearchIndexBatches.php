@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\ElasticSearch;
+namespace App\Jobs\CirrusSearch;
 
 
 use Illuminate\Support\Facades\Log;
@@ -12,7 +12,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
  * 
  * Example:
  * 
- * php artisan job:dispatchNow ElasticSearch\\QueueSearchIndexBatches 1 ,
+ * php artisan job:dispatchNow CirrusSearch\\QueueSearchIndexBatches 1
  */
 class QueueSearchIndexBatches extends CirrusSearchJob
 {
@@ -45,7 +45,7 @@ class QueueSearchIndexBatches extends CirrusSearchJob
                 throw new \RuntimeException('Batch parameters from command looks weird! fromId: ' . $fromId . ' toId: ' . $toId);
             }
 
-            $batches[] = new ForceSearchIndex( $this->wikiId, $fromId, $toId );
+            $batches[] = new ForceSearchIndex( 'id', $this->wikiId, $fromId, $toId );
         }
         
         return $batches;

@@ -1,14 +1,8 @@
 <?php
 
-namespace App\Jobs\ElasticSearch;
+namespace App\Jobs\CirrusSearch;
 
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use App\WikiSetting;
-use App\Http\Curl\CurlRequest;
-use App\Http\Curl\HttpRequest;
 use Illuminate\Support\Facades\Log;
-use App\Wiki;
-use App\Jobs\Job;
 
 class ElasticSearchIndexInit extends CirrusSearchJob
 {

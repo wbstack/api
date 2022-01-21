@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Jobs\ElasticSearch;
+namespace Tests\Jobs\CirrusSearch;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
-use App\Jobs\ElasticSearch\ElasticSearchIndexInit;
+use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Http\Curl\HttpRequest;
 use App\WikiManager;
 use App\WikiSetting;
