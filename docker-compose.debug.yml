@@ -1,0 +1,50 @@
+version: '2'
+services:
+  api:
+    build:
+      dockerfile: debug.Dockerfile
+      context: .
+    volumes:
+      - ./:/var/www/html
+      - ./start.sh:/usr/local/bin/start
+      - api-storage:/var/www/html/storage/
+      - ./words:/words
+    ports:
+      - 8082:80
+    restart: always
+    depends_on:
+      - sql
+    links:
+      - sql
+      - redis
+    environment:
+      - CONTAINER_ROLE=app
+    extra_hosts:
+      - host.docker.internal:host-gateway
+  sql:
+    image: "${DOCKER_DATABASE_IMAGE_NAME}"
+    environment:
+      MYSQL_ROOT_PASSWORD: imarootpassword
+      MYSQL_DATABASE: apidb
+    restart: always
+    volumes:
+      - sql-data:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.8
+    restart: always
+    ports:
+      - 8070:80
+    environment:
+      PMA_HOST: 'sql'
+      PMA_PORT: 3306
+      PMA_USER: 'root'
+      PMA_PASSWORD: 'imarootpassword'
+  redis:
+    image: redis:latest
+    restart: always
+    expose:
+      - 6379
+
+volumes:
+  sql-data:
+  api-storage:
