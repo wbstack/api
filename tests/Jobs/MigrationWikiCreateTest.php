@@ -18,6 +18,8 @@ class MigrationWikiCreateTest extends TestCase
         parent::setUp();
     }
 
+    // note: I tried to split this test into several test cases,
+    // but it seems like the DB transactions get rolled back after every test case?
     public function testMigrationWikiCreateRunsWithoutFailure()
     {
         $wikiDetailsFilepath = __DIR__.'/../data/example-wiki-details.json';
