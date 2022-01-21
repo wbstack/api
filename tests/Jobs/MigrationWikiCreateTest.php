@@ -33,6 +33,7 @@ class MigrationWikiCreateTest extends TestCase
 
         $user = User::factory()->create([
             'verified' => true,
+            'id' => 9001,
             'email' => $email,
         ]);
 
