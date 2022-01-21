@@ -29,6 +29,12 @@ class MigrationWikiCreate extends Job
     private $wikiDetailsFilepath;
     private $email;
 
+    private $prefix;
+    private $newSqlFile;
+    private $dbName;
+    private $dbUser;
+    private $dbPassword;
+
     /**
      * @param string $email the email of the user to own this wiki
      * @param string $wikiDetailsFilepath file path to a `wiki-details.json` file, created with `php artisan wbs-wiki:get domain $DOMAIN`
@@ -39,6 +45,12 @@ class MigrationWikiCreate extends Job
     {
         $this->email = $email;
         $this->wikiDetailsFilepath = $wikiDetailsFilepath;
+
+        $this->dbUser = 'mwu_'.substr(bin2hex(random_bytes(48)), 0, 10);
+        $this->dbPassword = substr(bin2hex(random_bytes(48)), 0, 14);
+        $this->prefix = 'mwt_'.substr(bin2hex(random_bytes(48)), 0, 10);
+        $this->dbName = 'mwdb_'.substr(bin2hex(random_bytes(48)), 0, 10);
+        $this->newSqlFile = config('wbstack.wiki_db_provision_version');
     }
 
     /**
@@ -62,8 +74,6 @@ class MigrationWikiCreate extends Job
 
         $wikiDb = $this->createWikiDb($manager);
         $this->createWiki($user, $wikiDetails, $wikiDb);
-
-        return true;
     }
 
     /**
