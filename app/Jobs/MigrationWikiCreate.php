@@ -103,10 +103,15 @@ class MigrationWikiCreate extends Job
     }
 
     /**
-     * @return void
+     * @param $user
+     * @param $wikiDetails
+     * @param $wikiDb
+     * @return Wiki
      */
     private function createWiki($user, $wikiDetails, $wikiDb) {
-        DB::transaction(function () use ($user, $wikiDetails, $wikiDb) {
+        $wiki = null;
+
+        DB::transaction(function () use (&$wiki, $user, $wikiDetails, $wikiDb) {
             $wiki = Wiki::create([
                 'sitename' => $wikiDetails->sitename,
                 'domain' => strtolower($wikiDetails->domain),
@@ -147,5 +152,7 @@ class MigrationWikiCreate extends Job
                 'wiki_id' => $wiki->id,
             ]);
         });
+
+        return $wiki;
     }
 }
