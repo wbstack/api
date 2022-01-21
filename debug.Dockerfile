@@ -39,6 +39,9 @@ xdebug.client_host=host.docker.internal\n\
 xdebug.client_port=9003\n\
 " > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
+ENV PHP_IDE_CONFIG "serverName=wbaas-local-api"
+ENV XDEBUG_SESSION 1
+
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
 # Change the document root
