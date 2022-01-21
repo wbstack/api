@@ -3,4 +3,5 @@
 /vendor
 /bootstrap/cache/*
 /storage/*.key
+.env
 Makefile

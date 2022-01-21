@@ -1,5 +1,9 @@
 # api
 
+## 8x.4.1 - 20 January 2022
+
+ - Add DeleteWikiDispatcherJob
+
 ## 8x.4.0 - 20 January 2022
 
  - Introduce SetWikiLogo Job

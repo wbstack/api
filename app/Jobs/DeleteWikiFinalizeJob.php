@@ -14,6 +14,7 @@ use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\Helper\ElasticSearchHelper;
 use App\Http\Curl\HttpRequest;
+use Google\Cloud\Core\Exception\GoogleException;
 
 class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
 {
@@ -98,17 +99,30 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
     }
 
     public function deleteSiteDirectory( int $wiki_id ): bool {
-        $disk = Storage::disk('gcs-public-static');
-        if (! $disk instanceof Cloud) {
-            $this->fail(new \RuntimeException("Invalid storage (not cloud)."));
-            return false;
-        }
+        try {
+            $disk = Storage::disk('gcs-public-static');
+            if (! $disk instanceof Cloud) {
+                $this->fail(new \RuntimeException("Invalid storage (not cloud)."));
+                return false;
+            }
 
-        $directory = Wiki::getSiteDirectory( $wiki_id );
-        if ( $disk->exists($directory) ) {
-            return $disk->deleteDirectory($directory);
-        } else {
-            return true;
+            $directory = Wiki::getSiteDirectory( $wiki_id );
+            if ( $disk->exists($directory) ) {
+                return $disk->deleteDirectory($directory);
+            } else {
+                return true;
+            }
+
+        // TODO add support for local files on minikube cluster
+        // Probably involves breaking out 'gcs-public-static' into some config setting etc.
+        } catch ( GoogleException $ex  ) {
+            if( !file_exists( '/var/run/secret/cloud.google.com/key.json' ) ) {
+                return true;
+            }
+
+            $this->fail($ex);
+            return false;
+
         }
     }
 }
