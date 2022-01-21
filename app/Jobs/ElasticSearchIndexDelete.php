@@ -6,6 +6,7 @@ use App\WikiSetting;
 use App\Http\Curl\HttpRequest;
 use App\Wiki;
 use App\Helper\ElasticSearchHelper;
+use Illuminate\Support\Facades\Config;
 
 class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
 {
@@ -60,10 +61,10 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
         }
         
         $elasticSearchBaseName = $wikiDB->name;
-        $elasticSearchHost = getenv('ELASTICSEARCH_HOST');
+        $elasticSearchHost = Config::get('wbstack.elasticsearch_host');
         
         if( !$elasticSearchHost ) {
-            $this->fail( new \RuntimeException('ELASTICSEARCH_HOST not configured') );
+            $this->fail( new \RuntimeException('wbstack.elasticsearch_host not configured') );
             return;
         }
         try{

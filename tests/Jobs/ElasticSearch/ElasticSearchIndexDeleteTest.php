@@ -12,18 +12,20 @@ use App\Wiki;
 use App\Jobs\ElasticSearchIndexDelete;
 use App\WikiDb;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Support\Facades\Config;
 
 class ElasticSearchIndexDeleteTest extends TestCase
 {
     use DatabaseTransactions;
-
     private $wiki;
     private $user;
     private $wikiDb;
+    private $elasticSearchHost;
 
     public function setUp(): void {
         parent::setUp();
 
+        $this->elasticSearchHost = Config::get('wbstack.elasticsearch_host');
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
@@ -52,11 +54,12 @@ class ElasticSearchIndexDeleteTest extends TestCase
             ->method('execute')
             ->willReturnOnConsecutiveCalls($mockResponse, $mockJsonSuccess);
 
+
         $request->expects($this->exactly(2))
             ->method('setOptions')
             ->withConsecutive( 
             [[
-                CURLOPT_URL => getenv('ELASTICSEARCH_HOST').'/_cat/indices/'.$this->wikiDb->name.'*?v&s=index&h=index',
+                CURLOPT_URL => $this->elasticSearchHost.'/_cat/indices/'.$this->wikiDb->name.'*?v&s=index&h=index',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 10,
@@ -64,7 +67,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
                 CURLOPT_CUSTOMREQUEST => 'GET',
             ]],
             [[
-                CURLOPT_URL => getenv('ELASTICSEARCH_HOST').'/'.$this->wikiDb->name.'*',
+                CURLOPT_URL => $this->elasticSearchHost.'/'.$this->wikiDb->name.'*',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 60,
@@ -138,10 +141,10 @@ class ElasticSearchIndexDeleteTest extends TestCase
             true
         ];
 
-        if ( getenv('ELASTICSEARCH_HOST') ) {
+        if ( $this->elasticSearchHost ) {
             yield [
                 $this->createMock(HttpRequest::class),
-                'Response looks weird when querying http://'.getenv('ELASTICSEARCH_HOST').'/_cat/indices/<WIKI_DB_NAME>*?v&s=index&h=index',
+                'Response looks weird when querying http://'.$this->elasticSearchHost.'/_cat/indices/<WIKI_DB_NAME>*?v&s=index&h=index',
                 [ "<html>asdasd\n\nasdasd", $mockJsonSuccess ],
                 true
             ];
