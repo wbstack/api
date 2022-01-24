@@ -8,9 +8,10 @@ use Illuminate\Database\DatabaseManager;
 
 /**
  * Only used in the migration from WBStack to wikibase.cloud
+ * To be deleted after migration
  *
  * Example usage that will always provision a new DB:
- * php artisan job:dispatchNow ProvisionWikiDbJob
+ * php artisan job:dispatchNow CreateEmptyWikiDb
  */
 class CreateEmptyWikiDb extends Job
 {
