@@ -5,16 +5,11 @@ namespace App\Jobs;
 use App\QueryserviceNamespace;
 use App\User;
 use App\Wiki;
-use App\WikiDb;
 use App\WikiDomain;
 use App\WikiManager;
 use App\WikiSetting;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\DatabaseManager;
-use Illuminate\Support\Str;
-use Lcobucci\JWT\Exception;
 
 /*
     - This will create a laravel Wiki object and persist it
@@ -55,14 +50,13 @@ class MigrationWikiCreate extends Job
         $wikiDetails = json_decode(file_get_contents($this->wikiDetailsFilepath));
 
         foreach ($wikiDetails->settings as $setting) {
-            if ($setting['name'] === "wikibaseFedPropsEnable") {
-                if ($setting['value'] == '1') {
+            if ($setting->name === "wikibaseFedPropsEnable") {
+                if ($setting->value == '1') {
                     die("Migration aborted; Feddy props detected!");
                 }
                 break;
             }
         }
-
 
         $prefix = $wikiDetails->wiki_db->prefix;
         $emptyWikiDbJob = new CreateEmptyWikiDb($prefix);

@@ -3,17 +3,16 @@
 namespace Tests\Jobs;
 
 use App\Jobs\MigrationWikiCreate;
-use App\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\TestCase;
-use App\WikiManager;
-use App\Wiki;
-use Illuminate\Contracts\Queue\Job;
-use App\WikiDomain;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\QueryserviceNamespace;
+use App\User;
+use App\Wiki;
 use App\WikiDb;
+use App\WikiDomain;
+use App\WikiManager;
 use App\WikiSetting;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Contracts\Queue\Job;
+use Tests\TestCase;
 
 class MigrationWikiCreateTest extends TestCase
 {
