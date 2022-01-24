@@ -18,7 +18,7 @@ use Lcobucci\JWT\Exception;
 
 /*
     - This will create a laravel Wiki object and persist it
-    - This Wiki object will be owned by a user that has the email address
+    - This Wiki object will be owned by the user with the same email address
     - A WikiDb will exist; it will have no tables but it will have grants for a) the wiki manager user and b) a specific user for this db
     - The wiki settings will be attached to the Wiki
     - A queryservice namespace will be assigned to this Wiki
@@ -26,8 +26,8 @@ use Lcobucci\JWT\Exception;
 
 class MigrationWikiCreate extends Job
 {
-    private $wikiDetailsFilepath;
     private $email;
+    private $wikiDetailsFilepath;
 
     private $prefix;
     private $dbName;
@@ -56,13 +56,6 @@ class MigrationWikiCreate extends Job
      */
     public function handle( DatabaseManager $manager )
     {
-        $userCollection = User::where('email', $this->email)->get();
-        $user = $userCollection->first();
-
-        if ($userCollection->count() !== 1) {
-            $this->fail( new \RuntimeException('Error: there were '.$userCollection->count().' users found with `email`: '.$this->email) );
-            return;
-        }
 
         if (! is_readable($this->wikiDetailsFilepath)) {
             $this->fail( new \RuntimeException('Error: the wiki-details json file is not readable (does the file exist? is the path correct?') );
@@ -71,35 +64,23 @@ class MigrationWikiCreate extends Job
 
         $wikiDetails = json_decode(file_get_contents($this->wikiDetailsFilepath));
 
-        $wikiDb = $this->createWikiDb($manager, $wikiDetails);
-        $this->createWiki($user, $wikiDetails, $wikiDb);
-    }
-
-    /**
-     * @param DatabaseManager $manager
-     * @return WikiDb
-     */
-    private function createWikiDb($manager, $wikiDetails) {
-        $manager->purge('mw');
-        $conn = $manager->connection('mw');
-        if (! $conn instanceof \Illuminate\Database\Connection) {
-            $this->fail(new \RuntimeException('Must be run on a PDO based DB connection'));
-
-            return; //safegaurd
+        foreach ($wikiDetails->settings as $setting) {
+            if ($setting['name'] === "wikibaseFedPropsEnable") {
+                if ($setting['value'] == '1') {
+                    die("Migration aborted; Feddy props detected!");
+                }
+                break;
+            }
         }
-        $pdo = $conn->getPdo();
 
-        $wikiDb = WikiDb::create([
-            'name' => $this->dbName,
-            'user' => $this->dbUser,
-            'password' => $this->dbPassword,
-            'version' => $wikiDetails->wiki_db->version,
-            'prefix' => $this->prefix,
-        ]);
 
-        $manager->purge('mw');
+        $prefix = $wikiDetails->wiki_db->prefix;
+        $emptyWikiDbJob = new CreateEmptyWikiDb($prefix);
+        $emptyWikiDbJob->handle($manager);
+        $wikiDb = $emptyWikiDbJob->getWikiDb();
 
-        return $wikiDb;
+        $user = User::firstOrCreate(['email' => $this->email]);
+        $this->createWiki($user, $wikiDetails, $wikiDb);
     }
 
     /**
@@ -120,34 +101,24 @@ class MigrationWikiCreate extends Job
             $wikiDb->wiki_id = $wiki->id;
             $wikiDb->save();
 
-            $nsAssignment = DB::table('queryservice_namespaces')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
-            if (! $nsAssignment) {
-                abort(503, 'QS Namespace ready, but failed to assign');
+            $nsAssignment = QueryserviceNamespace::firstWhere(['wiki_id' => null]);
+            $nsAssignment->wiki_id = $wiki->id;
+            $nsAssignment->save();
+
+            foreach ($wikiDetails->settings as $setting) {
+                    WikiSetting::create([
+                        'wiki_id' => $wiki->id,
+                        'name' => $setting->name,
+                        'value' => $setting->value,
+                    ]);
             }
 
-            // Create initial needed non default settings
-            // Docs: https://www.mediawiki.org/wiki/Manual:$wgSecretKey
-            WikiSetting::create([
-                'wiki_id' => $wiki->id,
-                'name' => WikiSetting::wgSecretKey,
-                'value' => Str::random(64),
-            ]);
+            // Also track the domain forever in the domains table
+            $wikiDomain = WikiDomain::firstWhere(['domain' => "$wiki->domain"]);
+            $wikiDomain->wiki_id = $wiki->id;
+            $wikiDomain->save();
 
-            // Create the enabled elasticsearch setting
-            // T285541
-            WikiSetting::create([
-                'wiki_id' => $wiki->id,
-                'name' => WikiSetting::wwExtEnableElasticSearch,
-                'value' => true,
-            ]);
-
-            // Also track the domain forever in your domains table
-            $wikiDomain = WikiDomain::create([
-                'domain' => $wiki->domain,
-                'wiki_id' => $wiki->id,
-            ]);
-
-            $ownerAssignment = WikiManager::create([
+            WikiManager::create([
                 'user_id' => $user->id,
                 'wiki_id' => $wiki->id,
             ]);

@@ -9,6 +9,11 @@ use Tests\TestCase;
 use App\WikiManager;
 use App\Wiki;
 use Illuminate\Contracts\Queue\Job;
+use App\WikiDomain;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use App\QueryserviceNamespace;
+use App\WikiDb;
+use App\WikiSetting;
 
 class MigrationWikiCreateTest extends TestCase
 {
@@ -31,6 +36,12 @@ class MigrationWikiCreateTest extends TestCase
             'email' => 'foobar@example.com',
         ]);
 
+        WikiDomain::create(['domain' => $wikiDetails->domain]);
+        QueryserviceNamespace::create([
+            'namespace' => "fakeNamespaceForTest",
+            'backend' => "fakeBackendForTest",
+        ]);
+
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
@@ -43,10 +54,10 @@ class MigrationWikiCreateTest extends TestCase
         $wikiCollection = Wiki::whereDomain($wikiDetails->domain)->get();
         $wiki = $wikiCollection->first();
 
-        $ownerAssignment = WikiManager::where([
+        $ownerAssignment = WikiManager::firstWhere([
             'user_id' => $user->id,
             'wiki_id' => $wiki->id,
-        ])->first();
+        ]);
 
         // This will create a laravel Wiki object and persist it
         $this->assertTrue(
@@ -59,10 +70,18 @@ class MigrationWikiCreateTest extends TestCase
         );
 
         // A WikiDb will exist; it will have no tables but it will have grants for a) the wiki manager user and b) a specific user for this db
-        // TODO
+        $wikiDb = WikiDb::firstWhere(['wiki_id' => $wiki->id]);
+        $this->assertModelExists($wikiDb);
+
+        $conn = $manager->connection('mw');
+        $pdo = $conn->getPdo();
+        $queryResult = $pdo->query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '$wikiDb->name'");
+
+        $this->assertSame(1, $queryResult->rowCount());
 
         // The wiki settings will be attached to the Wiki
-        // TODO
+        $wikiSettings = WikiSetting::where(['wiki_id' => $wiki->id]);
+        $this->assertSame(3, $wikiSettings->count());
 
         // A queryservice namespace will be assigned to this Wiki
         // TODO
