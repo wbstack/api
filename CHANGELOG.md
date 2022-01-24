@@ -1,6 +1,15 @@
 # api
 
-## 8x.4.1 - 20 January 2022
+## 8x.5.0 - 24 January 2022
+
+ - Add CreateEmptyWikiDb Job
+ - Add MigrationWikiCreate Job
+ - Add CirrusSearch Jobs
+ - Bump guzzlehttp/guzzle from 7.3.0 to 7.4.1
+ - Bump maclof/kubernetes-client from 0.21.0 to 0.23.0
+ - Bump predis/predis from 1.1.9 to 1.1.10
+
+ ## 8x.4.1 - 20 January 2022
 
  - Add DeleteWikiDispatcherJob
 
