@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Jobs;
+namespace Tests\Jobs\ElasticSearch;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;

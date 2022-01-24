@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Jobs;
+namespace Tests\Jobs\CirrusSearch;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
-use App\Jobs\ElasticSearchIndexInit;
+use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Http\Curl\HttpRequest;
 use App\WikiManager;
 use App\WikiSetting;
@@ -191,7 +191,7 @@ class ElasticSearchIndexInitTest extends TestCase
         $curlError->method('error')->willReturn('Scary Error!');
         yield [
             $curlError,
-            'curl error for <WIKI_ID>: Scary Error!',
+            'wbstackElasticSearchInit curl error for <WIKI_ID>: Scary Error!',
             $mockResponse
         ];
 

@@ -5,7 +5,6 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Http\Curl\CurlRequest;
 use App\Http\Curl\HttpRequest;
-use App\Jobs\ElasticSearchIndexInit;
 
 class AppServiceProvider extends ServiceProvider
 {
