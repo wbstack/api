@@ -1,0 +1,53 @@
+{
+  "id": 1,
+  "domain": "deerdeerdeer.wbaas.localhost",
+  "sitename": "DeerDeerDeer",
+  "deleted_at": null,
+  "created_at": "2022-01-18T15:32:17.000000Z",
+  "updated_at": "2022-01-18T15:32:17.000000Z",
+  "wiki_db": {
+    "id": 1,
+    "name": "mwdb_3a7fd89919",
+    "prefix": "mwt_28d20b0972",
+    "user": "mwu_720ef4f698",
+    "password": "26a72789bebfef",
+    "version": "mw1.37-fp-wbs1",
+    "wiki_id": 1,
+    "created_at": "2022-01-17T15:10:17.000000Z",
+    "updated_at": "2022-01-17T15:10:17.000000Z"
+  },
+  "wiki_queryservice_namespace": {
+    "id": 1,
+    "namespace": "qsns_71541d0c8b",
+    "backend": "queryservice.default.svc.cluster.local:9999",
+    "wiki_id": 1,
+    "created_at": "2022-01-17T15:10:17.000000Z",
+    "updated_at": "2022-01-17T15:10:17.000000Z"
+  },
+  "settings": [
+    {
+      "id": 1,
+      "name": "wgSecretKey",
+      "value": "DeYcBIThioSdJbbjmkQW3yBDIQNwbHplQQ6Aca6bOI9f6Mv6CsnldaZiPm2ISZTc",
+      "wiki_id": 1,
+      "created_at": "2022-01-18T15:32:17.000000Z",
+      "updated_at": "2022-01-18T15:32:17.000000Z"
+    },
+    {
+      "id": 2,
+      "name": "wwExtEnableElasticSearch",
+      "value": "0",
+      "wiki_id": 1,
+      "created_at": "2022-01-18T15:32:17.000000Z",
+      "updated_at": "2022-01-18T15:34:22.000000Z"
+    },
+    {
+      "id": 3,
+      "name": "wwExtEnableConfirmAccount",
+      "value": "1",
+      "wiki_id": 1,
+      "created_at": "2022-01-18T15:33:12.000000Z",
+      "updated_at": "2022-01-18T15:33:19.000000Z"
+    }
+  ]
+}
