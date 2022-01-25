@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d9654e47a8198223a80ad16acc51f90b",
+    "content-hash": "dbec6bd5034aee43dc1d9eeb745e0203",
     "packages": [
         {
             "name": "albertcht/invisible-recaptcha",
@@ -5003,21 +5003,21 @@
         },
         {
             "name": "php-http/socket-client",
-            "version": "2.0.2",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-http/socket-client.git",
-                "reference": "a53d9c25e34ae3c39d07158b7ae7bf25b83b300a"
+                "reference": "55910860c2ed02fdc0d74e0de8d91058e866d2d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-http/socket-client/zipball/a53d9c25e34ae3c39d07158b7ae7bf25b83b300a",
-                "reference": "a53d9c25e34ae3c39d07158b7ae7bf25b83b300a",
+                "url": "https://api.github.com/repos/php-http/socket-client/zipball/55910860c2ed02fdc0d74e0de8d91058e866d2d2",
+                "reference": "55910860c2ed02fdc0d74e0de8d91058e866d2d2",
                 "shasum": ""
             },
             "require": {
                 "nyholm/psr7": "^1.3",
-                "php": "^7.1",
+                "php": ">=7.1 ",
                 "php-http/httplug": "^2.0",
                 "psr/http-client": "^1.0",
                 "symfony/options-resolver": "^2.6 || ^3.4 || ^4.4 || ^5.0"
@@ -5057,9 +5057,9 @@
             "description": "Socket client for PHP-HTTP",
             "support": {
                 "issues": "https://github.com/php-http/socket-client/issues",
-                "source": "https://github.com/php-http/socket-client/tree/2.0.2"
+                "source": "https://github.com/php-http/socket-client/tree/2.1.0"
             },
-            "time": "2020-10-22T09:00:03+00:00"
+            "time": "2021-01-11T10:28:30+00:00"
         },
         {
             "name": "phpoption/phpoption",
