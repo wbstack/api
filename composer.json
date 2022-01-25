@@ -26,6 +26,7 @@
         "maclof/kubernetes-client": "^0.23.0",
         "mxl/laravel-job": "^1.2",
         "percymamedy/laravel-dev-booter": "^3.0",
+        "php-http/socket-client": "2.0.2",
         "predis/predis": "^1.1",
         "superbalist/laravel-google-cloud-storage": "^2.2"
     },
