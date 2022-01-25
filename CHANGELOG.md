@@ -1,5 +1,10 @@
 # api
 
+## 8x.6.0 - 25 January 2022
+
+ - REVERT Bump guzzlehttp/guzzle from 7.3.0 to 7.4.1
+ - Fix MigrationWikiCreate Job when user missing
+
 ## 8x.5.0 - 24 January 2022
 
  - Add CreateEmptyWikiDb Job
