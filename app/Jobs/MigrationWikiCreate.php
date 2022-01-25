@@ -63,7 +63,10 @@ class MigrationWikiCreate extends Job
         $emptyWikiDbJob->handle($manager);
         $wikiDb = $emptyWikiDbJob->getWikiDb();
 
-        $user = User::firstOrCreate(['email' => $this->email]);
+        $user = User::firstOrCreate(
+            [ 'email' => $this->email ],
+            [ 'password' => 'nothing-hashes-to-me' ] // this should mean the user can't login since nothing will ever hash to this
+        );
         $this->createWiki($user, $wikiDetails, $wikiDb);
     }
 

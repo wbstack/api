@@ -22,6 +22,27 @@ class MigrationWikiCreateTest extends TestCase
         parent::setUp();
     }
 
+    public function testMigrationWithoutUserRuns() {
+        $wikiDetailsFilepath = __DIR__.'/../data/example-wiki-details.json';
+        $wikiDetails = json_decode(file_get_contents($wikiDetailsFilepath));
+
+        WikiDomain::create(['domain' => $wikiDetails->domain]);
+        QueryserviceNamespace::create([
+            'namespace' => "fakeNamespaceForTest",
+            'backend' => "fakeBackendForTest",
+        ]);
+
+        $mockJob = $this->createMock(Job::class);
+        $mockJob->expects($this->never())->method('fail');
+
+        $manager = $this->app->make('db');
+
+        $job = new MigrationWikiCreate('me@you.com', $wikiDetailsFilepath);
+        $job->setJob( $mockJob );
+        $job->handle($manager);
+    }
+
+
     // note: I tried to split this test into several test cases,
     // but it seems like the DB transactions get rolled back after every test case?
     public function testMigrationWikiCreateRunsWithoutFailure()
