@@ -1,5 +1,9 @@
 # api
 
+## 8x.6.1 - 25 January 2022
+
+ - Specifically require http/socket-client:2.0.2
+
 ## 8x.6.0 - 25 January 2022
 
  - REVERT Bump guzzlehttp/guzzle from 7.3.0 to 7.4.1
