@@ -76,7 +76,7 @@ class SetWikiLogo extends Job
         }
         $storage->writeStream(
             $reducedPath,
-            Image::make($storage->path($logosDir . "/raw.png"))->resize(135, 135)->stream()->detach()
+            Image::make($this->logoPath)->resize(135, 135)->stream()->detach()
         );
 
         // Store a conversion for the favicon
@@ -86,7 +86,7 @@ class SetWikiLogo extends Job
         }
         $storage->writeStream(
             $faviconPath,
-            Image::make($storage->path($logosDir . "/raw.png"))->resize(64, 64)->stream()->detach()
+            Image::make($this->logoPath)->resize(64, 64)->stream()->detach()
         );
 
         // Get the urls
