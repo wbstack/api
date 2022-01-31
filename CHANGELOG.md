@@ -1,5 +1,9 @@
 # api
 
+## 8x.7.0 - 31 January 2022
+
+ - Fix logo uploading job
+
 ## 8x.6.1 - 25 January 2022
 
  - Specifically require http/socket-client:2.0.2
