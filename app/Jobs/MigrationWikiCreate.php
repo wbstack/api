@@ -106,17 +106,16 @@ class MigrationWikiCreate extends Job
             $wikiDomain->wiki_id = $wiki->id;
             $wikiDomain->save();
 
-            // Create k8s ingress if the wiki uses a custom domain
-            if ( ! WikiController::isSubDomain($wikiDetails->domain)) {
-                // TODO: should this be done synchronously with dispatch_sync(), or asynchronously with dispatch()?
-                dispatch_sync(new KubernetesIngressCreate($wiki->id, $wikiDetails->domain));
-            }
-
             WikiManager::create([
                 'user_id' => $user->id,
                 'wiki_id' => $wiki->id,
             ]);
         });
+
+        // Create k8s ingress if the wiki uses a custom domain
+        if ( isset($wiki->domain) && ! WikiController::isSubDomain($wiki->domain)) {
+            dispatch(new KubernetesIngressCreate($wiki->id, $wiki->domain));
+        }
 
         return $wiki;
     }
