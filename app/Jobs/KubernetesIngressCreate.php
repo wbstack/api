@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use Maclof\Kubernetes\Client;
 use Maclof\Kubernetes\Models\Ingress;
+use Illuminate\Support\Facades\Log;
 
 /**
  * This can be run with for example:
@@ -33,18 +34,12 @@ class KubernetesIngressCreate extends Job
     /**
      * @return void
      */
-    public function handle()
+    public function handle( Client $client )
     {
         // Docs for the client https://github.com/maclof/kubernetes-client
 
         // Connection example from: https://github.com/maclof/kubernetes-client#using-a-service-account
-        echo 'Creating k8s client'.PHP_EOL;
-
-        $client = new Client([
-            'master' => 'https://kubernetes.default.svc',
-            'ca_cert' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
-            'token'   => '/var/run/secrets/kubernetes.io/serviceaccount/token',
-        ]);
+        Log::info( 'Creating k8s client' );
 
         $ingress = new Ingress([
             'metadata' => [
@@ -101,9 +96,9 @@ class KubernetesIngressCreate extends Job
             ],
         ]);
 
-        echo 'Getting ingress resources'.PHP_EOL;
+        Log::info('Getting ingress resources');
         $ingresses = $client->ingresses();
-        echo 'Checking if resource exists: '.$ingress->getMetadata('name').PHP_EOL;
+        Log::info('Checking if resource exists: '.$ingress->getMetadata('name'));
         $exists = $ingresses->exists($ingress->getMetadata('name'));
         if ($exists) {
             $this->fail(
@@ -113,7 +108,7 @@ class KubernetesIngressCreate extends Job
             return; //safegaurd
         }
 
-        echo 'Creating ingress resource'.PHP_EOL;
+        Log::info('Creating ingress resource');
         $result = $client->ingresses()->create($ingress);
         // TODO check result
         // TODO output something?

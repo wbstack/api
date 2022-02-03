@@ -9,6 +9,8 @@ use App\Jobs\KubernetesIngressDeleteJob;
 use App\Wiki;
 use App\WikiManager;
 use Illuminate\Contracts\Queue\Job;
+use Maclof\Kubernetes\Client;
+use Illuminate\Support\Facades\App;
 
 class KubernetesIngressDeleteJobTest extends TestCase
 {
@@ -29,7 +31,9 @@ class KubernetesIngressDeleteJobTest extends TestCase
         $job = new KubernetesIngressDeleteJob(1);
         $job->setJob($mockJob);
         
-        $job->handle();
+        App::call(function ( Client $client ) use ($job) {
+            $job->handle( $client );
+        } );
 
 
 
