@@ -24,7 +24,7 @@ class KubernetesIngressDeleteJob extends Job
     /**
      * @return void
      */
-    public function handle()
+    public function handle( Client $client )
     {
         $wiki = Wiki::withTrashed()->where('id', $this->id )->first();
 
@@ -37,12 +37,6 @@ class KubernetesIngressDeleteJob extends Job
             $this->fail( new \RuntimeException("Wiki {$this->id} is not deleted, but it's ingress got called to be deleted.") );
             return;
         }
-
-        $client = new Client([
-            'master' => 'https://kubernetes.default.svc',
-            'ca_cert' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
-            'token'   => '/var/run/secrets/kubernetes.io/serviceaccount/token',
-        ]);
 
         $exists = $client->ingresses()->exists( KubernetesIngressCreate::getKubernetesIngressName($this->id) );
         
