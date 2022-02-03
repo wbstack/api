@@ -35,8 +35,6 @@ class KubernetesIngressDeleteJobTest extends TestCase
             $job->handle( $client );
         } );
 
-
-
     }
 
 }

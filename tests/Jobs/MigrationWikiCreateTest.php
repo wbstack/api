@@ -13,6 +13,8 @@ use App\WikiSetting;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Contracts\Queue\Job;
 use Tests\TestCase;
+use App\Jobs\KubernetesIngressCreate;
+use Illuminate\Support\Facades\Bus;
 
 class MigrationWikiCreateTest extends TestCase
 {
@@ -23,6 +25,8 @@ class MigrationWikiCreateTest extends TestCase
     }
 
     public function testMigrationWithoutUserRuns() {
+        Bus::fake();
+
         $wikiDetailsFilepath = __DIR__.'/../data/example-wiki-details.json';
         $wikiDetails = json_decode(file_get_contents($wikiDetailsFilepath));
 
@@ -40,6 +44,8 @@ class MigrationWikiCreateTest extends TestCase
         $job = new MigrationWikiCreate('me@you.com', $wikiDetailsFilepath);
         $job->setJob( $mockJob );
         $job->handle($manager);
+
+        Bus::assertDispatched(KubernetesIngressCreate::class);
     }
 
 
@@ -47,6 +53,8 @@ class MigrationWikiCreateTest extends TestCase
     // but it seems like the DB transactions get rolled back after every test case?
     public function testMigrationWikiCreateRunsWithoutFailure()
     {
+        Bus::fake();
+
         $wikiDetailsFilepath = __DIR__.'/../data/example-wiki-details.json';
         $wikiDetails = json_decode(file_get_contents($wikiDetailsFilepath));
 
@@ -70,6 +78,8 @@ class MigrationWikiCreateTest extends TestCase
         $job = new MigrationWikiCreate($user->email, $wikiDetailsFilepath);
         $job->setJob( $mockJob );
         $job->handle($manager);
+
+        Bus::assertDispatched(KubernetesIngressCreate::class);
 
         $wikiCollection = Wiki::whereDomain($wikiDetails->domain)->get();
         $wiki = $wikiCollection->first();

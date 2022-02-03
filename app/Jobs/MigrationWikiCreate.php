@@ -2,17 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Http\Controllers\WikiController;
 use App\QueryserviceNamespace;
 use App\User;
 use App\Wiki;
 use App\WikiDomain;
 use App\WikiManager;
 use App\WikiSetting;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\DatabaseManager;
-use App\Http\Controllers\WikiController;
-use Maclof\Kubernetes\Client;
-use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 
 /*
     - This will create a laravel Wiki object and persist it
@@ -110,10 +108,8 @@ class MigrationWikiCreate extends Job
 
             // Create k8s ingress if the wiki uses a custom domain
             if ( ! WikiController::isSubDomain($wikiDetails->domain)) {
-                $ingressCreateJob = new KubernetesIngressCreate($wiki->id, $wikiDetails->domain);
-                App::call(function ( Client $client ) use ($ingressCreateJob) {
-                    $ingressCreateJob->handle( $client );
-                } );
+                // TODO: should this be done synchronously with dispatch_sync(), or asynchronously with dispatch()?
+                dispatch_sync(new KubernetesIngressCreate($wiki->id, $wikiDetails->domain));
             }
 
             WikiManager::create([
