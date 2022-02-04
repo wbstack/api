@@ -1,5 +1,10 @@
 # api
 
+## 8x.8.0 - 4 Feburary 2022
+
+ - Fix custom domain ingress creation (revert maclof/kubernetes-client from 0.21.0 to 0.23.0)
+ - Add migrate custom domain script
+
 ## 8x.7.0 - 31 January 2022
 
  - Fix logo uploading job
