@@ -21,11 +21,8 @@ class MigrationWikiCreateTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function setUp(): void {
-        parent::setUp();
-    }
-
-    public function testMigrationWithCustomDomainAndWithoutUserRuns() {
+    public function testMigrationWithCustomDomainAndWithoutUserRunsAndCreatesUser(): void
+    {
         Bus::fake();
 
         $wikiDetailsFilepath = __DIR__.'/../data/example-wiki-details.json';
@@ -42,11 +39,16 @@ class MigrationWikiCreateTest extends TestCase
 
         $manager = $this->app->make('db');
 
-        $job = new MigrationWikiCreate('me@you.com', $wikiDetailsFilepath);
+        $userEmail = 'me@example.com';
+        $job = new MigrationWikiCreate($userEmail, $wikiDetailsFilepath);
         $job->setJob( $mockJob );
         $job->handle($manager);
 
         Bus::assertDispatched(KubernetesIngressCreate::class);
+
+        $user = User::where('email', $userEmail);
+        $this->assertTrue($user->exists());
+        $this->assertSame(1, $user->first()->verified);
     }
 
     public function testMigrationWithFreeDomainAndWithoutUserRuns() {
