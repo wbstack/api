@@ -1,6 +1,10 @@
 # api
 
-## 8x.8.0 - 4 Feburary 2022
+## 8x.8.1 - 8 February 2022
+
+- Ensure users created by the migration script are verified
+
+## 8x.8.0 - 4 February 2022
 
  - Fix custom domain ingress creation (revert maclof/kubernetes-client from 0.21.0 to 0.23.0)
  - Add migrate custom domain script
