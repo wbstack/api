@@ -18,32 +18,29 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
+use App\Helper\DomainValidator;
 
 class WikiController extends Controller
 {
+    private $domainValidator;
+
+    public function __construct( DomainValidator $domainValidator )
+    {
+        $this->domainValidator = $domainValidator;
+    }
+
     public function create(Request $request): \Illuminate\Http\Response
     {
         $user = $request->user();
-
-        $subDomainSuffix = Config::get('wbstack.subdomain_suffix');
         $submittedDomain = $request->input('domain');
-        $isSubdomain = $this->isSubDomain( $submittedDomain, $subDomainSuffix );
+        
+        $validator = $this->domainValidator->validate( $submittedDomain );
+        $isSubdomain = $this->isSubDomain($submittedDomain);
 
-        if ($isSubdomain) {
-            $subDomainSuffixLength = strlen($subDomainSuffix);
-            $requiredSubdomainPrefixChars = 5;
-            // We want at least 5 chars for the site sub domain
-            // This also stops things like mail. www. pop. ETC...
-            // TODO add a real disallow list for various wanted subdomains
-            $requiredLength = $requiredSubdomainPrefixChars + $subDomainSuffixLength;
-            $domainRequirements = 'required|unique:wikis|unique:wiki_domains|min:' . $requiredLength . '|regex:/^[a-z0-9-]+' . preg_quote( $subDomainSuffix ) . '$/';
-        } else {
-            $domainRequirements = 'required|unique:wikis|unique:wiki_domains|min:4|regex:/[a-z0-9-]+\.[a-z]+$/';
-        }
+        $validator->validateWithBag('post');
 
         // TODO extra validation that username is correct?
         $request->validate([
-            'domain' => $domainRequirements,
             'sitename' => 'required|min:3',
             'username' => 'required',
         ]);
