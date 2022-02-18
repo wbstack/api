@@ -27,7 +27,6 @@ class DomainValidator
             $requiredSubdomainPrefixChars = 5;
             // We want at least 5 chars for the site sub domain
             // This also stops things like mail. www. pop. ETC...
-            // TODO add a real disallow list for various wanted subdomains
             $requiredLength = $requiredSubdomainPrefixChars + $subDomainSuffixLength;
             $domainRequirements = array_merge(
                 [                
