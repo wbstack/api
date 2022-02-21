@@ -57,6 +57,7 @@ return [
     'diff',
     'docs',
     'donate',
+    'dyna',
     'email',
     'email',
     'feeds',
