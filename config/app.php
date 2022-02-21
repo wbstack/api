@@ -187,6 +187,7 @@ return [
 
         Intervention\Image\ImageServiceProvider::class,
         Laravel\Tinker\TinkerServiceProvider::class,
+        App\Providers\DomainValidatorServiceProvider::class
     ],
 
     // TODO maybe this should only be in dev?
