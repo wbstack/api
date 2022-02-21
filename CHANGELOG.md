@@ -1,5 +1,9 @@
 # api
 
+## 8x.8.2 - 21 Febuary 2022
+
+- Ensure certain wiki subdomains are forbidden for users.
+
 ## 8x.8.1 - 8 February 2022
 
 - Ensure users created by the migration script are verified
