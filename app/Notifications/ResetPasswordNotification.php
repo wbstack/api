@@ -60,11 +60,11 @@ class ResetPasswordNotification extends Notification
         $resetPasswordLink = config('wbstack.ui_url').'/reset-password'.$queryPart;
 
         return (new MailMessage)
-            ->subject(Lang::get('Reset Password Notification'))
+            ->subject(Lang::get('Please reset your password'))
             ->line(Lang::get('You are receiving this email because we received a password reset request for your account.'))
             ->action(Lang::get('Reset Password'), $resetPasswordLink)
             ->line(Lang::get('This password reset link will expire in :count minutes.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
-            ->line(Lang::get('If you did not request a password reset, no further action is required.'));
+            ->line(Lang::get('If you did not make this request, you can simply disregard this email.'));
     }
 
     /**
