@@ -63,10 +63,10 @@ class EmailReverificationNotification extends Notification
         $verifyEmailLink = config('wbstack.ui_url') . '/emailVerification/'.$this->token;
 
         return (new MailMessage)
-            ->subject(Lang::get('Email Verification'))
-            ->line(Lang::get('Someone, probably you, has requested another email verification link.'))
-            ->line(Lang::get('You can get started in seconds — just click below to begin.'))
-            ->action(Lang::get('Verify Email'), $verifyEmailLink);
+            ->subject(Lang::get('Please verify your email'))
+            ->line(Lang::get('Someone, probably you, has requested another link to verify the email associated with your Wikibase.cloud account. You’re just one step away from taking advantage of all that the platform has to offer. To complete your registration, verify your email address by clicking below.'))
+            ->action(Lang::get('Verify Email'), $verifyEmailLink)
+            ->line(Lang::get('If you did not make this request, you can simply disregard this email.'));
     }
 
     /**
