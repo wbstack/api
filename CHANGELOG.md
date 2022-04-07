@@ -1,5 +1,9 @@
 # api
 
+## 8x.8.3 - 7 April 2022
+
+- Update Email texts
+
 ## 8x.8.2 - 21 Febuary 2022
 
 - Ensure certain wiki subdomains are forbidden for users.
