@@ -1,5 +1,9 @@
 # api
 
+## 8x.8.4 - 8 April 2022
+
+- Fix contact link in mail templates
+
 ## 8x.8.3 - 7 April 2022
 
 - Update Email texts
