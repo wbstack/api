@@ -1,9 +1,6 @@
 @component('mail::layout')
     {{-- Header --}}
     @slot('header')
-        @component('mail::header', ['url' => config('app.url')])
-            {{ config('app.name') }}
-        @endcomponent
     @endslot
 
     {{-- Body --}}
@@ -21,7 +18,7 @@
     {{-- Footer --}}
     @slot('footer')
         @component('mail::footer')
-            © {{ date('Y') }} {{ config('app.name') }}. @lang('All rights reserved.')
+        This message was sent from an unmonitored account. You can get in touch with the Wikibase team through our [https://wikiba.se/contact/](Contact) page.
         @endcomponent
     @endslot
 @endcomponent
