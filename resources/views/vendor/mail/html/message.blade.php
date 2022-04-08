@@ -21,7 +21,7 @@
 {{-- Footer --}}
 @slot('footer')
 @component('mail::footer')
-This message was sent from an unmonitored account. You can get in touch with the Wikibase team through our <a href="{{ url('/contact') }}">contact</a> page.
+This message was sent from an unmonitored account. You can get in touch with the Wikibase team through our <a href="{{ url('/contact') }}">Contact</a> page.
 @endcomponent
 @endslot
 @endcomponent
