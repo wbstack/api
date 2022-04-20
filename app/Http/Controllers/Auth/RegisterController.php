@@ -10,6 +10,7 @@ use App\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -23,6 +24,10 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
+        if(Config::get('wbstack.disable_account_creation')) {
+            abort(503, 'Account creation not currently enabled');
+        }
+
         $this->validator($request->all())->validate();
 
         $user = null;

@@ -15,6 +15,7 @@ use App\WikiManager;
 use App\WikiSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -22,6 +23,10 @@ class WikiController extends Controller
 {
     public function create(Request $request): \Illuminate\Http\Response
     {
+        if(Config::get('wbstack.disable_wiki_creation')) {
+            abort(503, 'Wiki creation not currently enabled');
+        }
+
         $user = $request->user();
 
         $submittedDomain = $request->input('domain');
