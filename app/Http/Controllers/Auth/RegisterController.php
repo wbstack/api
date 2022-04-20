@@ -24,9 +24,7 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
-        if(Config::get('wbstack.disable_account_creation')) {
-            abort(503, 'Account creation not currently enabled');
-        }
+        abort(503, 'Account creation not currently enabled');
 
         $this->validator($request->all())->validate();
 

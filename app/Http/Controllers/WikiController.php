@@ -23,9 +23,7 @@ class WikiController extends Controller
 {
     public function create(Request $request): \Illuminate\Http\Response
     {
-        if(Config::get('wbstack.disable_wiki_creation')) {
-            abort(503, 'Wiki creation not currently enabled');
-        }
+        abort(503, 'Wiki creation not currently enabled');
 
         $user = $request->user();
 
