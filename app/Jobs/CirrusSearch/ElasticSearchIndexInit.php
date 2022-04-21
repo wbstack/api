@@ -10,13 +10,22 @@ class ElasticSearchIndexInit extends CirrusSearchJob
         return 'wbstackElasticSearchInit';
     }
 
+    private function logFailureAndDisable(): void {
+        $this->setting->update( [  'value' => false  ] );
+        Log::warning( __METHOD__ . ": Failed initializing elasticsearch. Disabling the setting." );
+    }
+
     public function handleResponse( string $rawResponse, $error ): void
     {
         $response = json_decode( $rawResponse, true );
 
-        if( !$this->validateOrFailRequest($response, $rawResponse, $error) || !$this->validateSuccess($response, $rawResponse, $error) ) {
-            $this->setting->update( [  'value' => false  ] );
-            Log::warning( __METHOD__ . ": Failed initializing elasticsearch. Disabling the setting." );
+        if( !$this->validateOrFailRequest($response, $rawResponse, $error) ) {
+            $this->logFailureAndDisable();
+            return;
+        }
+
+        if (!$this->validateSuccess($response, $rawResponse, $error)) {
+            $this->logFailureAndDisable();
             return;
         }
 
