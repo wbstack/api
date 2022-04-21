@@ -103,7 +103,7 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
 
         return true;
     }
-    protected function validateSuccess( ?array $response, string $rawResponse, $error ): bool {
+    protected function validateSuccess( array $response, string $rawResponse, $error ): bool {
         if ( !$this->isSuccessful($response)) {
             $this->fail( new \RuntimeException( $this->apiModule() . ' call for '.$this->wikiId.' was not successful:'.$rawResponse) );
             return false;
