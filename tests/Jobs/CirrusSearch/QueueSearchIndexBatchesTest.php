@@ -105,4 +105,38 @@ class QueueSearchIndexBatchesTest extends TestCase
         });
 
     }
+
+    public function testMediawikiErrorResponse() {
+        $errorResponse = file_get_contents(
+            __DIR__.'/../../data/mediawiki-api-error-response.json'
+        );
+
+        $request = $this->createMock(HttpRequest::class);
+        $request->method('execute')->willReturn($errorResponse);
+
+        $request->expects($this->once())
+            ->method('setOptions')
+            ->with([
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackQueueSearchIndexBatches&format=json',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_TIMEOUT => 1000,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_HTTPHEADER => [
+                    'content-type: application/x-www-form-urlencoded',
+                    'host: '.$this->wiki->domain,
+                ]
+        ]);
+
+        $mockJob = $this->createMock(Job::class);
+        $mockJob->expects($this->once())
+                ->method('fail')
+                ->with(new \RuntimeException('wbstackQueueSearchIndexBatches call failed with api error: Unrecognized value for parameter "action": wbstackQueueSearchIndexBatches.'));
+
+        $job = new QueueSearchIndexBatches($this->wiki->id);
+        $job->setJob($mockJob);
+        $job->handle($request);
+    }
+
 }

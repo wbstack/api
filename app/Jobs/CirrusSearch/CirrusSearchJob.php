@@ -91,6 +91,11 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
             return false;
         }
 
+        if( $this->hasApiError( $response ) ) {
+            $this->fail( new \RuntimeException( $this->apiModule() . ' call failed with api error: '. $response['error']['info'] ) );
+            return false;
+        }
+
         if ( !$this->isValid( $response ) ) {
             $this->fail( new \RuntimeException( $this->apiModule() . ' call for '.$this->wikiId.'. No ' . $this->apiModule() . ' key in response: '.$rawResponse) );
             return false;
@@ -106,6 +111,12 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
 
     protected function getRequestTimeout(): int {
         return 100;
+    }
+
+    // TODO Migrate this to some other baseclass for all internal api classes
+    // This and some other stuff would be usedful there too
+    protected function hasApiError( ?array $response ): bool {
+        return is_array($response) && array_key_exists( 'error', $response);
     }
 
     protected function isValid( ?array $response ): bool {
