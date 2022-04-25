@@ -139,7 +139,13 @@ class MigrationWikiCreateTest extends TestCase
 
         // The wiki settings will be attached to the Wiki
         $wikiSettings = WikiSetting::where(['wiki_id' => $wiki->id]);
-        $this->assertSame(3, $wikiSettings->count());
+        $this->assertSame(4, $wikiSettings->count());
+
+        // The wiki is set to read only
+        $wikiSettingReadOnly = WikiSetting::where(['wiki_id' => $wiki->id, 'name' => 'wgReadOnly']);
+        $this->assertSame(1, $wikiSettingReadOnly->count());
+        // and the readonly setting is a non empty string (important for mediawiki)
+        $this->assertTrue(strlen($wikiSettingReadOnly->first()->value) > 0);
 
         // A queryservice namespace will be assigned to this Wiki
         // TODO
