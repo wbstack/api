@@ -1,5 +1,9 @@
 # api
 
+## 8x.8.5 - 29 April 2022
+
+- [Allow forcesearchindex to fail](https://github.com/wbstack/api/pull/418)
+
 ## 8x.8.4 - 8 April 2022
 
 - Fix contact link in mail templates
