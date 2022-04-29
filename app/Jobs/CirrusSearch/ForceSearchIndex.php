@@ -47,6 +47,10 @@ class ForceSearchIndex extends CirrusSearchJob
             return;
         }
 
+        if( !$this->validateSuccess($response, $rawResponse, $error) ) {
+            return;
+        }
+
         $output = $response[$this->apiModule()]['output'];
 
         $successMatches = [];
