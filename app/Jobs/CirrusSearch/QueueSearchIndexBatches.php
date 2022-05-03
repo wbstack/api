@@ -60,6 +60,17 @@ class QueueSearchIndexBatches extends CirrusSearchJob
 
         $output = $response[$this->apiModule()]['output'];
 
+        // if there are no pages to index, just exit now.
+        if( !$this->isSuccessful($response) && 
+            is_array($output) && count($output) == 1 && $output[0] == "Couldn't find any pages to index.  fromId =  =  = toId." ) {
+            Log::warning(__METHOD__ . ": ForceSearchIndex could not find any pages to index. " . $rawResponse);
+            return;
+        }
+
+        if( !$this->validateSuccess($response, $rawResponse, $error) ) {
+            return;
+        }
+
         $batches = [];
 
         try {
