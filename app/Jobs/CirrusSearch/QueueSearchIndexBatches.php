@@ -63,7 +63,7 @@ class QueueSearchIndexBatches extends CirrusSearchJob
         // if there are no pages to index, just exit now.
         if( !$this->isSuccessful($response) && 
             is_array($output) && count($output) == 1 && $output[0] == "Couldn't find any pages to index.  fromId =  =  = toId." ) {
-            Log::warning(__METHOD__ . ": ForceSearchIndex could not find any pages to index. " . $rawResponse);
+            Log::warning(__METHOD__ . ": {$this->wiki->domain}: ForceSearchIndex could not find any pages to index. " . $rawResponse);
             return;
         }
 
@@ -76,7 +76,7 @@ class QueueSearchIndexBatches extends CirrusSearchJob
         try {
             $batches = $this->convertToBatch( $output );
         } catch (\RuntimeException $e) {
-            Log::error(__METHOD__ . ": Failed to convert command output into batched commands: " . $rawResponse);
+            Log::error(__METHOD__ . ": {$this->wiki->domain}: Failed to convert command output into batched commands: " . $rawResponse);
             $this->fail($e);
             return;
         }
@@ -89,7 +89,7 @@ class QueueSearchIndexBatches extends CirrusSearchJob
 
         } else {
 
-            Log::error(__METHOD__ . ": Job finished but didn't create any batches, something is weird");
+            Log::error(__METHOD__ . ": {$this->wiki->domain}: Job finished but didn't create any batches, something is weird");
             $this->fail( new \RuntimeException($this->apiModule() . ' call for '.$this->wikiId.' was not successful:' . $rawResponse ) );
         }
 

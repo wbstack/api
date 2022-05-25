@@ -12,7 +12,8 @@ class ElasticSearchIndexInit extends CirrusSearchJob
 
     private function logFailureAndDisable(): void {
         $this->setting->update( [  'value' => false  ] );
-        Log::warning( __METHOD__ . ": Failed initializing elasticsearch. Disabling the setting." );
+        Log::warning( __METHOD__ . ": {$this->wiki->domain}: Failed initializing elasticsearch. Disabling the setting." );
+
     }
 
     public function handleResponse( string $rawResponse, $error ): void
@@ -46,7 +47,7 @@ class ElasticSearchIndexInit extends CirrusSearchJob
             $enableElasticSearchFeature = true;
         } else {
 
-            Log::error(__METHOD__ . ": Job finished but didn't create or update, something is weird");
+            Log::error(__METHOD__ . ": {$this->wiki->domain} Job finished but didn't create or update, something is weird");
             $this->fail( new \RuntimeException($this->apiModule() . ' call for '.$this->wikiId.' was not successful:' . $rawResponse ) );
         }
 

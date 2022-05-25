@@ -2,6 +2,7 @@
 
 namespace App\Jobs\CirrusSearch;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\WikiSetting;
 use App\Http\Curl\HttpRequest;
@@ -61,6 +62,12 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
             $this->fail( new \RuntimeException($this->apiModule() . ' call for '.$this->wikiId.' was triggered but not WikiDb available') );
             $this->setting->update( [  'value' => false  ] );
             return;
+        }
+
+        // make sure the Elasticsearch is enabled for mediawiki
+        if( !$this->setting->value ) {
+            Log::info(__METHOD__ . ": {$this->wiki->domain}: Enabling setting " . WikiSetting::wwExtEnableElasticSearch);
+            $this->setting->update( [  'value' => true  ] );
         }
         
         $request->setOptions(
