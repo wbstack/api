@@ -15,6 +15,7 @@ use App\WikiManager;
 use App\Wiki;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
+use App\QueryserviceNamespace;
 
 class CreateTest extends TestCase
 {
@@ -25,6 +26,15 @@ class CreateTest extends TestCase
 
     public function testWikiCreateDispatchesSomeJobs()
     {
+        // seed up ready db
+        $manager = $this->app->make('db');
+        $job = new ProvisionWikiDbJob();
+        $job->handle($manager);
+
+        $dbRow = QueryserviceNamespace::create([
+            'namespace' => "derp",
+            'backend' => "wdqs.svc",
+        ]);
         Queue::fake();
 
         $user = User::factory()->create(['verified' => true]);
@@ -32,8 +42,8 @@ class CreateTest extends TestCase
 
         $response = $this->actingAs($user, 'api')
         ->json(
-            'POST', 
-            $this->route, 
+            'POST',
+            $this->route,
             [
                 'domain' => 'derp.com',
                 'sitename' => 'merp',
@@ -49,16 +59,16 @@ class CreateTest extends TestCase
         Queue::assertPushed( ProvisionWikiDbJob::class, 1);
         Queue::assertPushed( MediawikiInit::class, 1);
         Queue::assertPushed( ElasticSearchIndexInit::class, 1);
-        
+
         $id = $response->original['data']['id'];
 
         $this->assertSame(
-            1, 
+            1,
             WikiSetting::where( [ 'name' => WikiSetting::wgSecretKey, 'wiki_id' => $id ] )->count()
         );
 
         $this->assertSame(
-            1, 
+            1,
             WikiSetting::where( [ 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true, 'wiki_id' => $id ] )->count()
         );
     }
@@ -78,8 +88,8 @@ class CreateTest extends TestCase
 
         $response = $this->actingAs($user, 'api')
         ->json(
-            'POST', 
-            $this->route, 
+            'POST',
+            $this->route,
             [
                 'domain' => 'mywikidomain.com',
                 'sitename' => 'merp',
@@ -93,8 +103,8 @@ class CreateTest extends TestCase
 
         $response = $this->actingAs($user, 'api')
             ->json(
-                'POST', 
-                $this->route, 
+                'POST',
+                $this->route,
                 [
                     'domain' => 'mywikidomain-2.com',
                     'sitename' => 'merp',
@@ -109,8 +119,8 @@ class CreateTest extends TestCase
 
         $response = $this->actingAs($user, 'api')
         ->json(
-            'POST', 
-            $this->route, 
+            'POST',
+            $this->route,
             [
                 'domain' => 'mywikidomain-2.com',
                 'sitename' => 'merp',

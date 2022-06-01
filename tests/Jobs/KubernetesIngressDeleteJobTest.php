@@ -16,7 +16,7 @@ class KubernetesIngressDeleteJobTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function testDoesNotDeleteNonDeletedWikiws()
+    public function testDoesNotDeleteNonDeletedWikis()
     {
      
         $user = User::factory()->create(['verified' => true]);
@@ -26,9 +26,9 @@ class KubernetesIngressDeleteJobTest extends TestCase
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())
             ->method('fail')
-            ->with(new \RuntimeException("Wiki 1 is not deleted, but it's ingress got called to be deleted."));
+            ->with(new \RuntimeException("Wiki {$wiki->id} is not deleted, but it's ingress got called to be deleted."));
 
-        $job = new KubernetesIngressDeleteJob(1);
+        $job = new KubernetesIngressDeleteJob($wiki->id);
         $job->setJob($mockJob);
         
         App::call(function ( Client $client ) use ($job) {
