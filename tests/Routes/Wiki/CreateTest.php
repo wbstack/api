@@ -103,5 +103,24 @@ class CreateTest extends TestCase
             );
         $response->assertStatus(403)
             ->assertJsonPath('message', 'Too many wikis. Your new total of 2 would exceed the limit of 1 per user.');
+
+        // retry when disabled
+        Config::set('wbstack.wiki_max_per_user', false);
+
+        $response = $this->actingAs($user, 'api')
+        ->json(
+            'POST', 
+            $this->route, 
+            [
+                'domain' => 'mywikidomain-2.com',
+                'sitename' => 'merp',
+                'username' => 'AdminBoss'
+            ]
+        );
+
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.domain', 'mywikidomain-2.com')
+            ->assertJsonPath('success', true );
     }
 }
