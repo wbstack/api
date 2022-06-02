@@ -1,5 +1,9 @@
 # api
 
+## 8x.8.7 - 2 June 2022
+
+- Add the functionality to limit the number of wikis a user can have
+
 ## 8x.8.6 - 3 May 2022
 
 - [Allow forcesearchindex to fail](https://github.com/wbstack/api/pull/427)
