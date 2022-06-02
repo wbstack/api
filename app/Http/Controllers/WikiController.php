@@ -60,6 +60,13 @@ class WikiController extends Controller
                 abort(503, 'No query namespaces ready');
             }
 
+            $numWikis = $user->managesWikis()->count() + 1;
+            $maxWikis = config('wbstack.wiki_max_per_user');
+
+            if ( config('wbstack.wiki_max_per_user') !== false && $numWikis > config('wbstack.wiki_max_per_user')) {
+                abort(403, "Too many wikis. Your new total of {$numWikis} would exceed the limit of ${maxWikis} per user.");
+            }
+
             $wiki = Wiki::create([
                 'sitename' => $request->input('sitename'),
                 'domain' => strtolower($request->input('domain')),
