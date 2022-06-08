@@ -1,5 +1,11 @@
 # api
 
+## 8x.8.8 - 8 June 2022
+
+- Stop seeding dev data in tests
+- Add and schedule job for platform summary
+- Disable maximum wiki functionality
+
 ## 8x.8.7 - 2 June 2022
 
 - Add the functionality to limit the number of wikis a user can have
