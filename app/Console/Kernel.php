@@ -10,6 +10,7 @@ use App\Jobs\PruneQueryserviceBatchesTable;
 use App\Jobs\SandboxCleanupJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Jobs\PlatformStatsSummaryJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -37,6 +38,9 @@ class Kernel extends ConsoleKernel
         // TODO this should maybe only be run when sandbox as a whole is loaded?
         // TODO instead of using LOAD ROUTES, we should just have different modes?
         $schedule->job(new SandboxCleanupJob)->everyFifteenMinutes();
+
+        // platform summary stats job
+        $schedule->job(new PlatformStatsSummaryJob())->daily();
     }
 
     /**
