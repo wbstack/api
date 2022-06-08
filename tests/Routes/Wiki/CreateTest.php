@@ -76,6 +76,23 @@ class CreateTest extends TestCase
 
     public function testCreateWikiLimitsNumWikisPerUser()
     {
+        $manager = $this->app->make('db');
+
+        $job1 = new ProvisionWikiDbJob();
+        $job1->handle($manager);
+
+        $job2 = new ProvisionWikiDbJob();
+        $job2->handle($manager);
+
+        QueryserviceNamespace::create([
+            'namespace' => "ns-1",
+            'backend' => "wdqs.svc",
+        ]);
+        QueryserviceNamespace::create([
+            'namespace' => "ns-2",
+            'backend' => "wdqs.svc",
+        ]);
+
         Config::set('wbstack.wiki_max_per_user', 1);
 
         Queue::fake();
