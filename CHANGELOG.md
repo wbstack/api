@@ -3,7 +3,7 @@
 ## 8x.8.8 - 8 June 2022
 
 - Stop seeding dev data in tests
-- Add job for platform summary
+- Add and schedule job for platform summary
 - Disable maximum wiki functionality
 
 ## 8x.8.7 - 2 June 2022
