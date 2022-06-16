@@ -1,6 +1,11 @@
 # api
 
+## 8x.8.8 - 16 June 2022
+
+- Bump php from 7.4-apache to 8.1.7-apache
+
 ## 8x.8.9 - 13 June 2022
+
 - Bump `fakerphp/faker` from 1.18.0 to 1.19.0
 
 ## 8x.8.8 - 8 June 2022
