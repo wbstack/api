@@ -1,4 +1,6 @@
 # api
+## 8x.8.10 - 14 June 2022
+-Bump `phpunit/phpunit` from 9.5.13 to 9.5.20
 
 ## 8x.8.9 - 13 June 2022
 - Bump `fakerphp/faker` from 1.18.0 to 1.19.0
