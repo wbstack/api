@@ -1,7 +1,10 @@
 # api
 
+## 8x.8.15 - 17 June 2022
+- Bump laravel/ui from 3.4.1 to 3.4.6
+
 ## 8x.8.14 - 17 June 2022
-- Bump Bump laravel/framework from 8.80.0 to 8.83.16 
+- Bump laravel/framework from 8.80.0 to 8.83.16 
 
 ## 8x.8.13 - 17 June 2022
 - Bump guzzlehttp/guzzle from 7.3.0 to 7.4.4
