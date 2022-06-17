@@ -1,5 +1,8 @@
 # api
 
+## 8x.8.12 - 17 June 2022
+- Bump intervention/image from 2.7.1 to 2.7.2
+
 ## 8x.8.11 - 17 June 2022
 
 - Bump `composer` from 2.2 to 2.3
