@@ -1,5 +1,8 @@
 # api
 
+## 8x.8.13 - 17 June 2022
+- Bump guzzlehttp/guzzle from 7.3.0 to 7.4.4
+
 ## 8x.8.12 - 17 June 2022
 - Bump intervention/image from 2.7.1 to 2.7.2
 
