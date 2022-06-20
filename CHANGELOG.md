@@ -1,5 +1,8 @@
 # api
 
+## 8x.8.16 - 20 June 2022
+- Bump doctrine/dbal from 3.1.3 to 3.3.7
+
 ## 8x.8.15 - 17 June 2022
 - Bump laravel/ui from 3.4.1 to 3.4.6
 
