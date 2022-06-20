@@ -2,7 +2,7 @@
 
 namespace Tests\Jobs;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Http\Curl\HttpRequest;
 use App\Jobs\DeleteQueryserviceNamespaceJob;
@@ -16,7 +16,7 @@ use Illuminate\Contracts\Queue\Job;
 
 class DeleteQueryserviceNamespaceJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function testDeleteNamespace()
     {
@@ -44,8 +44,8 @@ class DeleteQueryserviceNamespaceJobTest extends TestCase
 
         $request->expects($this->exactly(1))
             ->method('setOptions')
-            ->with( 
-            [ 
+            ->with(
+            [
                 CURLOPT_URL => $dbRow->backend.'/bigdata/namespace/' . $namespace,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
@@ -59,12 +59,12 @@ class DeleteQueryserviceNamespaceJobTest extends TestCase
                 ]
             ]);
 
-        
+
         $job = new DeleteQueryserviceNamespaceJob($wiki->id);
         $job->handle( $request );
 
         $this->assertSame(
-             0, 
+             0,
              QueryserviceNamespace::where( ['namespace' => $namespace ])->count()
         );
     }

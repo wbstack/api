@@ -3,6 +3,7 @@
 namespace Tests\Jobs;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Http\Curl\HttpRequest;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
@@ -11,7 +12,7 @@ use App\Jobs\DeleteQueryserviceNamespaceJob;
 
 class ProvisionQueryserviceNamespaceJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function testCreatesNamespace()
     {
@@ -30,8 +31,8 @@ class ProvisionQueryserviceNamespaceJobTest extends TestCase
 
         $request->expects($this->exactly(1))
             ->method('setOptions')
-            ->with( 
-            [ 
+            ->with(
+            [
                 CURLOPT_URL => config('app.queryservice_host').'/bigdata/namespace',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
@@ -46,12 +47,12 @@ class ProvisionQueryserviceNamespaceJobTest extends TestCase
                 ]
             ]);
 
-        
+
         $job = new ProvisionQueryserviceNamespaceJob($namespace, null);
         $job->handle($request);
 
         $this->assertSame(
-             1, 
+             1,
              QueryserviceNamespace::where( ['namespace' => $namespace ])->count()
         );
     }
@@ -66,7 +67,7 @@ class ProvisionQueryserviceNamespaceJobTest extends TestCase
 
         $request->expects($this->never())
             ->method('setOptions');
-        
+
         QueryserviceNamespace::where([
             'wiki_id' => null,
         ])->delete();
@@ -84,7 +85,7 @@ class ProvisionQueryserviceNamespaceJobTest extends TestCase
         $job->handle($request);
 
         $this->assertSame(
-             0, 
+             0,
              QueryserviceNamespace::where( ['namespace' => $namespace ])->count()
         );
     }

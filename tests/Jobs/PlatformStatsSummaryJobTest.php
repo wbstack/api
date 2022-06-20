@@ -3,6 +3,7 @@
 namespace Tests\Jobs;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\User;
 use App\Wiki;
@@ -16,7 +17,7 @@ use App\Jobs\PlatformStatsSummaryJob;
 
 class PlatformStatsSummaryJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     private $numWikis = 5;
     private $wikis = [];
@@ -26,19 +27,8 @@ class PlatformStatsSummaryJobTest extends TestCase
 
     protected function setUp(): void {
         parent::setUp();
-        for($n = 0; $n < $this->numWikis; $n++ ) {
-            DB::connection('mysql')->getPdo()->exec("DROP DATABASE IF EXISTS {$this->db_name}{$n};");
-        }
         $this->seedWikis();
         $this->manager = $this->app->make('db');
-    }
-
-    protected function tearDown(): void {
-        foreach($this->wikis as $wiki) {
-            $wiki['wiki']->wikiDb()->forceDelete();
-            $wiki['wiki']->forceDelete();
-        }
-        parent::tearDown();
     }
 
     private function seedWikis() {
@@ -82,7 +72,7 @@ class PlatformStatsSummaryJobTest extends TestCase
 
         $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
-        
+
         $testWikis = [
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki1.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com' ] ),
@@ -99,7 +89,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 'version' => 'asdasdasdas',
                 'prefix' => 'asdasd',
                 'wiki_id' => $wiki->id
-            ]);  
+            ]);
         }
         $stats = [
             [   // inactive
@@ -145,10 +135,10 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "platform_summary_version" => "v1"
             ],
         ];
-          
+
 
        $groups =  $job->prepareStats($stats, $testWikis);
-    
+
        $this->assertEquals(
             [
                 "total" => 4,
@@ -162,7 +152,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "total_non_deleted_edits" => 1,
                 "platform_summary_version" => "v1"
             ],
-            $groups, 
+            $groups,
         );
     }
 

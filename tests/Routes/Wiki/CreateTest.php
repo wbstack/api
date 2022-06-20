@@ -2,6 +2,7 @@
 
 namespace Tests\Routes\Wiki\Managers;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -22,7 +23,7 @@ class CreateTest extends TestCase
     protected $route = 'wiki/create';
 
     use OptionsRequestAllowed;
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     /**
 	 * @dataProvider createProvider
