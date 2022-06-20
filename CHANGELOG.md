@@ -1,5 +1,8 @@
 # api
 
+## 8x.8.17 - 20 June 2022
+- Bump laravel/passport from 10.3.0 to 10.3.3
+
 ## 8x.8.16 - 20 June 2022
 - Bump doctrine/dbal from 3.1.3 to 3.3.7
 
