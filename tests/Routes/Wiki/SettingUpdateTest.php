@@ -8,6 +8,7 @@ use App\WikiManager;
 use App\WikiSetting;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\Routes\Traits\PostRequestNeedAuthentication;
 use Tests\TestCase;
@@ -19,7 +20,7 @@ class SettingUpdateTest extends TestCase
 
     protected $route = 'wiki/setting/foo/update';
 
-    use DatabaseTransactions;
+    use RefreshDatabase;
     use OptionsRequestAllowed;
     use PostRequestNeedAuthentication;
 

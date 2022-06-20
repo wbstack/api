@@ -4,6 +4,7 @@ namespace Tests\Jobs\Integration;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\WikiManager;
 use App\WikiSetting;
@@ -15,18 +16,18 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 /**
- * This is only meant to run when services is started with 
+ * This is only meant to run when services is started with
  * additional services from docker-compose.integration.yml
- * 
+ *
  * Delete all local indices:
- * 
+ *
  * curl -X DELETE "localhost:9200/*?pretty"
- * 
+ *
  * Example: docker-compose exec -e RUN_PHPUNIT_INTEGRATION_TEST=1 -e ELASTICSEARCH_HOST=elasticsearch.svc:9200 -T api vendor/bin/phpunit tests/Jobs/Integration/ElasticSearchIndexDeleteTest.php
  */
 class ElasticSearchIndexDeleteTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
     use DispatchesJobs;
 
     private $wiki;
@@ -35,7 +36,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
     public function makeRequest( $url, $method = 'GET' ) {
         // create some dummy index
         $curlRequest = new CurlRequest();
-        $curlRequest->setOptions( 
+        $curlRequest->setOptions(
             [
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
@@ -53,7 +54,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
             var_dump($err);
         }
         $curlRequest->close();
-        
+
         return json_decode($response, true);
     }
 

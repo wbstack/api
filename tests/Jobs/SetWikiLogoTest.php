@@ -11,6 +11,7 @@ use ErrorException;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Tests\TestCase;
@@ -18,7 +19,7 @@ use Psalm\Type\Union;
 
 class SetWikiLogoTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
     use DispatchesJobs;
 
     private function assertJobFails(string $wikiKey, string $wikiValue, string $logoPath)

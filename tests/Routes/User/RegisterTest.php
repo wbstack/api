@@ -6,6 +6,7 @@ use App\Invitation;
 use App\Notifications\UserCreationNotification;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
@@ -15,7 +16,7 @@ class RegisterTest extends TestCase
     protected $route = 'user/register';
 
     use OptionsRequestAllowed;
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     // TODO test password length when not deving
 

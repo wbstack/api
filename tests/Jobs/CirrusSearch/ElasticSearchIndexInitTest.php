@@ -4,6 +4,7 @@ namespace Tests\Jobs\CirrusSearch;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Http\Curl\HttpRequest;
@@ -18,7 +19,7 @@ use PHPUnit\TextUI\RuntimeException;
 
 class ElasticSearchIndexInitTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
     use DispatchesJobs;
 
     private $wiki;
@@ -95,7 +96,7 @@ class ElasticSearchIndexInitTest extends TestCase
 
         // feature should get enabled
         $this->assertSame(
-             1, 
+             1,
              WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
         );
     }
@@ -125,7 +126,7 @@ class ElasticSearchIndexInitTest extends TestCase
 
         // feature should get enabled
         $this->assertSame(
-             1, 
+             1,
              WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
         );
     }
@@ -150,16 +151,16 @@ class ElasticSearchIndexInitTest extends TestCase
         $mockJob->expects($this->once())
                 ->method('fail')
                 ->with(new \RuntimeException(str_replace('<WIKI_ID>', $this->wiki->id, $expectedFailure)));
-                
+
         $request->method('execute')->willReturn(json_encode($mockResponse));
 
         $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
         $job->handle($request);
-        
+
 
         $this->assertSame(
-             0, 
+             0,
              WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
         );
     }

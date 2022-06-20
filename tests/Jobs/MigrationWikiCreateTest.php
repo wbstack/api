@@ -12,6 +12,7 @@ use App\WikiManager;
 use App\WikiSetting;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Jobs\KubernetesIngressCreate;
 use Illuminate\Support\Facades\Bus;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Config;
 
 class MigrationWikiCreateTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function testMigrationWithCustomDomainAndWithoutUserRunsAndCreatesUser(): void
     {

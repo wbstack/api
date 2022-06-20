@@ -2,7 +2,7 @@
 
 namespace Tests\Jobs;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\QueryserviceNamespace;
 use Illuminate\Contracts\Queue\Job;
@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Config;
 
 class DeleteWikiDispatcherJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function setUp(): void {
         parent::setUp();
@@ -94,6 +94,7 @@ class DeleteWikiDispatcherJobTest extends TestCase
         $job->handle();
 
         Log::assertLogged('info', function ($message, $context) {
+            echo $message;
             return Str::contains($message, 'Found no soft deleted wikis over threshold. exiting.');
         });
 
@@ -120,10 +121,10 @@ class DeleteWikiDispatcherJobTest extends TestCase
         $this->assertNotNull($nsAssignment);
 
         WikiSetting::factory()->create(
-            [ 
+            [
                 'wiki_id' => $this->wiki->id,
                 'name' => WikiSetting::wwExtEnableElasticSearch,
-                'value' => true 
+                'value' => true
             ]
         );
 
@@ -147,7 +148,7 @@ class DeleteWikiDispatcherJobTest extends TestCase
     public function testActuallyRunningJobsThatDelete()
     {
         $this->wiki->update(['domain' => 'asdasdaf' . Config::get('wbstack.subdomain_suffix')]);
-        
+
         // create db to be deleted
         $job = new ProvisionWikiDbJob('great_job', 'the_test_database', null);
         $job->handle( $this->app->make('db') );
@@ -159,7 +160,7 @@ class DeleteWikiDispatcherJobTest extends TestCase
 
         $this->assertTrue( $res );
         $this->assertNotNull( WikiDb::where([ 'wiki_id' => $this->wiki->id ])->first() );
-        
+
         $mockJob = $this->createMock(Job::class);
         $job = new DeleteWikiDispatcherJob();
         $job->setJob($mockJob);
