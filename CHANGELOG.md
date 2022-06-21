@@ -1,5 +1,8 @@
 # api
 
+## 8x.8.18 - 21 June 2022
+- Slim down /main endpoint response
+
 ## 8x.8.17 - 20 June 2022
 - Bump laravel/passport from 10.3.0 to 10.3.3
 
