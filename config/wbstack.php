@@ -14,4 +14,5 @@ return [
     'platform_summary_email' => env('WBSTACK_MONITORING_EMAIL', 'monitoring@example.com'),
     'platform_summary_inactive_threshold' => env('WBSTACK_SUMMARY_INACTIVE_THRESHOLD', 60 * 60 * 24 * 90),
 
+    'elasticsearch_host' => env('ELASTICSEARCH_HOST', false),
 ];

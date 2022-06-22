@@ -13,6 +13,7 @@ use App\Http\Curl\CurlRequest;
 use App\WikiDb;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Support\Facades\Config;
 
 /**
  * This is only meant to run when services is started with 
@@ -63,11 +64,12 @@ class ElasticSearchIndexDeleteTest extends TestCase
             $this->markTestSkipped('No blazegraph instance to connect to');
         }
 
-        if ( !getenv('ELASTICSEARCH_HOST') ) {
-            throw new \Exception('ELASTICSEARCH_HOST not set');
+        $ELASTICSEARCH_HOST=Config::get('wbstack.elasticsearch_host');
+
+        if ( !$ELASTICSEARCH_HOST ) {
+            throw new \Exception('ELASTICSEARCH_HOST / wbstack.elasticsearch_host not set');
         }
 
-        $ELASTICSEARCH_HOST=getenv('ELASTICSEARCH_HOST');
 
         $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/someotherdbname_general_first?pretty", 'PUT');
         $this->assertTrue($response['acknowledged']);
