@@ -4,11 +4,11 @@ namespace App\Jobs;
 
 use App\Wiki;
 use App\WikiSetting;
-use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\File;
 use Intervention\Image\Facades\Image;
-use Storage;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\FilesystemAdapter;
 
 /**
  * This can be run with the artisan job command, for example:
@@ -56,7 +56,7 @@ class SetWikiLogo extends Job
 
         // Get the cloud disk we use to store logos
         $storage = Storage::disk('gcs-public-static');
-        if (!$storage instanceof Cloud) {
+        if (!$storage instanceof FilesystemAdapter) {
             # TODO: Use a more specific exception?
             $this->fail(new \RuntimeException("Invalid storage (not cloud)"));
             return;  //safeguard
