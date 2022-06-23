@@ -3,9 +3,9 @@
 ## 8x.9.1 -22 June 2022
 
 - Bump vimeo/psalm from 4.18 to 4.23.0
-- 
+
 ## 8x.9.0 - 22 June 2022
-- 
+
 - Move elasticsearch host usage to config
 
 ## 8x.8.18 - 21 June 2022
