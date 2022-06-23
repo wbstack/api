@@ -1,27 +1,39 @@
 # api
 
+## 8x.9.1 -22 June 2022
+
+- Bump vimeo/psalm from 4.18 to 4.23.0
+- 
 ## 8x.9.0 - 22 June 2022
+- 
 - Move elasticsearch host usage to config
 
 ## 8x.8.18 - 21 June 2022
+
 - Slim down /main endpoint response
 
 ## 8x.8.17 - 20 June 2022
+
 - Bump laravel/passport from 10.3.0 to 10.3.3
 
 ## 8x.8.16 - 20 June 2022
+
 - Bump doctrine/dbal from 3.1.3 to 3.3.7
 
 ## 8x.8.15 - 17 June 2022
+
 - Bump laravel/ui from 3.4.1 to 3.4.6
 
 ## 8x.8.14 - 17 June 2022
+
 - Bump laravel/framework from 8.80.0 to 8.83.16 
 
 ## 8x.8.13 - 17 June 2022
+
 - Bump guzzlehttp/guzzle from 7.3.0 to 7.4.4
 
 ## 8x.8.12 - 17 June 2022
+
 - Bump intervention/image from 2.7.1 to 2.7.2
 
 ## 8x.8.11 - 17 June 2022
