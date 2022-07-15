@@ -2,12 +2,15 @@
 
 namespace App\Notifications;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
 
 class ResetPasswordNotification extends Notification
 {
+    use  HasFactory;
+
     /**
      * The password reset token.
      *
