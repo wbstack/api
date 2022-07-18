@@ -1,6 +1,10 @@
 # api
 
-## 8x.9.1 -22 June 2022
+## 8x.9.2 - 18 July 2022
+
+- Fix reset password bug of task-specific emails
+
+## 8x.9.1 - 22 June 2022
 
 - Bump vimeo/psalm from 4.18 to 4.23.0
 
