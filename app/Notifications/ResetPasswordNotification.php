@@ -2,12 +2,15 @@
 
 namespace App\Notifications;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
 
 class ResetPasswordNotification extends Notification
 {
+    use  HasFactory;
+
     /**
      * The password reset token.
      *
@@ -56,7 +59,8 @@ class ResetPasswordNotification extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        $queryPart = "?token=$this->token&email={$notifiable->getEmailForPasswordReset()}";
+        $encodedEmail = urlencode($notifiable->getEmailForPasswordReset());
+        $queryPart = "?token=$this->token&email={$encodedEmail}";
         $resetPasswordLink = config('wbstack.ui_url').'/reset-password'.$queryPart;
 
         return (new MailMessage)
