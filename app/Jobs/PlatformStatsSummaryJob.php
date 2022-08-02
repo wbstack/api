@@ -11,6 +11,7 @@ use Illuminate\Notifications\Notifiable;
 use App\Notifications\PlatformStatsSummaryNotification;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\App;
 
 /*
 *
@@ -29,6 +30,8 @@ use Illuminate\Support\Facades\Notification;
 class PlatformStatsSummaryJob extends Job
 {
     private $inactiveThreshold;
+
+    private $platformSummaryStatsVersion = "v1";
     protected $email;
 
     public function __construct() {
@@ -102,6 +105,7 @@ class PlatformStatsSummaryJob extends Job
         $totalNonDeletedEdits = array_sum(array_column($nonDeletedStats, 'edits'));
 
         return [
+            'platform_summary_version' => $this->platformSummaryStatsVersion,
             'total' => count($wikis),
             'deleted' => count($deletedWikis),
             'active' => count($activeWikis),
@@ -146,9 +150,11 @@ class PlatformStatsSummaryJob extends Job
 
         $manager->purge('mw');
         $manager->purge('mysql');
-
-        Notification::route('mail', $this->email)
-            ->notify(new PlatformStatsSummaryNotification($summary));
+        
+        // Output to be scraped from logs
+        if( !App::runningUnitTests() ) {
+            print( json_encode($summary) . PHP_EOL );
+        }
 
     }
 
