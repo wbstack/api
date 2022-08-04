@@ -11,6 +11,8 @@ use App\Jobs\SandboxCleanupJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Jobs\PlatformStatsSummaryJob;
+use App\Wiki;
+use App\Jobs\SiteStatsUpdateJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -39,8 +41,8 @@ class Kernel extends ConsoleKernel
         // TODO instead of using LOAD ROUTES, we should just have different modes?
         $schedule->job(new SandboxCleanupJob)->everyFifteenMinutes();
 
-        // platform summary stats job
-        $schedule->job(new PlatformStatsSummaryJob())->daily();
+        // Schedule site stat updates for each wiki and platform-summary
+        $schedule->command('schedule:stats')->daily();
     }
 
     /**
