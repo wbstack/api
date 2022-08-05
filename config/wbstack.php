@@ -11,7 +11,6 @@ return [
     'wiki_hard_delete_threshold' => env('WBSTACK_HARD_DELETE_THRESHOLD', 30),
     'wiki_max_per_user' => env('WBSTACK_MAX_PER_USER', false),
 
-    'platform_summary_email' => env('WBSTACK_MONITORING_EMAIL', 'monitoring@example.com'),
     'platform_summary_inactive_threshold' => env('WBSTACK_SUMMARY_INACTIVE_THRESHOLD', 60 * 60 * 24 * 90),
 
     'elasticsearch_host' => env('ELASTICSEARCH_HOST', false),

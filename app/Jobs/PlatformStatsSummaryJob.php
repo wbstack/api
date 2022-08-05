@@ -32,10 +32,7 @@ class PlatformStatsSummaryJob extends Job
     private $inactiveThreshold;
 
     private $platformSummaryStatsVersion = "v1";
-    protected $email;
-
     public function __construct() {
-        $this->email = Config::get('wbstack.platform_summary_email');
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
     }
 
