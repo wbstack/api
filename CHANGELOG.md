@@ -1,5 +1,9 @@
 # api
 
+## 8x.9.3 - 08 August 2022
+
+- Refactor stats summary job
+
 ## 8x.9.2 - 18 July 2022
 
 - Fix reset password bug of task-specific emails
