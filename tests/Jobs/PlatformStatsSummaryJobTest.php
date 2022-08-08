@@ -13,8 +13,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Queue\Job;
 use Carbon\Carbon;
 use App\Jobs\PlatformStatsSummaryJob;
-use Illuminate\Support\Facades\Notification;
-use App\Notifications\PlatformStatsSummaryNotification;
 
 class PlatformStatsSummaryJobTest extends TestCase
 {
@@ -66,8 +64,6 @@ class PlatformStatsSummaryJobTest extends TestCase
     }
     public function testQueryGetsStats()
     {
-        Notification::fake();
-
         $manager = $this->app->make('db');
 
         $mockJob = $this->createMock(Job::class);
@@ -77,11 +73,6 @@ class PlatformStatsSummaryJobTest extends TestCase
         $job->setJob($mockJob);
 
         $job->handle($manager);
-
-        Notification::assertSentOnDemandTimes(
-            PlatformStatsSummaryNotification::class,
-            1
-        );
     }
 
     public function testGroupings()
@@ -117,7 +108,8 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "pages" => NULL,
                 "users" => NULL,
                 "lastEdit" => Carbon::now()->subDays(90)->timestamp,
-                "first100UsingOauth" => "0"
+                "first100UsingOauth" => "0",
+                "platform_summary_version" => "v1"
             ],
             [   // empty
                 "wiki" => "wiki2.com",
@@ -125,7 +117,8 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "pages" => NULL,
                 "users" => NULL,
                 "lastEdit" => NULL,
-                "first100UsingOauth" => "0"
+                "first100UsingOauth" => "0",
+                "platform_summary_version" => "v1"
             ],
 
             [   // deleted
@@ -134,7 +127,8 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "pages" => 2,
                 "users" => 3,
                 "lastEdit" => Carbon::now()->timestamp,
-                "first100UsingOauth" => "0"
+                "first100UsingOauth" => "0",
+                "platform_summary_version" => "v1"
             ],
 
             [   // active
@@ -143,7 +137,8 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "pages" => 2,
                 "users" => 3,
                 "lastEdit" => Carbon::now()->timestamp,
-                "first100UsingOauth" => "0"
+                "first100UsingOauth" => "0",
+                "platform_summary_version" => "v1"
             ]
         ];
           
@@ -160,6 +155,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "total_non_deleted_users" => 3,
                 "total_non_deleted_pages" => 2,
                 "total_non_deleted_edits" => 1,
+                "platform_summary_version" => "v1"
             ],
             $groups, 
         );
