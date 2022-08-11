@@ -13,9 +13,6 @@ use App\Jobs\SiteStatsUpdateJob;
 
 class SiteStatsUpdateJobTest extends TestCase
 {
-    private $wikiDomain;
-    private $email;
-    private $username;
 
     public function setUp(): void {
         parent::setUp();
@@ -32,7 +29,7 @@ class SiteStatsUpdateJobTest extends TestCase
             ->method('setOptions')
             ->with(
                 [
-                    CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstacksitestatsupdate&format=json',
+                    CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackSiteStatsUpdate&format=json',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_TIMEOUT => 60*5,
@@ -52,7 +49,7 @@ class SiteStatsUpdateJobTest extends TestCase
     {
         $mockResponse = [
             'warnings' => [],
-            'wbstacksitestatsupdate' => [
+            'wbstackSiteStatsUpdate' => [
                 "return" => 0
             ]
         ];
@@ -73,7 +70,7 @@ class SiteStatsUpdateJobTest extends TestCase
     public function testFatalErrorIsHandled()
     {
         $mockResponse = [
-            'wbstacksitestatsupdate' => [
+            'wbstackSiteStatsUpdate' => [
                 "return" => 1
             ]
         ];
@@ -84,7 +81,7 @@ class SiteStatsUpdateJobTest extends TestCase
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())
                 ->method('fail')
-                ->with(new \RuntimeException('wbstacksitestatsupdate call for ' . $this->wiki->domain . ' was not successful: ' . $mockResponseString ));
+                ->with(new \RuntimeException('wbstackSiteStatsUpdate call for ' . $this->wiki->domain . ' was not successful: ' . $mockResponseString ));
 
         $job = new SiteStatsUpdateJob( $this->wiki->id );
         $job->setJob($mockJob);

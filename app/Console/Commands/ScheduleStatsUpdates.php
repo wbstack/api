@@ -8,6 +8,9 @@ use App\Wiki;
 use App\Jobs\PlatformStatsSummaryJob;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
+/**
+ * Schedules jobs for updating site_stats per wiki then platformsummaryjob
+ */
 class ScheduleStatsUpdates extends Command
 {
     /**

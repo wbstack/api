@@ -32,7 +32,7 @@ class SiteStatsUpdateJob extends Job
         Log::info(__METHOD__ . ": Updating stats for or $wiki->domain");
 
         $request->setOptions([
-            CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstacksitestatsupdate&format=json',
+            CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackSiteStatsUpdate&format=json',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 60 * 5,
@@ -49,7 +49,7 @@ class SiteStatsUpdateJob extends Job
         $request->close();
 
         if ($err) {
-            Log::error(__METHOD__ . ": wbstacksitestatsupdate failed: $rawResponse");
+            Log::error(__METHOD__ . ": wbstackSiteStatsUpdate failed: $rawResponse");
             $this->fail(
                 new \RuntimeException('curl error for '.$wiki->domain.': '.$err)
             );
@@ -59,17 +59,17 @@ class SiteStatsUpdateJob extends Job
 
         $response = json_decode($rawResponse, true);
 
-        if ( !is_array($response) || !array_key_exists('wbstacksitestatsupdate', $response) ) {
+        if ( !is_array($response) || !array_key_exists('wbstackSiteStatsUpdate', $response) ) {
             $this->fail(
-                new \RuntimeException('wbstacksitestatsupdate call for '.$wiki->domain.'. No wbstacksitestatsupdate key in response: '.$rawResponse)
+                new \RuntimeException('wbstackSiteStatsUpdate call for '.$wiki->domain.'. No wbstackSiteStatsUpdate key in response: '.$rawResponse)
             );
 
             return; //safegaurd
         }
 
-        if ($response['wbstacksitestatsupdate']['return'] !== 0) {
+        if ($response['wbstackSiteStatsUpdate']['return'] !== 0) {
             $this->fail(
-                new \RuntimeException('wbstacksitestatsupdate call for '.$wiki->domain.' was not successful: '.$rawResponse)
+                new \RuntimeException('wbstackSiteStatsUpdate call for '.$wiki->domain.' was not successful: '.$rawResponse)
             );
 
             return; //safegaurd
