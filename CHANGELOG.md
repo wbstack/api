@@ -1,5 +1,9 @@
 # api
 
+## 8x.9.4 - 12 August 2022
+
+- Add SiteStatsUpdateJob
+
 ## 8x.9.3 - 08 August 2022
 
 - Refactor stats summary job
