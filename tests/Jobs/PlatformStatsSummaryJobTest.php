@@ -107,6 +107,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "edits" => NULL,
                 "pages" => NULL,
                 "users" => NULL,
+                "active_users" => NULL,
                 "lastEdit" => Carbon::now()->subDays(90)->timestamp,
                 "first100UsingOauth" => "0",
                 "platform_summary_version" => "v1"
@@ -116,30 +117,33 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "edits" => NULL,
                 "pages" => NULL,
                 "users" => NULL,
+                "active_users" => NULL,
                 "lastEdit" => NULL,
                 "first100UsingOauth" => "0",
                 "platform_summary_version" => "v1"
             ],
 
-            [   // deleted
+            [   // active
                 "wiki" => "wiki4.com",
                 "edits" => 1,
                 "pages" => 2,
                 "users" => 3,
+                "active_users" => 1,
                 "lastEdit" => Carbon::now()->timestamp,
                 "first100UsingOauth" => "0",
                 "platform_summary_version" => "v1"
             ],
 
-            [   // active
+            [   // deleted
                 "wiki" => "wiki3.com",
                 "edits" => 1,
                 "pages" => 2,
                 "users" => 3,
+                "active_users" => 0,
                 "lastEdit" => Carbon::now()->timestamp,
                 "first100UsingOauth" => "0",
                 "platform_summary_version" => "v1"
-            ]
+            ],
         ];
           
 
@@ -153,6 +157,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "inactive" => 1,
                 "empty" => 1,
                 "total_non_deleted_users" => 3,
+                "total_non_deleted_active_users" => 1,
                 "total_non_deleted_pages" => 2,
                 "total_non_deleted_edits" => 1,
                 "platform_summary_version" => "v1"
