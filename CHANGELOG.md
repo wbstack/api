@@ -1,5 +1,8 @@
 # api
 
+## 8x.9.5 - 15 August 2022
+- Add active users to PlatformStatsSummaryJob
+
 ## 8x.9.4 - 12 August 2022
 
 - Add SiteStatsUpdateJob
