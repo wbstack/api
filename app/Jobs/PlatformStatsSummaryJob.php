@@ -96,8 +96,8 @@ class PlatformStatsSummaryJob extends Job
             $activeWikis[] = $wiki;
         }
         
-        // TODO This doesn't add up https://github.com/wbstack/mediawiki/issues/59
         $totalNonDeletedUsers = array_sum(array_column($nonDeletedStats, 'users'));
+        $totalNonDeletedActiveUsers = array_sum(array_column($nonDeletedStats, 'active_users'));
         $totalNonDeletedPages = array_sum(array_column($nonDeletedStats, 'pages'));
         $totalNonDeletedEdits = array_sum(array_column($nonDeletedStats, 'edits'));
 
@@ -109,6 +109,7 @@ class PlatformStatsSummaryJob extends Job
             'inactive' => count($inactive),
             'empty' => count($emptyWikis),
             'total_non_deleted_users' => $totalNonDeletedUsers,
+            'total_non_deleted_active_users' => $totalNonDeletedActiveUsers,
             'total_non_deleted_pages' => $totalNonDeletedPages,
             'total_non_deleted_edits' => $totalNonDeletedEdits,
         ];
@@ -164,7 +165,7 @@ FROM
 SELECT '",wiki_dbs.wiki_id,"' as wiki
 ) t1,
     (
-SELECT MAX(ss_total_edits) as edits, MAX(ss_total_pages) as pages, MAX(ss_users) as users
+SELECT MAX(ss_total_edits) as edits, MAX(ss_total_pages) as pages, MAX(ss_users) as users, MAX(ss_active_users) as active_users
 FROM ",wiki_dbs.name,".",wiki_dbs.prefix,"_site_stats
 ) t2,
     (
