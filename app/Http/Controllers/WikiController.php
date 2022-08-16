@@ -47,6 +47,7 @@ class WikiController extends Controller
 
         $wiki = null;
         $dbAssignment = null;
+
         // TODO create with some sort of owner etc?
         DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain) {
             $dbVersion = Config::get('wbstack.wiki_db_use_version');
@@ -90,12 +91,12 @@ class WikiController extends Controller
                 'value' => Str::random(64),
             ]);
 
-            // Create the enabled elasticsearch setting
-            // T285541
+            // Create the elasticsearch setting
+            // T314937
             WikiSetting::create([
                 'wiki_id' => $wiki->id,
                 'name' => WikiSetting::wwExtEnableElasticSearch,
-                'value' => true,
+                'value' => Config::get('wbstack.elasticsearch_enabled_by_default'),
             ]);
 
             // Also track the domain forever in your domains table
@@ -123,8 +124,11 @@ class WikiController extends Controller
             }
         });
 
+
         // dispatch elasticsearch init job to enable the feature
-        $this->dispatch(new ElasticSearchIndexInit($wiki->id));
+        if ( Config::get('wbstack.elasticsearch_enabled_by_default') ) {
+            $this->dispatch(new ElasticSearchIndexInit($wiki->id));
+        }
         
         // opportunistic dispatching of jobs to make sure storage pools are topped up
         $this->dispatch(new ProvisionWikiDbJob(null, null, 10));
