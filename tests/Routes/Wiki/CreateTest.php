@@ -24,8 +24,13 @@ class CreateTest extends TestCase
     use OptionsRequestAllowed;
     use DatabaseTransactions;
 
-    public function testWikiCreateDispatchesSomeJobs()
+    /**
+	 * @dataProvider createProvider
+	 */
+    public function testWikiCreateDispatchesSomeJobs( $elasticSearchEnabledForNewWikis )
     {
+        Config::set('wbstack.elasticsearch_enabled_by_default', $elasticSearchEnabledForNewWikis );
+
         // seed up ready db
         $manager = $this->app->make('db');
         $job = new ProvisionWikiDbJob();
@@ -59,7 +64,11 @@ class CreateTest extends TestCase
 
         Queue::assertPushed( ProvisionWikiDbJob::class, 1);
         Queue::assertPushed( MediawikiInit::class, 1);
-        Queue::assertPushed( ElasticSearchIndexInit::class, 1);
+        if( $elasticSearchEnabledForNewWikis ) {
+            Queue::assertPushed( ElasticSearchIndexInit::class, 1);
+        } else {
+            Queue::assertNotPushed( ElasticSearchIndexInit::class );
+        }
 
         $id = $response->original['data']['id'];
 
@@ -70,8 +79,20 @@ class CreateTest extends TestCase
 
         $this->assertSame(
             1,
-            WikiSetting::where( [ 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true, 'wiki_id' => $id ] )->count()
+            WikiSetting::where( [ 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => $elasticSearchEnabledForNewWikis, 'wiki_id' => $id ] )->count()
         );
+    }
+
+
+    public function createProvider() {
+
+        yield [
+            true // elasticsearch enabled for new wikis
+        ];
+
+        yield [
+            false // elasticsearch disabled for new wikis
+        ];
     }
 
     public function testCreateWikiLimitsNumWikisPerUser()

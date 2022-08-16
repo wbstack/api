@@ -14,4 +14,6 @@ return [
     'platform_summary_inactive_threshold' => env('WBSTACK_SUMMARY_INACTIVE_THRESHOLD', 60 * 60 * 24 * 90),
 
     'elasticsearch_host' => env('ELASTICSEARCH_HOST', false),
+    'elasticsearch_enabled_by_default' => env('WBSTACK_ELASTICSEARCH_ENABLED_BY_DEFAULT', false),
+
 ];
