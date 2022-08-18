@@ -1,5 +1,9 @@
 # api
 
+
+## 8x.9.6 - 18 August 2022
+- Disable Elasticsearch on wiki creation by default. Make it configurable. 
+
 ## 8x.9.5 - 15 August 2022
 - Add active users to PlatformStatsSummaryJob
 
