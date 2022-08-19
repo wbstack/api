@@ -1,6 +1,9 @@
 # api
 
 
+## 8x.9.7 - 19 August 2022
+- Refactor /mine endpoint to include limit, count and wikis
+
 ## 8x.9.6 - 18 August 2022
 - Disable Elasticsearch on wiki creation by default. Make it configurable. 
 
