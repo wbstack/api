@@ -3,6 +3,11 @@ namespace App\Helper;
 
 class InviteHelper
 {
+
+    private $segments;
+    private $segmentLength;
+    private $prefix;
+
     public function __construct( int $numSegments = 2, int $segmentLength = 4)
     {
         $this->prefix = "wbstack-";
