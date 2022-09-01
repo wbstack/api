@@ -12,7 +12,7 @@ class InviteHelperTest extends TestCase
 {
     public function testGeneratesACode()
     {   
-        $expectedPattern = "/wbstack-(\d{4})-(\d{4})/";
+        $expectedPattern = "/wbcloud-(\d{4})-(\d{4})/";
 
         $sut = new InviteHelper(2, 4);
         $code = $sut->generate();
@@ -22,7 +22,7 @@ class InviteHelperTest extends TestCase
 
     public function testGeneratesAnotherCode()
     {   
-        $expectedPattern = "/wbstack-(\d{12})-(\d{12})-(\d{12})/";
+        $expectedPattern = "/wbcloud-(\d{12})-(\d{12})-(\d{12})/";
 
         $sut = new InviteHelper(3, 12);
         $code = $sut->generate();
