@@ -38,11 +38,13 @@ class KubernetesIngressCreateTest extends TestCase
         ]);
 
         $handlerStack = HandlerStack::create($mock);
-        $mockGuzzle = Guzzle6Client::createWithConfig(['handler' => $handlerStack]);
+        $mockGuzzle = Guzzle6Client::createWithConfig([
+            'handler' => $handlerStack,
+            'verify' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
+        ]);
 
         $job->handle(new Client([
             'master' => 'https://kubernetes.default.svc',
-            'ca_cert' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
             'token' => '/var/run/secrets/kubernetes.io/serviceaccount/token',
         ], null, $mockGuzzle));
     }
