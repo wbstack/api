@@ -83,10 +83,15 @@ class KubernetesIngressCreate extends Job
                             'paths' => [
                                 [
                                     'path' => '/',
+                                    'pathType' => 'Prefix',
                                     'backend' => [
                                         // TODO this should be an env var...
-                                        'serviceName' => 'platform-nginx',
-                                        'servicePort' => 8080,
+                                        'service' => [
+                                            'name' => 'platform-nginx',
+                                            'port' => [
+                                                'number' => 8080,
+                                            ],
+                                        ],
                                     ],
                                 ],
                             ],
