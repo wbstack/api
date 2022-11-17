@@ -34,7 +34,7 @@ class KubernetesIngressCreateTest extends TestCase
 
         $mock = new MockHandler([
             new Response(200, [], json_encode([ 'items' => [] ]) ),
-            new Response(200)
+            new Response(201, [], json_encode([]))
         ]);
 
         $handlerStack = HandlerStack::create($mock);
