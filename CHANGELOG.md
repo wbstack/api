@@ -1,5 +1,8 @@
 # api
 
+## 8x.9.10 - 21 November 2022
+- Use Generally Available Kubernetes ingress object rather than beta
+
 ## 8x.9.8 - 01 September 2022
 - Add command to create invitation codes in bulk `wbs-invitation:create-bulk`
 
