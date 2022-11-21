@@ -1,5 +1,7 @@
 # api
 
+## 8x.9.8 - 01 September 2022
+- Add command to create invitation codes in bulk `wbs-invitation:create-bulk`
 
 ## 8x.9.7 - 19 August 2022
 - Refactor /mine endpoint to include limit, count and wikis

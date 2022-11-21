@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Maclof\Kubernetes\Client;
+use Http\Adapter\Guzzle6\Client as Guzzle6Client;
 
 class KubernetesClientServiceProvider extends ServiceProvider
 {
@@ -15,11 +16,14 @@ class KubernetesClientServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(Client::class , function ($app) {
+            $httpClient = Guzzle6Client::createWithConfig([
+                'verify' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
+            ]);
+
             return new Client([
             'master' => 'https://kubernetes.default.svc',
-            'ca_cert' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
             'token' => '/var/run/secrets/kubernetes.io/serviceaccount/token',
-            ]);
+            ], null, $httpClient);
         });
     }
 }
