@@ -15,6 +15,7 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
     $router->post('user/verifyEmail', ['uses' => 'UserVerificationTokenController@verify']);
     $router->post('user/forgotPassword', ['uses' => 'Auth\ForgotPasswordController@sendResetLinkEmail']);
     $router->post('user/resetPassword', ['uses' => 'Auth\ResetPasswordController@reset']);
+    $router->post('contact/sendMessage', ['uses' => 'ContactController@sendMessage']);
 
     // Authed
     $router->group(['middleware' => ['auth:api']], function () use ($router) {
