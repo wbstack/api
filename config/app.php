@@ -4,6 +4,8 @@ return [
 
     'queryservice_host' => env('QUERY_SERVICE_HOST', 'queryservice:9999'),
 
+    'contact-mail-recipient' => env('CONTACT_MAIL_RECIPIENT', 'wikibase-cloud-owner@lists.wikimedia.org'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
