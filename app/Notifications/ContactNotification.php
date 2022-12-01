@@ -17,13 +17,6 @@ class ContactNotification extends Notification
     public $contactDetails;
 
     /**
-     * The callback that should be used to build the mail message.
-     *
-     * @var \Closure|null
-     */
-    public static $toMailCallback;
-
-    /**
      * Create a notification instance.
      *
      * @param  string  $token
@@ -35,8 +28,8 @@ class ContactNotification extends Notification
     public function __construct($name, $subject, $message, $contactDetails='')
     {
         $this->name = $name;
-        $this->subject = Lang::get('contact.' . $subject);
         $this->message = $message;
+        $this->subject = $subject;
         $this->contactDetails = $contactDetails;
     }
 
@@ -59,30 +52,22 @@ class ContactNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        if (static::$toMailCallback) {
-            return call_user_func(static::$toMailCallback, $notifiable, $this->token);
-        }
+        $subject = Lang::get('contact.' . $this->subject);
+        $contactDetails = $this->contactDetails ? $this->contactDetails:'None';
 
-        //$verifyEmailLink = config('wbstack.ui_url') . '/emailVerification/'.$this->token;
+        $mailFrom = str_replace('<subject>', $this->subject, config('app.contact-mail-sender'));
+        $mailSubject = config('app.name') . Lang::get(' contact form message: ') . $subject;
 
         return (new MailMessage)
-            ->subject(config('app.name') . ' ' . Lang::get(' contact form message: ') . $this->subject)
+            ->from($mailFrom)
+            ->subject($mailSubject)
             ->line(Lang::get('A message via the wikibase.cloud contact form has been submitted.'))
-            ->line(Lang::get('Name: ').$this->name)
-            ->line(Lang::get('Contact details: '). ($this->contactDetails?$this->contactDetails:'None'))
-            ->line(Lang::get('Subject: ') . $this->subject)
+            ->line(Lang::get('From: ') . $this->name)
+            ->line(Lang::get('Contact details: ') . $contactDetails)
+            ->line(Lang::get('Subject: ') . $subject)
+            ->line('---')
             ->line(Lang::get('Message:'))
-            ->line($this->message);
-    }
-
-    /**
-     * Set a callback that should be used when building the notification mail message.
-     *
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public static function toMailUsing($callback)
-    {
-        static::$toMailCallback = $callback;
+            ->line($this->message)
+            ->line('---');
     }
 }

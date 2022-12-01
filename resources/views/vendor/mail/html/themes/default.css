@@ -70,6 +70,12 @@ p.sub {
     font-size: 12px;
 }
 
+hr {
+    border: none;
+    height: 1px;
+    background: #718096;
+}
+
 img {
     max-width: 100%;
 }
