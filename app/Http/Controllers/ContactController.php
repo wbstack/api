@@ -22,7 +22,13 @@ class ContactController extends Controller
         $validator = $this->validator($request->all());
 
         if ($validator->fails()) {
-            abort(400);
+            $failed = $validator->failed();
+
+            if (isset($failed['recaptcha'])) {
+                abort(401);
+            } else {
+                abort(400);
+            }
         }
 
         $validated = $validator->safe();
