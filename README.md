@@ -1,14 +1,21 @@
 # WBStack Platform API
-
+## Configuration
 The platform API comes in a few different flavours that can be toggled using environment variables:
 
-- ROUTES_LOAD_WEB - web routes for the public facing wbstack.com usecase
-- ROUTES_LOAD_SANDBOX - web routes for the public facing sandbox usecase
-- ROUTES_LOAD_BACKEND - internal only API endpoints (non public) for all usecases
+- `ROUTES_LOAD_WEB` - web routes for the public facing wbstack.com usecase
+- `ROUTES_LOAD_SANDBOX` - web routes for the public facing sandbox usecase
+- `ROUTES_LOAD_BACKEND` - internal only API endpoints (non public) for all usecases
 
 This single application could likely be split up at some point.
 Everything is currently together to make use of the shared wiki management code
 and query service management code.
+
+## Additional environment variables
+### Contact page settings
+- `CONTACT_MAIL_SENDER` - The mail address of the sender address of the contact page mails.
+If the address includes the placeholder `<subject>`, it gets replaced with a shorthand for the actual selected subject (`give-feedback`, `report-a-problem`, etc)
+
+- `CONTACT_MAIL_RECIPIENT` - The receiver address of the contact page mails
 
 ## Developing
 
