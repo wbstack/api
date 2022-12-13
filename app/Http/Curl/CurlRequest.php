@@ -9,14 +9,23 @@ class CurlRequest implements HttpRequest
         $this->reset();
     }
 
+    /**
+     * @return void
+     */
     public function setOptions( array $options ) {
         curl_setopt_array( $this->handle, $options );
     }
 
+    /**
+     * @return bool|string
+     */
     public function execute() {
         return curl_exec($this->handle);
     }
 
+    /**
+     * @return string
+     */
     public function error() {
         return curl_error($this->handle);
     }
@@ -25,6 +34,9 @@ class CurlRequest implements HttpRequest
         return curl_getinfo($this->handle, $name);
     }
 
+    /**
+     * @return void
+     */
     public function close() {
         if( $this->handle ) {
             curl_close($this->handle);
@@ -32,6 +44,9 @@ class CurlRequest implements HttpRequest
         }
     }
 
+    /**
+     * @return void
+     */
     public function reset() {
         if( $this->handle ) {
             $this->close();

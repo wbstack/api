@@ -67,6 +67,9 @@ class ForceSearchIndex extends CirrusSearchJob
         }
     }
 
+    /**
+     * @return string
+     */
     protected function getQueryParams() {
         return parent::getQueryParams() . '&fromId=' . $this->fromId . '&toId=' . $this->toId;
     }

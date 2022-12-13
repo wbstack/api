@@ -130,6 +130,11 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
         return array_key_exists('return', $response[$this->apiModule()]) && $response[$this->apiModule()]['return'] == 0;
     }
 
+    /**
+     * @return string
+     *
+     * @psalm-return '&format=json'
+     */
     protected function getQueryParams() {
         return '&format=json';
     }

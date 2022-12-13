@@ -14,7 +14,7 @@ class Delete extends Command
     protected $signature = 'wbs-wiki:delete {key} {value}';
     protected $description = 'Soft deletes the Wiki matching the given key and value.';
 
-    public function handle()
+    public function handle(): int
     {
         $key = trim($this->argument('key'));
         $value = trim($this->argument('value'));

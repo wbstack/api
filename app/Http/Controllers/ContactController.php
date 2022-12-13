@@ -14,8 +14,7 @@ class ContactController extends Controller
     /**
      * Handle a contact page request for the application.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\Request  $request
      */
     public function sendMessage(Request $request): \Illuminate\Http\JsonResponse
     {
