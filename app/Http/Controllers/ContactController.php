@@ -47,14 +47,11 @@ class ContactController extends Controller
 
     /**
      * Get a validator for an incoming contact page request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Validation\Validator
      */
-    protected function validator(array $data): Validator
+    protected function validator(array $data): \Illuminate\Validation\Validator
     {
         if (! isset($data['contactDetails'])) {
-            $data['contactDetails'] = '';
+            $data['contactDetails'] = ''; // could we skip this using some feature of the validator
         }
 
         $validSubjects = [
