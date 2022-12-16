@@ -12,10 +12,10 @@ and query service management code.
 
 ## Additional environment variables
 ### Contact page settings
-- `CONTACT_MAIL_SENDER` - The mail address of the sender address of the contact page mails.
+- `WBSTACK_CONTACT_MAIL_SENDER` - The mail address of the sender address of the contact page mails.
 If the address includes the placeholder `<subject>`, it gets replaced with a shorthand for the actual selected subject (`give-feedback`, `report-a-problem`, etc)
 
-- `CONTACT_MAIL_RECIPIENT` - The receiver address of the contact page mails
+- `WBSTACK_CONTACT_MAIL_RECIPIENT` - The receiver address of the contact page mails
 
 ## Developing
 
