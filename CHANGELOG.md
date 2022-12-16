@@ -1,5 +1,10 @@
 # api
 
+## 8x.9.11 - 16 December 2022
+- Add /contact/sendMessage endpoint
+- Add `WBSTACK_CONTACT_MAIL_RECIPIENT` env var
+- Add `WBSTACK_CONTACT_MAIL_SENDER` env var
+
 ## 8x.9.10 - 21 November 2022
 - Use Generally Available Kubernetes ingress object rather than beta
 
