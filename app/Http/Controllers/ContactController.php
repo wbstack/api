@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\ContactNotification;
-use App\Notifications\ResetPasswordNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Notification;
@@ -50,9 +49,9 @@ class ContactController extends Controller
      * Get a validator for an incoming contact page request.
      *
      * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
+     * @return \Illuminate\Validation\Validator
      */
-    protected function validator(array $data)
+    protected function validator(array $data): Validator
     {
         if (! isset($data['contactDetails'])) {
             $data['contactDetails'] = '';

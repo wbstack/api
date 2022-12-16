@@ -132,8 +132,6 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
 
     /**
      * @return string
-     *
-     * @psalm-return '&format=json'
      */
     protected function getQueryParams() {
         return '&format=json';
