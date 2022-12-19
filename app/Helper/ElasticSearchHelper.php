@@ -13,7 +13,7 @@ class ElasticSearchHelper
         $this->elasticSearchBaseName = $elasticSearchBaseName;
     }
 
-    public function hasIndices( HttpRequest $request ) {
+    public function hasIndices( HttpRequest $request ): bool {
         
         $hasIndices = true;
 

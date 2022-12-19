@@ -15,7 +15,7 @@ class InviteHelper
         $this->segmentLength = $segmentLength;
     }
 
-    private function generateSegment( int &$counter ) {
+    private function generateSegment( int &$counter ): string {
         $segment = "";
 
         for($i = 0; $i < $this->segmentLength; $i++) {

@@ -4,6 +4,9 @@ return [
 
     'queryservice_host' => env('QUERY_SERVICE_HOST', 'queryservice:9999'),
 
+    'contact-mail-recipient' => env('WBSTACK_CONTACT_MAIL_RECIPIENT', 'wikibase-cloud-owner@lists.wikimedia.org'),
+    'contact-mail-sender' => env('WBSTACK_CONTACT_MAIL_SENDER', 'contact-<subject>@wikibase.cloud'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
