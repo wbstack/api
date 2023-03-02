@@ -28,7 +28,7 @@
         "mxl/laravel-job": "^1.2",
         "percymamedy/laravel-dev-booter": "^3.0",
         "php-http/guzzle6-adapter": "^2.0",
-        "predis/predis": "^1.1",
+        "predis/predis": "^2.1",
         "superbalist/laravel-google-cloud-storage": "^2.2"
     },
     "require-dev": {
