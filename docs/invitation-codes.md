@@ -16,3 +16,9 @@ And delete (unused) invitation codes with:
 ```
 php artisan wbs-invitation:delete <code>
 ```
+
+Bulk create multiple random codes with:
+
+```
+php artisan wbs-invitation:create-bulk <num-codes>
+```
