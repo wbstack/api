@@ -1,8 +1,7 @@
-This directory contains the SQL needed to create and update wiki DBs.
+This directory contains the SQL needed to create and wiki DBs.
 
 **Todos**
 
- - Create steps to create update files....
  - Programmatically get the SQL instead of using adminer?
  - Allow mediawiki LS.php to be runable with no prefix (currently you end up with _tablename.....)
  - Allow mediawiki LS.php to be run with now redis etc for sql creation...
@@ -28,8 +27,6 @@ Make sure you have updated the docker-compose-clean.yml to:
 
 - For adding extensions?
   - Include the latest version of the Mediawiki image with the new code added but not loaded (for extensions)
-- For updating?
-  - Updated the Mediawiki image tag
 - Update maintWikWiki.json to match the defaults needs to load all extension from the mw image
 
 **Start the setup:**
@@ -97,48 +94,4 @@ docker-compose -f docker-compose-clean.yml down --volumes
 ```
 
 ### Generating update / upgrade SQL
-
-If the diff between SQLs is super easy, maybe you can just make the updates file yourself..
-
-**READ THE README** for the update format, else you WILL get it wrong (\n\n etc...)
-
-Make sure you have updated the docker-compose-upgrade.yml to:
-
- - Include the latest version of the Mediawiki image with the new code / extensions loaded
- - Include the **OLD** version of the schema for the update mysql service in the upgradeFrom.sql file
-   - Make sure to setup the prefix to be SQL worthy.. ```/<<prefix>>_/prefix_/```
-
-Troubleshooting:
-
- - Some extensions don't handle only outputting sql very well.. In these cases youll have to make your own update sql file...
-   - Example, Echo in https://github.com/addshore/wbstack/issues/70
-
-**Start the setup:**
-
-```
-docker-compose -f docker-compose-upgrade.yml up -d
-```
-
-**Check & wait for mysql access in adminer?**
-
-http://localhost:1234/?server=sql-upgrade&username=root&db=wiki
-
-You might get an error is MySql is not ready yet.
-
-```SQLSTATE[HY000] [2002] Connection refused```
-
-If so, retry.
-
-**Then:**
-
-```
-docker-compose -f docker-compose-upgrade.yml exec mediawiki bash
-WBS_DOMAIN=maint php ./w/maintenance/update.php --schema sql.sql --quick
-cat sql.sql
-```
-
-**Cleanup the setup:**
-
-```
-docker-compose -f docker-compose-upgrade.yml down --volumes
-```
+Updates used to be performed in a similar way to creating new databases. Now they are handled by running update.php. See this [Job](../../app/Jobs/MediawikiUpdate.php).
