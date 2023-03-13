@@ -1,5 +1,8 @@
 # api
 
+## 8x.9.12 - 13 March 2023
+- Respond 200 for any email on password reset requests
+
 ## 8x.9.11 - 16 December 2022
 - Add /contact/sendMessage endpoint
 - Add `WBSTACK_CONTACT_MAIL_RECIPIENT` env var
