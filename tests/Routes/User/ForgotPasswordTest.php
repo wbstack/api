@@ -16,7 +16,7 @@ class ForgotPasswordTest extends TestCase
     use OptionsRequestAllowed;
     use DatabaseTransactions;
 
-    public function testForgotPasswordEmail_Success()
+    public function testForgotPasswordSubmission_Success()
     {
         Notification::fake();
         $user = User::factory()->create(['email' => 'foo+bar@example.com']);
@@ -28,5 +28,14 @@ class ForgotPasswordTest extends TestCase
                 return str_contains($notification->toMail($user)->data()['actionUrl'], 'foo%2Bbar%40example.com');
             }
         );
+    }
+
+    public function testForgotPasswordSubmission_NotFound()
+    {
+        Notification::fake();
+        $user = User::factory()->create(['email' => 'foo+bar@example.com']);
+        $this->json('POST', $this->route, ['email' => 'foo+baz@example.com',])
+            ->assertStatus(200);
+        Notification::assertNothingSent();
     }
 }

@@ -37,6 +37,6 @@ class ForgotPasswordController extends Controller
 
     protected function sendResetLinkFailedResponse(): \Illuminate\Http\JsonResponse
     {
-        return response()->json('Unauthorized', 401);
+        return response()->json('Success', 200);
     }
 }
