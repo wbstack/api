@@ -1,6 +1,6 @@
 # api
 
-## 8x.10.0 - 16 March 2023
+## 8x.10.0 - 20 March 2023
 - DB updates 1.38
 
 ## 8x.9.12 - 13 March 2023
