@@ -13,11 +13,8 @@ This directory contains the SQL needed to create and update wiki DBs.
 **Versions**
 
 - mw1.38-wbs1 - First 1.38 install
-
 - mw1.35-wbs1 - First 1.35 install
-
 - mw1.34-wbs1 - First 1.34 install
-
 - mw1.33-wbs5 - New extensions, TBA
 - mw1.33-wbs4 - New extensions, Math is the only table (mathoid...)
 - mw1.33-wbs3 - TRUNCATE l10n_cache table that we stopped using
@@ -117,7 +114,7 @@ WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
  - Copy output to the "new" directory with correct name, and make alterations:
      - Remove SET statements
      - Update the sql file in cleanSql.php
-     - Run cleanSql.php over the file: `php /usr/src/cleanSql.php`
+     - Run cleanSql.php over the file: `php ./w/maintenance/wbaas-api/cleanSql.php`
      - Manually add the prefix string to any FOREIGN KEY statements
      - Where FOREIGN KEYs are used, you may need to change the order of exported tables! (To ensure tables are created before they are referenced)
  - Compare the resulting schemas to see what has changed... (use https://www.diffchecker.com/ ?)
