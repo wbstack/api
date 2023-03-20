@@ -107,7 +107,7 @@ class DeleteWikiJobTest extends TestCase
         $conn->disconnect();
 
         // we now have some mediawiki tables here
-        $this->assertCount(85, $initialTables);
+        $this->assertCount(86, $initialTables);
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
@@ -136,7 +136,7 @@ class DeleteWikiJobTest extends TestCase
 
         // all tables are now in the new deleted database
         $pdo->exec("USE {$expectedDeletedName}");
-        $this->assertCount(85, $this->getResultValues( $pdo->query("SHOW TABLES")->fetchAll()));
+        $this->assertCount(86, $this->getResultValues( $pdo->query("SHOW TABLES")->fetchAll()));
 
         // Content now live in the deleted database
         $result = $pdo->query(sprintf('SELECT * FROM %s.interwiki', $expectedDeletedName))->fetchAll();

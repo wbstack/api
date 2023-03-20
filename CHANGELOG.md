@@ -1,5 +1,8 @@
 # api
 
+## 8x.10.0 - 16 March 2023
+- DB updates 1.38
+
 ## 8x.9.12 - 13 March 2023
 - Respond 200 for any email on password reset requests
 
