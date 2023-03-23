@@ -12,6 +12,7 @@ This directory contains the SQL needed to create and update wiki DBs.
 
 **Versions**
 
+- mw1.39-wbs1 - First 1.39 install
 - mw1.38-wbs1 - First 1.38 install
 - mw1.35-wbs1 - First 1.35 install
 - mw1.34-wbs1 - First 1.34 install
@@ -83,10 +84,10 @@ Comment out:
 
 Add the following:
 ```
-require_once "$IP/extensions/Wikibase/repo/Wikibase.php";
-require_once "$IP/extensions/Wikibase/repo/ExampleSettings.php";
-require_once "$IP/extensions/Wikibase/client/WikibaseClient.php";
-require_once "$IP/extensions/Wikibase/client/ExampleSettings.php";
+wfLoadExtension( 'WikibaseRepository', $wgBaseDirectory . '/extensions/Wikibase/extension-repo.json' );
+require_once "$wgBaseDirectory/extensions/Wikibase/repo/ExampleSettings.php";
+wfLoadExtension( 'WikibaseClient', $wgBaseDirectory . '/extensions/Wikibase/extension-client.json' );
+require_once "$wgBaseDirectory/extensions/Wikibase/client/ExampleSettings.php";
 ```
 
 Run the update script:
