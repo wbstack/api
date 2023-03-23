@@ -1,5 +1,8 @@
 # api
 
+## 8x.10.1 - 23 March 2023
+- Set the timeout for MediaWiki updates to 1hr
+
 ## 8x.10.0 - 20 March 2023
 - DB updates 1.38
 
