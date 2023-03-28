@@ -3,8 +3,7 @@ version: '3.1'
 services:
 
   mediawiki:
-    # TODO: Switch to future 1.39 release
-    image: local-wbaas-mediawiki
+    image: ghcr.io/wbstack/mediawiki:1.39-7.4-20230328-0
     volumes:
       - ./maintWikWiki.json:/var/www/html/w/maintWikWiki.json
       - ./new:/var/www/html/w/maintenance/wbaas-api/new
