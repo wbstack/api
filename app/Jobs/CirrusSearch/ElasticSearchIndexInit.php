@@ -11,7 +11,6 @@ class ElasticSearchIndexInit extends CirrusSearchJob
     }
 
     private function logFailureAndDisable(): void {
-        $this->setting->update( [  'value' => false  ] );
         Log::warning( __METHOD__ . ": Failed initializing elasticsearch. Disabling the setting." );
     }
 
@@ -31,30 +30,19 @@ class ElasticSearchIndexInit extends CirrusSearchJob
 
         $output = $response[$this->apiModule()]['output'];
 
-        $enableElasticSearchFeature = false;
-
-        // occurs a couple of times when newly created
-        if ( in_array( "\tCreating index...ok",  $output ) ) {
-
-            // newly created index succeeded, turn on the wiki setting
-            $enableElasticSearchFeature = true;
-
-        // occurs on a successful update run
-        } else if ( in_array( "\t\tValidating {$this->wikiDB->name}_general alias...ok", $output ) ) {
-
-            // script ran and update was successful, make sure feature is enabled
-            $enableElasticSearchFeature = true;
-        } else {
+        // newly created index failed, script ran and update was unsuccessful, then error.
+        if ( !(
+            in_array( "\tCreating index...ok",  $output ) ||
+            in_array( "\t\tValidating {$this->wikiDB->name}_general alias...ok", $output )
+        ) ) {
 
             Log::error(__METHOD__ . ": Job finished but didn't create or update, something is weird");
             $this->fail( new \RuntimeException($this->apiModule() . ' call for '.$this->wikiId.' was not successful:' . $rawResponse ) );
         }
-
-        $this->setting->update( [  'value' => $enableElasticSearchFeature  ] );
     }
 
     protected function getRequestTimeout(): int {
-        return getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT') !== false 
+        return getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT') !== false
             ? intval(getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT')) : parent::getRequestTimeout();
     }
 }
