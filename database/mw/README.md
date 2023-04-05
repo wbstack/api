@@ -113,7 +113,7 @@ WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
      - Remove SET statements
      - Update the sql file in cleanSql.php
      - Run cleanSql.php over the file: `php ./w/maintenance/wbaas-api/cleanSql.php`
-     - Manually add the prefix string to any FOREIGN KEY statements
+     - Manually add the prefix string to any FOREIGN KEY statements. In the case of constraints be sure to prefix both the KEY and the table (See: [T333824](https://phabricator.wikimedia.org/T333824)). 
      - Where FOREIGN KEYs are used, you may need to change the order of exported tables! (To ensure tables are created before they are referenced)
  - Compare the resulting schemas to see what has changed... (use https://www.diffchecker.com/ ?)
 
