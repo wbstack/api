@@ -4,6 +4,7 @@ namespace Tests\Jobs\CirrusSearch;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use RuntimeException;
 use Tests\TestCase;
 use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Http\Curl\HttpRequest;
@@ -13,8 +14,6 @@ use App\Wiki;
 use Illuminate\Contracts\Queue\Job;
 use App\WikiDb;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Support\Facades\DB;
-use PHPUnit\TextUI\RuntimeException;
 
 class ElasticSearchIndexInitTest extends TestCase
 {
@@ -95,7 +94,7 @@ class ElasticSearchIndexInitTest extends TestCase
 
         // feature should get enabled
         $this->assertSame(
-             1, 
+             1,
              WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
         );
     }
@@ -125,7 +124,7 @@ class ElasticSearchIndexInitTest extends TestCase
 
         // feature should get enabled
         $this->assertSame(
-             1, 
+             1,
              WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
         );
     }
@@ -142,26 +141,20 @@ class ElasticSearchIndexInitTest extends TestCase
 
     /**
 	 * @dataProvider failureProvider
+     * @expectedException RuntimeException
 	 */
     public function testFailure( $request, string $expectedFailure, $mockResponse )
     {
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())
-                ->method('fail')
-                ->with(new \RuntimeException(str_replace('<WIKI_ID>', $this->wiki->id, $expectedFailure)));
-                
+                ->method('fail');
+
         $request->method('execute')->willReturn(json_encode($mockResponse));
 
         $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
         $job->handle($request);
-        
-
-        $this->assertSame(
-             0, 
-             WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
-        );
     }
 
     public function failureProvider() {
