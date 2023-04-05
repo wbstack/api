@@ -1,5 +1,17 @@
 # api
 
+## 8x.11.0 - 28 March 2023
+- Use DB schemas from MediaWiki 1.39
+
+## 8x.10.1 - 23 March 2023
+- Set the timeout for MediaWiki updates to 1hr
+
+## 8x.10.0 - 20 March 2023
+- DB updates 1.38
+
+## 8x.9.12 - 13 March 2023
+- Respond 200 for any email on password reset requests
+
 ## 8x.9.11 - 16 December 2022
 - Add /contact/sendMessage endpoint
 - Add `WBSTACK_CONTACT_MAIL_RECIPIENT` env var

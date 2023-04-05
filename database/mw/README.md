@@ -11,15 +11,15 @@ This directory contains the SQL needed to create and wiki DBs.
 
 **Versions**
 
-- mw1.35-wbs1 - Fist 1.35 install
-
-- mw1.34-wbs1 - Fist 1.34 install
-
- - mw1.33-wbs5 - New extensions, TBA
- - mw1.33-wbs4 - New extensions, Math is the only table (mathoid...)
- - mw1.33-wbs3 - TRUNCATE l10n_cache table that we stopped using
- - mw1.33-wbs2 - With EntitySchema table
- - mw1.33-wbs1 - First version of 1.33
+- mw1.39-wbs1 - First 1.39 install
+- mw1.38-wbs1 - First 1.38 install
+- mw1.35-wbs1 - First 1.35 install
+- mw1.34-wbs1 - First 1.34 install
+- mw1.33-wbs5 - New extensions, TBA
+- mw1.33-wbs4 - New extensions, Math is the only table (mathoid...)
+- mw1.33-wbs3 - TRUNCATE l10n_cache table that we stopped using
+- mw1.33-wbs2 - With EntitySchema table
+- mw1.33-wbs1 - First version of 1.33
 
 ### Generating clean / fresh SQL
 
@@ -32,7 +32,7 @@ Make sure you have updated the docker-compose-clean.yml to:
 **Start the setup:**
 
 ```
-docker-compose -f docker-compose-clean.yml up -d
+docker compose -f docker-compose-clean.yml up -d
 ```
 
 **Check & wait for mysql access in adminer?**
@@ -48,16 +48,46 @@ If so, retry.
 **Then:**
 
 ```
-docker-compose -f docker-compose-clean.yml exec mediawiki bash
+docker compose -f docker-compose-clean.yml exec mediawiki bash
 mv ./w/LocalSettings.php ./w/LocalSettings.php.temp
 WBS_DOMAIN=maint php ./w/maintenance/install.php --dbserver sql-clean --dbuser root --dbpass toor --dbname wiki --with-extensions --pass AdminPass0 SiteName AdminName
 ```
 
-WHILE https://phabricator.wikimedia.org/T267809 is broken you'll then need to edit the auto generated LocalSettings.php file...
+**While** `WikibaseEdtf` causes `install.php` to fail with `--with-extensions`. As a workaround we specified all other extensions manually with `--extensions`, since it doesn't seem to add any tables itself and enabled it manually afterwards in LocalSettings.php (just like Wikibase)
+
+This can be used to generate a comma-separated list of extensions:
+```
+cd ./w/extensions/ && ls -dm * | tr -d ' ' | tr -d \\n && cd ./../../
+```
+
+This is an example install command with `WikibaseEdtf` excluded:
+```
+WBS_DOMAIN=maint php ./w/maintenance/install.php --dbserver sql-clean --dbuser root --dbpass toor --dbname wiki --extensions AdvancedSearch,Auth_remoteuser,CirrusSearch,Cite,CodeEditor,CodeMirror,ConfirmAccount,ConfirmEdit,DeleteBatch,Echo,Elastica,EmbedVideo,EntitySchema,Gadgets,Graph,InviteSignup,JsonConfig,Kartographer,Mailgun,Math,MobileFrontend,MultimediaViewer,Nuke,OAuth,PageImages,ParserFunctions,Poem,Popups,RevisionSlider,Score,Scribunto,SecureLinkFixer,SpamBlacklist,StopForumSpam,SyntaxHighlight_GeSHi,TemplateData,TemplateSandbox,TextExtracts,Thanks,ThatSrc,TorBlock,TwoColConflict,UniversalLanguageSelector,WikiEditor,WikiHiero,Wikibase,WikibaseCirrusSearch,WikibaseExampleData,WikibaseInWikitext,WikibaseLexeme,WikibaseLexemeCirrusSearch,WikibaseManifest,cldr --pass AdminPass0 SiteName AdminName
+```
+
+**While** https://phabricator.wikimedia.org/T267809 is broken you'll then need to edit the auto generated LocalSettings.php file...
 (per the instructions in the ticket)
 
-Note: while following this procedure for MW 1.36, `WikibaseEdtf` caused `install.php` to fail with `--with-extensions`. As a workaround we specified all other extensions manually with `--extensions`, since it doesn't seem to add any tables itself and enabled it manually afterwards in LocalSettings.php (just like Wikibase)
+Install an editor and open LocalSettings.php:
+```
+apt-get update && apt-get install -y vim
+vi ./w/LocalSettings.php
+```
 
+Comment out:
+```
+//require_once "$IP/extensions/Wikibase/Wikibase.php";
+```
+
+Add the following:
+```
+wfLoadExtension( 'WikibaseRepository', $wgBaseDirectory . '/extensions/Wikibase/extension-repo.json' );
+require_once "$wgBaseDirectory/extensions/Wikibase/repo/ExampleSettings.php";
+wfLoadExtension( 'WikibaseClient', $wgBaseDirectory . '/extensions/Wikibase/extension-client.json' );
+require_once "$wgBaseDirectory/extensions/Wikibase/client/ExampleSettings.php";
+```
+
+Run the update script:
 ```
 WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
 WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
@@ -82,7 +112,7 @@ WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
  - Copy output to the "new" directory with correct name, and make alterations:
      - Remove SET statements
      - Update the sql file in cleanSql.php
-     - Run cleanSql.php over the file
+     - Run cleanSql.php over the file: `php ./w/maintenance/wbaas-api/cleanSql.php`
      - Manually add the prefix string to any FOREIGN KEY statements
      - Where FOREIGN KEYs are used, you may need to change the order of exported tables! (To ensure tables are created before they are referenced)
  - Compare the resulting schemas to see what has changed... (use https://www.diffchecker.com/ ?)
@@ -90,7 +120,7 @@ WBS_DOMAIN=maint php ./w/maintenance/update.php --quick
 **Cleanup the setup:**
 
 ```
-docker-compose -f docker-compose-clean.yml down --volumes
+docker compose -f docker-compose-clean.yml down --volumes
 ```
 
 ### Generating update / upgrade SQL

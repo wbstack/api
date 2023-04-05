@@ -83,7 +83,7 @@ class MediawikiUpdate extends Job
             CURLOPT_URL => 'http://'.$this->targetBackendHost.'-app-backend/w/api.php?action=wbstackUpdate&format=json',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
-            CURLOPT_TIMEOUT => 60 * 5, // Longish timeout for such things?
+            CURLOPT_TIMEOUT => 60 * 60, // Longish timeout for such things?
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_HTTPHEADER => [
