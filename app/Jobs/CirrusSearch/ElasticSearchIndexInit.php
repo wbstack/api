@@ -11,7 +11,7 @@ class ElasticSearchIndexInit extends CirrusSearchJob
     }
 
     private function logFailure(): void {
-        Log::warning( __METHOD__ . ": Failed initializing elasticsearch." );
+        Log::error( __METHOD__ . ": Failed initializing elasticsearch." );
     }
 
     public function handleResponse( string $rawResponse, $error ): void
@@ -37,9 +37,9 @@ class ElasticSearchIndexInit extends CirrusSearchJob
         ) ) {
 
             Log::error(__METHOD__ . ": Job finished but didn't create or update, something is weird");
+            $this->logFailure();
             $this->fail( new \RuntimeException($this->apiModule() . ' call for '.$this->wikiId.' was not successful:' . $rawResponse ) );
         }
-        $this->setting->update( [  'value' => true  ] );
     }
 
     protected function getRequestTimeout(): int {

@@ -91,12 +91,6 @@ class ElasticSearchIndexInitTest extends TestCase
         $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
         $job->handle($request);
-
-        // feature should get enabled
-        $this->assertSame(
-             1,
-             WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
-        );
     }
 
     public function testUpdate()
