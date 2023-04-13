@@ -3,12 +3,12 @@
 
 # Example: make test FILTER=tests/Jobs/ElasticSearchIndexInitTest.php
 test:
-	docker-compose exec api vendor/bin/phpunit ${FILTER}
+	docker compose exec api vendor/bin/phpunit ${FILTER}
 
 init:
-	docker-compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install && php artisan key:generate'
+	docker compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install && php artisan key:generate'
 
 test-fresh: init test
 
 lint:
-	docker-compose exec -T api vendor/bin/psalm
+	docker compose exec -T api vendor/bin/psalm
