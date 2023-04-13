@@ -3,6 +3,7 @@
 namespace Tests\Jobs\Integration;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\QueryserviceNamespace;
@@ -16,21 +17,21 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 /**
- * This is only meant to run when services is started with 
+ * This is only meant to run when services is started with
  * additional services from docker-compose.integration.yml
- * 
+ *
  * Example: docker-compose exec -e RUN_PHPUNIT_INTEGRATION_TEST=1 -T api vendor/bin/phpunit tests/Jobs/Integration/QueryserviceNamespaceJobTest.php
  */
 class QueryserviceNamespaceJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
     use DispatchesJobs;
 
     public function setUp(): void {
         parent::setUp();
         if ( !getenv('RUN_PHPUNIT_INTEGRATION_TEST') ) {
             $this->markTestSkipped('No blazegraph instance to connect to');
-        }  
+        }
     }
 
     public function testIntegrationCreate()

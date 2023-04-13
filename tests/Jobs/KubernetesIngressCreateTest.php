@@ -4,6 +4,7 @@ namespace Tests\Jobs;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Wiki;
 use App\WikiManager;
@@ -17,7 +18,7 @@ use GuzzleHttp\Psr7\Response;
 
 class KubernetesIngressCreateTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function testCreateIngressJobDoesNotFail()
     {

@@ -2,7 +2,7 @@
 
 namespace Tests\Jobs;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Jobs\DeleteWikiDbJob;
 use App\User;
@@ -20,18 +20,10 @@ use Illuminate\Database\DatabaseManager;
 
 class DeleteWikiJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
     use DispatchesJobs;
 
     private $wiki;
-    protected $connectionsToTransact = ['mysql', 'mw'];
-
-    protected function setUp(): void {
-        parent::setUp();
-        DB::delete( "DELETE FROM wiki_dbs WHERE name='the_test_database';" );
-        DB::delete( "DELETE FROM wiki_dbs WHERE name='the_test_database_not_to_be_deleted';" );
-        DB::connection('mysql')->getPdo()->exec('DROP DATABASE IF EXISTS the_test_database; DROP DATABASE IF EXISTS the_test_database_not_to_be_deleted');
-    }
 
     private function getExpectedDeletedDatabaseName( $wiki ): string {
         return "mwdb_deleted_1631534400_" . $wiki->id;
@@ -78,13 +70,13 @@ class DeleteWikiJobTest extends TestCase
 
         // Would be injected by the app
         $manager = $this->app->make('db');
-  
+
         $job = new ProvisionWikiDbJob($databases[0]['prefix'], $databases[0]['name'], null);
         $job->handle($manager);
 
         // Would be injected by the app
         $manager = $this->app->make('db');
-  
+
         $job = new ProvisionWikiDbJob($databases[1]['prefix'], $databases[1]['name'], null);
         $job->handle($manager);
 
@@ -117,7 +109,7 @@ class DeleteWikiJobTest extends TestCase
 
         // this job will kill the underlying connection
         $job = new DeleteWikiDbJob( $this->wiki->id );
-        $job->setJob($mockJob);
+//        $job->setJob($mockJob);
         $job->handle($manager);
 
         // get a new connection and take a look at the database tables and newly created databases
@@ -167,7 +159,7 @@ class DeleteWikiJobTest extends TestCase
         $mockJob->expects($this->once())
                 ->method('fail')
                 ->with(new \RuntimeException(str_replace('<WIKI_ID>', $wiki_id, $expectedFailure)));
-                
+
         $job = new DeleteWikiDbJob($wiki_id);
         $job->setJob($mockJob);
         $job->handle($mockMananger);

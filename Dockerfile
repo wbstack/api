@@ -24,11 +24,18 @@ RUN apt-get update \
 	# For rewrite rules
 	&& a2enmod rewrite \
 	# Needed for gluedev/laravel-stackdriver
-	&& pecl install opencensus-alpha \
-	&& docker-php-ext-enable opencensus \
+	&& pecl install opencensus-alpha xdebug \
+	&& docker-php-ext-enable opencensus xdebug \
 	&& rm -rf /var/lib/apt/lists/*
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+
+RUN echo "zend_extension=xdebug\n\n\
+[xdebug]\n\
+xdebug.mode=develop,debug\n\
+xdebug.client_host=192.168.1.13\n\
+xdebug.client_port=9003\n\
+" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # Change the document root
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \

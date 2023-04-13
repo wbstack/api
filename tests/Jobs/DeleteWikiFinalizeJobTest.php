@@ -4,6 +4,7 @@ namespace Tests\Routes\Auth;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\WikiManager;
 use App\Wiki;
@@ -18,7 +19,7 @@ use Illuminate\Contracts\Queue\Job;
 
 class DeleteWikiFinalizeJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function setUp(): void {
         parent::setUp();
