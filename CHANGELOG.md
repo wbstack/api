@@ -1,5 +1,8 @@
 # api
 
+## 8x.11.1 - 18 April 2023
+- Do not disable elastic search on wikis after a failure
+
 ## 8x.11.0 - 28 March 2023
 - Use DB schemas from MediaWiki 1.39
 
