@@ -10,9 +10,8 @@ class ElasticSearchIndexInit extends CirrusSearchJob
         return 'wbstackElasticSearchInit';
     }
 
-    private function logFailureAndDisable(): void {
-        $this->setting->update( [  'value' => false  ] );
-        Log::warning( __METHOD__ . ": Failed initializing elasticsearch. Disabling the setting." );
+    private function logFailure(): void {
+        Log::error( __METHOD__ . ": Failed initializing elasticsearch." );
     }
 
     public function handleResponse( string $rawResponse, $error ): void
@@ -20,41 +19,31 @@ class ElasticSearchIndexInit extends CirrusSearchJob
         $response = json_decode( $rawResponse, true );
 
         if( !$this->validateOrFailRequest($response, $rawResponse, $error) ) {
-            $this->logFailureAndDisable();
+            $this->logFailure();
             return;
         }
 
         if (!$this->validateSuccess($response, $rawResponse, $error)) {
-            $this->logFailureAndDisable();
+            $this->logFailure();
             return;
         }
 
         $output = $response[$this->apiModule()]['output'];
 
-        $enableElasticSearchFeature = false;
-
-        // occurs a couple of times when newly created
-        if ( in_array( "\tCreating index...ok",  $output ) ) {
-
-            // newly created index succeeded, turn on the wiki setting
-            $enableElasticSearchFeature = true;
-
-        // occurs on a successful update run
-        } else if ( in_array( "\t\tValidating {$this->wikiDB->name}_general alias...ok", $output ) ) {
-
-            // script ran and update was successful, make sure feature is enabled
-            $enableElasticSearchFeature = true;
-        } else {
+        // if newly created index failed, script ran and update was unsuccessful, then log error.
+        if ( !(
+            in_array( "\tCreating index...ok",  $output ) ||
+            in_array( "\t\tValidating {$this->wikiDB->name}_general alias...ok", $output )
+        ) ) {
 
             Log::error(__METHOD__ . ": Job finished but didn't create or update, something is weird");
+            $this->logFailure();
             $this->fail( new \RuntimeException($this->apiModule() . ' call for '.$this->wikiId.' was not successful:' . $rawResponse ) );
         }
-
-        $this->setting->update( [  'value' => $enableElasticSearchFeature  ] );
     }
 
     protected function getRequestTimeout(): int {
-        return getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT') !== false 
+        return getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT') !== false
             ? intval(getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT')) : parent::getRequestTimeout();
     }
 }

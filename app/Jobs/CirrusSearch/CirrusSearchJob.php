@@ -59,10 +59,9 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
         // no wikiDB around
         if ( !$this->wikiDB ) {
             $this->fail( new \RuntimeException($this->apiModule() . ' call for '.$this->wikiId.' was triggered but not WikiDb available') );
-            $this->setting->update( [  'value' => false  ] );
             return;
         }
-        
+
         $request->setOptions(
             [
                 CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action='. $this->apiModule() . $this->getQueryParams(),
