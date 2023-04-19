@@ -14,6 +14,11 @@ $router->get(
     }
 );
 
+$router->group(['prefix' => 'ingress'], function () use ($router) {
+    // GET
+    $router->get('getWikiVersionForDomain', ['uses' => 'IngressController@getWikiVersionForDomain']);
+});
+
 $router->group(['prefix' => 'wiki'], function () use ($router) {
     // GET
     $router->get('getWikiForDomain', ['uses' => 'WikiController@getWikiForDomain']);
