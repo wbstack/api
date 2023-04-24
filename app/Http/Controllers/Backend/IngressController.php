@@ -12,10 +12,14 @@ class IngressController extends Controller
     {
         $domain = $request->query('domain');
         $version = Wiki::where('domain', $domain)
+            ->whereNull('deleted_at')
             ->leftJoin('wiki_dbs', 'wiki_id', '=', 'wikis.id')
             ->pluck('version')
             ->first();
 
+        if (is_null($version)) {
+            abort(401);
+        }
         return response(1)->header('x-version', $version);
     }
 }
