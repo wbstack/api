@@ -15,7 +15,7 @@ Parameter 3 and 4 represent a start and endpoint for the pages that should be in
 
 In this example case, the wiki only had 24 pages:
 ```
- $ kubectl exec -ti deployments/api-app-backend -- php artisan job:dispatchNow CirrusSearch\\ForceSearchIndex domain deerbase.wikibase.dev 0 1000
+$ kubectl exec -ti deployments/api-app-backend -- php artisan job:dispatchNow CirrusSearch\\ForceSearchIndex domain deerbase.wikibase.dev 0 1000
 [2023-04-26 15:16:01] production.INFO: App\Jobs\CirrusSearch\ForceSearchIndex::handleResponse: Finished batch! Indexed 24 pages. From id 0 to 1000  
 
 $ kubectl exec -ti deployments/api-app-backend -- php artisan job:dispatchNow CirrusSearch\\ForceSearchIndex domain deerbase.wikibase.dev 30 1000
