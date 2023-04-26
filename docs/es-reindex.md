@@ -9,7 +9,7 @@ You can execute it like this:
 kubectl exec -ti deployments/api-app-backend -- php artisan job:dispatchNow CirrusSearch\\ForceSearchIndex domain deerbase.wikibase.dev 0 1000
 ```
 
-Note that the 1st parameter (`domain` in this example) could be any other DB column. The second argument is the value to match against. In this example this means: "Run this for the wiki with the domain 'deerbase.wikibase.dev'".
+Note that the 1st parameter (`domain` in this example) could be any other DB column. The second argument is the value to match against. In this example this means: "Run this for the wiki with the domain `deerbase.wikibase.dev`".
 
 Parameter 3 and 4 represent a start and endpoint for the pages that should be indexed. If you don't know how many pages the wiki has (or if you want to limit server load), you can run it in batches, proceeding through the data until the job reports that it indexed 0 pages (example: first use `0 1000`, then `1000 2000`, and so on).
 
