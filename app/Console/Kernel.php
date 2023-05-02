@@ -43,6 +43,8 @@ class Kernel extends ConsoleKernel
 
         // Schedule site stat updates for each wiki and platform-summary
         $schedule->command('schedule:stats')->daily();
+
+        $schedule->job(new PollForMediaWikiJobsJob)->everyMinute();
     }
 
     /**
