@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 use Maclof\Kubernetes\Client;
 use Maclof\Kubernetes\Models\Job as KubernetesJob;
 
@@ -13,7 +14,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
 {
     use InteractsWithQueue, Queueable;
 
-    private $wikiDomain: string;
+    private string $wikiDomain;
 
     public function __construct ( string $wikiDomain )
     {
@@ -41,7 +42,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
             );
         }
 
-        $job = new KubernetesJob([]);
+        $job = new KubernetesJob([/* TODO: configure job */]);
         $kubernetesClient->jobs->create($job);
         return;
     }
