@@ -11,9 +11,16 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
 {
     use InteractsWithQueue, Queueable;
 
+    private $wikiDomain: string;
+
     public function __construct ( string $wikiDomain )
     {
         $this->wikiDomain = $wikiDomain;
+    }
+
+    public function uniqueId(): string
+    {
+        return $this->wikiDomain;
     }
 
     public function handle (): void
