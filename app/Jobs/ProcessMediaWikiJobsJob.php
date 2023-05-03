@@ -60,9 +60,9 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
                         'containers' => [
                             0 => [
                                 'name' => 'run-all-mw-jobs',
-                                'image' => $mwPod['spec']['template']['spec']['containers'][0]['image'],
+                                'image' => $mwPod['spec']['containers'][0]['image'],
                                 'env' => array_merge(
-                                    $mwPod['spec']['template']['spec']['containers'][0]['env'],
+                                    $mwPod['spec']['containers'][0]['env'],
                                     [['name' => 'WBS_DOMAIN', 'value' => $this->wikiDomain]]
                                 ),
                                 'command' => [
@@ -81,15 +81,32 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
                                     done
                                     CMD
                                 ],
-                                'restartPolicy' => 'Never'
                             ]
-                        ]
+                        ],
+                        'restartPolicy' => 'Never'
                     ]
                 ]
             ]
         ]);
-        $job = $kubernetesClient->jobs()->create($jobSpec);
-        // TODO: wait for job to finish
+        $jobName = $kubernetesClient->jobs()->create($jobSpec)['metadata']['name'];
+
+        // TODO: figure out how to use `wait` method instead
+        while (true) {
+            $job = $kubernetesClient->jobs()->setFieldSelector([
+                'metadata.name' => $jobName
+            ])->first()->toArray();
+
+            if (array_key_exists('completionTime', $job['status'])) {
+                if (!$job['status']['succeeded']) {
+                    $this->fail(
+                        new \RuntimeException('Failed to run Kubernetes job '.$jobName)
+                    );
+                }
+                break;
+            }
+
+            sleep(1);
+        }
         return;
     }
 
