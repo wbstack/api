@@ -37,7 +37,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
 
         if (!$mwPod) {
             $this->fail(
-                new RuntimeException(
+                new \RuntimeException(
                     'Unable to find a running MediaWiki pod in the cluster, '.
                     'cannot continue.'
                 )
@@ -45,8 +45,8 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
             return;
         }
 
-        // TODO: merge in specs and env from $mwPod
-        // as per script
+        $mwPod = $mwPod->toArray();
+
         $jobSpec = new KubernetesJob([
             'metadata' => [
                 'generateName' => 'run-all-mw-jobs-'
@@ -60,6 +60,11 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
                         'containers' => [
                             0 => [
                                 'name' => 'run-all-mw-jobs',
+                                'image' => $mwPod['spec']['template']['spec']['containers'][0]['image'],
+                                'env' => array_merge(
+                                    $mwPod['spec']['template']['spec']['containers'][0]['env'],
+                                    [['name' => 'WBS_DOMAIN', 'value' => $this->wikiDomain]]
+                                ),
                                 'command' => [
                                     0 => 'bash',
                                     1 => '-c',
