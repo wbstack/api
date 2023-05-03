@@ -18,7 +18,7 @@ class PollForMediaWikiJobsJob extends Job
 
     private function hasPendingJobs( string $wikiDomain ): bool
     {
-        return false;
+        return true;
     }
 
     private function enqueueWiki ( string $wikiDomain ): void
