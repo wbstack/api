@@ -64,16 +64,16 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
                                     0 => 'bash',
                                     1 => '-c',
                                     2 => <<<'CMD'
-JOBS_TO_GO=1
-while [ "$JOBS_TO_GO" != "0" ]
-do
-    echo "Running 1000 jobs"
-    php w/maintenance/runJobs.php --maxjobs 1000
-    echo Waiting for 1 seconds...
-    sleep 1
-    JOBS_TO_GO=$(php w/maintenance/showJobs.php | tr -d '[:space:]')
-    echo $JOBS_TO_GO jobs to go
-done
+                                    JOBS_TO_GO=1
+                                    while [ "$JOBS_TO_GO" != "0" ]
+                                    do
+                                        echo "Running 1000 jobs"
+                                        php w/maintenance/runJobs.php --maxjobs 1000
+                                        echo Waiting for 1 seconds...
+                                        sleep 1
+                                        JOBS_TO_GO=$(php w/maintenance/showJobs.php | tr -d '[:space:]')
+                                        echo $JOBS_TO_GO jobs to go
+                                    done
                                     CMD
                                 ],
                                 'restartPolicy' => 'Never'
@@ -83,7 +83,7 @@ done
                 ]
             ]
         ]);
-        $job = $kubernetesClient->jobs->create($jobSpec);
+        $job = $kubernetesClient->jobs()->create($jobSpec);
         // TODO: wait for job to finish
         return;
     }
