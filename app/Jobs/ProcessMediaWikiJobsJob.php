@@ -36,14 +36,55 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
         ])->first();
 
         if (!$mwPod) {
-            throw new Exception(
-                'Unable to find a running MediaWiki pod in the cluster, '.
-                'cannot continue.'
+            $this->fail(
+                new RuntimeException(
+                    'Unable to find a running MediaWiki pod in the cluster, '.
+                    'cannot continue.'
+                )
             );
+            return;
         }
 
-        $job = new KubernetesJob([/* TODO: configure job */]);
-        $kubernetesClient->jobs->create($job);
+        // TODO: merge in specs and env from $mwPod
+        // as per script
+        $jobSpec = new KubernetesJob([
+            'metadata' => [
+                'generateName' => 'run-all-mw-jobs-'
+            ],
+            'spec' => [
+                'template' => [
+                    'metadata' => [
+                        'name' => 'run-all-mw-jobs'
+                    ],
+                    'spec' => [
+                        'containers' => [
+                            0 => [
+                                'name' => 'run-all-mw-jobs',
+                                'command' => [
+                                    0 => 'bash',
+                                    1 => '-c',
+                                    2 => <<<'CMD'
+JOBS_TO_GO=1
+while [ "$JOBS_TO_GO" != "0" ]
+do
+    echo "Running 1000 jobs"
+    php w/maintenance/runJobs.php --maxjobs 1000
+    echo Waiting for 1 seconds...
+    sleep 1
+    JOBS_TO_GO=$(php w/maintenance/showJobs.php | tr -d '[:space:]')
+    echo $JOBS_TO_GO jobs to go
+done
+                                    CMD
+                                ],
+                                'restartPolicy' => 'Never'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+        $job = $kubernetesClient->jobs->create($jobSpec);
+        // TODO: wait for job to finish
         return;
     }
 
