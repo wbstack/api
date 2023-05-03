@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Wiki;
+use Illuminate\Support\Facades\Http;
 
 class PollForMediaWikiJobsJob extends Job
 {
@@ -18,7 +19,23 @@ class PollForMediaWikiJobsJob extends Job
 
     private function hasPendingJobs( string $wikiDomain ): bool
     {
-        return true;
+        $response = Http::withHeaders([
+            'host' => $wikiDomain
+        ])->get(
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
+        );
+
+        if ($response->failed()) {
+            $this->fail(
+                new \RuntimeException(
+                    'Failure polling wiki '.$wikiDomain.' for pending MediaWiki jobs: '.$response->clientError()
+                )
+            );
+
+            return false;
+        }
+
+        return $response->json()['query']['statistics']['jobs'] > 0;
     }
 
     private function enqueueWiki ( string $wikiDomain ): void
