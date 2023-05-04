@@ -17,19 +17,15 @@ class ForceSearchIndex extends CirrusSearchJob
 {
     private $fromId;
     private $toId;
+    private $cluster;
 
-    public function __construct( string $selectCol, $selectValue, int $fromId, int $toId  ) {
+    public function __construct( string $selectCol, $selectValue, int $fromId, int $toId, string $cluster ) {
         $wiki = Wiki::where($selectCol, $selectValue)->firstOrFail();
 
         $this->fromId = $fromId;
         $this->toId = $toId;
+        $this->cluster = $cluster;
         parent::__construct($wiki->id);
-    }
-    public function fromId(): int {
-        return $this->fromId;
-    }
-    public function toId(): int {
-        return $this->toId;
     }
 
     function apiModule(): string {
@@ -59,11 +55,11 @@ class ForceSearchIndex extends CirrusSearchJob
 
         if ( count($successMatches) === 2 && is_numeric($successMatches[1][0]) ) {
             $numIndexedPages = intVal($successMatches[1][0]);
-            Log::info(__METHOD__ . ": Finished batch! Indexed ${numIndexedPages} pages. From id {$this->fromId} to {$this->toId}");
+            Log::info(__METHOD__ . ": Finished batch! Indexed {$numIndexedPages} pages on {$this->cluster}. From id {$this->fromId} to {$this->toId}");
         } else {
             dd($successMatches);
             Log::error(__METHOD__ . ": Job finished but did not contain the expected output.");
-            $this->fail( new \RuntimeException($this->apiModule() . ' call for '.$this->wikiId.' was not successful:' . $rawResponse ) );
+            $this->fail( new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId . ' was not successful on ' . $this->cluster . ':' . $rawResponse ) );
         }
     }
 
@@ -71,6 +67,6 @@ class ForceSearchIndex extends CirrusSearchJob
      * @return string
      */
     protected function getQueryParams() {
-        return parent::getQueryParams() . '&fromId=' . $this->fromId . '&toId=' . $this->toId;
+        return parent::getQueryParams() . '&fromId=' . $this->fromId . '&toId=' . $this->toId . '&cluster=' . $this->cluster;
     }
 }

@@ -32,7 +32,7 @@ class QueueSearchIndexBatches extends CirrusSearchJob
 
         foreach ($output as $command) {
             $matches = [];
-            preg_match('/--fromId (\d+) --toId (\d+)/', $command, $matches, PREG_OFFSET_CAPTURE);
+            preg_match('/--fromId (\d+) --toId (\d+) --cluster (\w+)/', $command, $matches, PREG_OFFSET_CAPTURE);
 
             if ( count($matches) !== 3 ) {
                 throw new \RuntimeException('Got some weird output from the script: ' . $command);
@@ -40,12 +40,13 @@ class QueueSearchIndexBatches extends CirrusSearchJob
 
             $fromId = $matches[1][0];
             $toId = $matches[2][0];
+            $cluster = $matches[3][0];
 
             if( (!is_numeric($fromId) || !is_numeric($toId)) && intVal($fromId) <= intVal($toId) ) {
-                throw new \RuntimeException('Batch parameters from command looks weird! fromId: ' . $fromId . ' toId: ' . $toId);
+                throw new \RuntimeException('Batch parameters from command looks weird! fromId: ' . $fromId . ' toId: ' . $toId . ' cluster: ' . $cluster);
             }
 
-            $batches[] = new ForceSearchIndex( 'id', $this->wikiId, $fromId, $toId );
+            $batches[] = new ForceSearchIndex( 'id', $this->wikiId, $fromId, $toId, $cluster );
         }
         
         return $batches;
