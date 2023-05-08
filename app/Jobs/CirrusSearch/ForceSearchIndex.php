@@ -28,6 +28,18 @@ class ForceSearchIndex extends CirrusSearchJob
         parent::__construct($wiki->id);
     }
 
+    public function fromId(): int {
+        return $this->fromId;
+    }
+
+    public function toId(): int {
+        return $this->toId;
+    }
+
+    public function cluster(): string {
+        return $this->cluster;
+    }
+
     function apiModule(): string {
         return 'wbstackForceSearchIndex';
     }
@@ -55,18 +67,15 @@ class ForceSearchIndex extends CirrusSearchJob
 
         if ( count($successMatches) === 2 && is_numeric($successMatches[1][0]) ) {
             $numIndexedPages = intVal($successMatches[1][0]);
-            Log::info(__METHOD__ . ": Finished batch! Indexed {$numIndexedPages} pages on {$this->cluster}. From id {$this->fromId} to {$this->toId}");
+            Log::info(__METHOD__ . ": Finished batch! Indexed {$numIndexedPages} pages on {$this->cluster()}. From id {$this->fromId()} to {$this->toId()}");
         } else {
             dd($successMatches);
             Log::error(__METHOD__ . ": Job finished but did not contain the expected output.");
-            $this->fail( new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId . ' was not successful on ' . $this->cluster . ':' . $rawResponse ) );
+            $this->fail( new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId() . ' was not successful on ' . $this->cluster() . ':' . $rawResponse ) );
         }
     }
 
-    /**
-     * @return string
-     */
-    protected function getQueryParams() {
-        return parent::getQueryParams() . '&fromId=' . $this->fromId . '&toId=' . $this->toId . '&cluster=' . $this->cluster;
+    protected function getQueryParams(): string {
+        return parent::getQueryParams() . '&fromId=' . $this->fromId() . '&toId=' . $this->toId() . '&cluster=' . $this->cluster();
     }
 }

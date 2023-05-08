@@ -18,6 +18,17 @@ class QueueSearchIndexBatches extends CirrusSearchJob
 {
     use DispatchesJobs;
 
+    private $cluster;
+
+    public function __construct( int $wikiId, string $cluster ) {
+        $this->cluster = $cluster;
+        parent::__construct($wikiId);
+    }
+
+    public function cluster(): string {
+        return $this->cluster;
+    }
+
     function apiModule(): string {
         return 'wbstackQueueSearchIndexBatches';
     }
@@ -32,7 +43,7 @@ class QueueSearchIndexBatches extends CirrusSearchJob
 
         foreach ($output as $command) {
             $matches = [];
-            preg_match('/--fromId (\d+) --toId (\d+) --cluster (\w+)/', $command, $matches, PREG_OFFSET_CAPTURE);
+            preg_match('/--fromId (\d+) --toId (\d+)/', $command, $matches, PREG_OFFSET_CAPTURE);
 
             if ( count($matches) !== 3 ) {
                 throw new \RuntimeException('Got some weird output from the script: ' . $command);
@@ -40,13 +51,12 @@ class QueueSearchIndexBatches extends CirrusSearchJob
 
             $fromId = $matches[1][0];
             $toId = $matches[2][0];
-            $cluster = $matches[3][0];
 
             if( (!is_numeric($fromId) || !is_numeric($toId)) && intVal($fromId) <= intVal($toId) ) {
-                throw new \RuntimeException('Batch parameters from command looks weird! fromId: ' . $fromId . ' toId: ' . $toId . ' cluster: ' . $cluster);
+                throw new \RuntimeException('Batch parameters from command looks weird! fromId: ' . $fromId . ' toId: ' . $toId . ' cluster: ' . $this->cluster());
             }
 
-            $batches[] = new ForceSearchIndex( 'id', $this->wikiId, $fromId, $toId, $cluster );
+            $batches[] = new ForceSearchIndex( 'id', $this->wikiId(), $fromId, $toId, $this->cluster() );
         }
         
         return $batches;
@@ -87,12 +97,13 @@ class QueueSearchIndexBatches extends CirrusSearchJob
             foreach ($batches as $job) {
                 $this->dispatch($job);
             }
-
         } else {
-
             Log::error(__METHOD__ . ": Job finished but didn't create any batches, something is weird");
-            $this->fail( new \RuntimeException($this->apiModule() . ' call for '.$this->wikiId.' was not successful:' . $rawResponse ) );
+            $this->fail( new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId() . ' was not successful:' . $rawResponse ) );
         }
+    }
 
+    protected function getQueryParams(): string {
+        return parent::getQueryParams() . '&cluster=' . $this->cluster();
     }
 }

@@ -27,10 +27,12 @@ class ForceSearchIndexTest extends TestCase
     private $wiki;
     private $wikiDb;
     private $user;
+    private $cluster;
 
     public function setUp(): void {
         parent::setUp();
 
+        $this->cluster = 'primary';
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
@@ -92,7 +94,7 @@ class ForceSearchIndexTest extends TestCase
         $request->expects($this->once())
             ->method('setOptions')
             ->with([
-                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackForceSearchIndex&format=json&fromId=' . $fromId . '&toId=' . $toId,
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackForceSearchIndex&format=json' . '&fromId=' . $fromId . '&toId=' . $toId . '&cluster=' . $this->cluster,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 1000,
@@ -109,7 +111,7 @@ class ForceSearchIndexTest extends TestCase
                 ->method('fail')
                 ->withAnyParameters();
 
-        $job = new ForceSearchIndex('id', $this->wiki->id, $fromId, $toId);
+        $job = new ForceSearchIndex('id', $this->wiki->id, $fromId, $toId, $this->cluster);
         $job->setJob($mockJob);
         $job->handle($request);
     }

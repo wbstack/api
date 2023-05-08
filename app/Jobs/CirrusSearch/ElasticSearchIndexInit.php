@@ -13,6 +13,10 @@ class ElasticSearchIndexInit extends CirrusSearchJob
         parent::__construct($wikiId);
     }
 
+    public function cluster(): string {
+        return $this->cluster;
+    }
+
     function apiModule(): string {
         return 'wbstackElasticSearchInit';
     }
@@ -45,7 +49,7 @@ class ElasticSearchIndexInit extends CirrusSearchJob
 
             Log::error(__METHOD__ . ": Job finished but didn't create or update, something is weird");
             $this->logFailure();
-            $this->fail( new \RuntimeException($this->apiModule() . ' call for '.$this->wikiId.' was not successful:' . $rawResponse ) );
+            $this->fail( new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId() . ' was not successful:' . $rawResponse ) );
         }
     }
 
@@ -55,6 +59,6 @@ class ElasticSearchIndexInit extends CirrusSearchJob
     }
 
     protected function getQueryParams(): string {
-        return parent::getQueryParams() . '&cluster=' . $this->cluster;
+        return parent::getQueryParams() . '&cluster=' . $this->cluster();
     }
 }

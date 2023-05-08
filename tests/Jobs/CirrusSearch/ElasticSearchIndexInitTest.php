@@ -23,10 +23,12 @@ class ElasticSearchIndexInitTest extends TestCase
     private $wiki;
     private $wikiDb;
     private $user;
+    private $cluster;
 
     public function setUp(): void {
         parent::setUp();
 
+        $this->cluster = 'primary';
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
@@ -45,7 +47,7 @@ class ElasticSearchIndexInitTest extends TestCase
 
     public function testDispatching() {
         $mockJob = $this->createMock(Job::class);
-        $job = new ElasticSearchIndexInit($this->wiki->id);
+        $job = new ElasticSearchIndexInit($this->wiki->id, $this->cluster);
         $job->setJob($mockJob);
         $mockJob->expects($this->once())
             ->method('fail');
@@ -71,7 +73,7 @@ class ElasticSearchIndexInitTest extends TestCase
         $request->expects($this->once())
             ->method('setOptions')
             ->with([
-                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json',
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json&cluster=' . $this->cluster,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 1234,
@@ -88,7 +90,7 @@ class ElasticSearchIndexInitTest extends TestCase
                 ->method('fail')
                 ->withAnyParameters();
 
-        $job = new ElasticSearchIndexInit($this->wiki->id);
+        $job = new ElasticSearchIndexInit($this->wiki->id, $this->cluster);
         $job->setJob($mockJob);
         $job->handle($request);
 
@@ -118,7 +120,7 @@ class ElasticSearchIndexInitTest extends TestCase
                 ->method('fail')
                 ->withAnyParameters();
 
-        $job = new ElasticSearchIndexInit($this->wiki->id);
+        $job = new ElasticSearchIndexInit($this->wiki->id, $this->cluster);
         $job->setJob($mockJob);
         $job->handle($request);
 
@@ -135,7 +137,7 @@ class ElasticSearchIndexInitTest extends TestCase
         $request = $this->createMock(HttpRequest::class);
         $request->expects( $this->never() )->method('execute');
 
-        $job = new ElasticSearchIndexInit($this->wiki->id);
+        $job = new ElasticSearchIndexInit($this->wiki->id, $this->cluster);
         $job->handle($request);
     }
 
@@ -152,7 +154,7 @@ class ElasticSearchIndexInitTest extends TestCase
 
         $request->method('execute')->willReturn(json_encode($mockResponse));
 
-        $job = new ElasticSearchIndexInit($this->wiki->id);
+        $job = new ElasticSearchIndexInit($this->wiki->id, $this->cluster);
         $job->setJob($mockJob);
         $job->handle($request);
 

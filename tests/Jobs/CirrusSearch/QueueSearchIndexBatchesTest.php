@@ -28,10 +28,12 @@ class QueueSearchIndexBatchesTest extends TestCase
     private $wiki;
     private $wikiDb;
     private $user;
+    private $cluster;
 
     public function setUp(): void {
         parent::setUp();
 
+        $this->cluster = 'primary';
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
@@ -68,7 +70,7 @@ class QueueSearchIndexBatchesTest extends TestCase
         $request->expects($this->once())
             ->method('setOptions')
             ->with([
-                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackQueueSearchIndexBatches&format=json',
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackQueueSearchIndexBatches&format=json&cluster=' . $this->cluster,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 1000,
@@ -85,25 +87,30 @@ class QueueSearchIndexBatchesTest extends TestCase
                 ->method('fail')
                 ->withAnyParameters();
 
-        $job = new QueueSearchIndexBatches($this->wiki->id);
+        $job = new QueueSearchIndexBatches($this->wiki->id, $this->cluster);
         $job->setJob($mockJob);
         $job->handle($request);
 
         Queue::assertPushed(function (ForceSearchIndex $job) {
             return $job->wikiId() === $this->wiki->id
-            && $job->fromId() === 0 && $job->toId() === 1000;
+            && $job->cluster() === $this->cluster
+            && $job->fromId() === 0
+            && $job->toId() === 1000;
         });
 
         Queue::assertPushed(function (ForceSearchIndex $job) {
             return $job->wikiId() === $this->wiki->id
-            && $job->fromId() === 1001 && $job->toId() === 1234;
+            && $job->cluster() === $this->cluster
+            && $job->fromId() === 1001
+            && $job->toId() === 1234;
         });
 
         Queue::assertPushed(function (ForceSearchIndex $job) {
             return $job->wikiId() === $this->wiki->id
-            && $job->fromId() === 1235 && $job->toId() === 1236;
+            && $job->cluster() === $this->cluster
+            && $job->fromId() === 1235
+            && $job->toId() === 1236;
         });
-
     }
 
     public function testMediawikiErrorResponse() {
@@ -117,7 +124,7 @@ class QueueSearchIndexBatchesTest extends TestCase
         $request->expects($this->once())
             ->method('setOptions')
             ->with([
-                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackQueueSearchIndexBatches&format=json',
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackQueueSearchIndexBatches&format=json&cluster=' . $this->cluster,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 1000,
@@ -134,9 +141,8 @@ class QueueSearchIndexBatchesTest extends TestCase
                 ->method('fail')
                 ->with(new \RuntimeException('wbstackQueueSearchIndexBatches call failed with api error: Unrecognized value for parameter "action": wbstackQueueSearchIndexBatches.'));
 
-        $job = new QueueSearchIndexBatches($this->wiki->id);
+        $job = new QueueSearchIndexBatches($this->wiki->id, $this->cluster);
         $job->setJob($mockJob);
         $job->handle($request);
     }
-
 }
