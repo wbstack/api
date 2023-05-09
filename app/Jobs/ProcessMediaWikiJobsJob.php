@@ -28,6 +28,19 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
 
     public function handle (Client $kubernetesClient): void
     {
+        $hasRunningJob = $kubernetesClient->jobs()->setFieldSelector([
+            'status.phase' => 'Running'
+        ])->setLabelSelector([
+            'app.kubernetes.io/instance' => $this->wikiDomain
+        ])->find()->isNotEmpty();
+
+        if ($hasRunningJob) {
+            Log::info(
+                'Job for wiki "'.$this->wikiDomain.'" is still in process, skipping creation.'
+            );
+            return;
+        }
+
         $mwPod = $kubernetesClient->pods()->setFieldSelector([
             'status.phase' => 'Running'
         ])->setLabelSelector([
@@ -35,7 +48,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
             'app.kubernetes.io/component' => 'app-backend'
         ])->first();
 
-        if (!$mwPod) {
+        if ($mwPod === null) {
             $this->fail(
                 new \RuntimeException(
                     'Unable to find a running MediaWiki pod in the cluster, '.
@@ -49,7 +62,11 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
 
         $jobSpec = new KubernetesJob([
             'metadata' => [
-                'generateName' => 'run-all-mw-jobs-'
+                'generateName' => 'run-all-mw-jobs-',
+                'namespace' => 'api-jobs',
+                'labels' => [
+                    'app.kubernetes.io/instance' => $this->wikiDomain
+                ]
             ],
             'spec' => [
                 'ttlSecondsAfterFinished' => 60 * 60,
@@ -89,25 +106,12 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
                 ]
             ]
         ]);
-        $jobName = $kubernetesClient->jobs()->create($jobSpec)['metadata']['name'];
 
-        // TODO: figure out how to use `wait` method instead
-        while (true) {
-            $job = $kubernetesClient->jobs()->setFieldSelector([
-                'metadata.name' => $jobName
-            ])->first()->toArray();
-
-            if (array_key_exists('completionTime', $job['status'])) {
-                if (!$job['status']['succeeded']) {
-                    $this->fail(
-                        new \RuntimeException('Failed to run Kubernetes job '.$jobName)
-                    );
-                }
-                break;
-            }
-
-            sleep(1);
-        }
+        $job = $kubernetesClient->jobs()->create($jobSpec);
+        $jobName = data_get($job, 'metadata.name', 'unknown');
+        Log::info(
+            'MediaWiki Job for wiki "'.$this->wikiDomain.'" created with name "'.$jobName.'".'
+        );
         return;
     }
 
