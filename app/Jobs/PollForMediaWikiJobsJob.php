@@ -36,7 +36,7 @@ class PollForMediaWikiJobsJob extends Job
         }
 
         $pendingJobs = data_get($response->json(), 'query.statistics.jobs', 0);
-        return $pendingJobs > 0;
+        return $pendingJobs >= 0;
     }
 
     private function enqueueWiki (string $wikiDomain): void

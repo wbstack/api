@@ -15,11 +15,14 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
     use InteractsWithQueue, Queueable;
 
     private string $wikiDomain;
-    private const API_JOB_CONCURRENCY_LIMIT = intval(getenv('API_JOB_CONCURRENCY_LIMIT') || '8', 10);
+    private int $apiJobConcurrencyLimit;
 
     public function __construct (string $wikiDomain)
     {
         $this->wikiDomain = $wikiDomain;
+        $this->apiJobConcurrencyLimit = getenv('API_JOB_CONCURRENCY_LIMIT')
+            ? intval(getenv('API_JOB_CONCURRENCY_LIMIT'), 10)
+            : 8;
     }
 
     public function uniqueId(): string
@@ -29,26 +32,29 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
 
     public function handle (Client $kubernetesClient): void
     {
+        $filterCompletedJobs = function (KubernetesJob $job, int $key): bool {
+            $phase = data_get($job->toArray(), 'status.conditions.0.type', null);
+            return $phase === 'Running' || $phase === 'Pending';
+        };
+
         $kubernetesClient->setNamespace('api-jobs');
 
-        $numJobs = $kubernetesClient->jobs()->setFieldSelector([
-            'status.phase' => 'Running',
-        ])->setLabelSelector([
+        $numJobs = $kubernetesClient->jobs()->setLabelSelector([
             'app.kubernetes.io/name' => 'run-all-mw-jobs'
-        ])->find()->count();
+        ])->find()->filter($filterCompletedJobs)->count();
 
-        if ($numJobs >= self::API_JOB_CONCURRENCY_LIMIT) {
+        if ($numJobs >= $this->apiJobConcurrencyLimit) {
             Log::info(
-                $numJobs.' running jobs were found, skipping creation of new ones in order not to exceed the given concurrency limit of '.self::API_JOB_CONCURRENCY_LIMIT.'.'
+                $numJobs.' running jobs were found, skipping creation of new '.
+                'ones in order not to exceed the given concurrency '.
+                'limit of '.$this->apiJobConcurrencyLimit.'.'
             );
             return;
         }
 
-        $hasRunningJob = $kubernetesClient->jobs()->setFieldSelector([
-            'status.phase' => 'Running'
-        ])->setLabelSelector([
+        $hasRunningJob = $kubernetesClient->jobs()->setLabelSelector([
             'app.kubernetes.io/instance' => $this->wikiDomain
-        ])->find()->isNotEmpty();
+        ])->find()->filter($filterCompletedJobs)->isNotEmpty();
 
         if ($hasRunningJob) {
             Log::info(
@@ -56,6 +62,8 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
             );
             return;
         }
+
+        $kubernetesClient->setNamespace('default');
 
         $mwPod = $kubernetesClient->pods()->setFieldSelector([
             'status.phase' => 'Running'
@@ -76,6 +84,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
 
         $mwPod = $mwPod->toArray();
 
+        $kubernetesClient->setNamespace('api-jobs');
         $jobSpec = new KubernetesJob([
             'metadata' => [
                 'generateName' => 'run-all-mw-jobs-',
@@ -125,10 +134,11 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
         ]);
 
         $job = $kubernetesClient->jobs()->create($jobSpec);
-        $jobName = data_get($job, 'metadata.name', 'unknown');
+        $jobName = data_get($job, 'metadata.name', 'n/a');
         Log::info(
             'MediaWiki Job for wiki "'.$this->wikiDomain.'" created with name "'.$jobName.'".'
         );
+
         return;
     }
 
