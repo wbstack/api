@@ -16,17 +16,31 @@ services:
     expose:
         - 9999
 
-  elasticsearch:
-      image: wikibase/elasticsearch:6.5.4-wmde.1
-      restart: unless-stopped
-      ports:
-        - 9200:9200
-      networks:
-        default:
-          aliases:
-          - elasticsearch.svc
-      environment:
-        discovery.type: single-node
-        ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+  elasticsearch-6:
+    image: wikibase/elasticsearch:6.8.23-wmde.6
+    restart: unless-stopped
+    ports:
+      - 9200:9200
+    networks:
+      default:
+        aliases:
+          - elasticsearch-6.svc
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+
+  elasticsearch-7:
+    image: wikibase/elasticsearch:7.10.2-wmde.11
+    restart: unless-stopped
+    ports:
+      - 9201:9200
+    networks:
+      default:
+        aliases:
+          - elasticsearch-7.svc
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+
 volumes:
   query-service-data:

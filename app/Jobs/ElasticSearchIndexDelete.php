@@ -59,33 +59,51 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
             $setting->update( [  'value' => false  ] );
             return;
         }
-        
+
         $elasticSearchBaseName = $wikiDB->name;
-        $elasticSearchHost = Config::get('wbstack.elasticsearch_host');
-        
-        if( !$elasticSearchHost ) {
+
+        $primaryElasticSearchHost = Config::get( 'wbstack.primary_elasticsearch_host' );
+        if( !$primaryElasticSearchHost ) {
             $this->fail( new \RuntimeException('wbstack.elasticsearch_host not configured') );
             return;
         }
-        try{
-            $elasticSearchHelper = new ElasticSearchHelper($elasticSearchHost, $elasticSearchBaseName);
 
-            // Not having any indices to remove should not fail the job
-            if( !$elasticSearchHelper->hasIndices($request) ) {
-                $setting->update( [  'value' => false  ] );
-                return;
+        try {
+            $this->deleteIndices( $request, $primaryElasticSearchHost, $elasticSearchBaseName );
+
+            $secondaryElasticSearchHost = Config::get( 'wbstack.secondary_elasticsearch_host' );
+            if ( $secondaryElasticSearchHost ) {
+                $this->deleteIndices( $request, $secondaryElasticSearchHost, $elasticSearchBaseName );
             }
-        } catch(\RuntimeException $exception) {
-            $this->fail($exception);
+        } catch ( \RuntimeException $exception ) {
+            $this->fail( $exception );
             return;
         }
 
+        $setting->update( [  'value' => false ] );
+    }
+
+    /**
+     * @param  HttpRequest  $request
+     * @param  string $elasticSearchHost
+     * @param  string $elasticSearchBaseName
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    private function deleteIndices( $request, $elasticSearchHost, $elasticSearchBaseName ) {
+        $elasticSearchHelper = new ElasticSearchHelper( $elasticSearchHost, $elasticSearchBaseName );
+
+        // Not having any indices to remove should not fail the job
+        if( !$elasticSearchHelper->hasIndices( $request ) ) {
+            return;
+        }
 
         // So there are some indices to delete for the wiki
         //
         // make a request to the elasticsearch cluster using DELETE
         // use cirrusSearch baseName to delete indices
-        $url = $elasticSearchHost."/{$elasticSearchBaseName}*";
+        $url = $elasticSearchHost . "/{$elasticSearchBaseName}*";
 
         $request->reset();
 
@@ -94,7 +112,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
-                CURLOPT_TIMEOUT => getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_DELETE_DELETE') ?: 60,
+                CURLOPT_TIMEOUT => getenv( 'CURLOPT_TIMEOUT_ELASTICSEARCH_DELETE_DELETE' ) ?: 60,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'DELETE',
             ]
@@ -104,18 +122,14 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
         $err = $request->error();
         $request->close();
 
-        if ($err ) {
-            $this->fail( new \RuntimeException('curl error for '.$this->wikiId.': '.$err) );
-            return;
+        if ( $err ) {
+            throw new \RuntimeException( 'curl error for ' . $this->wikiId . ': ' . $err );
         }
 
-        $response = json_decode($rawResponse, true);
+        $response = json_decode( $rawResponse, true );
 
-        if ( !is_array($response) || !array_key_exists('acknowledged', $response) || $response['acknowledged'] !== true) {
-            $this->fail( new \RuntimeException('ElasticSearchIndexDelete job for '.$this->wikiId.' was not successful: '.$rawResponse) );
-            return;
+        if ( !is_array( $response ) || !array_key_exists( 'acknowledged', $response ) || $response[ 'acknowledged' ] !== true ) {
+            throw new \RuntimeException( 'ElasticSearchIndexDelete job for ' . $this->wikiId . ' was not successful: ' . $rawResponse );
         }
-
-        $setting->update( [  'value' => false ] );
     }
 }
