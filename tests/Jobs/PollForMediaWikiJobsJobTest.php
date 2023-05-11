@@ -74,4 +74,23 @@ class PollForMediaWikiJobsJobTest extends TestCase
         $job->handle();
         Bus::assertDispatched(ProcessMediaWikiJobsJob::class);
     }
+
+    public function testWithFailure()
+    {
+        Http::fake([
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => Http::response([
+                'error' => 'Something went wrong'
+            ], 500)
+        ]);
+        Bus::fake();
+
+        $mockJob = $this->createMock(Job::class);
+
+        $job = new PollForMediaWikiJobsJob();
+        $job->setJob($mockJob);
+
+        $mockJob->expects($this->once())->method('fail');
+        $job->handle();
+        Bus::assertNothingDispatched();
+    }
 }
