@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class PollForMediaWikiJobsJob extends Job
 {
-    public function handle(): void
+    public function handle (): void
     {
         $wikis = Wiki::all()->pluck('domain');
         foreach ($wikis as $wikiDomain) {
@@ -17,7 +17,7 @@ class PollForMediaWikiJobsJob extends Job
         }
     }
 
-    private function hasPendingJobs(string $wikiDomain): bool
+    private function hasPendingJobs (string $wikiDomain): bool
     {
         $response = Http::withHeaders([
             'host' => $wikiDomain
@@ -36,7 +36,7 @@ class PollForMediaWikiJobsJob extends Job
         }
 
         $pendingJobs = data_get($response->json(), 'query.statistics.jobs', 0);
-        return $pendingJobs == 0;
+        return $pendingJobs > 0;
     }
 
     private function enqueueWiki (string $wikiDomain): void
