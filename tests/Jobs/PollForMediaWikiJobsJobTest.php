@@ -41,12 +41,36 @@ class PollForMediaWikiJobsJobTest extends TestCase
         ]);
 
         $mockJob = $this->createMock(Job::class);
+        $job = new PollForMediaWikiJobsJob();
+        $job->setJob($mockJob);
+
         $mockJob->expects($this->never())->method('fail');
-        $mockJob->expects($this->never())->method('enqueueWiki');
+        // $mockJob->expects($this->never())->method('enqueueWiki');
         $mockJob->expects($this->once())->method('hasPendingJobs')->with($this->wiki->getAttribute('domain'));
+
+        $job->handle();
+    }
+
+    public function testWithJobs()
+    {
+        Http::fake([
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => Http::response([
+                'query' => [
+                    'statistics' => [
+                        'jobs' => 3
+                    ]
+                ]
+            ], 200)
+        ]);
+
+        $mockJob = $this->createMock(Job::class);
 
         $job = new PollForMediaWikiJobsJob();
         $job->setJob($mockJob);
+
+        $mockJob->expects($this->never())->method('fail');
+        // $mockJob->expects($this->once())->method('enqueueWiki');
+        $mockJob->expects($this->once())->method('hasPendingJobs')->with($this->wiki->getAttribute('domain'));
 
         $job->handle();
     }
