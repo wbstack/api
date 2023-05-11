@@ -42,6 +42,8 @@ class PollForMediaWikiJobsJobTest extends TestCase
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
+        $mockJob->expects($this->never())->method('enqueueWiki');
+        $mockJob->expects($this->once())->method('hasPendingJobs')->with($this->wiki->getAttribute('domain'));
 
         $job = new PollForMediaWikiJobsJob();
         $job->setJob($mockJob);
