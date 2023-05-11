@@ -3,7 +3,7 @@
 namespace Tests\Routes\Auth;
 
 use App\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
 
@@ -12,7 +12,7 @@ class LoginTest extends TestCase
     protected $route = 'auth/login';
 
     use OptionsRequestAllowed;
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function testLoginFail_noExistingUser()
     {
