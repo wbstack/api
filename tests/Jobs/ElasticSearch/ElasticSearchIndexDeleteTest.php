@@ -25,7 +25,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
-        $this->elasticSearchHost = Config::get('wbstack.elasticsearch_host');
+        $this->elasticSearchHost = Config::get('wbstack.primary_elasticsearch_host');
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);

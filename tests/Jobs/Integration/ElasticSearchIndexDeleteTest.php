@@ -64,7 +64,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
             $this->markTestSkipped('No blazegraph instance to connect to');
         }
 
-        $ELASTICSEARCH_HOST=Config::get('wbstack.elasticsearch_host');
+        $ELASTICSEARCH_HOST=Config::get('wbstack.primary_elasticsearch_host');
 
         if ( !$ELASTICSEARCH_HOST ) {
             throw new \Exception('ELASTICSEARCH_HOST / wbstack.elasticsearch_host not set');
