@@ -64,7 +64,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
 
         $primaryElasticSearchHost = Config::get( 'wbstack.primary_elasticsearch_host' );
         if( !$primaryElasticSearchHost ) {
-            $this->fail( new \RuntimeException('wbstack.elasticsearch_host not configured') );
+            $this->fail( new \RuntimeException('wbstack.primary_elasticsearch_host not configured') );
             return;
         }
 

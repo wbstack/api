@@ -60,12 +60,12 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
         $wikiDB = $wiki->wikiDb()->first();
 
         if( $wikiDB ) {
-            try{
+            try {
                 $elasticSearchBaseName = $wikiDB->name;
                 $primaryElasticSearchHost = Config::get( 'wbstack.primary_elasticsearch_host' );
                 $secondaryElasticSearchHost = Config::get( 'wbstack.secondary_elasticsearch_host' );
 
-                $elasticSearchHelper = new ElasticSearchHelper( $elasticSearchHost, $elasticSearchBaseName );
+                $elasticSearchHelper = new ElasticSearchHelper( $primaryElasticSearchHost, $elasticSearchBaseName );
                 if( $elasticSearchHelper->hasIndices( $request ) ) {
                     throw new \RuntimeException("Elasticsearch indices with basename {$elasticSearchBaseName} still exists in primary cluster");
                 }
