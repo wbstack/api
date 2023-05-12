@@ -65,7 +65,7 @@ class CreateTest extends TestCase
         Queue::assertPushed( ProvisionWikiDbJob::class, 1);
         Queue::assertPushed( MediawikiInit::class, 1);
         if( $elasticSearchEnabledForNewWikis ) {
-            Queue::assertPushed( ElasticSearchIndexInit::class, 1);
+            Queue::assertPushed( ElasticSearchIndexInit::class, 2);
         } else {
             Queue::assertNotPushed( ElasticSearchIndexInit::class );
         }

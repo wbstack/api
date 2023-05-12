@@ -20,12 +20,14 @@ class ElasticSearchIndexDeleteTest extends TestCase
     private $wiki;
     private $user;
     private $wikiDb;
-    private $elasticSearchHost;
+    private $primaryElasticSearchHost;
+    private $secondaryElasticSearchHost;
 
     public function setUp(): void {
         parent::setUp();
 
-        $this->elasticSearchHost = Config::get('wbstack.primary_elasticsearch_host');
+        $this->primaryElasticSearchHost = Config::get('wbstack.primary_elasticsearch_host');
+        $this->secondaryElasticSearchHost = Config::get('wbstack.secondary_elasticsearch_host');
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
@@ -50,16 +52,16 @@ class ElasticSearchIndexDeleteTest extends TestCase
         $mockJsonSuccess = '{"acknowledged" : true}';
 
         $request = $this->createMock(HttpRequest::class);
-        $request->expects($this->exactly(2))
+        $request->expects($this->exactly(4))
             ->method('execute')
-            ->willReturnOnConsecutiveCalls($mockResponse, $mockJsonSuccess);
+            ->willReturnOnConsecutiveCalls($mockResponse, $mockJsonSuccess, $mockResponse, $mockJsonSuccess);
 
 
-        $request->expects($this->exactly(2))
+        $request->expects($this->exactly(4))
             ->method('setOptions')
             ->withConsecutive( 
             [[
-                CURLOPT_URL => $this->elasticSearchHost.'/_cat/indices/'.$this->wikiDb->name.'*?v&s=index&h=index',
+                CURLOPT_URL => $this->primaryElasticSearchHost.'/_cat/indices/'.$this->wikiDb->name.'*?v&s=index&h=index',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 10,
@@ -67,13 +69,30 @@ class ElasticSearchIndexDeleteTest extends TestCase
                 CURLOPT_CUSTOMREQUEST => 'GET',
             ]],
             [[
-                CURLOPT_URL => $this->elasticSearchHost.'/'.$this->wikiDb->name.'*',
+                CURLOPT_URL => $this->primaryElasticSearchHost.'/'.$this->wikiDb->name.'*',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 60,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'DELETE',
-            ]]);
+            ]],
+            [[
+                CURLOPT_URL => $this->secondaryElasticSearchHost.'/_cat/indices/'.$this->wikiDb->name.'*?v&s=index&h=index',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_TIMEOUT => 10,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+            ]],
+            [[
+                CURLOPT_URL => $this->secondaryElasticSearchHost.'/'.$this->wikiDb->name.'*',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_TIMEOUT => 60,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'DELETE',
+            ]],
+        );
         
 
         $mockJob = $this->createMock(Job::class);
@@ -141,10 +160,10 @@ class ElasticSearchIndexDeleteTest extends TestCase
             true
         ];
 
-        if ( $this->elasticSearchHost ) {
+        if ( $this->primaryElasticSearchHost ) {
             yield [
                 $this->createMock(HttpRequest::class),
-                'Response looks weird when querying http://'.$this->elasticSearchHost.'/_cat/indices/<WIKI_DB_NAME>*?v&s=index&h=index',
+                'Response looks weird when querying http://'.$this->primaryElasticSearchHost.'/_cat/indices/<WIKI_DB_NAME>*?v&s=index&h=index',
                 [ "<html>asdasd\n\nasdasd", $mockJsonSuccess ],
                 true
             ];

@@ -67,7 +67,7 @@ class DeleteWikiFinalizeJobTest extends TestCase
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())->method('fail')->with(
-            new \RuntimeException("Elasticsearch indices with basename {$wikiDbName} still exists")
+            new \RuntimeException("Elasticsearch indices with basename {$wikiDbName} still exists in primary cluster")
         );
 
         $job = new DeleteWikiFinalizeJob( $wiki->id );
