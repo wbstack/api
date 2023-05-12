@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Config;
  * 
  * curl -X DELETE "localhost:9200/*?pretty"
  * 
- * Example: docker-compose exec -e RUN_PHPUNIT_INTEGRATION_TEST=1 -e WBSTACK_PRIMARY_ELASTICSEARCH_HOST=elasticsearch.svc:9200 -T api vendor/bin/phpunit tests/Jobs/Integration/ElasticSearchIndexDeleteTest.php
+ * Example: docker-compose exec -e RUN_PHPUNIT_INTEGRATION_TEST=1 -e WBSTACK_PRIMARY_ELASTICSEARCH_HOST=elasticsearch.svc:9200 -e WBSTACK_SECONDARY_ELASTICSEARCH_HOST=null -T api vendor/bin/phpunit tests/Jobs/Integration/ElasticSearchIndexDeleteTest.php
  */
 class ElasticSearchIndexDeleteTest extends TestCase
 {
