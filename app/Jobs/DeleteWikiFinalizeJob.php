@@ -8,6 +8,7 @@ use App\QueryserviceNamespace;
 use App\WikiDb;
 use Traversable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\WikiLogoController;
 use Illuminate\Contracts\Filesystem\Cloud;
