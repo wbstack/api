@@ -13,8 +13,8 @@ return [
 
     'platform_summary_inactive_threshold' => env('WBSTACK_SUMMARY_INACTIVE_THRESHOLD', 60 * 60 * 24 * 90),
 
-    'primary_elasticsearch_host' => env('PRIMARY_ELASTICSEARCH_HOST', false),
-    'secondary_elasticsearch_host' => env('SECONDARY_ELASTICSEARCH_HOST', false),
+    'primary_elasticsearch_host' => env('WBSTACK_PRIMARY_ELASTICSEARCH_HOST', false),
+    'secondary_elasticsearch_host' => env('WBSTACK_SECONDARY_ELASTICSEARCH_HOST', false),
     'elasticsearch_enabled_by_default' => env('WBSTACK_ELASTICSEARCH_ENABLED_BY_DEFAULT', false),
 
 ];
