@@ -15,6 +15,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
     use InteractsWithQueue, Queueable;
 
     private string $wikiDomain;
+    private string $jobsKubernetesNamespace;
     private int $apiJobConcurrencyLimit;
 
     public function __construct (string $wikiDomain)
@@ -23,6 +24,9 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
         $this->apiJobConcurrencyLimit = getenv('API_JOB_CONCURRENCY_LIMIT')
             ? intval(getenv('API_JOB_CONCURRENCY_LIMIT'), 10)
             : 8;
+        $this->jobsKubernetesNamespace = getenv('API_JOB_NAMESPACE')
+            ? getenv('API_JOB_NAMESPACE')
+            : 'api-jobs';
     }
 
     public function uniqueId(): string
@@ -37,7 +41,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
             return $phase === 'Running' || $phase === 'Pending';
         };
 
-        $kubernetesClient->setNamespace('api-jobs');
+        $kubernetesClient->setNamespace($this->jobsKubernetesNamespace);
 
         $numJobs = $kubernetesClient->jobs()->setLabelSelector([
             'app.kubernetes.io/name' => 'run-all-mw-jobs'
@@ -84,11 +88,11 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
 
         $mediawikiPod = $mediawikiPod->toArray();
 
-        $kubernetesClient->setNamespace('api-jobs');
+        $kubernetesClient->setNamespace($this->jobsKubernetesNamespace);
         $jobSpec = new KubernetesJob([
             'metadata' => [
                 'generateName' => 'run-all-mw-jobs-',
-                'namespace' => 'api-jobs',
+                'namespace' => $this->jobsKubernetesNamespace,
                 'labels' => [
                     'app.kubernetes.io/instance' => $this->wikiDomain,
                     'app.kubernetes.io/name' => 'run-all-mw-jobs'
