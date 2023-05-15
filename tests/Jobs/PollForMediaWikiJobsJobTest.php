@@ -25,12 +25,6 @@ class PollForMediaWikiJobsJobTest extends TestCase
         $this->wiki = Wiki::factory()->create();
     }
 
-    public function tearDown(): void
-    {
-        $this->wiki->delete();
-        parent::tearDown();
-    }
-
     public function testNoJobs()
     {
         Http::fake([
