@@ -10,8 +10,8 @@ class PollForMediaWikiJobsJob extends Job
 {
     public function handle (): void
     {
-        $wikis = Wiki::all()->pluck('domain');
-        foreach ($wikis as $wikiDomain) {
+        $allWikiDomains = Wiki::all()->pluck('domain');
+        foreach ($allWikiDomains as $wikiDomain) {
             if ($this->hasPendingJobs($wikiDomain)) {
                 $this->enqueueWiki($wikiDomain);
             }
@@ -34,8 +34,8 @@ class PollForMediaWikiJobsJob extends Job
             return false;
         }
 
-        $pendingJobs = data_get($response->json(), 'query.statistics.jobs', 0);
-        return $pendingJobs > 0;
+        $pendingJobsCount = data_get($response->json(), 'query.statistics.jobs', 0);
+        return $pendingJobsCount > 0;
     }
 
     private function enqueueWiki (string $wikiDomain): void

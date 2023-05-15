@@ -52,11 +52,11 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
             return;
         }
 
-        $hasRunningJob = $kubernetesClient->jobs()->setLabelSelector([
+        $hasRunningJobForSameWiki = $kubernetesClient->jobs()->setLabelSelector([
             'app.kubernetes.io/instance' => $this->wikiDomain
         ])->find()->filter($filterCompletedJobs)->isNotEmpty();
 
-        if ($hasRunningJob) {
+        if ($hasRunningJobForSameWiki) {
             Log::info(
                 'Job for wiki "'.$this->wikiDomain.'" is still in process, skipping creation.'
             );
@@ -65,14 +65,14 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
 
         $kubernetesClient->setNamespace('default');
 
-        $mwPod = $kubernetesClient->pods()->setFieldSelector([
+        $mediawikiPod = $kubernetesClient->pods()->setFieldSelector([
             'status.phase' => 'Running'
         ])->setLabelSelector([
             'app.kubernetes.io/name' => 'mediawiki',
             'app.kubernetes.io/component' => 'app-backend'
         ])->first();
 
-        if ($mwPod === null) {
+        if ($mediawikiPod === null) {
             $this->fail(
                 new \RuntimeException(
                     'Unable to find a running MediaWiki pod in the cluster, '.
@@ -82,7 +82,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
             return;
         }
 
-        $mwPod = $mwPod->toArray();
+        $mediawikiPod = $mediawikiPod->toArray();
 
         $kubernetesClient->setNamespace('api-jobs');
         $jobSpec = new KubernetesJob([
@@ -104,9 +104,9 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
                         'containers' => [
                             0 => [
                                 'name' => 'run-all-mw-jobs',
-                                'image' => $mwPod['spec']['containers'][0]['image'],
+                                'image' => $mediawikiPod['spec']['containers'][0]['image'],
                                 'env' => array_merge(
-                                    $mwPod['spec']['containers'][0]['env'],
+                                    $mediawikiPod['spec']['containers'][0]['env'],
                                     [['name' => 'WBS_DOMAIN', 'value' => $this->wikiDomain]]
                                 ),
                                 'command' => [
