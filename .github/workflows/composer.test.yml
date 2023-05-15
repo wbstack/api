@@ -43,7 +43,6 @@ jobs:
 
     - name: Setup - Other things
       run: |
-        docker-compose exec -T api php artisan passport:install
         docker-compose exec -T api php artisan key:generate
 
     - name: PHPUnit

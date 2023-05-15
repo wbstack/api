@@ -14,6 +14,12 @@ class LoginTest extends TestCase
     use OptionsRequestAllowed;
     use DatabaseTransactions;
 
+    public function setUp (): void
+    {
+        parent::setUp();
+        $this->artisan('passport:install', ['--no-interaction' => true]);
+    }
+
     public function testLoginFail_noExistingUser()
     {
         // This random user probably doesn't exist in the db
