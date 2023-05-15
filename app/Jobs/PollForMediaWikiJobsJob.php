@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Wiki;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PollForMediaWikiJobsJob extends Job
 {
@@ -26,12 +27,10 @@ class PollForMediaWikiJobsJob extends Job
         );
 
         if ($response->failed()) {
-            $this->fail(
-                new \RuntimeException(
-                    'Failure polling wiki '.$wikiDomain.' for pending MediaWiki jobs: '.$response->clientError()
-                )
+            $this->job->markAsFailed();
+            Log::error(
+                'Failure polling wiki '.$wikiDomain.' for pending MediaWiki jobs: '.$response->clientError()
             );
-
             return false;
         }
 

@@ -48,6 +48,7 @@ class PollForMediaWikiJobsJobTest extends TestCase
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
+        $mockJob->expects($this->never())->method('markAsFailed');
         $job->handle();
         Bus::assertNothingDispatched();
     }
@@ -71,6 +72,7 @@ class PollForMediaWikiJobsJobTest extends TestCase
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
+        $mockJob->expects($this->never())->method('markAsFailed');
         $job->handle();
         Bus::assertDispatched(ProcessMediaWikiJobsJob::class);
     }
@@ -89,7 +91,8 @@ class PollForMediaWikiJobsJobTest extends TestCase
         $job = new PollForMediaWikiJobsJob();
         $job->setJob($mockJob);
 
-        $mockJob->expects($this->once())->method('fail');
+        $mockJob->expects($this->once())->method('markAsFailed');
+        $mockJob->expects($this->never())->method('fail');
         $job->handle();
         Bus::assertNothingDispatched();
     }
