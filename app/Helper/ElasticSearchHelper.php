@@ -19,6 +19,9 @@ class ElasticSearchHelper
 
         // Make an initial request to see if there is anything
         $url = $this->elasticSearchHost."/_cat/indices/{$this->elasticSearchBaseName}*?v&s=index&h=index"; 
+
+        $request->reset();
+
         $request->setOptions( 
             [
                 CURLOPT_URL => $url,
