@@ -10,13 +10,14 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Database\Eloquent\Model;
 
 class PollForMediaWikiJobsJobTest extends TestCase
 {
 
     use RefreshDatabase;
 
-    private $wiki;
+    private Model $wiki;
 
     public function setUp(): void
     {
@@ -26,7 +27,7 @@ class PollForMediaWikiJobsJobTest extends TestCase
 
     public function tearDown(): void
     {
-        $this->wiki->forceDelete();
+        $this->wiki->delete();
         parent::tearDown();
     }
 
