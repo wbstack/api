@@ -21,7 +21,6 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
     public function __construct (string $wikiDomain)
     {
         $this->wikiDomain = $wikiDomain;
-        $this->apiJobConcurrencyLimit = intval(env('API_JOB_CONCURRENCY_LIMIT', 8), 10);
         $this->jobsKubernetesNamespace = env('API_JOB_NAMESPACE', 'api-jobs');
     }
 
@@ -38,19 +37,6 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
         };
 
         $kubernetesClient->setNamespace($this->jobsKubernetesNamespace);
-
-        $numJobs = $kubernetesClient->jobs()->setLabelSelector([
-            'app.kubernetes.io/name' => 'run-all-mw-jobs'
-        ])->find()->filter($filterCompletedJobs)->count();
-
-        if ($numJobs >= $this->apiJobConcurrencyLimit) {
-            Log::info(
-                $numJobs.' running jobs were found, skipping creation of new '.
-                'ones in order not to exceed the given concurrency '.
-                'limit of '.$this->apiJobConcurrencyLimit.'.'
-            );
-            return;
-        }
 
         $hasRunningJobForSameWiki = $kubernetesClient->jobs()->setLabelSelector([
             'app.kubernetes.io/instance' => $this->wikiDomain
