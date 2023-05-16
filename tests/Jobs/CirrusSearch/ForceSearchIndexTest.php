@@ -32,7 +32,7 @@ class ForceSearchIndexTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
-        $this->cluster = 'primary';
+        $this->cluster = 'default';
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);

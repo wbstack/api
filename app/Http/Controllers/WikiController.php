@@ -127,7 +127,7 @@ class WikiController extends Controller
 
         // dispatch elasticsearch init job to enable the feature
         if ( Config::get( 'wbstack.elasticsearch_enabled_by_default' ) ) {
-            $this->dispatch( new ElasticSearchIndexInit( $wiki->id, 'primary' ) );
+            $this->dispatch( new ElasticSearchIndexInit( $wiki->id, 'default' ) );
 
             if ( Config::get( 'wbstack.secondary_elasticsearch_host' ) ) {
                 $this->dispatch( new ElasticSearchIndexInit( $wiki->id, 'secondary') );
