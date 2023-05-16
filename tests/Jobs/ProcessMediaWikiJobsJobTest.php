@@ -52,7 +52,6 @@ class ProcessMediaWikiJobsJobTest extends TestCase
 
         $mock = new MockHandler([
             new Response(200, [], json_encode([ 'items' => [] ])),
-            new Response(200, [], json_encode([ 'items' => [] ])),
             new Response(200, [], json_encode([ 'items' => [
                 [
                     'kind' => 'Pod',

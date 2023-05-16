@@ -16,7 +16,6 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
 
     private string $wikiDomain;
     private string $jobsKubernetesNamespace;
-    private int $apiJobConcurrencyLimit;
 
     public function __construct (string $wikiDomain)
     {
@@ -31,16 +30,21 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
 
     public function handle (Client $kubernetesClient): void
     {
-        $filterCompletedJobs = function (KubernetesJob $job, int $key): bool {
-            $phase = data_get($job->toArray(), 'status.conditions.0.type', null);
-            return $phase === 'Running' || $phase === 'Pending';
-        };
-
         $kubernetesClient->setNamespace($this->jobsKubernetesNamespace);
 
         $hasRunningJobForSameWiki = $kubernetesClient->jobs()->setLabelSelector([
             'app.kubernetes.io/instance' => $this->wikiDomain
-        ])->find()->filter($filterCompletedJobs)->isNotEmpty();
+        ])->find()->filter(function (KubernetesJob $job, int $key): bool {
+            $conditions = data_get($job->toArray(), 'status.conditions.0.status', 'False');
+            $type = data_get($job->toArray(), 'status.conditions.0.type', 'n/a');
+
+            $status = data_get($conditions, 'status', 'False');
+            if ($status !== 'True') {
+                return true;
+            }
+
+            return $type !== 'Complete' && $type !== 'Failure';
+        })->isNotEmpty();
 
         if ($hasRunningJobForSameWiki) {
             Log::info(
