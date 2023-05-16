@@ -10,6 +10,6 @@ sequenceDiagram
     PollForMediaWikiJobsJob->>+ProcessMediaWikiJobsJob: Created if there are 0>jobs on a given Wiki
     ProcessMediaWikiJobsJob->>+Kubernetes API: request spec for existing mediawiki backend pod
     Kubernetes API->>-ProcessMediaWikiJobsJob: spec for existing mediawiki backend pod
-    ProcessMediaWikiJobsJob->>+Kubernetes API: submit new k8s job if no existing job exists
-    Kubernetes API->>+run-all-mw-jobs- pod: creates if there is space in namespace
+    ProcessMediaWikiJobsJob->>+Kubernetes API: submit new k8s job if no existing job exists and we are not exceeding a concurrency limit
+    Kubernetes API->>+run-all-mw-jobs- pod: created by the job
 ```
