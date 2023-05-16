@@ -21,12 +21,8 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
     public function __construct (string $wikiDomain)
     {
         $this->wikiDomain = $wikiDomain;
-        $this->apiJobConcurrencyLimit = getenv('API_JOB_CONCURRENCY_LIMIT')
-            ? intval(getenv('API_JOB_CONCURRENCY_LIMIT'), 10)
-            : 8;
-        $this->jobsKubernetesNamespace = getenv('API_JOB_NAMESPACE')
-            ? getenv('API_JOB_NAMESPACE')
-            : 'api-jobs';
+        $this->apiJobConcurrencyLimit = intval(env('API_JOB_CONCURRENCY_LIMIT', 8), 10);
+        $this->jobsKubernetesNamespace = env('API_JOB_NAMESPACE', 'api-jobs');
     }
 
     public function uniqueId(): string
