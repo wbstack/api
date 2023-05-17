@@ -26,8 +26,6 @@ class ProcessMediaWikiJobsJobTest extends TestCase
 
         $mock = new MockHandler([
             new Response(200, [], json_encode([ 'items' => [] ])),
-            new Response(200, [], json_encode([ 'items' => [] ])),
-            new Response(200, [], json_encode([ 'items' => [] ]))
         ]);
 
         $handlerStack = HandlerStack::create($mock);
@@ -51,7 +49,6 @@ class ProcessMediaWikiJobsJobTest extends TestCase
         $job->setJob($mockJob);
 
         $mock = new MockHandler([
-            new Response(200, [], json_encode([ 'items' => [] ])),
             new Response(200, [], json_encode([ 'items' => [
                 [
                     'kind' => 'Pod',
@@ -67,6 +64,7 @@ class ProcessMediaWikiJobsJobTest extends TestCase
                     ]
                 ]
             ]])),
+            new Response(200, [], json_encode([ 'items' => [] ])),
             new Response(201, [], json_encode([ 'items' => [] ]))
         ]);
 

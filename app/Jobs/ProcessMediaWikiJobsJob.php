@@ -30,28 +30,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
 
     public function handle (Client $kubernetesClient): void
     {
-        $kubernetesClient->setNamespace($this->jobsKubernetesNamespace);
-
-        // Room for optimization: whenever we move away from maclof/kubernetes, we could also
-        // handle deduplication per wiki on Kubernetes level: When trying to create a job that
-        // already exists, Kubernetes returns "409 Conflict" which we could consider
-        // wanted behavior and just try to create a job every time this Job is called.
-        //
-        // This is currently not possible because the Kubernetes client does not let us inspect
-        // the response code of a failed job creation.
-        $hasRunningJobForSameWiki = $kubernetesClient->jobs()->setLabelSelector([
-            'app.kubernetes.io/instance' => $this->wikiDomain
-        ])->find()->isNotEmpty();
-
-        if ($hasRunningJobForSameWiki) {
-            Log::info(
-                'Job for wiki "'.$this->wikiDomain.'" is still in process, skipping creation.'
-            );
-            return;
-        }
-
         $kubernetesClient->setNamespace('default');
-
         $mediawikiPod = $kubernetesClient->pods()->setFieldSelector([
             'status.phase' => 'Running'
         ])->setLabelSelector([
@@ -68,13 +47,12 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
             );
             return;
         }
-
         $mediawikiPod = $mediawikiPod->toArray();
 
         $kubernetesClient->setNamespace($this->jobsKubernetesNamespace);
         $jobSpec = new KubernetesJob([
             'metadata' => [
-                'generateName' => 'run-all-mw-jobs-',
+                'name' => 'run-all-mw-jobs-'.hash('sha256', $this->wikiDomain),
                 'namespace' => $this->jobsKubernetesNamespace,
                 'labels' => [
                     'app.kubernetes.io/instance' => $this->wikiDomain,
@@ -120,7 +98,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
             ]
         ]);
 
-        $job = $kubernetesClient->jobs()->create($jobSpec);
+        $job = $kubernetesClient->jobs()->apply($jobSpec);
         $jobName = data_get($job, 'metadata.name', 'n/a');
         Log::info(
             'MediaWiki Job for wiki "'.$this->wikiDomain.'" created with name "'.$jobName.'".'
