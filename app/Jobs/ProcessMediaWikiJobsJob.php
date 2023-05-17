@@ -32,19 +32,16 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
     {
         $kubernetesClient->setNamespace($this->jobsKubernetesNamespace);
 
+        // Room for optimization: whenever we move away from maclof/kubernetes, we could also
+        // handle deduplication per wiki on Kubernetes level: When trying to create a job that
+        // already exists, Kubernetes returns "409 Conflict" which we could consider
+        // wanted behavior and just try to create a job every time this Job is called.
+        //
+        // This is currently not possible because the Kubernetes client does not let us inspect
+        // the response code of a failed job creation.
         $hasRunningJobForSameWiki = $kubernetesClient->jobs()->setLabelSelector([
             'app.kubernetes.io/instance' => $this->wikiDomain
-        ])->find()->filter(function (KubernetesJob $job, int $key): bool {
-            $conditions = data_get($job->toArray(), 'status.conditions.0.status', 'False');
-            $type = data_get($job->toArray(), 'status.conditions.0.type', 'n/a');
-
-            $status = data_get($conditions, 'status', 'False');
-            if ($status !== 'True') {
-                return true;
-            }
-
-            return $type !== 'Complete' && $type !== 'Failure';
-        })->isNotEmpty();
+        ])->find()->isNotEmpty();
 
         if ($hasRunningJobForSameWiki) {
             Log::info(
@@ -85,7 +82,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
                 ]
             ],
             'spec' => [
-                'ttlSecondsAfterFinished' => 60 * 60,
+                'ttlSecondsAfterFinished' => 0,
                 'template' => [
                     'metadata' => [
                         'name' => 'run-all-mw-jobs'
