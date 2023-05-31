@@ -65,7 +65,11 @@ class ProcessMediaWikiJobsJobTest extends TestCase
                 ]
             ]])),
             new Response(200, [], json_encode([ 'items' => [] ])),
-            new Response(201, [], json_encode([ 'items' => [] ]))
+            new Response(201, [], json_encode([
+                'metadata' => [
+                    'name' => 'some-job-name'
+                ]
+            ]))
         ]);
 
         $handlerStack = HandlerStack::create($mock);
