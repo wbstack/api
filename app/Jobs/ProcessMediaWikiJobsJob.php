@@ -52,7 +52,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
         $kubernetesClient->setNamespace($this->jobsKubernetesNamespace);
         $jobSpec = new KubernetesJob([
             'metadata' => [
-                'name' => 'run-all-mw-jobs-'.hash('sha256', $this->wikiDomain),
+                'name' => 'run-all-mw-jobs-'.hash('sha1', $this->wikiDomain),
                 'namespace' => $this->jobsKubernetesNamespace,
                 'labels' => [
                     'app.kubernetes.io/instance' => $this->wikiDomain,
