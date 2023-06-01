@@ -14,5 +14,6 @@
     <env name="APP_ENV" value="testing"/>
     <env name="CACHE_DRIVER" value="array"/>
     <env name="QUEUE_CONNECTION" value="sync"/>
+    <env name="PLATFORM_MW_BACKEND_HOST" value="mediawiki-139-app-backend.default.svc.cluster.default"/>
   </php>
 </phpunit>

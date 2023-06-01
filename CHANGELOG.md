@@ -1,5 +1,8 @@
 # api
 
+## 8x.12.0 - TBD
+- Poll wikis for pending MediaWiki jobs and create Kubernetes jobs to process them if needed
+
 ## 8x.11.1 - 18 April 2023
 - Do not disable elastic search on wikis after a failure
 
