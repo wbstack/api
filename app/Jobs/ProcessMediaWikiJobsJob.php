@@ -109,7 +109,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
             return;
         }
         Log::info(
-            'MediaWiki Job for wiki "'.$this->wikiDomain.'" created with name "'.$jobName.'".'
+            'MediaWiki Job for wiki "'.$this->wikiDomain.'" exists or was created with name "'.$jobName.'".'
         );
 
         return;
