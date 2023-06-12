@@ -5,9 +5,11 @@ namespace App\Jobs;
 use App\Wiki;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 
-class PollForMediaWikiJobsJob extends Job
+class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique
 {
+    public $timeout = 3600;
     public function handle (): void
     {
         $allWikiDomains = Wiki::all()->pluck('domain');

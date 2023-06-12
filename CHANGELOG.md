@@ -1,6 +1,9 @@
 # api
 
-## 8x.12.0 - TBD
+## 8x.12.1 - 12 June 2023
+- Raise timeout values for polling wikis for pending jobs
+
+## 8x.12.0 - 01 June 2023
 - Poll wikis for pending MediaWiki jobs and create Kubernetes jobs to process them if needed
 
 ## 8x.11.1 - 18 April 2023
