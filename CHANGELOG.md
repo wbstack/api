@@ -1,5 +1,8 @@
 # api
 
+## 8x.12.2 - 13 June 2023
+- Make sure job for polling wikis does queue properly
+
 ## 8x.12.1 - 12 June 2023
 - Raise timeout values for polling wikis for pending jobs
 
