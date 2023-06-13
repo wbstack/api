@@ -6,8 +6,9 @@ use App\Wiki;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique
+class PollForMediaWikiJobsJob extends Job implements ShouldQueue, ShouldBeUnique
 {
     public $timeout = 3600;
     public function handle (): void
