@@ -1,5 +1,8 @@
 # api
 
+## 8x.12.2 - 13 June 2023
+- Concurrently poll wikis for pending jobs
+
 ## 8x.12.1 - 12 June 2023
 - Raise timeout values for polling wikis for pending jobs
 
