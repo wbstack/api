@@ -45,7 +45,7 @@ class Kernel extends ConsoleKernel
         // Schedule site stat updates for each wiki and platform-summary
         $schedule->command('schedule:stats')->daily();
 
-        $schedule->job(new PollForMediaWikiJobsJob)->everyMinute();
+        $schedule->job(new PollForMediaWikiJobsJob)->name('Poll for MediaWiki Jobs')->withoutOverlapping();
     }
 
     /**

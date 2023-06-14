@@ -1,5 +1,8 @@
 # api
 
+## 8x.12.3 - 13 June 2023
+- Schedule job for polling wikis without overlap
+
 ## 8x.12.2 - 13 June 2023
 - Make sure job for polling wikis does queue properly
 
