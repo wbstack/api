@@ -1,5 +1,8 @@
 # api
 
+## 8x.12.3 - 19 June 2023
+- Run polling job less often
+
 ## 8x.12.2 - 13 June 2023
 - Make sure job for polling wikis does queue properly
 
