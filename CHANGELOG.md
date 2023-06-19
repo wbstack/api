@@ -1,5 +1,8 @@
 # api
 
+## 8x.12.4 - 19 June 2023
+- Reenable work done in polling job
+
 ## 8x.12.3 - 19 June 2023
 - Temporary fix: make polling job a no-op so the queue can empty
 - Run polling job less often
