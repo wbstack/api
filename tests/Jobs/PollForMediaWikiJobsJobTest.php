@@ -27,7 +27,6 @@ class PollForMediaWikiJobsJobTest extends TestCase
 
     public function testNoJobs()
     {
-        $this->markTestSkipped();
         Http::fake([
             getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => Http::response([
                 'query' => [
@@ -51,7 +50,6 @@ class PollForMediaWikiJobsJobTest extends TestCase
 
     public function testWithJobs()
     {
-        $this->markTestSkipped();
         Http::fake([
             getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => Http::response([
                 'query' => [
@@ -76,7 +74,6 @@ class PollForMediaWikiJobsJobTest extends TestCase
 
     public function testWithFailure()
     {
-        $this->markTestSkipped();
         Http::fake([
             getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => Http::response([
                 'error' => 'Something went wrong'
