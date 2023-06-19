@@ -13,12 +13,15 @@ class PollForMediaWikiJobsJob extends Job implements ShouldQueue, ShouldBeUnique
     public $timeout = 3600;
     public function handle (): void
     {
-        $allWikiDomains = Wiki::all()->pluck('domain');
-        foreach ($allWikiDomains as $wikiDomain) {
-            if ($this->hasPendingJobs($wikiDomain)) {
-                $this->enqueueWiki($wikiDomain);
+        return;
+        /*
+         $allWikiDomains = Wiki::all()->pluck('domain');
+         foreach ($allWikiDomains as $wikiDomain) {
+             if ($this->hasPendingJobs($wikiDomain)) {
+                 $this->enqueueWiki($wikiDomain);
+                }
             }
-        }
+        */
     }
 
     private function hasPendingJobs (string $wikiDomain): bool
