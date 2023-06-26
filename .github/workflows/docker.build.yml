@@ -100,8 +100,8 @@ jobs:
         if: steps.update-check.outputs.match == 'true'
         with:
           path: ./repos/wbaas-deploy-staging
-          commit-message: 'Staging+Local: Deploy new Platform API image ${{ steps.docker_meta.outputs.tags }}'
-          title: 'Staging+Local: Deploy new Platform API image ${{ steps.docker_meta.outputs.tags }}'
+          commit-message: 'Staging+Local: Deploy new Platform API image ${{ steps.update-values.outputs.tag }}'
+          title: 'Staging+Local: Deploy new Platform API image ${{ steps.update-values.outputs.tag }}'
           branch: deploy-to-staging-${{ steps.update-values.outputs.tag }}
           committer: wmdebot <github-bots@wikimedia.de>
           author: wmdebot <github-bots@wikimedia.de>
@@ -116,8 +116,8 @@ jobs:
         if: steps.update-check.outputs.match == 'true'
         with:
           path: ./repos/wbaas-deploy-production
-          commit-message: 'Production: Deploy new Platform API image ${{ steps.docker_meta.outputs.tags }}'
-          title: 'Production: Deploy new Platform API image ${{ steps.docker_meta.outputs.tags }}'
+          commit-message: 'Production: Deploy new Platform API image ${{ steps.update-values.outputs.tag }}'
+          title: 'Production: Deploy new Platform API image ${{ steps.update-values.outputs.tag }}'
           branch: deploy-to-production-${{ steps.update-values.outputs.tag }}
           committer: wmdebot <github-bots@wikimedia.de>
           author: wmdebot <github-bots@wikimedia.de>
