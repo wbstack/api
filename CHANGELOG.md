@@ -1,5 +1,8 @@
 # api
 
+## 8x.13.0 - 22 June 2023
+- Force lowercase domain names on wiki creation
+
 ## 8x.12.4 - 19 June 2023
 - Reenable work done in polling job
 

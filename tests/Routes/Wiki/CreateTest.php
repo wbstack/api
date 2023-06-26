@@ -51,7 +51,7 @@ class CreateTest extends TestCase
             'POST',
             $this->route,
             [
-                'domain' => 'derp.com',
+                'domain' => 'dErP.com',
                 'sitename' => 'merp',
                 'username' => 'AdminBoss'
             ]
@@ -82,7 +82,6 @@ class CreateTest extends TestCase
             WikiSetting::where( [ 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => $elasticSearchEnabledForNewWikis, 'wiki_id' => $id ] )->count()
         );
     }
-
 
     public function createProvider() {
 

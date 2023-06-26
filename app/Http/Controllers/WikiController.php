@@ -32,7 +32,7 @@ class WikiController extends Controller
     public function create(Request $request): \Illuminate\Http\Response
     {
         $user = $request->user();
-        $submittedDomain = $request->input('domain');
+        $submittedDomain = strtolower($request->input('domain'));
         
         $validator = $this->domainValidator->validate( $submittedDomain );
         $isSubdomain = $this->isSubDomain($submittedDomain);
