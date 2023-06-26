@@ -83,7 +83,7 @@ jobs:
         if: steps.update-check.outputs.match == 'true'
         id: update-values
         run: |
-          TAG="$(echo ${{ steps.docker_meta.outputs.tags }} | cut -d':' -f2)"
+          TAG="$GITHUB_REF_NAME"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           sed -i "/image:/{n;s/tag:.*/tag: $TAG/;}" ./repos/wbaas-deploy-staging/k8s/helmfile/env/local/api.values.yaml.gotmpl
           sed -i "/image:/{n;s/tag:.*/tag: $TAG/;}" ./repos/wbaas-deploy-staging/k8s/helmfile/env/staging/api.values.yaml.gotmpl
