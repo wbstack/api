@@ -1,5 +1,8 @@
 # api
 
+## 8x.14.0 - TBD
+- Collect signup rate metrics with platform summary job
+
 ## 8x.13.0 - 22 June 2023
 - Force lowercase domain names on wiki creation
 
