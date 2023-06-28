@@ -7,10 +7,7 @@ use Illuminate\Database\DatabaseManager;
 use PDO;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Notifications\Notifiable;
-use App\Notifications\PlatformStatsSummaryNotification;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\App;
 
 /*
@@ -30,10 +27,12 @@ use Illuminate\Support\Facades\App;
 class PlatformStatsSummaryJob extends Job
 {
     private $inactiveThreshold;
+    private $signupRanges;
 
     private $platformSummaryStatsVersion = "v1";
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
+        $this->signupRanges = Config::get('wbstack.platform_summary_signup_ranges');
     }
 
     private function isNullOrEmpty( $value ): bool {
@@ -43,12 +42,17 @@ class PlatformStatsSummaryJob extends Job
     public function prepareStats( array $allStats, $wikis ): array {
 
         $deletedWikis = [];
-        $activeWikis=  [];
-        $inactive =  [];
-        $emptyWikis =  [];
-
+        $activeWikis = [];
+        $inactive = [];
+        $emptyWikis = [];
+        $newWikis = [];
+        foreach ($this->signupRanges as $range) {
+            $newWikis[$range] = [];
+        }
         $nonDeletedStats = [];
-        $currentTime = Carbon::now()->timestamp;
+
+        $now = Carbon::now();
+        $currentTime = $now->timestamp;
 
         foreach( $wikis as $wiki ) {
 
@@ -57,10 +61,17 @@ class PlatformStatsSummaryJob extends Job
                 continue;
             }
 
+            $createdAt = new Carbon($wiki->created_at);
+            foreach ($newWikis as $range=>$matches) {
+                $lookback = new \DateInterval($range);
+                if ($createdAt >= $now->clone()->sub($lookback)) {
+                    $newWikis[$range][] = $wiki;
+                }
+            }
+
             $wikiDb = $wiki->wikiDb()->first();
 
             if( !$wikiDb ) {
-
                 Log::error(__METHOD__ . ": Could not find WikiDB for {$wiki->domain}");
                 continue;
             }
@@ -71,7 +82,7 @@ class PlatformStatsSummaryJob extends Job
                 Log::warning(__METHOD__ . ": Could not find stats for {$wiki->domain}");
                 continue;
             }
-            
+
             $stats = $allStats[$found_key];
 
             // is it empty?
@@ -86,7 +97,7 @@ class PlatformStatsSummaryJob extends Job
             if(!is_null($stats['lastEdit'])){
                 $lastTimestamp = intVal($stats['lastEdit']);
                 $diff = $currentTime - $lastTimestamp;
-                
+
                 if ($diff >= $this->inactiveThreshold) {
                     $inactive[] = $wiki;
                     continue;
@@ -95,13 +106,13 @@ class PlatformStatsSummaryJob extends Job
 
             $activeWikis[] = $wiki;
         }
-        
+
         $totalNonDeletedUsers = array_sum(array_column($nonDeletedStats, 'users'));
         $totalNonDeletedActiveUsers = array_sum(array_column($nonDeletedStats, 'active_users'));
         $totalNonDeletedPages = array_sum(array_column($nonDeletedStats, 'pages'));
         $totalNonDeletedEdits = array_sum(array_column($nonDeletedStats, 'edits'));
 
-        return [
+        $result = [
             'platform_summary_version' => $this->platformSummaryStatsVersion,
             'total' => count($wikis),
             'deleted' => count($deletedWikis),
@@ -113,6 +124,12 @@ class PlatformStatsSummaryJob extends Job
             'total_non_deleted_pages' => $totalNonDeletedPages,
             'total_non_deleted_edits' => $totalNonDeletedEdits,
         ];
+
+        foreach ($newWikis as $range=>$items) {
+            $result['new_wikis_'.$range] = count($items);
+        }
+
+        return $result;
     }
 
     public function handle( DatabaseManager $manager ): void
@@ -133,11 +150,11 @@ class PlatformStatsSummaryJob extends Job
         $mediawikiPdo = $mwConn->getPdo();
 
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
-        
+
         // prepare the first query
         $statement = $pdo->prepare($this->wikiStatsQuery);
         $statement->execute();
-        
+
         // produces the stats query
         $result = $statement->fetchAll(PDO::FETCH_ASSOC)[0];
         $query = array_values($result)[0];
@@ -148,7 +165,7 @@ class PlatformStatsSummaryJob extends Job
 
         $manager->purge('mw');
         $manager->purge('mysql');
-        
+
         // Output to be scraped from logs
         if( !App::runningUnitTests() ) {
             print( json_encode($summary) . PHP_EOL );
@@ -183,7 +200,7 @@ SELECT '",wikis.domain,"' as wiki
 "
 
 ) SEPARATOR ' UNION ALL ')
-    
+
     FROM apidb.wiki_dbs
     LEFT JOIN apidb.wikis ON wiki_dbs.wiki_id = wikis.id;
 

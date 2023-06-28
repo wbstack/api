@@ -82,13 +82,12 @@ class PlatformStatsSummaryJobTest extends TestCase
 
         $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
-        
-        $testWikis = [
-            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki1.com' ] ),
-            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com' ] ),
-            Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->subDays(90)->timestamp, 'domain' => 'wiki3.com' ] ),
-            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com' ] )
 
+        $testWikis = [
+            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki1.com', 'created_at' => Carbon::now()->subMinutes(4)->timestamp ] ),
+            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com', 'created_at' => Carbon::now()->subHours(72)->timestamp ] ),
+            Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->subDays(90)->timestamp, 'domain' => 'wiki3.com', 'created_at' => Carbon::now()->subHours(72)->timestamp ] ),
+            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com', 'created_at' => Carbon::now()->subYears(6)->timestamp ] )
         ];
 
         foreach($testWikis as $wiki) {
@@ -99,7 +98,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 'version' => 'asdasdasdas',
                 'prefix' => 'asdasd',
                 'wiki_id' => $wiki->id
-            ]);  
+            ]);
         }
         $stats = [
             [   // inactive
@@ -145,10 +144,10 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "platform_summary_version" => "v1"
             ],
         ];
-          
+
 
        $groups =  $job->prepareStats($stats, $testWikis);
-    
+
        $this->assertEquals(
             [
                 "total" => 4,
@@ -160,9 +159,11 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "total_non_deleted_active_users" => 1,
                 "total_non_deleted_pages" => 2,
                 "total_non_deleted_edits" => 1,
-                "platform_summary_version" => "v1"
+                "platform_summary_version" => "v1",
+                "new_wikis_PT24H" => 1,
+                "new_wikis_P30D" => 2,
             ],
-            $groups, 
+            $groups,
         );
     }
 
