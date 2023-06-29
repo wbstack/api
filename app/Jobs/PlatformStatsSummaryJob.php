@@ -28,58 +28,46 @@ use Illuminate\Support\Facades\App;
 class PlatformStatsSummaryJob extends Job
 {
     private $inactiveThreshold;
-    private $creationRanges;
+    private $creationRateRanges;
 
     private $platformSummaryStatsVersion = "v1";
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
-        $this->creationRanges = Config::get('wbstack.platform_summary_creation_ranges');
+        $this->creationRateRanges = Config::get('wbstack.platform_summary_creation_rate_ranges');
     }
 
     private function isNullOrEmpty( $value ): bool {
         return is_null($value) || intVal($value) === 0;
     }
 
-    public function prepareStats( array $allStats, $wikis, $users ): array {
+    public function getCreationStats(): array {
+        $result = [];
+        $now = Carbon::now();
+        foreach ($this->creationRateRanges as $range) {
+            $limit = $now->clone()->sub(new \DateInterval($range));
+            $wikis = Wiki::where('created_at', '>=', $limit)->count();
+            $result['wikis_created_'.$range] = $wikis;
+            $users = User::where('created_at', '>=', $limit)->count();
+            $result['users_created_'.$range] = $users;
+        }
+        return $result;
+    }
+
+    public function prepareStats( array $allStats, $wikis): array {
 
         $deletedWikis = [];
         $activeWikis = [];
         $inactive = [];
         $emptyWikis = [];
         $nonDeletedStats = [];
-        $createdWikis = [];
-        $createdUsers = [];
-        foreach ($this->creationRanges as $range) {
-            $createdWikis[$range] = [];
-            $createdUsers[$range] = [];
-        }
 
-        $now = Carbon::now();
-        $currentTime = $now->timestamp;
-
-        foreach ( $users as $user ) {
-            $createdAt = new Carbon($user->created_at);
-            foreach ($createdUsers as $range=>$matches) {
-                $lookback = new \DateInterval($range);
-                if ($createdAt >= $now->clone()->sub($lookback)) {
-                    $createdUsers[$range][] = $user;
-                }
-            }
-        }
+        $currentTime = Carbon::now()->timestamp;
 
         foreach( $wikis as $wiki ) {
 
             if( !is_null($wiki->deleted_at) ) {
                 $deletedWikis[] = $wiki;
                 continue;
-            }
-
-            $createdAt = new Carbon($wiki->created_at);
-            foreach ($createdWikis as $range=>$matches) {
-                $lookback = new \DateInterval($range);
-                if ($createdAt >= $now->clone()->sub($lookback)) {
-                    $createdWikis[$range][] = $wiki;
-                }
             }
 
             $wikiDb = $wiki->wikiDb()->first();
@@ -125,7 +113,7 @@ class PlatformStatsSummaryJob extends Job
         $totalNonDeletedPages = array_sum(array_column($nonDeletedStats, 'pages'));
         $totalNonDeletedEdits = array_sum(array_column($nonDeletedStats, 'edits'));
 
-        $result = [
+        return [
             'platform_summary_version' => $this->platformSummaryStatsVersion,
             'total' => count($wikis),
             'deleted' => count($deletedWikis),
@@ -137,22 +125,11 @@ class PlatformStatsSummaryJob extends Job
             'total_non_deleted_pages' => $totalNonDeletedPages,
             'total_non_deleted_edits' => $totalNonDeletedEdits,
         ];
-
-        foreach ($createdWikis as $range=>$items) {
-            $result['wikis_created_'.$range] = count($items);
-        }
-
-        foreach ($createdUsers as $range=>$items) {
-            $result['users_created_'.$range] = count($items);
-        }
-
-        return $result;
     }
 
     public function handle( DatabaseManager $manager ): void
     {
         $wikis = Wiki::withTrashed()->with('wikidb')->get();
-        $users = User::all();
 
         $manager->purge('mw');
         $manager->purge('mysql');
@@ -179,7 +156,10 @@ class PlatformStatsSummaryJob extends Job
 
         // use mw PDO to talk to mediawiki dbs
         $allStats = $mediawikiPdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
-        $summary = $this->prepareStats( $allStats, $wikis, $users );
+        $summary = $this->prepareStats( $allStats, $wikis );
+
+        $creationStats = $this->getCreationStats();
+        $summary = array_merge($summary, $creationStats);
 
         $manager->purge('mw');
         $manager->purge('mysql');

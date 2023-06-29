@@ -2,7 +2,8 @@
 
 namespace Tests\Jobs;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\User;
 use App\Wiki;
@@ -16,7 +17,7 @@ use App\Jobs\PlatformStatsSummaryJob;
 
 class PlatformStatsSummaryJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     private $numWikis = 5;
     private $wikis = [];
@@ -30,7 +31,6 @@ class PlatformStatsSummaryJobTest extends TestCase
             DB::connection('mysql')->getPdo()->exec("DROP DATABASE IF EXISTS {$this->db_name}{$n};");
         }
         $this->seedWikis();
-        $this->manager = $this->app->make('db');
     }
 
     protected function tearDown(): void {
@@ -42,7 +42,6 @@ class PlatformStatsSummaryJobTest extends TestCase
     }
 
     private function seedWikis() {
-        $manager = $this->app->make('db');
         for($n = 0; $n < $this->numWikis; $n++ ) {
 
             $user = User::factory()->create(['verified' => true]);
@@ -50,7 +49,7 @@ class PlatformStatsSummaryJobTest extends TestCase
             WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
             $job = new ProvisionWikiDbJob($this->db_prefix . $n, $this->db_name . $n, null);
-            $job->handle($manager);
+            $job->handle($this->app->make(DatabaseManager::class));
 
             $wikiDb = WikiDb::whereName($this->db_name.$n)->first();
             $wikiDb->update( ['wiki_id' => $wiki->id] );
@@ -64,15 +63,13 @@ class PlatformStatsSummaryJobTest extends TestCase
     }
     public function testQueryGetsStats()
     {
-        $manager = $this->app->make('db');
-
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
         $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
 
-        $job->handle($manager);
+        $job->handle($this->app->make(DatabaseManager::class));
     }
 
     public function testGroupings()
@@ -84,10 +81,11 @@ class PlatformStatsSummaryJobTest extends TestCase
         $job->setJob($mockJob);
 
         $testWikis = [
-            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki1.com', 'created_at' => Carbon::now()->subMinutes(4)->timestamp ] ),
-            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com', 'created_at' => Carbon::now()->subHours(72)->timestamp ] ),
-            Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->subDays(90)->timestamp, 'domain' => 'wiki3.com', 'created_at' => Carbon::now()->subHours(72)->timestamp ] ),
-            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com', 'created_at' => Carbon::now()->subYears(6)->timestamp ] )
+            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki1.com' ] ),
+            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com' ] ),
+            Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->subDays(90)->timestamp, 'domain' => 'wiki3.com' ] ),
+            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com' ] )
+
         ];
 
         foreach($testWikis as $wiki) {
@@ -145,13 +143,8 @@ class PlatformStatsSummaryJobTest extends TestCase
             ],
         ];
 
-        $users = [
-            User::factory()->create([ "created_at" => Carbon::now()->subDays(90)->timestamp ]),
-            User::factory()->create([ "created_at" => Carbon::now()->subHours(1)->timestamp ]),
-            User::factory()->create([ "created_at" => Carbon::now()->subHours(48)->timestamp ]),
-        ];
 
-       $groups =  $job->prepareStats($stats, $testWikis, $users);
+       $groups =  $job->prepareStats($stats, $testWikis);
 
        $this->assertEquals(
             [
@@ -164,15 +157,34 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "total_non_deleted_active_users" => 1,
                 "total_non_deleted_pages" => 2,
                 "total_non_deleted_edits" => 1,
-                "platform_summary_version" => "v1",
-                "wikis_created_PT24H" => 1,
-                "wikis_created_P30D" => 2,
-                "users_created_PT24H" => 1,
-                "users_created_P30D" => 2,
+                "platform_summary_version" => "v1"
             ],
             $groups,
         );
     }
 
+    function testCreationStats() {
+        $mockJob = $this->createMock(Job::class);
+        $mockJob->expects($this->never())->method('fail');
+
+        $job = new PlatformStatsSummaryJob();
+        $job->setJob($mockJob);
+
+        $testWikis = [];
+        $testUsers = [];
+
+        $stats =  $job->getCreationStats();
+
+        $this->assertEquals(
+            [
+                'wikis_created_PT24H' => 0,
+                'wikis_created_P30D' => 0,
+                'users_created_PT24H' => 0,
+                'users_created_P30D' => 0,
+            ],
+             $stats,
+         );
+
+    }
 
 }
