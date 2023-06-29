@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Wiki;
+use App\User;
 use Illuminate\Database\DatabaseManager;
 use PDO;
 use Carbon\Carbon;
@@ -39,20 +40,32 @@ class PlatformStatsSummaryJob extends Job
         return is_null($value) || intVal($value) === 0;
     }
 
-    public function prepareStats( array $allStats, $wikis ): array {
+    public function prepareStats( array $allStats, $wikis, $users ): array {
 
         $deletedWikis = [];
         $activeWikis = [];
         $inactive = [];
         $emptyWikis = [];
+        $nonDeletedStats = [];
         $createdWikis = [];
+        $createdUsers = [];
         foreach ($this->creationRanges as $range) {
             $createdWikis[$range] = [];
+            $createdUsers[$range] = [];
         }
-        $nonDeletedStats = [];
 
         $now = Carbon::now();
         $currentTime = $now->timestamp;
+
+        foreach ( $users as $user ) {
+            $createdAt = new Carbon($user->created_at);
+            foreach ($createdUsers as $range=>$matches) {
+                $lookback = new \DateInterval($range);
+                if ($createdAt >= $now->clone()->sub($lookback)) {
+                    $createdUsers[$range][] = $user;
+                }
+            }
+        }
 
         foreach( $wikis as $wiki ) {
 
@@ -129,12 +142,17 @@ class PlatformStatsSummaryJob extends Job
             $result['wikis_created_'.$range] = count($items);
         }
 
+        foreach ($createdUsers as $range=>$items) {
+            $result['users_created_'.$range] = count($items);
+        }
+
         return $result;
     }
 
     public function handle( DatabaseManager $manager ): void
     {
         $wikis = Wiki::withTrashed()->with('wikidb')->get();
+        $users = User::all();
 
         $manager->purge('mw');
         $manager->purge('mysql');
@@ -161,7 +179,7 @@ class PlatformStatsSummaryJob extends Job
 
         // use mw PDO to talk to mediawiki dbs
         $allStats = $mediawikiPdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
-        $summary = $this->prepareStats( $allStats, $wikis );
+        $summary = $this->prepareStats( $allStats, $wikis, $users );
 
         $manager->purge('mw');
         $manager->purge('mysql');

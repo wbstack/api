@@ -145,8 +145,13 @@ class PlatformStatsSummaryJobTest extends TestCase
             ],
         ];
 
+        $users = [
+            User::factory()->create([ "created_at" => Carbon::now()->subDays(90)->timestamp ]),
+            User::factory()->create([ "created_at" => Carbon::now()->subHours(1)->timestamp ]),
+            User::factory()->create([ "created_at" => Carbon::now()->subHours(48)->timestamp ]),
+        ];
 
-       $groups =  $job->prepareStats($stats, $testWikis);
+       $groups =  $job->prepareStats($stats, $testWikis, $users);
 
        $this->assertEquals(
             [
@@ -162,6 +167,8 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "platform_summary_version" => "v1",
                 "wikis_created_PT24H" => 1,
                 "wikis_created_P30D" => 2,
+                "users_created_PT24H" => 1,
+                "users_created_P30D" => 2,
             ],
             $groups,
         );
