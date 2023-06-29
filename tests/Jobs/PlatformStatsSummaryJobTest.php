@@ -160,8 +160,8 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "total_non_deleted_pages" => 2,
                 "total_non_deleted_edits" => 1,
                 "platform_summary_version" => "v1",
-                "new_wikis_PT24H" => 1,
-                "new_wikis_P30D" => 2,
+                "wikis_created_PT24H" => 1,
+                "wikis_created_P30D" => 2,
             ],
             $groups,
         );

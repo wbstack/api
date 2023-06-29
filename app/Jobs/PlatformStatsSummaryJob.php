@@ -27,12 +27,12 @@ use Illuminate\Support\Facades\App;
 class PlatformStatsSummaryJob extends Job
 {
     private $inactiveThreshold;
-    private $signupRanges;
+    private $creationRanges;
 
     private $platformSummaryStatsVersion = "v1";
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
-        $this->signupRanges = Config::get('wbstack.platform_summary_signup_ranges');
+        $this->creationRanges = Config::get('wbstack.platform_summary_creation_ranges');
     }
 
     private function isNullOrEmpty( $value ): bool {
@@ -45,9 +45,9 @@ class PlatformStatsSummaryJob extends Job
         $activeWikis = [];
         $inactive = [];
         $emptyWikis = [];
-        $newWikis = [];
-        foreach ($this->signupRanges as $range) {
-            $newWikis[$range] = [];
+        $createdWikis = [];
+        foreach ($this->creationRanges as $range) {
+            $createdWikis[$range] = [];
         }
         $nonDeletedStats = [];
 
@@ -62,10 +62,10 @@ class PlatformStatsSummaryJob extends Job
             }
 
             $createdAt = new Carbon($wiki->created_at);
-            foreach ($newWikis as $range=>$matches) {
+            foreach ($createdWikis as $range=>$matches) {
                 $lookback = new \DateInterval($range);
                 if ($createdAt >= $now->clone()->sub($lookback)) {
-                    $newWikis[$range][] = $wiki;
+                    $createdWikis[$range][] = $wiki;
                 }
             }
 
@@ -125,8 +125,8 @@ class PlatformStatsSummaryJob extends Job
             'total_non_deleted_edits' => $totalNonDeletedEdits,
         ];
 
-        foreach ($newWikis as $range=>$items) {
-            $result['new_wikis_'.$range] = count($items);
+        foreach ($createdWikis as $range=>$items) {
+            $result['wikis_created_'.$range] = count($items);
         }
 
         return $result;

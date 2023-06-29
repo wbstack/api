@@ -12,8 +12,8 @@ return [
     'wiki_max_per_user' => env('WBSTACK_MAX_PER_USER', false),
 
     'platform_summary_inactive_threshold' => env('WBSTACK_SUMMARY_INACTIVE_THRESHOLD', 60 * 60 * 24 * 90),
-    'platform_summary_signup_ranges' => array_filter(
-        explode(',', env('WBSTACK_SUMMARY_SIGNUP_RANGES', '')),
+    'platform_summary_creation_ranges' => array_filter(
+        explode(',', env('WBSTACK_SUMMARY_CREATION_RANGES', '')),
         function ($item) { return $item !== ''; }
     ),
 
