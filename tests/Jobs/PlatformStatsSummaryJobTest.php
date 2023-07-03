@@ -29,12 +29,11 @@ class PlatformStatsSummaryJobTest extends TestCase
         for($n = 0; $n < $this->numWikis; $n++ ) {
             DB::connection('mysql')->getPdo()->exec("DROP DATABASE IF EXISTS {$this->db_name}{$n};");
         }
-        $this->seedWikis();
-        $this->manager = $this->app->make('db');
+        $this->wikis = [];
     }
 
     protected function tearDown(): void {
-        foreach($this->wikis as $wiki) {
+        foreach ($this->wikis as $wiki) {
             $wiki['wiki']->wikiDb()->forceDelete();
             $wiki['wiki']->forceDelete();
         }
@@ -42,7 +41,6 @@ class PlatformStatsSummaryJobTest extends TestCase
     }
 
     private function seedWikis() {
-        $this->wikis = [];
         $manager = $this->app->make('db');
         for($n = 0; $n < $this->numWikis; $n++ ) {
 
@@ -65,6 +63,7 @@ class PlatformStatsSummaryJobTest extends TestCase
     }
     public function testQueryGetsStats()
     {
+        $this->seedWikis();
         $manager = $this->app->make('db');
 
         $mockJob = $this->createMock(Job::class);
@@ -89,7 +88,6 @@ class PlatformStatsSummaryJobTest extends TestCase
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->subDays(90)->timestamp, 'domain' => 'wiki3.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com' ] )
-
         ];
 
         foreach($testWikis as $wiki) {
