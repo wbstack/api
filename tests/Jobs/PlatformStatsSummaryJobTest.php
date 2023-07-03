@@ -35,13 +35,10 @@ class PlatformStatsSummaryJobTest extends TestCase
     }
 
     protected function tearDown(): void {
-        foreach ($this->wikis as $wiki) {
-            $wiki->wikiDb()->forceDelete();
-            $wiki->forceDelete();
-        }
-        foreach ($this->users as $user) {
-            $user->forceDelete();
-        }
+        Wiki::query()->delete();
+        User::query()->delete();
+        WikiManager::query()->delete();
+        WikiDb::query()->delete();
         parent::tearDown();
     }
 
@@ -59,7 +56,7 @@ class PlatformStatsSummaryJobTest extends TestCase
             $wikiDb = WikiDb::whereName($this->db_name.$n)->first();
             $wikiDb->update( ['wiki_id' => $wiki->id] );
 
-            $this->wikis[] = Wiki::whereId($wiki->id)->with('wikidb')->first();
+            $this->wikis[] = $wiki;
             $this->users[] = $user;
         }
 
@@ -86,15 +83,15 @@ class PlatformStatsSummaryJobTest extends TestCase
         $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
         
-        $this->wikis = [
+        $wikis = [
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki1.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->subDays(90)->timestamp, 'domain' => 'wiki3.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com' ] )
         ];
 
-        foreach($this->wikis as $wiki) {
-            $wikiDB = WikiDb::create([
+        foreach($wikis as $wiki) {
+            WikiDb::create([
                 'name' => 'mwdb_asdasfasfasf' . $wiki->id,
                 'user' => 'asdasd',
                 'password' => 'asdasfasfasf',
@@ -149,7 +146,7 @@ class PlatformStatsSummaryJobTest extends TestCase
         ];
           
 
-       $groups =  $job->prepareStats($stats, $this->wikis);
+       $groups =  $job->prepareStats($stats, $wikis);
     
        $this->assertEquals(
             [
@@ -174,17 +171,33 @@ class PlatformStatsSummaryJobTest extends TestCase
         $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
 
-        $testWikis = [];
-        $testUsers = [];
+        Wiki::factory()->create([
+            'created_at' => Carbon::now()->subHours(1)
+        ]);
+        Wiki::factory()->create([
+            'created_at' => Carbon::now()->subDays(2)
+        ]);
+        Wiki::factory()->create([
+            'created_at' => Carbon::now()->subDays(90)
+        ]);
+        User::factory()->create([
+            'created_at' => Carbon::now()->subHours(1)
+        ]);
+        User::factory()->create([
+            'created_at' => Carbon::now()->subHours(2)
+        ]);
+        User::factory()->create([
+            'created_at' => Carbon::now()->subDays(200)
+        ]);
 
         $stats =  $job->getCreationStats();
 
         $this->assertEquals(
             [
-                'wikis_created_PT24H' => 0,
-                'wikis_created_P30D' => 0,
-                'users_created_PT24H' => 0,
-                'users_created_P30D' => 0,
+                'wikis_created_PT24H' => 1,
+                'wikis_created_P30D' => 2,
+                'users_created_PT24H' => 2,
+                'users_created_P30D' => 2,
             ],
              $stats,
          );
