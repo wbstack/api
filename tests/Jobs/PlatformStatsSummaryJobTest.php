@@ -42,6 +42,7 @@ class PlatformStatsSummaryJobTest extends TestCase
     }
 
     private function seedWikis() {
+        $this->wikis = [];
         $manager = $this->app->make('db');
         for($n = 0; $n < $this->numWikis; $n++ ) {
 
