@@ -13,8 +13,7 @@ return [
 
     'platform_summary_inactive_threshold' => env('WBSTACK_SUMMARY_INACTIVE_THRESHOLD', 60 * 60 * 24 * 90),
     'platform_summary_creation_rate_ranges' => array_filter(
-        explode(',', env('WBSTACK_SUMMARY_CREATION_RATE_RANGES', '')),
-        function ($item) { return $item !== ''; }
+        explode(',', env('WBSTACK_SUMMARY_CREATION_RATE_RANGES', ''))
     ),
 
     'elasticsearch_host' => env('ELASTICSEARCH_HOST', false),
