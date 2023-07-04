@@ -1,6 +1,6 @@
 # api
 
-## 8x.14.0 - TBD
+## 8x.14.0 - 04 July 2023
 - Collect signup and wiki creation rate metrics with platform summary job
 
 ## 8x.13.0 - 22 June 2023
