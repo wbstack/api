@@ -12,6 +12,9 @@ return [
     'wiki_max_per_user' => env('WBSTACK_MAX_PER_USER', false),
 
     'platform_summary_inactive_threshold' => env('WBSTACK_SUMMARY_INACTIVE_THRESHOLD', 60 * 60 * 24 * 90),
+    'platform_summary_creation_rate_ranges' => array_filter(
+        explode(',', env('WBSTACK_SUMMARY_CREATION_RATE_RANGES', ''))
+    ),
 
     'elasticsearch_host' => env('ELASTICSEARCH_HOST', false),
     'elasticsearch_enabled_by_default' => env('WBSTACK_ELASTICSEARCH_ENABLED_BY_DEFAULT', false),

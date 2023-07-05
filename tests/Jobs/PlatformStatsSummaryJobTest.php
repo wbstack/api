@@ -2,7 +2,7 @@
 
 namespace Tests\Jobs;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\User;
 use App\Wiki;
@@ -16,28 +16,29 @@ use App\Jobs\PlatformStatsSummaryJob;
 
 class PlatformStatsSummaryJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     private $numWikis = 5;
     private $wikis = [];
+    private $users = [];
 
     private $db_prefix = "somecoolprefix";
     private $db_name = "some_cool_db_name";
 
     protected function setUp(): void {
         parent::setUp();
-        for($n = 0; $n < $this->numWikis; $n++ ) {
+        for ($n = 0; $n < $this->numWikis; $n++) {
             DB::connection('mysql')->getPdo()->exec("DROP DATABASE IF EXISTS {$this->db_name}{$n};");
         }
-        $this->seedWikis();
-        $this->manager = $this->app->make('db');
+        $this->wikis = [];
+        $this->users = [];
     }
 
     protected function tearDown(): void {
-        foreach($this->wikis as $wiki) {
-            $wiki['wiki']->wikiDb()->forceDelete();
-            $wiki['wiki']->forceDelete();
-        }
+        Wiki::query()->delete();
+        User::query()->delete();
+        WikiManager::query()->delete();
+        WikiDb::query()->delete();
         parent::tearDown();
     }
 
@@ -55,15 +56,14 @@ class PlatformStatsSummaryJobTest extends TestCase
             $wikiDb = WikiDb::whereName($this->db_name.$n)->first();
             $wikiDb->update( ['wiki_id' => $wiki->id] );
 
-            $this->wikis[] = [
-                'user' => $user,
-                'wiki' => Wiki::whereId($wiki->id)->with('wikidb')->first()
-            ];
+            $this->wikis[] = $wiki;
+            $this->users[] = $user;
         }
 
     }
     public function testQueryGetsStats()
     {
+        $this->seedWikis();
         $manager = $this->app->make('db');
 
         $mockJob = $this->createMock(Job::class);
@@ -83,16 +83,15 @@ class PlatformStatsSummaryJobTest extends TestCase
         $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
         
-        $testWikis = [
+        $wikis = [
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki1.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->subDays(90)->timestamp, 'domain' => 'wiki3.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com' ] )
-
         ];
 
-        foreach($testWikis as $wiki) {
-            $wikiDB = WikiDb::create([
+        foreach($wikis as $wiki) {
+            WikiDb::create([
                 'name' => 'mwdb_asdasfasfasf' . $wiki->id,
                 'user' => 'asdasd',
                 'password' => 'asdasfasfasf',
@@ -147,7 +146,7 @@ class PlatformStatsSummaryJobTest extends TestCase
         ];
           
 
-       $groups =  $job->prepareStats($stats, $testWikis);
+       $groups =  $job->prepareStats($stats, $wikis);
     
        $this->assertEquals(
             [
@@ -165,6 +164,43 @@ class PlatformStatsSummaryJobTest extends TestCase
             $groups, 
         );
     }
+    function testCreationStats() {
+        $mockJob = $this->createMock(Job::class);
+        $mockJob->expects($this->never())->method('fail');
 
+        $job = new PlatformStatsSummaryJob();
+        $job->setJob($mockJob);
 
+        Wiki::factory()->create([
+            'created_at' => Carbon::now()->subHours(1)
+        ]);
+        Wiki::factory()->create([
+            'created_at' => Carbon::now()->subDays(2)
+        ]);
+        Wiki::factory()->create([
+            'created_at' => Carbon::now()->subDays(90)
+        ]);
+        User::factory()->create([
+            'created_at' => Carbon::now()->subHours(1)
+        ]);
+        User::factory()->create([
+            'created_at' => Carbon::now()->subHours(2)
+        ]);
+        User::factory()->create([
+            'created_at' => Carbon::now()->subDays(200)
+        ]);
+
+        $stats =  $job->getCreationStats();
+
+        $this->assertEquals(
+            [
+                'wikis_created_PT24H' => 1,
+                'wikis_created_P30D' => 2,
+                'users_created_PT24H' => 2,
+                'users_created_P30D' => 2,
+            ],
+             $stats,
+         );
+
+    }
 }
