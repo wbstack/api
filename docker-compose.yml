@@ -13,20 +13,24 @@ services:
       - 8082:80
     restart: always
     depends_on:
-      - sql
-    links:
-      - sql
-      - redis
+      sql:
+        condition: service_healthy
     environment:
       - CONTAINER_ROLE=app
+
   sql:
     image: "${DOCKER_DATABASE_IMAGE_NAME}"
     environment:
       MYSQL_ROOT_PASSWORD: imarootpassword
       MYSQL_DATABASE: apidb
     restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
     volumes:
       - sql-data:/var/lib/mysql
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:4.8
     restart: always
@@ -37,6 +41,7 @@ services:
       PMA_PORT: 3306
       PMA_USER: 'root'
       PMA_PASSWORD: 'imarootpassword'
+
   redis:
     image: redis:latest
     restart: always
