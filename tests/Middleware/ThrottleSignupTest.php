@@ -45,7 +45,7 @@ class ThrottleSignupTest extends TestCase
                 Carbon::now()->subHours(2)
             ]
         );
-        
+
         $request = new Request();
         $middleware = new ThrottleSignup();
         $called = false;
@@ -78,16 +78,16 @@ class ThrottleSignupTest extends TestCase
                 Carbon::now()->subMinutes(2)
             ]
         );
-        
+
         $request = new Request();
         $middleware = new ThrottleSignup();
         $called = false;
-        
+
         $response = $middleware->handle($request, function ($req) use (&$called) {
             $called = true;
-            return $req;
+            return response('OK', 200);
         }, '3', 'PT1H');
-        
+
         $this->assertEquals(
             429,
             $response->getStatusCode(),
@@ -98,6 +98,39 @@ class ThrottleSignupTest extends TestCase
             false,
             $called,
             "Expected callback not to be called when it was."
+        );
+    }
+
+    public function testNoConfiguration()
+    {
+        $this->seedUsers(
+            [
+                Carbon::now()->subMinutes(2),
+                Carbon::now()->subMinutes(23),
+                Carbon::now()->subMinutes(4),
+                Carbon::now()->subMinutes(2)
+            ]
+        );
+
+        $request = new Request();
+        $middleware = new ThrottleSignup();
+        $called = false;
+
+        $response = $middleware->handle($request, function ($req) use (&$called) {
+            $called = true;
+            return response('OK', 200);
+        }, '', '');
+
+        $this->assertEquals(
+            200,
+            $response->getStatusCode(),
+            'Expected 200 status code, got '.$response->getStatusCode(),
+        );
+
+        $this->assertEquals(
+            true,
+            $called,
+            "Expected callback to be called when it was not."
         );
     }
 }

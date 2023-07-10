@@ -1,17 +1,21 @@
 <?php
- 
+
 namespace App\Http\Middleware;
- 
+
 use Closure;
 use Carbon\Carbon;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
- 
+
 class ThrottleSignup
 {
     public function handle(Request $request, Closure $next, string $limit, string $range)
     {
+        if (!$limit || !$range) {
+            return $next($request);
+        }
+
         $lookback = Carbon::now()->sub(new \DateInterval($range));
         $recentSignups = User::where('created_at', '>=', $lookback)->count();
         if ($recentSignups >= intval($limit)) {
@@ -21,7 +25,7 @@ class ThrottleSignup
                 429
             );
         }
- 
+
         return $next($request);
     }
 }
