@@ -1,5 +1,8 @@
 # api
 
+## 8x.15.0 - TBD
+- Throttle user signup
+
 ## 8x.14.0 - 04 July 2023
 - Collect signup and wiki creation rate metrics with platform summary job
 

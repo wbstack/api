@@ -11,7 +11,10 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
     $router->post('auth/login', ['uses' => 'Auth\LoginController@login']);
     // TODO actually use logout route in VUE app..
     $router->post('auth/logout', ['uses' => 'Auth\LoginController@logout']);
-    $router->post('user/register', ['uses' => 'Auth\RegisterController@register']);
+    $router->post('user/register', [
+        'middleware' => ['throttle_signup:'.Config::get('wbstack.signup_throttling_limit').','.Config::get('wbstack.signup_throttling_range')],
+        'uses' => 'Auth\RegisterController@register'
+    ]);
     $router->post('user/verifyEmail', ['uses' => 'UserVerificationTokenController@verify']);
     $router->post('user/forgotPassword', ['uses' => 'Auth\ForgotPasswordController@sendResetLinkEmail']);
     $router->post('user/resetPassword', ['uses' => 'Auth\ResetPasswordController@reset']);

@@ -43,6 +43,7 @@ class Kernel extends HttpKernel
         //'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
 
         'backend.auth' => \App\Http\Middleware\BackendAuth::class,
+        'throttle_signup' => \App\Http\Middleware\ThrottleSignup::class,
         //'throttle' => App\Http\Middleware\ThrottleRequests::class,
         //'auth' => App\Http\Middleware\Authenticate::class,
         'cors' => \Fruitcake\Cors\HandleCors::class,
