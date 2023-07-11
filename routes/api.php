@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Config;
+
 /**
  * This route file is loaded in the RouteServiceProvider optionally when an env var is set.
  * You'll find that service in the Providers directory.
