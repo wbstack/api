@@ -19,7 +19,7 @@ return [
     'elasticsearch_host' => env('ELASTICSEARCH_HOST', false),
     'elasticsearch_enabled_by_default' => env('WBSTACK_ELASTICSEARCH_ENABLED_BY_DEFAULT', false),
 
-    'signup_throttling_limit' => env('SIGNUP_THROTTLING_LIMIT', ''),
-    'signup_throttling_range' => env('SIGNUP_THROTTLING_RANGE', ''),
+    'signup_throttling_limit' => env('WBSTACK_SIGNUP_THROTTLING_LIMIT', ''),
+    'signup_throttling_range' => env('WBSTACK_SIGNUP_THROTTLING_RANGE', ''),
 
 ];
