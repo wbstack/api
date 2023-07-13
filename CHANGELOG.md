@@ -1,5 +1,8 @@
 # api
 
+## 8x.15.0 - 13 July 2023
+- Throttle user signup
+
 ## 8x.14.0 - 04 July 2023
 - Collect signup and wiki creation rate metrics with platform summary job
 
@@ -52,7 +55,7 @@
 - Refactor /mine endpoint to include limit, count and wikis
 
 ## 8x.9.6 - 18 August 2022
-- Disable Elasticsearch on wiki creation by default. Make it configurable. 
+- Disable Elasticsearch on wiki creation by default. Make it configurable.
 
 ## 8x.9.5 - 15 August 2022
 - Add active users to PlatformStatsSummaryJob
@@ -95,7 +98,7 @@
 
 ## 8x.8.14 - 17 June 2022
 
-- Bump laravel/framework from 8.80.0 to 8.83.16 
+- Bump laravel/framework from 8.80.0 to 8.83.16
 
 ## 8x.8.13 - 17 June 2022
 
@@ -113,7 +116,7 @@
 
 - Bump `phpunit/phpunit` from 9.5.13 to 9.5.20
 
-## 8x.8.9 - 13 June 
+## 8x.8.9 - 13 June
 
 - Bump `fakerphp/faker` from 1.18.0 to 1.19.0
 
