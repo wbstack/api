@@ -89,9 +89,9 @@ class ThrottleSignupTest extends TestCase
         }, '3', 'PT1H');
 
         $this->assertEquals(
-            429,
+            503,
             $response->getStatusCode(),
-            'Expected 429 status code, got '.$response->getStatusCode(),
+            'Expected 503 status code, got '.$response->getStatusCode(),
         );
 
         $this->assertEquals(

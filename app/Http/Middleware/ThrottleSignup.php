@@ -22,7 +22,7 @@ class ThrottleSignup
             Log::warning("WARN_SIGNUP_THROTTLED: Given limit of '$limit' in range '$range' was exceeded, attempted account creation was blocked.");
             return response()->json(
                 ["errors" => "Due to high load, we're currently not able to create an account for you. Please try again tomorrow or reach out through our contact page."],
-                429
+                503
             );
         }
 
