@@ -16,6 +16,8 @@ class ProvisionQueryserviceNamespaceJob extends Job
     private $namespace;
     private $maxFree;
 
+    public $tries = 1;
+
     /**
      * @return void
      */
@@ -98,7 +100,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
                 $this->fail(
                     new \RuntimeException("The namespace: {$this->namespace} already exists. response: " . $response)
                 );
-                return;                
+                return;
             } else {
                 $this->fail(
                     new \RuntimeException('Valid response, but couldn\'t find "CREATED: " in: '.$response)

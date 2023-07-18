@@ -7,6 +7,8 @@ use App\WikiSetting;
 
 class SandboxCleanupJob extends Job
 {
+    public $tries = 1;
+
     public function handle(): void
     {
         Wiki::whereIn('id', WikiSetting::whereName('wwSandboxAutoUserLogin')->pluck('wiki_id')->toArray())

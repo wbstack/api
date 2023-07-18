@@ -7,6 +7,8 @@ use Carbon\Carbon;
 
 class PruneQueryserviceBatchesTable extends Job
 {
+    public $tries = 1;
+
     public function handle(): void
     {
         // TODO possibly have some sort of user output...

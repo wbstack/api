@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 
 class PruneEventPageUpdatesTable extends Job
 {
+    public $tries = 1;
+
     public function handle(): void
     {
         // Assume that we only need the latest 100k page update events

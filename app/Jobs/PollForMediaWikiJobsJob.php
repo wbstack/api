@@ -10,6 +10,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 class PollForMediaWikiJobsJob extends Job implements ShouldQueue, ShouldBeUnique
 {
+    public $tries = 1;
+
     public $timeout = 3600;
     public function handle (): void
     {

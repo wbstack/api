@@ -6,6 +6,7 @@ use App\UserVerificationToken;
 
 class ExpireOldUserVerificationTokensJob extends Job
 {
+    public $tries = 1;
     /**
      * @return void
      */
