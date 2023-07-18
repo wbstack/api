@@ -84,4 +84,5 @@ return [
         'table' => 'failed_jobs',
     ],
 
+    'backoff' => explode(',', env('QUEUE_BACKOFF', '10,60,300,900,1500')),
 ];
