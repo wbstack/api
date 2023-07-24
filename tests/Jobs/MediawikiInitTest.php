@@ -82,11 +82,11 @@ class MediawikiInitTest extends TestCase
 
         $mockJob = $this->createMock(Job::class);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage($mockExceptionMessage);
-
         $job = new MediawikiInit( $this->wikiDomain, $this->username, $this->email );
         $job->setJob($mockJob);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage($mockExceptionMessage);
         $job->handle($request);
     }
 }
