@@ -1,6 +1,6 @@
 # api
 
-## 8x.15.1 - 13 July 2023
+## 8x.15.1 - 24 July 2023
 - Report Exception instead of logging when throttling account creation
 
 ## 8x.15.0 - 13 July 2023
