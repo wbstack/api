@@ -76,8 +76,9 @@ class MediawikiInitTest extends TestCase
     public function testFatalErrorIsHandled()
     {
         $mockResponse = 'oh no';
-        $mockExceptionMessage = 'wbstackInit call for some.domain.com. No wbstackInit key in response: ' . $mockResponse;
         $request = $this->getMockRequest($mockResponse);
+
+        $mockExceptionMessage = 'wbstackInit call for some.domain.com. No wbstackInit key in response: ' . $mockResponse;
 
         $mockJob = $this->createMock(Job::class);
 
