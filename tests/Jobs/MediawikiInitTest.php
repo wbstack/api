@@ -76,22 +76,16 @@ class MediawikiInitTest extends TestCase
     public function testFatalErrorIsHandled()
     {
         $mockResponse = 'oh no';
-        $mockException = new \RuntimeException('wbstackInit call for some.domain.com. No wbstackInit key in response: ' . $mockResponse);
-
+        $mockExceptionMessage = 'wbstackInit call for some.domain.com. No wbstackInit key in response: ' . $mockResponse;
         $request = $this->getMockRequest($mockResponse);
 
         $mockJob = $this->createMock(Job::class);
 
-        $caughtException = null;
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage($mockExceptionMessage);
 
-        try {
-            $job = new MediawikiInit( $this->wikiDomain, $this->username, $this->email );
-            $job->setJob($mockJob);
-            $job->handle($request);
-        } catch(\RuntimeException $e) {
-            $caughtException = $e;
-        }
-
-        $this->assertEquals($caughtException, $mockException);
+        $job = new MediawikiInit( $this->wikiDomain, $this->username, $this->email );
+        $job->setJob($mockJob);
+        $job->handle($request);
     }
 }
