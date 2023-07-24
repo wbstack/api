@@ -48,29 +48,17 @@ class MediawikiInit extends Job
         $request->close();
 
         if ($err) {
-            $this->fail(
-                new \RuntimeException('curl error for '.$this->wikiDomain.': '.$err)
-            );
-
-            return; //safegaurd
+            throw new \RuntimeException('curl error for '.$this->wikiDomain.': '.$err);
         }
 
         $response = json_decode($rawResponse, true);
 
         if ( !is_array($response) || !array_key_exists('wbstackInit', $response) ) {
-            $this->fail(
-                new \RuntimeException('wbstackInit call for '.$this->wikiDomain.'. No wbstackInit key in response: '.$rawResponse)
-            );
-
-            return; //safegaurd
+            throw new \RuntimeException('wbstackInit call for '.$this->wikiDomain.'. No wbstackInit key in response: '.$rawResponse);
         }
 
         if ($response['wbstackInit']['success'] == 0) {
-            $this->fail(
-                new \RuntimeException('wbstackInit call for '.$this->wikiDomain.' was not successful:'.$rawResponse)
-            );
-
-            return; //safegaurd
+            throw new \RuntimeException('wbstackInit call for '.$this->wikiDomain.' was not successful:'.$rawResponse);
         }
         // Otherwise there was success (and we could get the userId if we wanted...
     }
