@@ -78,7 +78,7 @@ class MediawikiInitTest extends TestCase
         $mockResponse = 'oh no';
         $request = $this->getMockRequest($mockResponse);
 
-        $mockExceptionMessage = 'wbstackInit call for some.domain.com. No wbstackInit key in response: ' . $mockResponse;
+        $expectedExceptionMessage = 'wbstackInit call for some.domain.com. No wbstackInit key in response: ' . $mockResponse;
 
         $mockJob = $this->createMock(Job::class);
 
@@ -86,7 +86,7 @@ class MediawikiInitTest extends TestCase
         $job->setJob($mockJob);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage($mockExceptionMessage);
+        $this->expectExceptionMessage($expectedExceptionMessage);
         $job->handle($request);
     }
 }
