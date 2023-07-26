@@ -6,6 +6,7 @@ use App\WikiSetting;
 use App\WikiManager;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\Helper\ElasticSearchHelper;
@@ -58,6 +59,14 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
             $elasticSearchHosts = [];
             if (Config::get('wbstack.elasticsearch_host')) {
                 $elasticSearchHosts[] = Config::get('wbstack.elasticsearch_host');
+                Log::warning(
+                    'Setting ELASTICSEARCH_HOST is deprecated. Please use ELASTICSEARCH_DEFAULT_HOST/ELASTICSEARCH_WRITE_ONLY_HOST instead.'
+                );
+            } else if (Config::get('wbstack.elasticsearch_default_host')) {
+                $elasticSearchHosts[] = Config::get('wbstack.elasticsearch_default_host');
+                if (Config::get('wbstack.elasticsearch_write_only_host')) {
+                    $elasticSearchHosts[] = Config::get('wbstack.elasticsearch_write_only_host');
+                }
             }
 
             foreach ($elasticSearchHosts as $elasticSearchHost) {

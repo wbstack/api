@@ -7,6 +7,7 @@ use App\Http\Curl\HttpRequest;
 use App\Wiki;
 use App\Helper\ElasticSearchHelper;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 
 class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
 {
@@ -62,8 +63,17 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
 
         $elasticSearchBaseName = $wikiDB->name;
         $elasticSearchHosts = [];
+        $elasticSearchHosts = [];
         if (Config::get('wbstack.elasticsearch_host')) {
             $elasticSearchHosts[] = Config::get('wbstack.elasticsearch_host');
+            Log::warning(
+                'Setting ELASTICSEARCH_HOST is deprecated. Please use ELASTICSEARCH_DEFAULT_HOST/ELASTICSEARCH_WRITE_ONLY_HOST instead.'
+            );
+        } else if (Config::get('wbstack.elasticsearch_default_host')) {
+            $elasticSearchHosts[] = Config::get('wbstack.elasticsearch_default_host');
+            if (Config::get('wbstack.elasticsearch_write_only_host')) {
+                $elasticSearchHosts[] = Config::get('wbstack.elasticsearch_write_only_host');
+            }
         }
 
         if (empty($elasticSearchHosts)) {
