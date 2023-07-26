@@ -56,23 +56,10 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
         $wikiDB = $wiki->wikiDb()->first();
 
         if( $wikiDB ) {
-            $elasticSearchHosts = [];
-            if (Config::get('wbstack.elasticsearch_host')) {
-                $elasticSearchHosts[] = Config::get('wbstack.elasticsearch_host');
-                Log::warning(
-                    'Setting ELASTICSEARCH_HOST is deprecated. Please use ELASTICSEARCH_DEFAULT_HOST/ELASTICSEARCH_WRITE_ONLY_HOST instead.'
-                );
-            } else if (Config::get('wbstack.elasticsearch_default_host')) {
-                $elasticSearchHosts[] = Config::get('wbstack.elasticsearch_default_host');
-                if (Config::get('wbstack.elasticsearch_write_only_host')) {
-                    $elasticSearchHosts[] = Config::get('wbstack.elasticsearch_write_only_host');
-                }
-            }
-
+            $elasticSearchHosts = Config::get('wbstack.elasticsearch_hosts');
             foreach ($elasticSearchHosts as $elasticSearchHost) {
                 try {
                     $elasticSearchBaseName = $wikiDB->name;
-                    $elasticSearchHost = Config::get('wbstack.elasticsearch_host');
                     $elasticSearchHelper = new ElasticSearchHelper($elasticSearchHost, $elasticSearchBaseName);
                     $request->reset();
                     if( $elasticSearchHelper->hasIndices( $request ) ) {
