@@ -1,5 +1,10 @@
 # api
 
+## 8x.16.0 - 27 July 2023
+- Added calling `report()` on for failed jobs to be able to gather them in Stackdriver (#622)
+- Removed `fail()` calls for `MediawikiInit` Job, so it gets retried by the queue (#623)
+- Added configurable backoff setting for failed jobs (#621) 
+
 ## 8x.15.1 - 24 July 2023
 - Report Exception instead of logging when throttling account creation
 
