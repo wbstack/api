@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Config;
 
 abstract class Job implements ShouldQueue
 {
@@ -20,4 +21,9 @@ abstract class Job implements ShouldQueue
     |
     */
     use InteractsWithQueue, Queueable, SerializesModels;
+
+    public function backoff(): array
+    {
+        return Config::get('queue.backoff');
+    }
 }
