@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Queue\Events\JobFailed;
 use App\Http\Curl\CurlRequest;
 use App\Http\Curl\HttpRequest;
 
@@ -31,6 +33,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Queue::failing(function (JobFailed $event) {
+            $name = data_get($event->job->payload(), 'data.commandName');
+            $wrappedException = new \Exception("Executing Job '$name' failed.", 1, $event->exception);
+            report($wrappedException);
+        });
     }
 }
