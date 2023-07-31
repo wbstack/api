@@ -78,9 +78,9 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
                     $setting->update( [  'value' => false  ] );
                     continue;
                 }
-            } catch(\RuntimeException $exception) {
+            } catch (\RuntimeException $exception) {
                 $this->fail($exception);
-                return;
+                continue;
             }
 
 
