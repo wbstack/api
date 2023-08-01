@@ -12,7 +12,6 @@ use Carbon\Carbon;
 use App\Jobs\DeleteWikiFinalizeJob;
 use App\WikiDb;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\WikiLogoController;
 use App\Http\Curl\HttpRequest;
 use Illuminate\Contracts\Queue\Job;
 
@@ -67,7 +66,7 @@ class DeleteWikiFinalizeJobTest extends TestCase
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())->method('fail')->with(
-            new \RuntimeException("Elasticsearch indices with basename {$wikiDbName} still exists")
+            new \RuntimeException("Elasticsearch indices with basename {$wikiDbName} still exists in http://localhost:9200")
         );
 
         $job = new DeleteWikiFinalizeJob( $wiki->id );

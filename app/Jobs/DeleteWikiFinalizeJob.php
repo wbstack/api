@@ -4,12 +4,9 @@ namespace App\Jobs;
 use App\Wiki;
 use App\WikiSetting;
 use App\WikiManager;
-use App\QueryserviceNamespace;
-use App\WikiDb;
-use Traversable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\WikiLogoController;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\Helper\ElasticSearchHelper;
@@ -59,20 +56,22 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
         $wikiDB = $wiki->wikiDb()->first();
 
         if( $wikiDB ) {
-            try{
-                $elasticSearchBaseName = $wikiDB->name;
-                $elasticSearchHost = getenv('ELASTICSEARCH_HOST');
-                $elasticSearchHelper = new ElasticSearchHelper($elasticSearchHost, $elasticSearchBaseName);
-
-                if( $elasticSearchHelper->hasIndices( $request ) ) {
-                    throw new \RuntimeException("Elasticsearch indices with basename {$elasticSearchBaseName} still exists");
+            $elasticSearchHosts = Config::get('wbstack.elasticsearch_hosts');
+            foreach ($elasticSearchHosts as $elasticSearchHost) {
+                try {
+                    $elasticSearchBaseName = $wikiDB->name;
+                    $elasticSearchHelper = new ElasticSearchHelper($elasticSearchHost, $elasticSearchBaseName);
+                    $request->reset();
+                    if( $elasticSearchHelper->hasIndices( $request ) ) {
+                        throw new \RuntimeException("Elasticsearch indices with basename {$elasticSearchBaseName} still exists in {$elasticSearchHost}");
+                    }
+                } catch (\RuntimeException $exception) {
+                    $this->fail($exception);
+                    continue;
                 }
-            } catch(\RuntimeException $exception) {
-                $this->fail($exception);
-                return;
-            }
 
-            $this->fail(new \RuntimeException("WikiDb for ${$wiki->id} still exists"));
+                $this->fail(new \RuntimeException("WikiDb for ${$wiki->id} still exists"));
+            }
             return;
         }
 

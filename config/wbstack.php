@@ -16,7 +16,7 @@ return [
         explode(',', env('WBSTACK_SUMMARY_CREATION_RATE_RANGES', ''))
     ),
 
-    'elasticsearch_host' => env('ELASTICSEARCH_HOST', false),
+    'elasticsearch_hosts' => array_filter(explode(',', env('ELASTICSEARCH_HOST', ''))),
     'elasticsearch_enabled_by_default' => env('WBSTACK_ELASTICSEARCH_ENABLED_BY_DEFAULT', false),
 
     'signup_throttling_limit' => env('WBSTACK_SIGNUP_THROTTLING_LIMIT', ''),
