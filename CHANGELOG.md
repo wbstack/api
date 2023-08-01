@@ -1,5 +1,8 @@
 # api
 
+## 8x.17.0 - 01 August 2023
+- Support arbitrary number of ElasticSearch clusters
+
 ## 8x.16.0 - 27 July 2023
 - Added calling `report()` on for failed jobs to be able to gather them in Stackdriver (#622)
 - Removed `fail()` calls for `MediawikiInit` Job, so it gets retried by the queue (#623)
