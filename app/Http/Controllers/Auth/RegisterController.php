@@ -66,7 +66,7 @@ class RegisterController extends Controller
           'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             // Not confirmed for password as we do that ourselves? No, we do it in the UI..
           'password' => ['required', 'string', 'min:8'/*, 'confirmed'*/],
-          'recaptcha' => 'required|captcha',
+          'recaptcha' => 'required|recaptcha',
       ];
 
         // XXX: for phpunit dont validate captcha when requested....

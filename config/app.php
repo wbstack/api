@@ -184,7 +184,8 @@ return [
         /*
          * Imported from LUMEN
          */
-        AlbertCht\InvisibleReCaptcha\InvisibleReCaptchaServiceProvider::class,
+        // OLD recaptcha provider AlbertCht\InvisibleReCaptcha\InvisibleReCaptchaServiceProvider::class,
+        Biscolab\ReCaptcha\ReCaptchaServiceProvider::class,
 
         PercyMamedy\LaravelDevBooter\ServiceProvider::class,
 
@@ -251,5 +252,6 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
+        'ReCaptcha' => Biscolab\ReCaptcha\Facades\ReCaptcha::class,
     ],
 ];

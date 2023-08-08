@@ -66,7 +66,7 @@ class ContactController extends Controller
             'subject'        => ['string', 'required', 'max:300', Rule::in($validSubjects)],
             'name'           => ['string', 'required', 'max:300'],
             'message'        => ['string', 'required', 'max:10000'],
-            'recaptcha'      => ['string', 'required', 'captcha'],
+            'recaptcha'      => ['string', 'required', 'recaptcha'],
             'contactDetails' => ['string', 'nullable', 'max:300'],
         ];
 
