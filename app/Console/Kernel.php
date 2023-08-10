@@ -11,9 +11,6 @@ use App\Jobs\SandboxCleanupJob;
 use App\Jobs\PollForMediaWikiJobsJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use App\Jobs\PlatformStatsSummaryJob;
-use App\Wiki;
-use App\Jobs\SiteStatsUpdateJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -43,7 +40,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new SandboxCleanupJob)->everyFifteenMinutes();
 
         // Schedule site stat updates for each wiki and platform-summary
-        $schedule->command('schedule:stats')->daily();
+        $schedule->command('schedule:stats')->dailyAt('7:00');
 
         $schedule->job(new PollForMediaWikiJobsJob)->everyFifteenMinutes();
     }
