@@ -1,6 +1,6 @@
 # api
 
-## 8x.17.1 - TBD
+## 8x.17.1 - 11 August 2023
 - Reschedule stats collection job to 7AM
 
 ## 8x.17.0 - 01 August 2023
