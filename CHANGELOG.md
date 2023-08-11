@@ -1,5 +1,8 @@
 # api
 
+## 8x.17.1 - TBD
+- Reschedule stats collection job to 7AM
+
 ## 8x.17.0 - 01 August 2023
 - Support arbitrary number of ElasticSearch clusters
 
