@@ -1,5 +1,8 @@
 # api
 
+## 8x.17.2 - 11 August 2023
+- Update CHANGELOG.md file
+
 ## 8x.17.1 - 11 August 2023
 - Reschedule stats collection job to 7AM
 
