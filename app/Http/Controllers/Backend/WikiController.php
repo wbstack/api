@@ -15,17 +15,27 @@ class WikiController extends Controller
         $domain = $request->input('domain');
 
         // XXX: this same logic is in quickstatements.php and platform api WikiController backend
-
-        if ($domain === 'localhost' || $domain === 'mediawiki') {
-            // If just using localhost then just get the first undeleted wiki
-            $result = Wiki::with(self::$with)->first();
-        } else {
-            // TODO don't select the timestamps and redundant info for the settings?
-            $result = Wiki::where('domain', $domain)->with(self::$with)->first();
+        try {
+            if ($domain === 'localhost' || $domain === 'mediawiki') {
+                // If just using localhost then just get the first undeleted wiki
+                $result = Wiki::with(self::$with)->get();
+            } else {
+                // TODO don't select the timestamps and redundant info for the settings?
+                $result = Wiki::where('domain', $domain)->with(self::$with)->get();
+            }
+        } catch (\Exception $ex) {
+            return response($ex->getMessage(), 500);
         }
 
-        $res['data'] = $result;
+        switch (count($result)) {
+            case 0:
+                return response('Not found', 404);
+            case 1:
+                $res['data'] = $result[0];
+                return response($res);
+            default:
+                return response('Query yields multiple results', 500);
+        }
 
-        return response($res);
     }
 }
