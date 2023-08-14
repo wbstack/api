@@ -18,7 +18,7 @@ class WikiController extends Controller
         try {
             if ($domain === 'localhost' || $domain === 'mediawiki') {
                 // If just using localhost then just get the first undeleted wiki
-                $result = Wiki::with(self::$with)->limit(1)->first();
+                $result = Wiki::with(self::$with)->first();
             } else {
                 // TODO don't select the timestamps and redundant info for the settings?
                 $result = Wiki::where('domain', $domain)->with(self::$with)->first();
