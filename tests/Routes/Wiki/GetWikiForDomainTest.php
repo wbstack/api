@@ -6,7 +6,7 @@ use Tests\TestCase;
 use App\Wiki;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class CreateTest extends TestCase
+class GetWikiForDomainTest extends TestCase
 {
     protected $route = '/backend/wiki/getWikiForDomain';
 
