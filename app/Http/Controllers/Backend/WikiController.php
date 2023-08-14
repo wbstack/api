@@ -10,7 +10,7 @@ class WikiController extends Controller
 {
     private static $with = ['wikiDb', 'wikiQueryserviceNamespace', 'settings'];
 
-    public function getWikiForDomain(Request $request): \Illuminate\Http\Response
+    public function getWikiForDomain(Request $request): \Illuminate\Http\JsonResponse
     {
         $domain = $request->input('domain');
 
@@ -18,24 +18,19 @@ class WikiController extends Controller
         try {
             if ($domain === 'localhost' || $domain === 'mediawiki') {
                 // If just using localhost then just get the first undeleted wiki
-                $result = Wiki::with(self::$with)->get();
+                $result = Wiki::with(self::$with)->limit(1)->first();
             } else {
                 // TODO don't select the timestamps and redundant info for the settings?
-                $result = Wiki::where('domain', $domain)->with(self::$with)->get();
+                $result = Wiki::where('domain', $domain)->with(self::$with)->first();
             }
         } catch (\Exception $ex) {
-            return response($ex->getMessage(), 500);
+            return response()->json($ex->getMessage(), 500);
         }
 
-        switch (count($result)) {
-            case 0:
-                return response('Not found', 404);
-            case 1:
-                $res['data'] = $result[0];
-                return response($res);
-            default:
-                return response('Query yields multiple results', 500);
+        if (!$result) {
+            return response()->json(['error' => 'Not found'], 404);
         }
 
+        return response()->json(['data' => $result], 200);
     }
 }
