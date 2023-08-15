@@ -39,7 +39,7 @@ class ChangeEmailTest extends TestCase
 
         $this->assertSame($oldUser->id, $newUser->id);
         $this->assertSame($newUser->email, $emailNew);
-        $this->assertSame($newUser->verified, 0);
+        $this->assertFalse($newUser->hasVerifiedEmail());
 
         Notification::assertSentTo([$newUser], EmailReverificationNotification::class);
     }
