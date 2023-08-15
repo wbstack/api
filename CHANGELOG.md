@@ -1,5 +1,8 @@
 # api
 
+## 8x.17.3 - 15 August 2023
+- Respond with proper HTTP status code on backend wiki lookup
+
 ## 8x.17.2 - 11 August 2023
 - Update CHANGELOG.md file
 
