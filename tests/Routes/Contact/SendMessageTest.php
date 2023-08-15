@@ -44,7 +44,7 @@ class SendMessageTest extends TestCase
         $data = $this->postDataTemplateEmpty;
 
         $response = $this->json('POST', $this->route, $data);
-        $response->assertStatus(422);
+        $response->assertStatus(401);
     }
 
     public function testSendMessage_InvalidDataSubject()
@@ -53,7 +53,7 @@ class SendMessageTest extends TestCase
         $data['message'] = "Hi!";
         $data['subject'] = "not-valid";
         $response = $this->json('POST', $this->route, $data);
-        $response->assertStatus(422);
+        $response->assertStatus(400);
     }
 
     public function testSendMessage_MessageTooLong()
@@ -61,7 +61,7 @@ class SendMessageTest extends TestCase
         $data = $this->postDataTemplateValid;
         $data['message'] = str_repeat("Hi!", 10000);
         $response = $this->json('POST', $this->route, $data);
-        $response->assertStatus(422);
+        $response->assertStatus(400);
     }
 
     public function testSendMessage_NameTooLong()
@@ -69,7 +69,7 @@ class SendMessageTest extends TestCase
         $data = $this->postDataTemplateValid;
         $data['name'] = str_repeat("Hi!", 10000);
         $response = $this->json('POST', $this->route, $data);
-        $response->assertStatus(422);
+        $response->assertStatus(400);
     }
 
     public function testSendMessage_ContactDetailsTooLong()
@@ -77,7 +77,7 @@ class SendMessageTest extends TestCase
         $data = $this->postDataTemplateValid;
         $data['contactDetails'] = str_repeat("Hi!", 10000);
         $response = $this->json('POST', $this->route, $data);
-        $response->assertStatus(422);
+        $response->assertStatus(400);
     }
 
     public function testSendMessage_Success()
@@ -93,7 +93,6 @@ class SendMessageTest extends TestCase
 
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(200);
-        $recipient = config('app.contact-mail-recipient');
         Notification::assertSentTo(new AnonymousNotifiable(), ContactNotification::class, function ($notification) {
             $this->assertSame(
                 "contact-general-question@wikibase.cloud",
@@ -105,8 +104,12 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_RecaptchaFailure()
     {
+        Notification::fake();
+
         putenv('PHPUNIT_RECAPTCHA_CHECK=1');
         $response = $this->json('POST', $this->route, $this->postDataTemplateValid);
-        $response->assertStatus(422);
+        $response->assertStatus(401);
+
+        Notification::assertNothingSent();
     }
 }
