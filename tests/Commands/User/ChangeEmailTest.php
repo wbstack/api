@@ -24,7 +24,7 @@ class ChangeEmailTest extends TestCase
 
         $this->artisan('wbs-user:change-email')
             ->expectsQuestion('Current user address', $emailNew)
-            ->expectsOutput("Did not find a user for '$emailNew' Please try again.")
+            ->expectsOutput("Did not find a user for '$emailNew'. Please try again.")
             ->expectsQuestion('Current user address', $emailOld)
             ->expectsOutput("Found a user for '$emailOld'")
             ->expectsQuestion('New user address', $emailOld)

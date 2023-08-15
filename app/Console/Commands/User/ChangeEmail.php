@@ -21,7 +21,7 @@ class ChangeEmail extends Command
             if ($user) {
                 $this->line("Found a user for '$emailOld'");
             } else {
-                $this->warn("Did not find a user for '$emailOld' Please try again.");
+                $this->warn("Did not find a user for '$emailOld'. Please try again.");
             }
         } while(!$user);
 
