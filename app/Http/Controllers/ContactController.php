@@ -21,6 +21,7 @@ class ContactController extends Controller
 
         logger()->info($request);
         logger()->info($validator->validated());
+        logger()->info($validator->fails() ? 'request data FAILED validation':'request data PASSED validation');
 
         if ($validator->fails()) {
             $failed = $validator->failed();
