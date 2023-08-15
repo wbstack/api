@@ -3,14 +3,14 @@
 namespace Tests\Commands;
 
 use App\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Notifications\EmailReverificationNotification;
 use Illuminate\Support\Facades\Notification;
 
 class ChangeEmailTest extends TestCase
 {
-    use DatabaseMigrations;
+    use RefreshDatabase;
 
     public function test()
     {
