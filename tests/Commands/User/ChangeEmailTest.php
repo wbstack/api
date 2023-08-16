@@ -12,35 +12,78 @@ class ChangeEmailTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function test()
+    const EMAIL_OLD = 'old@example.com';
+    const EMAIL_NEW = 'new@example.com';
+    protected function createUser($email) {
+        $user = new User(['email' => $email, 'password' => 'worldsstrongestpassword']);
+        $user->save();
+
+        return $user;
+    }
+
+    public function testSuccess()
     {
         Notification::fake();
 
-        $emailOld = 'old@example.com';
-        $emailNew = 'new@example.com';
+        $oldUser = $this->createUser(self::EMAIL_OLD);
 
-        $oldUser = new User(['email' => $emailOld, 'password' => 'worldsstrongestpassword']);
-        $oldUser->save();
+        $this->artisan('wbs-user:change-email',
+            [
+                '--from' => self::EMAIL_OLD,
+                '--to' => self::EMAIL_NEW,
+            ]
+        )->assertExitCode(0);
 
-        $this->artisan('wbs-user:change-email')
-            ->expectsQuestion('Current user address', $emailNew)
-            ->expectsOutput("Did not find a user for '$emailNew'. Please try again.")
-            ->expectsQuestion('Current user address', $emailOld)
-            ->expectsOutput("Found a user for '$emailOld'")
-            ->expectsQuestion('New user address', $emailOld)
-            ->expectsOutput("New email matches current email. Please provide a different address.")
-            ->expectsQuestion('New user address', $emailNew)
-            ->expectsConfirmation("Confirm: changing user mail address '$emailOld' to '$emailNew'", "yes")
-            ->expectsOutput("Successfully changed user email '$emailOld' to '$emailNew'")
-            ->expectsOutput("Note: a verification mail was sent to the new address ('$emailNew').")
-            ->assertExitCode(0);
-
-        $newUser = User::firstWhere('email', $emailNew);
+        $newUser = User::firstWhere('email', self::EMAIL_NEW);
 
         $this->assertSame($oldUser->id, $newUser->id);
-        $this->assertSame($newUser->email, $emailNew);
+        $this->assertSame($newUser->email, self::EMAIL_NEW);
         $this->assertFalse($newUser->hasVerifiedEmail());
 
         Notification::assertSentTo([$newUser], EmailReverificationNotification::class);
+    }
+
+    public function testSame()
+    {
+        Notification::fake();
+
+        $oldUser = $this->createUser(self::EMAIL_OLD);
+
+        $this->artisan('wbs-user:change-email',
+            [
+                '--from' => self::EMAIL_OLD,
+                '--to' => self::EMAIL_OLD,
+            ]
+        )->assertExitCode(2);
+
+        $newUser = User::firstWhere('email', self::EMAIL_OLD);
+
+        $this->assertSame($oldUser->id, $newUser->id);
+        $this->assertSame($newUser->email, self::EMAIL_OLD);
+        $this->assertTrue($newUser->hasVerifiedEmail());
+
+        Notification::assertNothingSent();
+    }
+
+    public function testUserNotFound()
+    {
+        Notification::fake();
+
+        $oldUser = $this->createUser(self::EMAIL_OLD);
+
+        $this->artisan('wbs-user:change-email',
+            [
+                '--from' => self::EMAIL_NEW,
+                '--to' => self::EMAIL_OLD,
+            ]
+        )->assertExitCode(1);
+
+        $newUser = User::firstWhere('email', self::EMAIL_OLD);
+
+        $this->assertSame($oldUser->id, $newUser->id);
+        $this->assertSame($newUser->email, self::EMAIL_OLD);
+        $this->assertTrue($newUser->hasVerifiedEmail());
+
+        Notification::assertNothingSent();
     }
 }

@@ -8,34 +8,25 @@ use App\Jobs\UserVerificationCreateTokenAndSendJob;
 
 class ChangeEmail extends Command
 {
-    protected $signature = 'wbs-user:change-email';
+    protected $signature = 'wbs-user:change-email {--from=} {--to=}';
 
     protected $description = 'Change e-mail address for user';
 
     public function handle(): int
     {
-        do {
-            $emailOld = $this->ask('Current user address');
-            $user = User::whereEmail($emailOld)->first();
+        $emailOld = $this->argument('--from');
+        $emailNew = $this->argument('--to');
 
-            if ($user) {
-                $this->line("Found a user for '$emailOld'");
-            } else {
-                $this->warn("Did not find a user for '$emailOld'. Please try again.");
-            }
-        } while(!$user);
+        $user = User::whereEmail($emailOld)->first();
 
-        do {
-            $emailNew = $this->ask('New user address');
-            
-            if ($emailNew == $emailOld) {
-                $this->warn("New email matches current email. Please provide a different address.");
-            }
-        } while ($emailNew == $emailOld);
-
-        if (! $this->confirm("Confirm: changing user mail address '$emailOld' to '$emailNew'")) {
-            $this->warn("Aborted changing user email address");
+        if (!$user) {
+            $this->error("Error: Could not find a user for '$emailOld'.");
             return 1;
+        }
+
+        if ($emailNew == $emailOld) {
+            $this->error("Error: New email matches current email.");
+            return 2;
         }
 
         $user->email = $emailNew;
@@ -44,13 +35,13 @@ class ChangeEmail extends Command
         if ($user->save()) {
             UserVerificationCreateTokenAndSendJob::newForReverification($user)->handle();
 
-            $this->info("Successfully changed user email '$emailOld' to '$emailNew'");
+            $this->info("Successfully changed user email from '$emailOld' to '$emailNew'");
             $this->line("Note: a verification mail was sent to the new address ('$emailNew').");
 
             return 0;
         } else {
-            $this->error("Failed to change user email '$emailOld' to '$emailNew'");
-            return 2;
+            $this->error("Error: Failed to save changes to the database.");
+            return 3;
         }
     }
 }
