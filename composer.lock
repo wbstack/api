@@ -4,71 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fe02cfc5d9eabea10ff779004ed40d5d",
+    "content-hash": "f7fd42b9a66acb07a01c4edc436ad40b",
     "packages": [
-        {
-            "name": "albertcht/invisible-recaptcha",
-            "version": "v1.9.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/albertcht/invisible-recaptcha.git",
-                "reference": "d69593858de5ede82cccf72ff17ff651fdba6eff"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/albertcht/invisible-recaptcha/zipball/d69593858de5ede82cccf72ff17ff651fdba6eff",
-                "reference": "d69593858de5ede82cccf72ff17ff651fdba6eff",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "^6.2|^7.0",
-                "illuminate/support": "^5.0|^6.0|^7.0|^8.0",
-                "illuminate/view": "^5.0|^6.0|^7.0|^8.0",
-                "php": "^5.6.4 || ^7.0 || ^8.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^8.0|^9.3"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "AlbertCht\\InvisibleReCaptcha\\InvisibleReCaptchaServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "AlbertCht\\InvisibleReCaptcha\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Albert Chen",
-                    "homepage": "https://www.albert-chen.com"
-                }
-            ],
-            "description": "Invisible reCAPTCHA For Laravel.",
-            "keywords": [
-                "captcha",
-                "invisible",
-                "invisible-recaptcha",
-                "laravel",
-                "laravel5",
-                "no-captcha",
-                "php",
-                "recaptcha"
-            ],
-            "support": {
-                "issues": "https://github.com/albertcht/invisible-recaptcha/issues",
-                "source": "https://github.com/albertcht/invisible-recaptcha/tree/v1.9.6"
-            },
-            "time": "2021-04-10T14:05:31+00:00"
-        },
         {
             "name": "asm89/stack-cors",
             "version": "v2.0.5",
