@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Rules\Recaptcha;
 
 class RegisterController extends Controller
 {
@@ -63,29 +64,22 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         $validation = [
-          'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            // Not confirmed for password as we do that ourselves? No, we do it in the UI..
-          'password' => ['required', 'string', 'min:8'/*, 'confirmed'*/],
-          'recaptcha' => 'required|recaptcha',
+            'recaptcha' => ['required', 'string', 'bail', new Recaptcha],
+            'email'     => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password'  => ['required', 'string', 'min:8'],
+            'invite'    => ['required', 'string', 'exists:invitations,code']
       ];
 
         // XXX: for phpunit dont validate captcha when requested....
         // TODO this should be mocked in the test instead
-        if (getenv('PHPUNIT_RECAPTCHA_CHECK') == '0') {
+        if (getenv('PHPUNIT_RECAPTCHA_CHECK') === '1') {
             unset($validation['recaptcha']);
         }
 
         // If this is the first user then do not require an invitation or captcha
         if (User::count() === 0) {
-            $inviteRequired = false;
             unset($validation['recaptcha']);
-        } else {
-            $inviteRequired = true;
-            $validation['invite'] = 'required|exists:invitations,code';
-        }
-        // For testing, allow 5 char emails ot skip captcha...
-        if (array_key_exists('email', $data) && strlen($data['email']) == 5) {
-            unset($validation['recaptcha']);
+            unset($validation['invite']);
         }
 
         return Validator::make($data, $validation);

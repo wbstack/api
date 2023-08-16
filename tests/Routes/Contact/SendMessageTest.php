@@ -105,8 +105,8 @@ class SendMessageTest extends TestCase
     public function testSendMessage_RecaptchaFailure()
     {
         Notification::fake();
+        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
 
-        putenv('PHPUNIT_RECAPTCHA_CHECK=1');
         $response = $this->json('POST', $this->route, $this->postDataTemplateValid);
         $response->assertStatus(401);
 

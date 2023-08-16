@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
+use App\Rules\Recaptcha;
 
 class ContactController extends Controller
 {
@@ -19,13 +20,6 @@ class ContactController extends Controller
     {
         $validator = $this->validator($request->all());
 
-        // TODO remove these lines before merging
-        // logger()->info($request);
-        // logger()->info($validator->fails() ? 'request data FAILED validation':'request data PASSED validation');
-        // logger()->info($validator->failed());
-        // logger()->info($validator->errors()->messages());
-        // logger()->info($validator->validated());
-        
         if ($validator->fails()) {
             $failed = $validator->failed();
 
@@ -57,10 +51,6 @@ class ContactController extends Controller
      */
     protected function validator(array $data): \Illuminate\Validation\Validator
     {
-        if (! isset($data['contactDetails'])) {
-            $data['contactDetails'] = ''; // could we skip this using some feature of the validator
-        }
-
         $validSubjects = [
             'general-question',
             'feature-request',
@@ -70,16 +60,16 @@ class ContactController extends Controller
         ];
 
         $validation = [
-            'subject'        => ['string', 'required', 'max:300', Rule::in($validSubjects)],
-            'name'           => ['string', 'required', 'max:300'],
-            'message'        => ['string', 'required', 'max:10000'],
-            'recaptcha'      => ['string', 'required', 'recaptcha'],
+            'recaptcha'      => ['required', 'string', 'bail', new Recaptcha],
+            'subject'        => ['required', 'string', 'max:300', Rule::in($validSubjects)],
+            'name'           => ['required', 'string', 'max:300'],
+            'message'        => ['required', 'string', 'max:10000'],
             'contactDetails' => ['string', 'nullable', 'max:300'],
         ];
 
         // XXX: for phpunit dont validate captcha when requested....
         // TODO this should be mocked in the test instead
-        if (getenv('PHPUNIT_RECAPTCHA_CHECK') == '0') {
+        if (getenv('PHPUNIT_RECAPTCHA_CHECK') === '1') {
             unset($validation['recaptcha']);
         }
 
