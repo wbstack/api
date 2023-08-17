@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
-use App\Rules\Recaptcha;
+use App\Rules\RecaptchaValidation;
 
 class ContactController extends Controller
 {
@@ -60,17 +60,18 @@ class ContactController extends Controller
         ];
 
         $validation = [
-            'recaptcha'      => ['required', 'string', 'bail', new Recaptcha],
+            'recaptcha'      => ['required', 'string', 'bail', new RecaptchaValidation],
             'subject'        => ['required', 'string', 'max:300', Rule::in($validSubjects)],
             'name'           => ['required', 'string', 'max:300'],
             'message'        => ['required', 'string', 'max:10000'],
             'contactDetails' => ['string', 'nullable', 'max:300'],
         ];
 
-        // XXX: for phpunit dont validate captcha when requested....
         // TODO this should be mocked in the test instead
-        if (getenv('PHPUNIT_RECAPTCHA_CHECK') === '1') {
-            unset($validation['recaptcha']);
+        if (app()->environment('testing')) {
+            if (getenv('PHPUNIT_RECAPTCHA_CHECK') === '0') {
+                unset($validation['recaptcha']);            
+            }
         }
 
         return Validator::make($data, $validation);

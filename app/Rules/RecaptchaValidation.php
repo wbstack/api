@@ -4,7 +4,7 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\ImplicitRule;
 
-class Recaptcha implements ImplicitRule
+class RecaptchaValidation implements ImplicitRule
 {
     /**
      * @var \ReCaptcha\ReCaptcha

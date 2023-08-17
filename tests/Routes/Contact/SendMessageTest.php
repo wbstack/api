@@ -3,11 +3,7 @@
 namespace Tests\Routes\Contact;
 
 use App\Notifications\ContactNotification;
-use App\User;
-use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -44,7 +40,7 @@ class SendMessageTest extends TestCase
         $data = $this->postDataTemplateEmpty;
 
         $response = $this->json('POST', $this->route, $data);
-        $response->assertStatus(401);
+        $response->assertStatus(400);
     }
 
     public function testSendMessage_InvalidDataSubject()

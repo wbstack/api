@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use App\Rules\Recaptcha;
+use App\Rules\RecaptchaValidation;
 
 class RegisterController extends Controller
 {
@@ -64,22 +64,17 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         $validation = [
-            'recaptcha' => ['required', 'string', 'bail', new Recaptcha],
+            'recaptcha' => ['required', 'string', 'bail', new RecaptchaValidation],
             'email'     => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password'  => ['required', 'string', 'min:8'],
             'invite'    => ['required', 'string', 'exists:invitations,code']
-      ];
+        ];
 
-        // XXX: for phpunit dont validate captcha when requested....
         // TODO this should be mocked in the test instead
-        if (getenv('PHPUNIT_RECAPTCHA_CHECK') === '1') {
-            unset($validation['recaptcha']);
-        }
-
-        // If this is the first user then do not require an invitation or captcha
-        if (User::count() === 0) {
-            unset($validation['recaptcha']);
-            unset($validation['invite']);
+        if (app()->environment('testing')) {
+            if (getenv('PHPUNIT_RECAPTCHA_CHECK') === '0') {
+                unset($validation['recaptcha']);            
+            }
         }
 
         return Validator::make($data, $validation);
