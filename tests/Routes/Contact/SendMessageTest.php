@@ -37,6 +37,8 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_NoData()
     {
+        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
+
         $data = $this->postDataTemplateEmpty;
 
         $response = $this->json('POST', $this->route, $data);
@@ -45,6 +47,8 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_InvalidDataSubject()
     {
+        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
+
         $data = $this->postDataTemplateValid;
         $data['message'] = "Hi!";
         $data['subject'] = "not-valid";
@@ -54,6 +58,8 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_MessageTooLong()
     {
+        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
+
         $data = $this->postDataTemplateValid;
         $data['message'] = str_repeat("Hi!", 10000);
         $response = $this->json('POST', $this->route, $data);
@@ -62,6 +68,8 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_NameTooLong()
     {
+        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
+
         $data = $this->postDataTemplateValid;
         $data['name'] = str_repeat("Hi!", 10000);
         $response = $this->json('POST', $this->route, $data);
@@ -70,6 +78,8 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_ContactDetailsTooLong()
     {
+        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
+
         $data = $this->postDataTemplateValid;
         $data['contactDetails'] = str_repeat("Hi!", 10000);
         $response = $this->json('POST', $this->route, $data);
@@ -78,6 +88,8 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_Success()
     {
+        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
+
         Notification::fake();
         $data = [
             'name'           => 'foo',
@@ -101,7 +113,7 @@ class SendMessageTest extends TestCase
     public function testSendMessage_RecaptchaFailure()
     {
         Notification::fake();
-        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
+        putenv('PHPUNIT_RECAPTCHA_CHECK=1');
 
         $response = $this->json('POST', $this->route, $this->postDataTemplateValid);
         $response->assertStatus(401);
