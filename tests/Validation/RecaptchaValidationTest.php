@@ -20,18 +20,18 @@ class RecaptchaValidationTest extends TestCase
         );
     }
 
-    public function testSuccess()
-    {
-        $mockBuilder = $this->getMockBuilder(RecaptchaValidation::class)
-            ->disableOriginalConstructor();
+    // public function testSuccess()
+    // {
+    //     $mockBuilder = $this->getMockBuilder(RecaptchaValidation::class)
+    //         ->disableOriginalConstructor();
 
-        $rule = $mockBuilder->getMock();
+    //     $rule = $mockBuilder->getMock();
 
 
 
-        // TODO! 
-        // $this->assertTrue(
-        //     $rule->passes('token', 'invalid')
-        // );
-    }
+    //     TODO! 
+    //     $this->assertTrue(
+    //         $rule->passes('token', 'invalid')
+    //     );
+    // }
 }
