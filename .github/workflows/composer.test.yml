@@ -46,7 +46,7 @@ jobs:
         docker-compose exec -T api php artisan key:generate
 
     - name: PHPUnit
-      run: docker-compose exec -T api vendor/bin/phpunit
+      run: docker-compose exec -e APP_ENV=testing -T api vendor/bin/phpunit
     - name: Psalm
       run: docker-compose exec -T api vendor/bin/psalm
 
