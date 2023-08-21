@@ -45,17 +45,17 @@ class RecaptchaValidation implements ImplicitRule
                 request()->getClientIp()
             );
 
-        logger()->debug([
-            self::class,
-            $response->toArray()
+        logger()->debug('recaptcha response', [
+            'class' => self::class,
+            'response' => $response->toArray()
         ]);
 
         if ($response->isSuccess()) {
             if ($response->getScore() <= $this->maxScore) {
                 return true;
             } else {
-                logger()->debug([
-                    self::class,
+                logger()->debug('recaptcha above max score', [
+                    'class'    => self::class,
                     'maxScore' => $this->maxScore,
                     'score'    => $response->getScore()
                 ]);
