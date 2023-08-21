@@ -36,7 +36,7 @@ class CreateWikiSiteStatsTable extends Migration
         });
 
         Schema::table('wikis', function (Blueprint $table) {
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->boolean('is_featured')->default(false);
         });
     }
