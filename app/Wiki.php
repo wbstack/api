@@ -49,6 +49,8 @@ class Wiki extends Model
     protected $fillable = [
         'sitename',
         'domain',
+        'description',
+        'is_featured',
     ];
 
     protected $dates = [
