@@ -6,16 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Jobs\InvitationDeleteJob;
 use App\Jobs\UserCreateJob;
 use App\Jobs\UserVerificationCreateTokenAndSendJob;
-use App\User;
+use App\Rules\ReCaptchaValidation;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use App\Rules\RecaptchaValidation;
 
 class RegisterController extends Controller
 {
+    /**
+     * @var \App\Rules\ReCaptchaValidation
+     */
+    protected $recaptchaValidation;
+
+    public function __construct(ReCaptchaValidation $recaptchaValidation) {
+        $this->recaptchaValidation = $recaptchaValidation;
+    }
+
     /**
      * Handle a registration request for the application.
      *
@@ -64,18 +72,11 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         $validation = [
-            'recaptcha' => ['required', 'string', 'bail', new RecaptchaValidation],
+            'recaptcha' => ['required', 'string', 'bail', $this->recaptchaValidation],
             'email'     => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password'  => ['required', 'string', 'min:8'],
             'invite'    => ['required', 'string', 'exists:invitations,code']
         ];
-
-        // TODO this should be mocked in the test instead
-        if (app()->environment('testing')) {
-            if (getenv('PHPUNIT_RECAPTCHA_CHECK') === '0') {
-                unset($validation['recaptcha']);            
-            }
-        }
 
         return Validator::make($data, $validation);
     }
