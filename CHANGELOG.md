@@ -1,5 +1,8 @@
 # api
 
+## 8x.18.0 - 22 August 2023
+- Add WikiSiteStats model for persisting MediaWiki stats for a wiki
+
 ## 8x.17.3 - 15 August 2023
 - Respond with proper HTTP status code on backend wiki lookup
 
