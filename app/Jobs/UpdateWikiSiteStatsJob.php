@@ -15,7 +15,14 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
     {
         $allWikis = Wiki::all();
         foreach ($allWikis as $wiki) {
-            $this->updateSiteStats($wiki);
+            try {
+                $this->updateSiteStats($wiki);
+            } catch (\Exception $ex) {
+                $this->job->markAsFailed();
+                Log::error(
+                    'Failure polling wiki '.$wiki->getAttribute('domain').' for sitestats: '.$ex->getMessage()
+                );
+            }
         }
     }
 
@@ -28,11 +35,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         );
 
         if ($response->failed()) {
-            $this->job->markAsFailed();
-            Log::error(
-                'Failure polling wiki '.$wiki->getAttribute('domain').' for sitestats: '.$response->clientError()
-            );
-            return;
+            throw new \Exception('Request failed with reason '.$response->body());
         }
 
         $responseBody = $response->json();

@@ -76,8 +76,8 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                     ]],
                     200,
                 );
-                default:
-                    return Http::response('not found', 404);
+            default:
+                return Http::response('not found', 404);
             }
         });
 
@@ -146,8 +146,8 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                     ]],
                     200,
                 );
-                default:
-                    return Http::response('not found', 404);
+            default:
+                return Http::response('not found', 404);
             }
         });
 
