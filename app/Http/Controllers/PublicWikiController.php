@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Wiki;
 use App\Http\Resources\PublicWikiResource;
-use App\Http\Resources\PublicWikiCollection;
 
 class PublicWikiController extends Controller
 {
@@ -31,7 +30,7 @@ class PublicWikiController extends Controller
             $query = $query->whereRelation('wikiSiteStats', 'pages', '>', 0);
         }
 
-        return new PublicWikiCollection($query->paginate($perPage));
+        return PublicWikiResource::collection($query->paginate($perPage));
     }
 
     /**
