@@ -3,6 +3,8 @@
 namespace App\Rules;
 
 use Illuminate\Contracts\Validation\ImplicitRule;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class RecaptchaValidation implements ImplicitRule
 {
@@ -10,6 +12,11 @@ class RecaptchaValidation implements ImplicitRule
      * @var \ReCaptcha\ReCaptcha
      */
     protected $recaptcha = null;
+
+    /**
+     * @var string
+     */
+    protected $hostname = null;
 
     /**
      * @var float
@@ -23,11 +30,66 @@ class RecaptchaValidation implements ImplicitRule
      */
     public function __construct()
     {
-        $this->recaptcha = new \ReCaptcha\ReCaptcha(
+        $this->recaptcha = $this->buildRecaptcha(
             config('recaptcha.secret_key')
         );
 
         $this->minScore = (float) config('recaptcha.min_score');
+        $this->initHostname();
+    }
+
+    /**
+     * Initializes the $hostname property via config value `app.url`
+     * 
+     * @return bool
+     */
+    public function initHostname()
+    {
+        $appUrl = config('app.url');
+        if (blank($appUrl)) {
+            logger()->warning('app.url is not set; ReCaptcha hostname verification disabled', [self::class]);
+            return false;
+        }
+
+        $parsedUrl = parse_url($appUrl);
+        $this->hostname = Arr::get($parsedUrl, 'host', null);
+
+        if (blank($this->hostname)) {
+            logger()->error('hostname detection failed; ReCaptcha hostname verification disabled', [self::class]);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Compares passed string to initialized hostname.
+     * Defaults to verifying anything if self::$hostname is not set.
+     * 
+     * @param  string $hostname
+     * @return bool  
+     */
+    public function verifyHostname($hostname) {
+        if (filled($this->hostname)) {
+            if (
+                ! Str::of($this->hostname)->exactly($hostname)
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Builds ReCaptcha object
+     * 
+     * @param  string $secretKey
+     * @return \ReCaptcha\ReCaptcha
+     */
+    public function buildRecaptcha($secretKey)
+    {
+        return new \ReCaptcha\ReCaptcha($secretKey);
     }
 
     /**
@@ -39,30 +101,45 @@ class RecaptchaValidation implements ImplicitRule
      */
     public function passes($attribute, $value)
     {
-        $response = $this->recaptcha
+        // @var \Recaptcha\Response
+        $recaptchaResponse = $this->recaptcha
             ->verify(
                 $value,
                 request()->getClientIp()
             );
 
-        logger()->debug('recaptcha response', [
-            'class' => self::class,
-            'response' => $response->toArray()
+        logger()->debug(self::class.': response', [
+            'response' => $recaptchaResponse->toArray()
         ]);
 
-        if ($response->isSuccess()) {
-            if ($response->getScore() >= $this->minScore) {
-                return true;
-            } else {
-                logger()->debug('recaptcha above min score', [
-                    'class'    => self::class,
-                    'minScore' => $this->minScore,
-                    'score'    => $response->getScore()
-                ]);
-            }
+        if (! $this->verifyHostname($recaptchaResponse->getHostname())) {
+            logger()->debug(self::class.': hostname verification failed', [
+                'hostname'         => $this->hostname,
+            ]);
+
+            return false;
         }
 
-        return false;
+        if (! $recaptchaResponse->isSuccess()) {
+            logger()->debug(self::class.': ReCaptcha lib returned below min score', [
+                'minScore' => $this->minScore,
+            ]);
+            
+            return false;
+        }
+
+        if ($recaptchaResponse->getScore() < $this->minScore) {
+            logger()->debug(self::class.': below min score', [
+                'minScore' => $this->minScore,
+                'score'    => $recaptchaResponse->getScore()
+            ]);
+
+            return false;
+        }
+
+        logger()->debug(self::class.': validation passed');
+
+        return true;
     }
 
     /**
