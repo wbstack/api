@@ -49,6 +49,8 @@ class Wiki extends Model
     protected $fillable = [
         'sitename',
         'domain',
+        'description',
+        'is_featured',
     ];
 
     protected $dates = [
@@ -73,6 +75,11 @@ class Wiki extends Model
     public function wikiDb(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(WikiDb::class);
+    }
+
+    public function wikiSiteStats(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(WikiSiteStats::class);
     }
 
     /**
