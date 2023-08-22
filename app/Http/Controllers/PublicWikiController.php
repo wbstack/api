@@ -18,7 +18,15 @@ class PublicWikiController extends Controller
         if ($perPage !== null) {
             $perPage = intval($perPage);
         }
-        return new PublicWikiCollection(Wiki::query()->paginate($perPage));
+
+        $query = Wiki::query();
+
+        $isFeatured = $request->query('is_featured', null);
+        if ($isFeatured !== null) {
+            $query = $query->where(['is_featured' => boolval($isFeatured)]);
+        }
+
+        return new PublicWikiCollection($query->paginate($perPage));
     }
 
     /**
