@@ -3,7 +3,8 @@
 ## 8x.22.0 - TODO
 - Remove `albertcht/invisible-recaptcha` package
 - Add validation class App\Rules\RecaptchaValidation for using `google/recaptcha` package
-  - Use it for Register & Contact Controllers
+  - Use it for Register & Contact Controllers via Service Provider
+  - replace application path change for testing with mocking ReCaptcha object
 - Use env var `LOG_LEVEL` to configure stderr log channel (defaults to `info`)
 
 ## 8x.21.3 - 30 August 2023
