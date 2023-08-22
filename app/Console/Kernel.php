@@ -9,6 +9,7 @@ use App\Jobs\PruneEventPageUpdatesTable;
 use App\Jobs\PruneQueryserviceBatchesTable;
 use App\Jobs\SandboxCleanupJob;
 use App\Jobs\PollForMediaWikiJobsJob;
+use App\Jobs\UpdateWikiSiteStatsJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -43,6 +44,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('schedule:stats')->dailyAt('7:00');
 
         $schedule->job(new PollForMediaWikiJobsJob)->everyFifteenMinutes();
+
+        $schedule->job(new UpdateWikiSiteStatsJob)->dailyAt('19:00');
     }
 
     /**
