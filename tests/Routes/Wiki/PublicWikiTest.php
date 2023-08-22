@@ -5,6 +5,7 @@ namespace Tests\Routes\Wiki;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
 use App\WikiSiteStats;
+use App\WikiSetting;
 use App\Wiki;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
@@ -19,11 +20,13 @@ class PublicWikiTest extends TestCase
         parent::setUp();
         Wiki::query()->delete();
         WikiSiteStats::query()->delete();
+        WikiSetting::query()->delete();
     }
 
     public function tearDown(): void {
         Wiki::query()->delete();
         WikiSiteStats::query()->delete();
+        WikiSetting::query()->delete();
         parent::tearDown();
     }
 
@@ -133,5 +136,20 @@ class PublicWikiTest extends TestCase
             ->assertJsonPath('data.0.wiki_site_stats.pages', 66)
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('meta.total', 1);
+    }
+
+    public function testLogoUrl()
+    {
+        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'is_featured' => false]);
+        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id]);
+        WikiSetting::factory()->create(['wiki_id' => $wiki->id, 'name' => 'wgLogo', 'value' => 'https://storage.googleapis.com/wikibase-cloud/foo.bar.png']);
+
+        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'is_featured' => true]);
+        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id]);
+
+        $this->json('GET', $this->route)
+            ->assertStatus(200)
+            ->assertJsonPath('data.0.logo_url', 'https://storage.googleapis.com/wikibase-cloud/foo.bar.png')
+            ->assertJsonPath('data.1.logo_url', null);
         }
 }
