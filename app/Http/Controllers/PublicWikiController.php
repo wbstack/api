@@ -14,11 +14,6 @@ class PublicWikiController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = $request->query('per_page', null);
-        if ($perPage !== null) {
-            $perPage = intval($perPage);
-        }
-
         $query = Wiki::query();
 
         $isFeatured = $request->query('is_featured', null);
@@ -32,23 +27,34 @@ class PublicWikiController extends Controller
         }
 
         $sort = $request->query('sort', 'sitename');
+        $direction = $request->query('direction', 'asc');
         switch ($sort) {
         case 'sitename':
             $query = $query->orderBy(
                 'sitename',
-                $request->query('direction', 'asc')
+                $direction
             );
             break;
         case 'pages':
             $query = $query->orderBy(
-                WikiSiteStats::query()->select('pages')->whereColumn('wiki_site_stats.wiki_id', 'wikis.id'),
-                $request->query('direction', 'asc')
+                WikiSiteStats::query()
+                    ->select('pages')
+                    ->whereColumn('wiki_site_stats.wiki_id', 'wikis.id'),
+                $direction
             );
             break;
         default:
-            return response()->json(['message' => 'Sorting by '.$sort.' is not supported.'], 400);
+            return response()
+                ->json(
+                    ['message' => 'Sorting by '.$sort.' is not supported.'],
+                    400
+                );
         }
 
+        $perPage = $request->query('per_page', null);
+        if ($perPage !== null) {
+            $perPage = intval($perPage);
+        }
         return PublicWikiResource::collection($query->paginate($perPage));
     }
 

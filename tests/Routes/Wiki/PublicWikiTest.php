@@ -190,7 +190,7 @@ class PublicWikiTest extends TestCase
             ->assertJsonCount(2, 'data')
             ->assertJsonPath('meta.total', 2);
 
-            $this->json('GET', $this->route)
+        $this->json('GET', $this->route)
             ->assertStatus(200)
             ->assertJsonCount(3, 'data')
             ->assertJsonPath('meta.total', 3);
@@ -198,11 +198,15 @@ class PublicWikiTest extends TestCase
 
     public function testLogoUrl()
     {
-        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'is_featured' => false]);
+        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'sitename' => 'asite']);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id]);
-        WikiSetting::factory()->create(['wiki_id' => $wiki->id, 'name' => 'wgLogo', 'value' => 'https://storage.googleapis.com/wikibase-cloud/foo.bar.png']);
+        WikiSetting::factory()->create([
+            'wiki_id' => $wiki->id,
+            'name' => 'wgLogo',
+            'value' => 'https://storage.googleapis.com/wikibase-cloud/foo.bar.png'
+        ]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'is_featured' => true]);
+        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'sitename' => 'bsite']);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id]);
 
         $this->json('GET', $this->route)
