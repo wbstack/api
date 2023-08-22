@@ -27,8 +27,7 @@ class RecaptchaValidation implements ImplicitRule
     }
 
     /**
-     * Compares passed string to initialized hostname.
-     * Defaults to verifying anything if self::$hostname is not set.
+     * Comparison against expected hostname.
      * 
      * @param  string $hostname
      * @return bool  
