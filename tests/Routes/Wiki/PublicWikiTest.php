@@ -79,45 +79,79 @@ class PublicWikiTest extends TestCase
 
     public function testGetAll()
     {
-        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud']);
+        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'sitename' => 'bsite']);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud']);
+        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'sitename' => 'asite']);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 66]);
 
         $this->json('GET', $this->route)
+            ->assertStatus(200)
+            ->assertJsonPath('data.0.domain', 'two.wikibase.cloud')
+            ->assertJsonPath('data.0.wiki_site_stats.pages', 66)
+            ->assertJsonPath('data.1.domain', 'one.wikibase.cloud')
+            ->assertJsonPath('data.1.wiki_site_stats.pages', 77);
+    }
+
+    public function testCustomSorting()
+    {
+        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'sitename' => 'bsite']);
+        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
+
+        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'sitename' => 'asite']);
+        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 66]);
+
+        $this->json('GET', $this->route.'?sort=pages&direction=desc')
             ->assertStatus(200)
             ->assertJsonPath('data.0.domain', 'one.wikibase.cloud')
             ->assertJsonPath('data.0.wiki_site_stats.pages', 77)
             ->assertJsonPath('data.1.domain', 'two.wikibase.cloud')
             ->assertJsonPath('data.1.wiki_site_stats.pages', 66);
+
+        $this->json('GET', $this->route.'?direction=desc')
+            ->assertStatus(200)
+            ->assertJsonPath('data.0.domain', 'one.wikibase.cloud')
+            ->assertJsonPath('data.0.wiki_site_stats.pages', 77)
+            ->assertJsonPath('data.1.domain', 'two.wikibase.cloud')
+            ->assertJsonPath('data.1.wiki_site_stats.pages', 66);
+
+        $this->json('GET', $this->route.'?sort=pages')
+            ->assertStatus(200)
+            ->assertJsonPath('data.0.domain', 'two.wikibase.cloud')
+            ->assertJsonPath('data.0.wiki_site_stats.pages', 66)
+            ->assertJsonPath('data.1.domain', 'one.wikibase.cloud')
+            ->assertJsonPath('data.1.wiki_site_stats.pages', 77);
+
+        $this->json('GET', $this->route.'?sort=dinosaur')
+            ->assertStatus(400)
+            ->assertJsonStructure(['message']);
     }
 
     public function testPagination()
     {
-        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud']);
+        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'sitename' => 'csite']);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud']);
+        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'sitename' => 'bsite']);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 66]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'three.wikibase.cloud']);
+        $wiki = Wiki::factory()->create(['domain' => 'three.wikibase.cloud', 'sitename' => 'asite']);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 55]);
 
         $this->json('GET', $this->route.'?per_page=1')
-            ->assertStatus(200)
-            ->assertJsonPath('data.0.domain', 'one.wikibase.cloud')
-            ->assertJsonPath('data.0.wiki_site_stats.pages', 77)
-            ->assertJsonCount(1, 'data')
-            ->assertJsonPath('meta.total', 3);
-
-        $this->json('GET', $this->route.'?per_page=1&page=3')
             ->assertStatus(200)
             ->assertJsonPath('data.0.domain', 'three.wikibase.cloud')
             ->assertJsonPath('data.0.wiki_site_stats.pages', 55)
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('meta.total', 3);
-        }
+
+        $this->json('GET', $this->route.'?per_page=1&page=3')
+            ->assertStatus(200)
+            ->assertJsonPath('data.0.domain', 'one.wikibase.cloud')
+            ->assertJsonPath('data.0.wiki_site_stats.pages', 77)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('meta.total', 3);
+    }
 
     public function testFilterIsFeatured()
     {
@@ -140,19 +174,19 @@ class PublicWikiTest extends TestCase
 
     public function testFilterIsActive()
     {
-        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud']);
+        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'sitename' => 'csite']);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud']);
+        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'sitename' => 'bsite']);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 0]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'three.wikibase.cloud']);
+        $wiki = Wiki::factory()->create(['domain' => 'three.wikibase.cloud', 'sitename' => 'asite']);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 55]);
 
         $this->json('GET', $this->route.'?is_active=1')
             ->assertStatus(200)
-            ->assertJsonPath('data.0.domain', 'one.wikibase.cloud')
-            ->assertJsonPath('data.1.domain', 'three.wikibase.cloud')
+            ->assertJsonPath('data.0.domain', 'three.wikibase.cloud')
+            ->assertJsonPath('data.1.domain', 'one.wikibase.cloud')
             ->assertJsonCount(2, 'data')
             ->assertJsonPath('meta.total', 2);
 
@@ -175,5 +209,6 @@ class PublicWikiTest extends TestCase
             ->assertStatus(200)
             ->assertJsonPath('data.0.logo_url', 'https://storage.googleapis.com/wikibase-cloud/foo.bar.png')
             ->assertJsonPath('data.1.logo_url', null);
-        }
+    }
+
 }
