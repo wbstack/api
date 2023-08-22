@@ -119,7 +119,7 @@ class PublicWikiTest extends TestCase
             ->assertJsonPath('meta.total', 3);
         }
 
-    public function testFilter()
+    public function testFilterIsFeatured()
     {
         $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'is_featured' => false]);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
@@ -136,6 +136,30 @@ class PublicWikiTest extends TestCase
             ->assertJsonPath('data.0.wiki_site_stats.pages', 66)
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('meta.total', 1);
+    }
+
+    public function testFilterIsActive()
+    {
+        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud']);
+        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
+
+        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud']);
+        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 0]);
+
+        $wiki = Wiki::factory()->create(['domain' => 'three.wikibase.cloud']);
+        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 55]);
+
+        $this->json('GET', $this->route.'?is_active=1')
+            ->assertStatus(200)
+            ->assertJsonPath('data.0.domain', 'one.wikibase.cloud')
+            ->assertJsonPath('data.1.domain', 'three.wikibase.cloud')
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('meta.total', 2);
+
+            $this->json('GET', $this->route)
+            ->assertStatus(200)
+            ->assertJsonCount(3, 'data')
+            ->assertJsonPath('meta.total', 3);
     }
 
     public function testLogoUrl()

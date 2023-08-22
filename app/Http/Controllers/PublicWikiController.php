@@ -26,6 +26,11 @@ class PublicWikiController extends Controller
             $query = $query->where(['is_featured' => boolval($isFeatured)]);
         }
 
+        $isActive = $request->query('is_active', null);
+        if ($isActive !== null && boolval($isActive)) {
+            $query = $query->whereRelation('wikiSiteStats', 'pages', '>', 0);
+        }
+
         return new PublicWikiCollection($query->paginate($perPage));
     }
 
