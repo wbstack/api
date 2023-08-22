@@ -6,24 +6,27 @@ use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
-class RecaptchaValidation implements ImplicitRule
+class ReCaptchaValidation implements ImplicitRule
 {
     /**
-     * Derives the hostname from the `app.url` config value.
-     * 
-     * @return string|false
+     * @var string $secret Secret Site Key
      */
-    static public function getHostname()
-    {
-        $appUrl = config('app.url');
-        if (blank($appUrl)) {
-            logger()->warning(self::class.': app.url is not set; ReCaptcha hostname verification disabled');
+    protected $secret;
 
-            return false;
-        }
+    /**
+     * @var string $minScore Lowest score to pass (0.0 - 1.0)
+     */
+    protected $minScore;
 
-        $parsedUrl = parse_url($appUrl);
-        return Arr::get($parsedUrl, 'host', false);
+    /**
+     * @var string $appUrl App URL of client request
+     */
+    protected $appUrl;
+
+    public function __construct($secret, $minScore, $appUrl) {
+        $this->secret = $secret;
+        $this->appUrl = $appUrl;
+        $this->minScore = $minScore;
     }
 
     /**
@@ -34,7 +37,8 @@ class RecaptchaValidation implements ImplicitRule
      */
     public function verifyHostname($hostname)
     {
-        $expectedHostname = self::getHostname();
+        $parsedUrl = parse_url($this->appUrl);
+        $expectedHostname = Arr::get($parsedUrl, 'host', null);
 
         if (filled($expectedHostname)) {
             if (false === Str::of($expectedHostname)->exactly($hostname)) {
@@ -48,22 +52,32 @@ class RecaptchaValidation implements ImplicitRule
     }
 
     /**
-     * Verifies the ReCaptcha Request with the ReCaptcha Service
+     * Verifies the ReCaptcha Request with the official ReCaptcha service library
      * 
      * @param  string $secretKey
      * @return \ReCaptcha\Response 
      */
     public function verify($token)
     {
-        $recaptcha = new \ReCaptcha\ReCaptcha(
-            config('recaptcha.secret_key')
-        );
+        $recaptchaResponse = new \ReCaptcha\Response(false);
 
-        $recaptchaResponse = $recaptcha
-        ->verify(
-            $token,
-            request()->getClientIp()
-        );
+        try {
+            $recaptcha = new \ReCaptcha\ReCaptcha(
+                $this->secret
+            );
+
+            $recaptchaResponse = $recaptcha
+            ->verify(
+                $token,
+                request()->getClientIp()
+            );
+
+            logger()->debug(self::class.': response', [
+                'response' => $recaptchaResponse->toArray()
+            ]);
+        } catch(\Exception $e) {
+            logger()->error(self::class.': Exception thrown by \Recaptcha\ReCaptcha::verify', [$e]);
+        }
 
         return $recaptchaResponse;
     }
@@ -79,35 +93,22 @@ class RecaptchaValidation implements ImplicitRule
     {
         $recaptchaResponse = $this->verify($value);
 
-        logger()->debug(self::class.': response', [
-            'response' => $recaptchaResponse->toArray()
-        ]);
-
         if (false === $this->verifyHostname($recaptchaResponse->getHostname())) {
-            logger()->debug(self::class.': hostname verification failed', [
-                'hostname' => self::getHostname(),
-            ]);
-
             return false;
         }
 
         if (false === $recaptchaResponse->isSuccess()) {
-            logger()->debug(self::class.': ReCaptcha response claims no success');
-            
             return false;
         }
 
-        $minScore = (float) config('recaptcha.min_score');
-        if ($recaptchaResponse->getScore() < $minScore) {
+        if ($recaptchaResponse->getScore() < $this->minScore) {
             logger()->debug(self::class.': below min score', [
-                'minScore' => $minScore,
+                'minScore' => $this->minScore,
                 'score'    => $recaptchaResponse->getScore()
             ]);
 
             return false;
         }
-
-        logger()->debug(self::class.': validation passed');
 
         return true;
     }
