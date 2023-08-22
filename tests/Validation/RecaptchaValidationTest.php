@@ -9,29 +9,86 @@ use App\Rules\RecaptchaValidation;
 
 class RecaptchaValidationTest extends TestCase
 {
-    public function test_example()
+    protected function getMockedRule($fakeResponse)
     {
-        $this->assertTrue(app()->environment('testing'));
+        $mockRuleBuilder = $this->getMockBuilder(RecaptchaValidation::class);
+        $mockRuleBuilder->onlyMethods([
+            'verify'
+        ]);
 
+        $mockRule = $mockRuleBuilder->getMock();
+        $mockRule->method('verify')
+        ->willReturn(
+            \ReCaptcha\Response::fromJson(
+                json_encode($fakeResponse)
+            )
+        );
+
+        return $mockRule;
+    }
+
+    protected function getValidFakeResponse()
+    {
+        return [
+            'hostname' => RecaptchaValidation::getHostname(),
+            'score'    => config('recaptcha.min_score'),
+            'success'  => true,
+        ];
+    }
+
+    public function testBypass()
+    {
         $rule = new RecaptchaValidation;
 
         $this->assertFalse(
-            $rule->passes('token', 'invalid')
+            $rule->passes('token', 'bypass')
         );
     }
 
-    // public function testSuccess()
-    // {
-    //     $mockBuilder = $this->getMockBuilder(RecaptchaValidation::class)
-    //         ->disableOriginalConstructor();
+    public function testLowScore()
+    {
+        $fakeResponse = $this->getValidFakeResponse();
+        $fakeResponse['score'] = config('recaptcha.min_score') - 1;
 
-    //     $rule = $mockBuilder->getMock();
+        $mockRule = $this->getMockedRule($fakeResponse);
 
+        $this->assertFalse(
+            $mockRule->passes('token', '')
+        );
+    }
 
+    public function testWrongHostname()
+    {
+        $fakeResponse = $this->getValidFakeResponse();
+        $fakeResponse['hostname'] = 'example.com';
 
-    //     TODO! 
-    //     $this->assertTrue(
-    //         $rule->passes('token', 'invalid')
-    //     );
-    // }
+        $mockRule = $this->getMockedRule($fakeResponse);
+
+        $this->assertFalse(
+            $mockRule->passes('token', '')
+        );
+    }
+
+    public function testNoSuccess()
+    {
+        $fakeResponse = $this->getValidFakeResponse();
+        $fakeResponse['success'] = false;
+
+        $mockRule = $this->getMockedRule($fakeResponse);
+
+        $this->assertFalse(
+            $mockRule->passes('token', '')
+        );
+    }
+
+    public function testSuccess()
+    {
+        $fakeResponse = $this->getValidFakeResponse();
+
+        $mockRule = $this->getMockedRule($fakeResponse);
+
+        $this->assertTrue(
+            $mockRule->passes('token', '')
+        );
+    }
 }

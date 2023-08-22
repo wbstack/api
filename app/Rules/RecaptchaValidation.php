@@ -9,57 +9,21 @@ use Illuminate\Support\Str;
 class RecaptchaValidation implements ImplicitRule
 {
     /**
-     * @var \ReCaptcha\ReCaptcha
-     */
-    protected $recaptcha = null;
-
-    /**
-     * @var string
-     */
-    protected $hostname = null;
-
-    /**
-     * @var float
-     */
-    protected $minScore = null;
-
-    /**
-     * Create a new rule instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->recaptcha = $this->buildRecaptcha(
-            config('recaptcha.secret_key')
-        );
-
-        $this->minScore = (float) config('recaptcha.min_score');
-        $this->initHostname();
-    }
-
-    /**
-     * Initializes the $hostname property via config value `app.url`
+     * Derives the hostname from the `app.url` config value.
      * 
-     * @return bool
+     * @return string|false
      */
-    public function initHostname()
+    static public function getHostname()
     {
         $appUrl = config('app.url');
         if (blank($appUrl)) {
-            logger()->warning('app.url is not set; ReCaptcha hostname verification disabled', [self::class]);
+            logger()->warning(self::class.': app.url is not set; ReCaptcha hostname verification disabled');
+
             return false;
         }
 
         $parsedUrl = parse_url($appUrl);
-        $this->hostname = Arr::get($parsedUrl, 'host', null);
-
-        if (blank($this->hostname)) {
-            logger()->error('hostname detection failed; ReCaptcha hostname verification disabled', [self::class]);
-            return false;
-        }
-
-        return true;
+        return Arr::get($parsedUrl, 'host', false);
     }
 
     /**
@@ -69,27 +33,40 @@ class RecaptchaValidation implements ImplicitRule
      * @param  string $hostname
      * @return bool  
      */
-    public function verifyHostname($hostname) {
-        if (filled($this->hostname)) {
-            if (
-                ! Str::of($this->hostname)->exactly($hostname)
-            ) {
+    public function verifyHostname($hostname)
+    {
+        $expectedHostname = self::getHostname();
+
+        if (filled($expectedHostname)) {
+            if (false === Str::of($expectedHostname)->exactly($hostname)) {
                 return false;
             }
+        } else {
+            logger()->error(self::class.': hostname detection failed; ReCaptcha hostname verification disabled');
         }
 
         return true;
     }
 
     /**
-     * Builds ReCaptcha object
+     * Verifies the ReCaptcha Request with the ReCaptcha Service
      * 
      * @param  string $secretKey
-     * @return \ReCaptcha\ReCaptcha
+     * @return \ReCaptcha\Response 
      */
-    public function buildRecaptcha($secretKey)
+    public function verify($token)
     {
-        return new \ReCaptcha\ReCaptcha($secretKey);
+        $recaptcha = new \ReCaptcha\ReCaptcha(
+            config('recaptcha.secret_key')
+        );
+
+        $recaptchaResponse = $recaptcha
+        ->verify(
+            $token,
+            request()->getClientIp()
+        );
+
+        return $recaptchaResponse;
     }
 
     /**
@@ -101,36 +78,30 @@ class RecaptchaValidation implements ImplicitRule
      */
     public function passes($attribute, $value)
     {
-        // @var \Recaptcha\Response
-        $recaptchaResponse = $this->recaptcha
-            ->verify(
-                $value,
-                request()->getClientIp()
-            );
+        $recaptchaResponse = $this->verify($value);
 
         logger()->debug(self::class.': response', [
             'response' => $recaptchaResponse->toArray()
         ]);
 
-        if (! $this->verifyHostname($recaptchaResponse->getHostname())) {
+        if (false === $this->verifyHostname($recaptchaResponse->getHostname())) {
             logger()->debug(self::class.': hostname verification failed', [
-                'hostname'         => $this->hostname,
+                'hostname' => self::getHostname(),
             ]);
 
             return false;
         }
 
-        if (! $recaptchaResponse->isSuccess()) {
-            logger()->debug(self::class.': ReCaptcha lib returned below min score', [
-                'minScore' => $this->minScore,
-            ]);
+        if (false === $recaptchaResponse->isSuccess()) {
+            logger()->debug(self::class.': ReCaptcha response claims no success');
             
             return false;
         }
 
-        if ($recaptchaResponse->getScore() < $this->minScore) {
+        $minScore = (float) config('recaptcha.min_score');
+        if ($recaptchaResponse->getScore() < $minScore) {
             logger()->debug(self::class.': below min score', [
-                'minScore' => $this->minScore,
+                'minScore' => $minScore,
                 'score'    => $recaptchaResponse->getScore()
             ]);
 
