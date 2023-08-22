@@ -3,9 +3,11 @@
 namespace Tests\Routes\Contact;
 
 use App\Notifications\ContactNotification;
+use App\Rules\ReCaptchaValidation;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
+use Tests\Feature\ReCaptchaValidationTest;
 
 class SendMessageTest extends TestCase
 {
@@ -35,19 +37,41 @@ class SendMessageTest extends TestCase
         'other',
     ];
 
+    public function mockReCaptchaValidation($fakeResponse=[])
+    {
+        // replace injected ReCaptchaValidation class with mock (ContactController::$recaptchaValidation)
+        $fakeResponse = array_merge([
+            'success'  => true,
+            'hostname' => 'localhost',
+            'score'    => config('recaptcha.min_score'),
+        ], $fakeResponse);
+    
+        $mockRuleBuilder = $this->getMockBuilder(ReCaptchaValidation::class);
+        $mockRuleBuilder->setConstructorArgs(['someSecret', config('recaptcha.min_score'), 'localhost']);
+        $mockRuleBuilder->onlyMethods(['verify']);
+    
+        $mockRule = $mockRuleBuilder->getMock();
+        $mockRule->method('verify')
+        ->willReturn(
+            \ReCaptcha\Response::fromJson(
+                json_encode($fakeResponse)
+            )
+        );
+    
+        $this->app->instance(ReCaptchaValidation::class, $mockRule);
+    }
+
     public function testSendMessage_NoData()
     {
-        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
-
         $data = $this->postDataTemplateEmpty;
 
         $response = $this->json('POST', $this->route, $data);
-        $response->assertStatus(400);
+        $response->assertStatus(401);
     }
 
     public function testSendMessage_InvalidDataSubject()
     {
-        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
+        $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateValid;
         $data['message'] = "Hi!";
@@ -58,7 +82,7 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_MessageTooLong()
     {
-        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
+        $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateValid;
         $data['message'] = str_repeat("Hi!", 10000);
@@ -68,7 +92,7 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_NameTooLong()
     {
-        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
+        $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateValid;
         $data['name'] = str_repeat("Hi!", 10000);
@@ -78,7 +102,7 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_ContactDetailsTooLong()
     {
-        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
+        $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateValid;
         $data['contactDetails'] = str_repeat("Hi!", 10000);
@@ -88,9 +112,9 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_Success()
     {
-        putenv('PHPUNIT_RECAPTCHA_CHECK=0');
-
+        $this->mockReCaptchaValidation();
         Notification::fake();
+
         $data = [
             'name'           => 'foo',
             'contactDetails' => 'bar',
@@ -112,8 +136,8 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_RecaptchaFailure()
     {
+        $this->mockReCaptchaValidation(['success' => false]);
         Notification::fake();
-        putenv('PHPUNIT_RECAPTCHA_CHECK=1');
 
         $response = $this->json('POST', $this->route, $this->postDataTemplateValid);
         $response->assertStatus(401);
