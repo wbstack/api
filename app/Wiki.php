@@ -57,8 +57,6 @@ class Wiki extends Model
         'deleted_at',
     ];
 
-    protected $perPage = 20;
-
     public function wikiDbVersion()
     {
         /**
