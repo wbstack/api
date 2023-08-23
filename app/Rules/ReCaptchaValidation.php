@@ -10,7 +10,7 @@ use \ReCaptcha\ReCaptcha;
 class ReCaptchaValidation implements ImplicitRule
 {
     /**
-     * @var string $recaptcha \ReCaptcha\ReCaptcha instance
+     * @var \ReCaptcha\ReCaptcha $recaptcha  instance
      */
     protected $recaptcha;
 
