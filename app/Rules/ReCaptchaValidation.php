@@ -35,7 +35,7 @@ class ReCaptchaValidation implements ImplicitRule
      * @param  string $hostname
      * @return bool  
      */
-    public function verifyHostname($hostname)
+    private function verifyHostname($hostname)
     {
         $parsedUrl = parse_url($this->appUrl);
         $expectedHostname = Arr::get($parsedUrl, 'host', null);
