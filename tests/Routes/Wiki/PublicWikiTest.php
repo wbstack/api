@@ -43,11 +43,19 @@ class PublicWikiTest extends TestCase
 
     public function testGetOne()
     {
-        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'one.wikibase.cloud'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 77
+        ]);
 
-        Wiki::factory()->create(['domain' => 'two.wikibase.cloud']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 66]);
+        Wiki::factory()->create([
+            'domain' => 'two.wikibase.cloud'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 66
+        ]);
 
         $this->json('GET', $this->route.'/'.$wiki->id)
             ->assertStatus(200)
@@ -57,11 +65,19 @@ class PublicWikiTest extends TestCase
 
     public function testGetAll()
     {
-        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'sitename' => 'bsite']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'one.wikibase.cloud', 'sitename' => 'bsite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 77
+        ]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'sitename' => 'asite']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 66]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'two.wikibase.cloud', 'sitename' => 'asite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 66
+        ]);
 
         $this->json('GET', $this->route)
             ->assertStatus(200)
@@ -73,13 +89,23 @@ class PublicWikiTest extends TestCase
 
     public function testCustomSorting()
     {
-        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'sitename' => 'bsite']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'one.wikibase.cloud', 'sitename' => 'bsite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 77
+        ]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'sitename' => 'asite']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 66]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'two.wikibase.cloud', 'sitename' => 'asite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 66
+        ]);
 
-        Wiki::factory()->create(['domain' => 'nostats.wikibase.cloud', 'sitename' => 'zsite']);
+        Wiki::factory()->create([
+            'domain' => 'nostats.wikibase.cloud', 'sitename' => 'zsite'
+        ]);
 
         $this->json('GET', $this->route.'?sort=pages&direction=desc')
             ->assertStatus(200)
@@ -115,14 +141,26 @@ class PublicWikiTest extends TestCase
 
     public function testPagination()
     {
-        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'sitename' => 'csite']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'one.wikibase.cloud', 'sitename' => 'csite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 77
+        ]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'sitename' => 'bsite']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 66]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'two.wikibase.cloud', 'sitename' => 'bsite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 66
+        ]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'three.wikibase.cloud', 'sitename' => 'asite']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 55]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'three.wikibase.cloud', 'sitename' => 'asite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 55
+        ]);
 
         $this->json('GET', $this->route.'?per_page=1')
             ->assertStatus(200)
@@ -141,14 +179,26 @@ class PublicWikiTest extends TestCase
 
     public function testFilterIsFeatured()
     {
-        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'is_featured' => false]);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'one.wikibase.cloud', 'is_featured' => false
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 77
+        ]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'is_featured' => true]);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 66]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'two.wikibase.cloud', 'is_featured' => true
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 66
+        ]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'three.wikibase.cloud', 'is_featured' => false]);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 55]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'three.wikibase.cloud', 'is_featured' => false
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 55
+        ]);
 
         $this->json('GET', $this->route.'?is_featured=1')
             ->assertStatus(200)
@@ -160,16 +210,30 @@ class PublicWikiTest extends TestCase
 
     public function testFilterIsActive()
     {
-        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'sitename' => 'csite']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'one.wikibase.cloud', 'sitename' => 'csite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 77
+        ]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'sitename' => 'bsite']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 0]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'two.wikibase.cloud', 'sitename' => 'bsite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 0
+        ]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'three.wikibase.cloud', 'sitename' => 'asite']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 55]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'three.wikibase.cloud', 'sitename' => 'asite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 55
+        ]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'nostats.wikibase.cloud', 'sitename' => 'zsite']);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'nostats.wikibase.cloud', 'sitename' => 'zsite'
+        ]);
 
         $this->json('GET', $this->route.'?is_active=1')
             ->assertStatus(200)
@@ -186,20 +250,31 @@ class PublicWikiTest extends TestCase
 
     public function testLogoUrl()
     {
-        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud', 'sitename' => 'asite']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'one.wikibase.cloud', 'sitename' => 'asite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id
+        ]);
         WikiSetting::factory()->create([
             'wiki_id' => $wiki->id,
             'name' => 'wgLogo',
             'value' => 'https://storage.googleapis.com/wikibase-cloud/foo.bar.png'
         ]);
 
-        $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'sitename' => 'bsite']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id]);
+        $wiki = Wiki::factory()->create([
+            'domain' => 'two.wikibase.cloud', 'sitename' => 'bsite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id
+        ]);
 
         $this->json('GET', $this->route)
             ->assertStatus(200)
-            ->assertJsonPath('data.0.logo_url', 'https://storage.googleapis.com/wikibase-cloud/foo.bar.png')
+            ->assertJsonPath(
+                'data.0.logo_url',
+                'https://storage.googleapis.com/wikibase-cloud/foo.bar.png'
+            )
             ->assertJsonPath('data.1.logo_url', null);
     }
 
