@@ -1,5 +1,8 @@
 # api
 
+## 8x.19.0 - 23 August 2023
+- Add daily job for updating MediaWiki stats on wikis
+
 ## 8x.18.0 - 22 August 2023
 - Add WikiSiteStats model for persisting MediaWiki stats for a wiki
 
