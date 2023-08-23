@@ -236,6 +236,13 @@ class PublicWikiTest extends TestCase
         ]);
 
         $wiki = Wiki::factory()->create([
+            'domain' => 'four.wikibase.cloud', 'sitename' => 'dsite'
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id, 'pages' => 1
+        ]);
+
+        $wiki = Wiki::factory()->create([
             'domain' => 'nostats.wikibase.cloud', 'sitename' => 'zsite'
         ]);
 
@@ -248,8 +255,8 @@ class PublicWikiTest extends TestCase
 
         $this->json('GET', $this->route)
             ->assertStatus(200)
-            ->assertJsonCount(4, 'data')
-            ->assertJsonPath('meta.total', 4);
+            ->assertJsonCount(5, 'data')
+            ->assertJsonPath('meta.total', 5);
     }
 
     public function testLogoUrl()
@@ -281,5 +288,4 @@ class PublicWikiTest extends TestCase
             )
             ->assertJsonPath('data.1.logo_url', null);
     }
-
 }

@@ -13,6 +13,9 @@ class PublicWikiController extends Controller
         'sort' => 'sitename',
         'direction' => 'asc'
     ];
+
+    private static $activeThresholdPageCount = 2;
+
     /**
      * Display a listing of the resource.
      */
@@ -37,7 +40,9 @@ class PublicWikiController extends Controller
         }
 
         if (array_key_exists('is_active', $params) && $params['is_active']) {
-            $query = $query->whereRelation('wikiSiteStats', 'pages', '>', 0);
+            $query = $query->whereRelation(
+                'wikiSiteStats', 'pages', '>=', self::$activeThresholdPageCount
+            );
         }
 
         switch ($params['sort']) {
