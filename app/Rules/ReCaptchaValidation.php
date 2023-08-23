@@ -9,9 +9,9 @@ use Illuminate\Support\Str;
 class ReCaptchaValidation implements ImplicitRule
 {
     /**
-     * @var string $secret Secret Site Key
+     * @var string $recaptcha \ReCaptcha\ReCaptcha instance
      */
-    protected $secret;
+    protected $recaptcha;
 
     /**
      * @var string $minScore Lowest score to pass (0.0 - 1.0)
@@ -23,10 +23,10 @@ class ReCaptchaValidation implements ImplicitRule
      */
     protected $appUrl;
 
-    public function __construct($secret, $minScore, $appUrl) {
-        $this->secret = $secret;
-        $this->appUrl = $appUrl;
+    public function __construct(\ReCaptcha\ReCaptcha $recaptcha, $minScore, $appUrl) {
+        $this->recaptcha = $recaptcha;
         $this->minScore = $minScore;
+        $this->appUrl = $appUrl;
     }
 
     /**
@@ -45,7 +45,9 @@ class ReCaptchaValidation implements ImplicitRule
                 return false;
             }
         } else {
-            logger()->error(self::class.': hostname detection failed; ReCaptcha hostname verification disabled');
+            logger()->error('Hostname detection failed; ReCaptcha hostname verification disabled', [
+                'class' => self::class,
+            ]);
         }
 
         return true;
@@ -62,21 +64,21 @@ class ReCaptchaValidation implements ImplicitRule
         $recaptchaResponse = new \ReCaptcha\Response(false);
 
         try {
-            $recaptcha = new \ReCaptcha\ReCaptcha(
-                $this->secret
-            );
-
-            $recaptchaResponse = $recaptcha
+            $recaptchaResponse = $this->recaptcha
             ->verify(
                 $token,
                 request()->getClientIp()
             );
 
-            logger()->debug(self::class.': response', [
+            logger()->debug('ReCaptcha response', [
+                'class'    => self::class,
                 'response' => $recaptchaResponse->toArray()
             ]);
         } catch(\Exception $e) {
-            logger()->error(self::class.': Exception thrown by \Recaptcha\ReCaptcha::verify', [$e]);
+            logger()->error(self::class.': Exception thrown by \Recaptcha\ReCaptcha::verify', [
+                'class'     => self::class,
+                'exception' => $e,
+            ]);
         }
 
         return $recaptchaResponse;
@@ -102,7 +104,8 @@ class ReCaptchaValidation implements ImplicitRule
         }
 
         if ($recaptchaResponse->getScore() < $this->minScore) {
-            logger()->debug(self::class.': below min score', [
+            logger()->debug('ReCaptcha response below minScore', [
+                'class'    => self::class,
                 'minScore' => $this->minScore,
                 'score'    => $recaptchaResponse->getScore()
             ]);
