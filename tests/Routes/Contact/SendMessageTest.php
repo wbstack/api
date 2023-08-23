@@ -110,6 +110,23 @@ class SendMessageTest extends TestCase
         $response->assertStatus(400);
     }
 
+
+    public function testSendMessage_NoContactDetails()
+    {
+        $this->mockReCaptchaValidation();
+        Notification::fake();
+
+        $data = [
+            'name'           => 'foo',
+            'subject'        => 'general-question',
+            'message'        => 'baz',
+            'recaptcha'      => 'fake-token',
+        ];
+
+        $response = $this->json('POST', $this->route, $data);
+        $response->assertStatus(200);
+    }
+
     public function testSendMessage_Success()
     {
         $this->mockReCaptchaValidation();

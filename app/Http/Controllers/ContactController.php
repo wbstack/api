@@ -60,6 +60,10 @@ class ContactController extends Controller
      */
     protected function validator(array $data): \Illuminate\Validation\Validator
     {
+        if (! isset($data['contactDetails'])) {
+            $data['contactDetails'] = ''; // could we skip this using some feature of the validator?
+        }
+
         $validSubjects = [
             'general-question',
             'feature-request',
