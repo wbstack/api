@@ -5,6 +5,7 @@ namespace App\Rules;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use \ReCaptcha\ReCaptcha;
 
 class ReCaptchaValidation implements ImplicitRule
 {
@@ -23,7 +24,7 @@ class ReCaptchaValidation implements ImplicitRule
      */
     protected $appUrl;
 
-    public function __construct(\ReCaptcha\ReCaptcha $recaptcha, $minScore, $appUrl) {
+    public function __construct(ReCaptcha $recaptcha, $minScore, $appUrl) {
         $this->recaptcha = $recaptcha;
         $this->minScore = $minScore;
         $this->appUrl = $appUrl;
@@ -45,7 +46,7 @@ class ReCaptchaValidation implements ImplicitRule
                 return false;
             }
         } else {
-            logger()->error('Hostname detection failed; ReCaptcha hostname verification disabled', [
+            logger()->error('ReCaptcha hostname detection failed; will not verify hostname', [
                 'class' => self::class,
             ]);
         }
@@ -75,7 +76,7 @@ class ReCaptchaValidation implements ImplicitRule
                 'response' => $recaptchaResponse->toArray()
             ]);
         } catch(\Exception $e) {
-            logger()->error(self::class.': Exception thrown by \Recaptcha\ReCaptcha::verify', [
+            logger()->error('Exception thrown by \Recaptcha\ReCaptcha::verify', [
                 'class'     => self::class,
                 'exception' => $e,
             ]);

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Rules\ReCaptchaValidation;
+use \ReCaptcha\ReCaptcha;
 
 class ReCaptchaServiceProvider extends ServiceProvider
 {
@@ -13,10 +14,14 @@ class ReCaptchaServiceProvider extends ServiceProvider
      * @return void
      */
     public function register()
-    {
+    {        
         $this->app->bind(ReCaptchaValidation::class, function($app) {
+            $recaptcha = new ReCaptcha(
+                config('recaptcha.secret')
+            );
+
             return new ReCaptchaValidation(
-                config('recaptcha.secret_key'),
+                $recaptcha,
                 config('recaptcha.min_score'),
                 config('app.url')
             );
