@@ -101,26 +101,34 @@ class PublicWikiTest extends TestCase
         $wiki = Wiki::factory()->create(['domain' => 'two.wikibase.cloud', 'sitename' => 'asite']);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 66]);
 
+        Wiki::factory()->create(['domain' => 'nostats.wikibase.cloud', 'sitename' => 'zsite']);
+
         $this->json('GET', $this->route.'?sort=pages&direction=desc')
             ->assertStatus(200)
             ->assertJsonPath('data.0.domain', 'one.wikibase.cloud')
             ->assertJsonPath('data.0.wiki_site_stats.pages', 77)
             ->assertJsonPath('data.1.domain', 'two.wikibase.cloud')
-            ->assertJsonPath('data.1.wiki_site_stats.pages', 66);
+            ->assertJsonPath('data.1.wiki_site_stats.pages', 66)
+            ->assertJsonPath('data.2.domain', 'nostats.wikibase.cloud')
+            ->assertJsonPath('data.2.wiki_site_stats', null);
 
         $this->json('GET', $this->route.'?direction=desc')
             ->assertStatus(200)
-            ->assertJsonPath('data.0.domain', 'one.wikibase.cloud')
-            ->assertJsonPath('data.0.wiki_site_stats.pages', 77)
-            ->assertJsonPath('data.1.domain', 'two.wikibase.cloud')
-            ->assertJsonPath('data.1.wiki_site_stats.pages', 66);
+            ->assertJsonPath('data.0.domain', 'nostats.wikibase.cloud')
+            ->assertJsonPath('data.0.wiki_site_stats', null)
+            ->assertJsonPath('data.1.domain', 'one.wikibase.cloud')
+            ->assertJsonPath('data.1.wiki_site_stats.pages', 77)
+            ->assertJsonPath('data.2.domain', 'two.wikibase.cloud')
+            ->assertJsonPath('data.2.wiki_site_stats.pages', 66);
 
         $this->json('GET', $this->route.'?sort=pages')
             ->assertStatus(200)
-            ->assertJsonPath('data.0.domain', 'two.wikibase.cloud')
-            ->assertJsonPath('data.0.wiki_site_stats.pages', 66)
-            ->assertJsonPath('data.1.domain', 'one.wikibase.cloud')
-            ->assertJsonPath('data.1.wiki_site_stats.pages', 77);
+            ->assertJsonPath('data.0.domain', 'nostats.wikibase.cloud')
+            ->assertJsonPath('data.0.wiki_site_stats', null)
+            ->assertJsonPath('data.1.domain', 'two.wikibase.cloud')
+            ->assertJsonPath('data.1.wiki_site_stats.pages', 66)
+            ->assertJsonPath('data.2.domain', 'one.wikibase.cloud')
+            ->assertJsonPath('data.2.wiki_site_stats.pages', 77);
 
         $this->json('GET', $this->route.'?sort=dinosaur')
             ->assertStatus(400)
@@ -183,6 +191,8 @@ class PublicWikiTest extends TestCase
         $wiki = Wiki::factory()->create(['domain' => 'three.wikibase.cloud', 'sitename' => 'asite']);
         WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 55]);
 
+        $wiki = Wiki::factory()->create(['domain' => 'nostats.wikibase.cloud', 'sitename' => 'zsite']);
+
         $this->json('GET', $this->route.'?is_active=1')
             ->assertStatus(200)
             ->assertJsonPath('data.0.domain', 'three.wikibase.cloud')
@@ -192,8 +202,8 @@ class PublicWikiTest extends TestCase
 
         $this->json('GET', $this->route)
             ->assertStatus(200)
-            ->assertJsonCount(3, 'data')
-            ->assertJsonPath('meta.total', 3);
+            ->assertJsonCount(4, 'data')
+            ->assertJsonPath('meta.total', 4);
     }
 
     public function testLogoUrl()
