@@ -37,32 +37,24 @@ class SendMessageTest extends TestCase
         'other',
     ];
 
-    public function mockReCaptchaValidation($fakeResponse=[])
+    public function mockReCaptchaValidation($passes=true)
     {
         // replace injected ReCaptchaValidation class with mock (ContactController::$recaptchaValidation)
-        $fakeResponse = array_merge([
-            'success'  => true,
-            'hostname' => 'localhost',
-            'score'    => config('recaptcha.min_score'),
-        ], $fakeResponse);
-    
         $mockRuleBuilder = $this->getMockBuilder(ReCaptchaValidation::class);
-        $mockRuleBuilder->setConstructorArgs(['someSecret', config('recaptcha.min_score'), 'localhost']);
-        $mockRuleBuilder->onlyMethods(['verify']);
+        $mockRuleBuilder->setConstructorArgs([new \ReCaptcha\ReCaptcha('someSecret'), config('recaptcha.min_score'), 'http://localhost']);
+        $mockRuleBuilder->onlyMethods(['passes']);
     
         $mockRule = $mockRuleBuilder->getMock();
-        $mockRule->method('verify')
-        ->willReturn(
-            \ReCaptcha\Response::fromJson(
-                json_encode($fakeResponse)
-            )
-        );
+        $mockRule->method('passes')
+        ->willReturn($passes);
     
         $this->app->instance(ReCaptchaValidation::class, $mockRule);
     }
 
     public function testSendMessage_NoData()
     {
+        $this->mockReCaptchaValidation(false);
+
         $data = $this->postDataTemplateEmpty;
 
         $response = $this->json('POST', $this->route, $data);
@@ -153,7 +145,7 @@ class SendMessageTest extends TestCase
 
     public function testSendMessage_RecaptchaFailure()
     {
-        $this->mockReCaptchaValidation(['success' => false]);
+        $this->mockReCaptchaValidation(false);
         Notification::fake();
 
         $response = $this->json('POST', $this->route, $this->postDataTemplateValid);

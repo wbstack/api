@@ -20,26 +20,16 @@ class RegisterTest extends TestCase
 
     // TODO test password length when not deving
 
-    public function mockReCaptchaValidation($fakeResponse=[])
+    public function mockReCaptchaValidation($passes=true)
     {
-        // replace injected ReCaptchaValidation class with mock (RegisterController::$recaptchaValidation)
-        $fakeResponse = array_merge([
-            'success'  => true,
-            'hostname' => 'localhost',
-            'score'    => config('recaptcha.min_score'),
-        ], $fakeResponse);
-    
+        // replace injected ReCaptchaValidation class with mock (ContactController::$recaptchaValidation)
         $mockRuleBuilder = $this->getMockBuilder(ReCaptchaValidation::class);
-        $mockRuleBuilder->setConstructorArgs(['someSecret', config('recaptcha.min_score'), 'localhost']);
-        $mockRuleBuilder->onlyMethods(['verify']);
+        $mockRuleBuilder->setConstructorArgs([new \ReCaptcha\ReCaptcha('someSecret'), config('recaptcha.min_score'), 'http://localhost']);
+        $mockRuleBuilder->onlyMethods(['passes']);
     
         $mockRule = $mockRuleBuilder->getMock();
-        $mockRule->method('verify')
-        ->willReturn(
-            \ReCaptcha\Response::fromJson(
-                json_encode($fakeResponse)
-            )
-        );
+        $mockRule->method('passes')
+        ->willReturn($passes);
     
         $this->app->instance(ReCaptchaValidation::class, $mockRule);
     }
@@ -104,7 +94,7 @@ class RegisterTest extends TestCase
 
     public function testCreate_NoToken()
     {
-        $this->mockReCaptchaValidation();
+        $this->mockReCaptchaValidation(false);
 
         $invite = Invitation::factory()->create();
         $user = User::factory()->make();

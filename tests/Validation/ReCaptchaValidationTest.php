@@ -6,16 +6,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Rules\ReCaptchaValidation;
+use \ReCaptcha\ReCaptcha;
 
 class ReCaptchaValidationTest extends TestCase
 {
-    public function buildMockedReCaptchaRule($fakeResponse)
+    public function buildMockedReCaptcha($fakeResponse)
     {
-        $mockRuleBuilder = $this->getMockBuilder(ReCaptchaValidation::class);
+        $mockRuleBuilder = $this->getMockBuilder(ReCaptcha::class);
         $mockRuleBuilder->setConstructorArgs([
             config('recaptcha.secretKey', 'someSecret'),
-            config('recaptcha.minScore', 0.5),
-            config('app.url', 'localhost'),
         ]);
         $mockRuleBuilder->onlyMethods([
             'verify'
@@ -47,12 +46,28 @@ class ReCaptchaValidationTest extends TestCase
         return array_merge($template, $data);
     }
 
-    public function testBypass()
+    public function buildReCaptchaValidation($recaptcha=false, $minScore=false, $appUrl=false) {
+        if (false === $recaptcha) {
+            $recaptcha = new ReCaptcha('secret');
+        }
+
+        if (false === $minScore) {
+            $minScore = config('recaptcha.min_score', 0.5);
+        }
+
+        if (false === $appUrl) {
+            $appUrl = config('app.url', 'http://www.wbaas.localhost');
+        }
+
+        return new ReCaptchaValidation($recaptcha, $minScore, $appUrl);
+    }
+
+    public function testBypassFails()
     {
-        $rule = new ReCaptchaValidation('secret', 0.0, 'localhost');
+        $rule = $this->buildReCaptchaValidation();
 
         $this->assertFalse(
-            $rule->passes('token', 'bypass')
+            $rule->passes('token', 'someToken')
         );
     }
 
@@ -62,45 +77,65 @@ class ReCaptchaValidationTest extends TestCase
             'score' => config('recaptcha.min_score') -1,
         ]);
 
-        $mockRule = $this->buildMockedReCaptchaRule($fakeResponse, $this);
+        $mockReCaptcha = $this->buildMockedReCaptcha($fakeResponse);
+        $rule = $this->buildReCaptchaValidation($mockReCaptcha);
 
         $this->assertFalse(
-            $mockRule->passes('token', '')
+            $rule->passes('token', 'someToken')
+        );
+    }
+
+    public function testInactiveHostVerification()
+    {
+        $fakeResponse = $this->buildReCaptchaFakeResponse([
+            'hostname' => 'example.com'
+        ]);
+
+        $mockReCaptcha = $this->buildMockedReCaptcha($fakeResponse);
+        $rule = $this->buildReCaptchaValidation($mockReCaptcha, false, 'localhost');
+
+        $this->assertTrue(
+            $rule->passes('token', 'someToken')
         );
     }
 
     public function testWrongHostname()
     {
-        $fakeResponse = $this->buildReCaptchaFakeResponse();
-        $fakeResponse['hostname'] = 'example.com';
+        $fakeResponse = $this->buildReCaptchaFakeResponse([
+            'hostname' => 'example.com'
+        ]);
 
-        $mockRule = $this->buildMockedReCaptchaRule($fakeResponse, $this);
+        $mockReCaptcha = $this->buildMockedReCaptcha($fakeResponse);
+        $rule = $this->buildReCaptchaValidation($mockReCaptcha);
 
         $this->assertFalse(
-            $mockRule->passes('token', '')
+            $rule->passes('token', 'someToken')
         );
     }
 
     public function testNoSuccess()
     {
-        $fakeResponse = $this->buildReCaptchaFakeResponse();
-        $fakeResponse['success'] = false;
+        $fakeResponse = $this->buildReCaptchaFakeResponse([
+            'success' => false
+        ]);
 
-        $mockRule = $this->buildMockedReCaptchaRule($fakeResponse, $this);
+        $mockReCaptcha = $this->buildMockedReCaptcha($fakeResponse);
+        $rule = $this->buildReCaptchaValidation($mockReCaptcha);
 
         $this->assertFalse(
-            $mockRule->passes('token', '')
+            $rule->passes('token', 'someToken')
         );
     }
 
     public function testSuccess()
     {
         $fakeResponse = $this->buildReCaptchaFakeResponse();
+        $mockReCaptcha = $this->buildMockedReCaptcha($fakeResponse);
 
-        $mockRule = $this->buildMockedReCaptchaRule($fakeResponse, $this);
+        $rule = $this->buildReCaptchaValidation($mockReCaptcha);
 
         $this->assertTrue(
-            $mockRule->passes('token', '')
+            $rule->passes('token', 'someToken')
         );
     }
 }
