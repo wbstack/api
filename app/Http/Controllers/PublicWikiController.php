@@ -59,34 +59,10 @@ class PublicWikiController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): \Illuminate\Http\JsonResponse
-    {
-        return response()->json(['message' => 'Method not allowed'], 405);
-    }
-
-    /**
      * Display the specified resource.
      */
     public function show($id)
     {
         return new PublicWikiResource(Wiki::findOrFail($id));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id): \Illuminate\Http\JsonResponse
-    {
-        return response()->json(['message' => 'Method not allowed'], 405);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id): \Illuminate\Http\JsonResponse
-    {
-        return response()->json(['message' => 'Method not allowed'], 405);
     }
 }

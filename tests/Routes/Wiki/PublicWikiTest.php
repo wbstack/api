@@ -41,28 +41,6 @@ class PublicWikiTest extends TestCase
             ->assertJsonPath('data', []);
     }
 
-    public function testBadMethods()
-    {
-        $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud']);
-        WikiSiteStats::factory()->create(['wiki_id' => $wiki->id, 'pages' => 77]);
-
-        $this->json('DELETE', $this->route.'/'.$wiki->id)
-            ->assertStatus(405)
-            ->assertJsonStructure(['message']);
-
-        $this->assertEquals(Wiki::where('id', $wiki->id)->count(), 1);
-
-        $this->json('PATCH', $this->route.'/'.$wiki->id, ['domain' => 'foo.wikibase.cloud'])
-            ->assertStatus(405)
-            ->assertJsonStructure(['message']);
-
-        $this->assertEquals(Wiki::where('id', $wiki->id)->first()->getAttribute('domain'), 'one.wikibase.cloud');
-
-        $this->json('POST', $this->route, ['domain' => 'create.wikibase.cloud'])
-            ->assertStatus(405)
-            ->assertJsonStructure(['message']);
-    }
-
     public function testGetOne()
     {
         $wiki = Wiki::factory()->create(['domain' => 'one.wikibase.cloud']);

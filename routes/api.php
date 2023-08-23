@@ -22,7 +22,7 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
     $router->post('user/resetPassword', ['uses' => 'Auth\ResetPasswordController@reset']);
     $router->post('contact/sendMessage', ['uses' => 'ContactController@sendMessage']);
 
-    $router->apiResource('wiki', 'PublicWikiController');
+    $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
 
     // Authed
     $router->group(['middleware' => ['auth:api']], function () use ($router) {
