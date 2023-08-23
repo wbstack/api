@@ -137,6 +137,10 @@ class PublicWikiTest extends TestCase
         $this->json('GET', $this->route.'?sort=dinosaur')
             ->assertStatus(400)
             ->assertJsonStructure(['message']);
+
+        $this->json('GET', $this->route.'?direction=random')
+            ->assertStatus(400)
+            ->assertJsonStructure(['message']);
     }
 
     public function testPagination()

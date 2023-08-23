@@ -26,8 +26,16 @@ class PublicWikiController extends Controller
             $query = $query->whereRelation('wikiSiteStats', 'pages', '>', 0);
         }
 
-        $sort = $request->query('sort', 'sitename');
         $direction = $request->query('direction', 'asc');
+        if ($direction !== 'asc' && $direction !== 'desc') {
+            return response()
+                ->json(
+                    ['message' => 'Direction '.$direction.' is not supported.'],
+                    400
+                );
+        }
+
+        $sort = $request->query('sort', 'sitename');
         switch ($sort) {
         case 'sitename':
             $query = $query->orderBy(
