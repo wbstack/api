@@ -9,38 +9,42 @@ use App\Http\Resources\PublicWikiResource;
 
 class PublicWikiController extends Controller
 {
+    private static $defaultParams = [
+        'sort' => 'sitename',
+        'direction' => 'asc'
+    ];
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
+        $request->validate([
+            'sort' => 'in:sitename,pages',
+            'direction' => 'in:desc,asc',
+            'is_featured' => 'boolean',
+            'is_active' => 'boolean',
+            'per_page' => 'numeric',
+            'page' => 'numeric'
+        ]);
+
+        $params = array_merge(self::$defaultParams, $request->input());
         $query = Wiki::query();
 
-        $isFeatured = $request->query('is_featured', null);
-        if ($isFeatured !== null) {
-            $query = $query->where(['is_featured' => boolval($isFeatured)]);
+        if (array_key_exists('is_featured', $params)) {
+            $query = $query->where([
+                'is_featured' => boolval($params['is_featured'])
+            ]);
         }
 
-        $isActive = $request->query('is_active', null);
-        if ($isActive !== null && boolval($isActive)) {
+        if (array_key_exists('is_active', $params) && $params['is_active']) {
             $query = $query->whereRelation('wikiSiteStats', 'pages', '>', 0);
         }
 
-        $direction = $request->query('direction', 'asc');
-        if ($direction !== 'asc' && $direction !== 'desc') {
-            return response()
-                ->json(
-                    ['message' => 'Direction '.$direction.' is not supported.'],
-                    400
-                );
-        }
-
-        $sort = $request->query('sort', 'sitename');
-        switch ($sort) {
+        switch ($params['sort']) {
         case 'sitename':
             $query = $query->orderBy(
                 'sitename',
-                $direction
+                $params['direction']
             );
             break;
         case 'pages':
@@ -48,21 +52,16 @@ class PublicWikiController extends Controller
                 WikiSiteStats::query()
                     ->select('pages')
                     ->whereColumn('wiki_site_stats.wiki_id', 'wikis.id'),
-                $direction
+                $params['direction']
             );
             break;
-        default:
-            return response()
-                ->json(
-                    ['message' => 'Sorting by '.$sort.' is not supported.'],
-                    400
-                );
         }
 
-        $perPage = $request->query('per_page', null);
-        if ($perPage !== null) {
-            $perPage = intval($perPage);
+        $perPage = null;
+        if (array_key_exists('per_page', $params)) {
+            $perPage = intval($params['per_page']);
         }
+
         return PublicWikiResource::collection($query->paginate($perPage));
     }
 

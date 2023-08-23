@@ -135,11 +135,11 @@ class PublicWikiTest extends TestCase
             ->assertJsonPath('data.2.wiki_site_stats.pages', 77);
 
         $this->json('GET', $this->route.'?sort=dinosaur')
-            ->assertStatus(400)
+            ->assertStatus(422)
             ->assertJsonStructure(['message']);
 
         $this->json('GET', $this->route.'?direction=random')
-            ->assertStatus(400)
+            ->assertStatus(422)
             ->assertJsonStructure(['message']);
     }
 
