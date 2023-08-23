@@ -1,5 +1,8 @@
 # api
 
+## 8x.20.0 - 23 August 2023
+- Add public /wiki endpoint
+
 ## 8x.19.0 - 23 August 2023
 - Add daily job for updating MediaWiki stats on wikis
 
