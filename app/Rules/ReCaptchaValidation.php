@@ -57,7 +57,7 @@ class ReCaptchaValidation implements ImplicitRule
      * @param  string $secretKey
      * @return \ReCaptcha\Response 
      */
-    public function verify($token)
+    private function verify($token)
     {
         $recaptchaResponse = new \ReCaptcha\Response(false);
 
