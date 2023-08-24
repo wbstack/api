@@ -1,5 +1,8 @@
 # api
 
+## 8x.21.0 - 24 August 2023
+- Allow for trusted proxies to be configured
+
 ## 8x.20.0 - 23 August 2023
 - Add public /wiki endpoint
 
