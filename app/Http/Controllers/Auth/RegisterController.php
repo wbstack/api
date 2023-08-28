@@ -40,9 +40,6 @@ class RegisterController extends Controller
             $request->input('email'),
             $request->input('password')
           ))->handle();
-            if ($request->input('invite')) {
-                ( new InvitationDeleteJob($request->input('invite')) )->handle();
-            }
             (UserVerificationCreateTokenAndSendJob::newForAccountCreation($user))->handle();
         });
 
@@ -75,9 +72,7 @@ class RegisterController extends Controller
             'recaptcha' => ['required', 'string', 'bail', $this->recaptchaValidation],
             'email'     => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password'  => ['required', 'string', 'min:8'],
-            'invite'    => ['required', 'string', 'exists:invitations,code']
         ];
-
         return Validator::make($data, $validation);
     }
 }
