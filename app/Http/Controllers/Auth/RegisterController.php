@@ -31,9 +31,6 @@ class RegisterController extends Controller
             $request->input('email'),
             $request->input('password')
           ))->handle();
-            if ($request->input('invite')) {
-                ( new InvitationDeleteJob($request->input('invite')) )->handle();
-            }
             (UserVerificationCreateTokenAndSendJob::newForAccountCreation($user))->handle();
         });
 
@@ -75,14 +72,6 @@ class RegisterController extends Controller
             unset($validation['recaptcha']);
         }
 
-        // If this is the first user then do not require an invitation or captcha
-        if (User::count() === 0) {
-            $inviteRequired = false;
-            unset($validation['recaptcha']);
-        } else {
-            $inviteRequired = true;
-            $validation['invite'] = 'required|exists:invitations,code';
-        }
         // For testing, allow 5 char emails ot skip captcha...
         if (array_key_exists('email', $data) && strlen($data['email']) == 5) {
             unset($validation['recaptcha']);
