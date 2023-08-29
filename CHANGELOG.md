@@ -1,5 +1,8 @@
 # api
 
+## 8x.21.1 - 29 August 2023
+- Continue collecting platform stats when single job failed
+
 ## 8x.21.0 - 24 August 2023
 - Allow for trusted proxies to be configured
 
