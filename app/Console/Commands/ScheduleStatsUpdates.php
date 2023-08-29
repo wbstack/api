@@ -51,10 +51,11 @@ class ScheduleStatsUpdates extends Command
 
         Log::info(__METHOD__ . ": Scheduling updates for " . count($siteStatsUpdateJobs) . " wikis.");
 
-        Bus::chain([
-            ...$siteStatsUpdateJobs,
-            new PlatformStatsSummaryJob()
-        ])->dispatch();
+        Bus::batch($siteStatsUpdateJobs)
+            ->allowFailures()
+            ->then(function () {
+                dispatch(new PlatformStatsSummaryJob());
+            })->dispatch();
         return 0;
     }
 }
