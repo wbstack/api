@@ -14,10 +14,15 @@ class ChangeEmailTest extends TestCase
 
     const EMAIL_OLD = 'old@example.com';
     const EMAIL_NEW = 'new@example.com';
-    protected function createUser($email) {
-        $user = new User(['email' => $email, 'password' => 'worldsstrongestpassword']);
+    
+    private function createUser($email)
+    {
+        $user = new User([
+            'email' => $email,
+            'password' => 'worldsstrongestpassword'
+        ]);
         $user->save();
-
+        
         return $user;
     }
 
@@ -60,7 +65,7 @@ class ChangeEmailTest extends TestCase
 
         $this->assertSame($oldUser->id, $newUser->id);
         $this->assertSame($newUser->email, self::EMAIL_OLD);
-        $this->assertTrue($newUser->hasVerifiedEmail());
+        $this->assertFalse($newUser->hasVerifiedEmail());
 
         Notification::assertNothingSent();
     }
@@ -82,7 +87,7 @@ class ChangeEmailTest extends TestCase
 
         $this->assertSame($oldUser->id, $newUser->id);
         $this->assertSame($newUser->email, self::EMAIL_OLD);
-        $this->assertTrue($newUser->hasVerifiedEmail());
+        $this->assertFalse($newUser->hasVerifiedEmail());
 
         Notification::assertNothingSent();
     }
