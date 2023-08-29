@@ -14,8 +14,8 @@ class ChangeEmail extends Command
 
     public function handle(): int
     {
-        $emailOld = $this->argument('--from');
-        $emailNew = $this->argument('--to');
+        $emailOld = $this->option('from');
+        $emailNew = $this->option('to');
 
         $user = User::whereEmail($emailOld)->first();
 
