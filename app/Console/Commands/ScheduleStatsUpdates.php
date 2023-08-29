@@ -53,7 +53,7 @@ class ScheduleStatsUpdates extends Command
 
         Bus::batch($siteStatsUpdateJobs)
             ->allowFailures()
-            ->then(function () {
+            ->finally(function () {
                 dispatch(new PlatformStatsSummaryJob());
             })->dispatch();
         return 0;

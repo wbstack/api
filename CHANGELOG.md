@@ -1,5 +1,8 @@
 # api
 
+## 8x.21.2 - 29 August 2023
+- Also run PlatformStatsSummaryJob if preceding jobs failed
+
 ## 8x.21.1 - 29 August 2023
 - Continue collecting platform stats when single job failed
 
