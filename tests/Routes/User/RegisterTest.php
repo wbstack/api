@@ -23,13 +23,9 @@ class RegisterTest extends TestCase
     public function mockReCaptchaValidation($passes=true)
     {
         // replace injected ReCaptchaValidation class with mock (ContactController::$recaptchaValidation)
-        $mockRuleBuilder = $this->getMockBuilder(ReCaptchaValidation::class);
-        $mockRuleBuilder->setConstructorArgs([new \ReCaptcha\ReCaptcha('someSecret'), config('recaptcha.min_score'), 'http://localhost']);
-        $mockRuleBuilder->onlyMethods(['passes']);
-    
-        $mockRule = $mockRuleBuilder->getMock();
+        $mockRule = $this->createMock(ReCaptchaValidation::class);
         $mockRule->method('passes')
-        ->willReturn($passes);
+            ->willReturn($passes);
     
         $this->app->instance(ReCaptchaValidation::class, $mockRule);
     }
