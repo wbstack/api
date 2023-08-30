@@ -1,5 +1,9 @@
 # api
 
+## 8x.21.3 - 30 August 2023
+- Add migration for creating batches table
+- Make batched job batchable
+
 ## 8x.21.2 - 29 August 2023
 - Also run PlatformStatsSummaryJob if preceding jobs failed
 

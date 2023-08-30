@@ -5,6 +5,8 @@ namespace App\Jobs;
 use App\Wiki;
 use Illuminate\Support\Facades\Log;
 use App\Http\Curl\HttpRequest;
+use Illuminate\Bus\Batchable;
+
 
 /*
 *
@@ -14,15 +16,17 @@ use App\Http\Curl\HttpRequest;
 */
 class SiteStatsUpdateJob extends Job
 {
+    use Batchable;
+
     private $wiki_id;
 
     public function __construct( $wiki_id ) {
         $this->wiki_id = $wiki_id;
     }
-    
+
     public function handle( HttpRequest $request ): void
     {
-        $timeStart = microtime(true); 
+        $timeStart = microtime(true);
 
         $wiki = Wiki::where('id', $this->wiki_id)->first();
         if( !$wiki ) {
@@ -44,7 +48,7 @@ class SiteStatsUpdateJob extends Job
             ],
         ]);
 
-        $rawResponse = $request->execute(); 
+        $rawResponse = $request->execute();
         $err = $request->error();
         $request->close();
 
