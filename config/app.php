@@ -180,11 +180,11 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\KubernetesClientServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\ReCaptchaServiceProvider::class,
 
         /*
          * Imported from LUMEN
          */
-        AlbertCht\InvisibleReCaptcha\InvisibleReCaptchaServiceProvider::class,
 
         PercyMamedy\LaravelDevBooter\ServiceProvider::class,
 
@@ -250,6 +250,5 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
     ],
 ];

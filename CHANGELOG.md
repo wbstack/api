@@ -1,5 +1,12 @@
 # api
 
+## 8x.22.0 - 05 September 2023
+- Remove `albertcht/invisible-recaptcha` package
+- Add validation class App\Rules\RecaptchaValidation for using `google/recaptcha` package
+  - Use it for Register & Contact Controllers via Service Provider
+  - replace application path change for testing with mocking ReCaptcha object
+- Use env var `LOG_LEVEL` to configure stderr log channel (defaults to `info`)
+
 ## 8x.21.3 - 30 August 2023
 - Add migration for creating batches table
 - Make batched job batchable
