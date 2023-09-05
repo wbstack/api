@@ -1,6 +1,6 @@
 # api
 
-## 8x.22.0 - TODO
+## 8x.22.0 - 05 September 2023
 - Remove `albertcht/invisible-recaptcha` package
 - Add validation class App\Rules\RecaptchaValidation for using `google/recaptcha` package
   - Use it for Register & Contact Controllers via Service Provider
