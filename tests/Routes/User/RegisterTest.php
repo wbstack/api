@@ -20,7 +20,7 @@ class RegisterTest extends TestCase
 
     // TODO test password length when not deving
 
-    public function mockReCaptchaValidation($passes=true)
+    private function mockReCaptchaValidation($passes=true)
     {
         // replace injected ReCaptchaValidation class with mock (ContactController::$recaptchaValidation)
         $mockRule = $this->createMock(ReCaptchaValidation::class);

@@ -37,7 +37,7 @@ class SendMessageTest extends TestCase
         'other',
     ];
 
-    public function mockReCaptchaValidation($passes=true)
+    private function mockReCaptchaValidation($passes=true)
     {
         // replace injected ReCaptchaValidation class with mock (ContactController::$recaptchaValidation)
         $mockRule = $this->createMock(ReCaptchaValidation::class);
