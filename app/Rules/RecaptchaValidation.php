@@ -14,7 +14,7 @@ class RecaptchaValidation implements ImplicitRule
     /**
      * @var float
      */
-    protected $maxScore = null;
+    protected $minScore = null;
 
     /**
      * Create a new rule instance.
@@ -27,7 +27,7 @@ class RecaptchaValidation implements ImplicitRule
             config('recaptcha.secret_key')
         );
 
-        $this->maxScore = (float) config('recaptcha.max_score');
+        $this->minScore = (float) config('recaptcha.min_score');
     }
 
     /**
@@ -51,12 +51,12 @@ class RecaptchaValidation implements ImplicitRule
         ]);
 
         if ($response->isSuccess()) {
-            if ($response->getScore() <= $this->maxScore) {
+            if ($response->getScore() >= $this->minScore) {
                 return true;
             } else {
-                logger()->debug('recaptcha above max score', [
+                logger()->debug('recaptcha above min score', [
                     'class'    => self::class,
-                    'maxScore' => $this->maxScore,
+                    'minScore' => $this->minScore,
                     'score'    => $response->getScore()
                 ]);
             }
