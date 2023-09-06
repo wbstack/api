@@ -17,7 +17,7 @@ class ReCaptchaServiceProvider extends ServiceProvider
     {        
         $this->app->bind(ReCaptchaValidation::class, function($app) {
             $recaptcha = new ReCaptcha(
-                config('recaptcha.secret')
+                config('recaptcha.secret_key')
             );
 
             return new ReCaptchaValidation(
