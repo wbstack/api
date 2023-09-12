@@ -30,7 +30,6 @@ class RegisterTest extends TestCase
         $resp = $this->json('POST', $this->route, [
           'email' => $userToCreate->email,
           'password' => 'anyPassword',
-          'invite' => $invite->code,
         ]);
         putenv('PHPUNIT_RECAPTCHA_CHECK=1');
 
@@ -53,22 +52,9 @@ class RegisterTest extends TestCase
         $this->json('POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
-          'invite' => $invite->code,
         ])
         ->assertStatus(422)
         ->assertJsonStructure(['errors' => ['email']]);
-    }
-
-    public function testCreate_NoInvitation()
-    {
-        $this->markTestSkipped('Fixme');
-        $user = User::factory()->make();
-        $this->json('POST', $this->route, [
-          'email' => $user->email,
-          'password' => 'anyPassword',
-        ])
-        ->assertStatus(422)
-        ->assertJsonStructure(['errors' => ['invite']]);
     }
 
     public function testCreate_NoToken()
@@ -79,7 +65,6 @@ class RegisterTest extends TestCase
         $this->json('POST', $this->route, [
           'email' => $user->email,
           'password' => 'anyPassword',
-          'invite' => $invite->code,
         ])
         ->assertStatus(422)
         ->assertJsonStructure(['errors' => ['recaptcha']]);
@@ -92,25 +77,12 @@ class RegisterTest extends TestCase
         ->assertJsonStructure(['errors' => ['email', 'password']]);
     }
 
-    public function testCreate_BadInvitation()
-    {
-        $user = User::factory()->create();
-        $this->json('POST', $this->route, [
-          'email' => $user->email,
-          'password' => 'anyPassword',
-          'bad' => 'someInvite',
-        ])
-        ->assertStatus(422)
-        ->assertJsonStructure(['errors' => ['invite']]);
-    }
-
     public function testCreate_BadEmail()
     {
         $invite = Invitation::factory()->create();
         $this->json('POST', $this->route, [
           'email' => 'notAnEmail',
           'password' => 'anyPassword',
-          'invite' => $invite->code,
         ])
         ->assertStatus(422)
         ->assertJsonStructure(['errors' => ['email']]);
