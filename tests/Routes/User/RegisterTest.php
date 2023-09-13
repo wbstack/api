@@ -41,6 +41,7 @@ class RegisterTest extends TestCase
         $resp = $this->json('POST', $this->route, [
           'email' => $userToCreate->email,
           'password' => 'anyPassword',
+          'recaptcha' => 'someToken'
         ]);
 
         $resp->assertStatus(200)
