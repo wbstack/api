@@ -14,7 +14,7 @@ class ReCaptchaValidationTest extends TestCase
     {
         $mockRuleBuilder = $this->getMockBuilder(ReCaptcha::class);
         $mockRuleBuilder->setConstructorArgs([
-            config('recaptcha.secretKey', 'someSecret'),
+            config('recaptcha.secret_key', 'someSecret'),
         ]);
         $mockRuleBuilder->onlyMethods([
             'verify'

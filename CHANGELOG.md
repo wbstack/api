@@ -2,6 +2,7 @@
 
 ## 8x.22.1 - 13 September 2023
 - Prevent multiple job invocations from reusing the same K8s client instance
+- fix for using the correct recaptcha config key
 
 ## 8x.22.0 - 05 September 2023
 - Remove `albertcht/invisible-recaptcha` package
