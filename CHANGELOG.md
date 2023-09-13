@@ -1,5 +1,8 @@
 # api
 
+## 8x.22.1 - TBD
+- Prevent multiple job invocations from reusing the same K8s client instance
+
 ## 8x.22.0 - 05 September 2023
 - Remove `albertcht/invisible-recaptcha` package
 - Add validation class App\Rules\RecaptchaValidation for using `google/recaptcha` package
