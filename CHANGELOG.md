@@ -1,5 +1,8 @@
 # api
 
+## 8x.23.0 - 13 September 2023
+- Remove sign up code requirement when creating account
+
 ## 8x.22.2 - 13 September 2023
 - Prevent Laravel IDE helper from being loaded in staging
 
