@@ -1,6 +1,6 @@
 # api
 
-## 8x.22.1 - TBD
+## 8x.22.1 - 13 September 2023
 - Prevent multiple job invocations from reusing the same K8s client instance
 
 ## 8x.22.0 - 05 September 2023
