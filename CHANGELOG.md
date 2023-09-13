@@ -1,5 +1,8 @@
 # api
 
+## 8x.22.2 - 13 September 2023
+- Prevent Laravel IDE helper from being loaded in staging
+
 ## 8x.22.1 - 13 September 2023
 - Prevent multiple job invocations from reusing the same K8s client instance
 - fix for using the correct recaptcha config key
