@@ -15,7 +15,7 @@ class KubernetesClientServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(Client::class , function ($app) {
+        $this->app->bind(Client::class , function ($app) {
             $httpClient = Guzzle6Client::createWithConfig([
                 'verify' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
             ]);
