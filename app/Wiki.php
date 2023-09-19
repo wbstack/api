@@ -82,6 +82,11 @@ class Wiki extends Model
         return $this->hasOne(WikiSiteStats::class);
     }
 
+    public function wikiLifecycleEvents(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(WikiLifecycleEvents::class);
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      *
