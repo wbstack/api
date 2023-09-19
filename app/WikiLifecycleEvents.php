@@ -17,4 +17,9 @@ class WikiLifecycleEvents extends Model
     protected $fillable = self::FIELDS;
 
     protected $visible = self::FIELDS;
+
+    protected $casts = [
+        'first_edited' => 'datetime',
+        'last_edited' => 'datetime',
+    ];
 }

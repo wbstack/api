@@ -67,12 +67,87 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                     ]])
                 ],
                 getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1' => [
-                    'this.wikibase.cloud' => Http::response([]),
-                    'that.wikibase.cloud' => Http::response([]),
+                    'this.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'pages' => [
+                                [
+                                    'revisions' => [
+                                        [
+                                            'timestamp' => '2023-02-27T16:57:06Z'
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]),
+                    'that.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'pages' => [
+                                [
+                                    'revisions' => [
+                                        [
+                                            'timestamp' => '2023-05-07T21:31:47Z'
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]),
                 ],
                 getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json' => [
-                    'this.wikibase.cloud' => Http::response([]),
-                    'that.wikibase.cloud' => Http::response([]),
+                    'this.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'recentchanges' => [
+                                [
+                                    'type' => 'new',
+                                    'ns' => 120,
+                                    'title' => 'Item:Q312951',
+                                    'pageid' => 310675,
+                                    'revid' => 830699,
+                                    'old_revid' => 0,
+                                    'rcid' => 829604,
+                                    'timestamp' => '2023-09-16T17:22:33Z'
+                                ],
+                                [
+
+                                    'type' => 'edit',
+                                    'ns' => 4,
+                                    'title' => 'Project:Home',
+                                    'pageid' => 1,
+                                    'revid' => 830698,
+                                    'old_revid' => 830094,
+                                    'rcid' => 829603,
+                                    'timestamp' => '2023-09-16T04:50:03Z'
+                                ]
+                            ]
+                        ]
+                    ]),
+                    'that.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'recentchanges' => [
+                                [
+                                    'type' => 'edit',
+                                    'ns' => 120,
+                                    'title' => 'Item:Q158700',
+                                    'pageid' => 204252,
+                                    'revid' => 438675,
+                                    'old_revid' => 438674,
+                                    'rcid' => 441539,
+                                    'timestamp' => '2023-09-19T11:35:09Z'
+                                ],
+                                [
+                                    'type' => 'edit',
+                                    'ns' => 120,
+                                    'title' => 'Item:Q158700',
+                                    'pageid' => 204252,
+                                    'revid' => 438674,
+                                    'old_revid' => 438673,
+                                    'rcid' => 441538,
+                                    'timestamp' => '2023-09-19T11:33:50Z'
+                                ]
+                            ]
+                        ]
+                    ]),
                 ],
             ];
 
@@ -98,9 +173,15 @@ class UpdateWikiSiteStatsJobTest extends TestCase
 
         $stats1 = Wiki::with('wikiSiteStats')->where(['domain' => 'this.wikibase.cloud'])->first()->wikiSiteStats()->first();
         $this->assertEquals($stats1['admins'], 7);
+        $events1 = Wiki::with('wikiLifecycleEvents')->where(['domain' => 'this.wikibase.cloud'])->first()->wikiLifecycleEvents()->first();
+        $this->assertEquals($events1['first_edited']->toIso8601String(), '2023-02-27T16:57:06+00:00');
+        $this->assertEquals($events1['last_edited']->toIso8601String(), '2023-09-16T17:22:33+00:00');
 
         $stats2 = Wiki::with('wikiSiteStats')->where(['domain' => 'that.wikibase.cloud'])->first()->wikiSiteStats()->first();
         $this->assertEquals($stats2['jobs'], 12);
+        $events2 = Wiki::with('wikiLifecycleEvents')->where(['domain' => 'that.wikibase.cloud'])->first()->wikiLifecycleEvents()->first();
+        $this->assertEquals($events2['first_edited']->toIso8601String(), '2023-05-07T21:31:47+00:00');
+        $this->assertEquals($events2['last_edited']->toIso8601String(), '2023-09-19T11:35:09+00:00');
     }
 
     public function testFailure()

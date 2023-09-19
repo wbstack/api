@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Client\Pool;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Carbon\Carbon;
 
 class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
 {
@@ -39,8 +40,8 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         ]);
 
         $wiki->wikiLifecycleEvents()->updateOrCreate([
-            'first_edited' => data_get($responses['revisions']->json(), 'query.pages.0.revisions.0.timestamp'),
-            'last_edited' => data_get($responses['recentchanges']->json(), 'query.recentchanges.0.timestamp'),
+            'first_edited' => Carbon::parse(data_get($responses['revisions']->json(), 'query.pages.0.revisions.0.timestamp')),
+            'last_edited' => Carbon::parse(data_get($responses['recentchanges']->json(), 'query.recentchanges.0.timestamp')),
         ]);
     }
 
