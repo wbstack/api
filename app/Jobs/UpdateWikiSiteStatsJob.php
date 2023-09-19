@@ -30,17 +30,17 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
 
     private function updateLifecycleEvents (Wiki $wiki): void {
         $responses = Http::pool(fn (Pool $pool) => [
-            $pool->get(
+            $pool->as('revisions')->withHeaders(['host' => $wiki->getAttribute('domain')])->get(
                 getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1'
             ),
-            $pool->get(
+            $pool->as('recentchanges')->withHeaders(['host' => $wiki->getAttribute('domain')])->get(
                 getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json'
             ),
         ]);
 
         $wiki->wikiLifecycleEvents()->updateOrCreate([
-            'first_edited' => data_get($responses[0]->json(), 'query.pages.0.revisions.0.timestamp'),
-            'last_edited' => data_get($responses[1]->json(), 'query.recentchanges.0.timestamp'),
+            'first_edited' => data_get($responses['revisions']->json(), 'query.pages.0.revisions.0.timestamp'),
+            'last_edited' => data_get($responses['recentchanges']->json(), 'query.recentchanges.0.timestamp'),
         ]);
     }
 

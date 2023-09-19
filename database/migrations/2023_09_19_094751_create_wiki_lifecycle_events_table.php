@@ -18,6 +18,8 @@ class CreateWikiLifecycleEventsTable extends Migration
             $table->timestamps();
             $table->timestamp('first_edited')->nullable();
             $table->timestamp('last_edited')->nullable();
+
+            $table->unsignedInteger('wiki_id');
             $table->foreign('wiki_id')->references('id')->on('wikis');
         });
     }
