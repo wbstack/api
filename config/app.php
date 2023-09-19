@@ -198,7 +198,6 @@ return [
         MattAllan\LaravelCodeStyle\ServiceProvider::class,
     ],
     'local_providers' => [
-        MattAllan\LaravelCodeStyle\ServiceProvider::class,
     ],
 
     /*
