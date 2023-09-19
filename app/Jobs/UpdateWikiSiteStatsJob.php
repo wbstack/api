@@ -39,10 +39,19 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
             ),
         ]);
 
-        $wiki->wikiLifecycleEvents()->updateOrCreate([
-            'first_edited' => Carbon::parse(data_get($responses['revisions']->json(), 'query.pages.0.revisions.0.timestamp')),
-            'last_edited' => Carbon::parse(data_get($responses['recentchanges']->json(), 'query.recentchanges.0.timestamp')),
-        ]);
+        $update = [];
+
+        $firstEdited = data_get($responses['revisions']->json(), 'query.pages.0.revisions.0.timestamp');
+        if ($firstEdited) {
+            $update['first_edited'] = Carbon::parse($firstEdited);
+        }
+
+        $lastEdited = data_get($responses['recentchanges']->json(), 'query.recentchanges.0.timestamp');
+        if ($lastEdited) {
+            $update['last_edited'] = Carbon::parse($lastEdited);
+        }
+
+        $wiki->wikiLifecycleEvents()->updateOrCreate($update);
     }
 
     private function updateSiteStats (Wiki $wiki): void
