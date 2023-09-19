@@ -225,12 +225,24 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                 ],
                 getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1' => [
                     'fail.wikibase.cloud' => Http::response([]),
-                    'incomplete.wikibase.cloud' => Http::response([]),
+                    'incomplete.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'pages' => [
+                                [
+                                    'revisions' => [
+                                        [
+                                            'timestamp' => '2023-05-07T21:31:47Z'
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]),
                     'that.wikibase.cloud' => Http::response([]),
                 ],
                 getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json' => [
                     'fail.wikibase.cloud' => Http::response([]),
-                    'incomplete.wikibase.cloud' => Http::response([]),
+                    'incomplete.wikibase.cloud' => Http::response('haha whoops', 500),
                     'that.wikibase.cloud' => Http::response([]),
                 ],
             ];
@@ -261,5 +273,8 @@ class UpdateWikiSiteStatsJobTest extends TestCase
         $stats2 = Wiki::with('wikiSiteStats')->where(['domain' => 'incomplete.wikibase.cloud'])->first()->wikiSiteStats()->first();
         $this->assertEquals($stats2['articles'], 99);
         $this->assertEquals($stats2['images'], 0);
+        $events2 = Wiki::with('wikiLifecycleEvents')->where(['domain' => 'incomplete.wikibase.cloud'])->first()->wikiLifecycleEvents()->first();
+        $this->assertEquals($events2['first_edited']->toIso8601String(), '2023-05-07T21:31:47+00:00');
+        $this->assertEquals($events2['last_edited'], null);
     }
 }
