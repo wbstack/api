@@ -195,10 +195,8 @@ return [
 
     // TODO maybe this should only be in dev?
     'dev_providers' => [
-        MattAllan\LaravelCodeStyle\ServiceProvider::class,
     ],
     'local_providers' => [
-        MattAllan\LaravelCodeStyle\ServiceProvider::class,
     ],
 
     /*
