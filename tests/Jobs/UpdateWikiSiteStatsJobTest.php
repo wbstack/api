@@ -78,8 +78,14 @@ class UpdateWikiSiteStatsJobTest extends TestCase
 
             $url = $request->url();
             $hostHeader = $request->header('host')[0];
-            $match = data_get($responses, $url.'.'.$hostHeader, Http::response('not found', 404));
-            return $match;
+            // N.B.: using `data_get` is not feasible here as the array keys
+            // contain dots
+            if (array_key_exists($url, $responses)) {
+                if (array_key_exists($hostHeader, $responses[$url])) {
+                    return $responses[$url][$hostHeader];
+                }
+            }
+            return Http::response('not found', 404);
         });
 
         $mockJob = $this->createMock(Job::class);
@@ -150,8 +156,14 @@ class UpdateWikiSiteStatsJobTest extends TestCase
 
             $url = $request->url();
             $hostHeader = $request->header('host')[0];
-            $match = data_get($responses, $url.'.'.$hostHeader, Http::response('not found', 404));
-            return $match;
+            // N.B.: using `data_get` is not feasible here as the array keys
+            // contain dots
+            if (array_key_exists($url, $responses)) {
+                if (array_key_exists($hostHeader, $responses[$url])) {
+                    return $responses[$url][$hostHeader];
+                }
+            }
+            return Http::response('not found', 404);
         });
 
         $mockJob = $this->createMock(Job::class);
