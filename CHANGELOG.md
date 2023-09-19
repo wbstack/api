@@ -1,5 +1,13 @@
 # api
 
+## 8x.24.0 - 19 September 2023
+- Fix local app env #648
+  - Remove MattAllan\LaravelCodeStyle from local_providers
+  - Remove obsolete local check for jobs
+  - Remove unused IdeHelperServiceProvider  
+- Increase EventPageUpdate pruning rate to 250 (from 50) #646
+- Increase QsBatch prune rate to 500 (from 100) #647
+
 ## 8x.23.0 - 13 September 2023
 - Remove sign up code requirement when creating account
 
