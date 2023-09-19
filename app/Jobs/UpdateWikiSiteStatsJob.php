@@ -6,6 +6,7 @@ use App\Wiki;
 use App\WikiSiteStats;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Client\Pool;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
@@ -17,6 +18,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         foreach ($allWikis as $wiki) {
             try {
                 $this->updateSiteStats($wiki);
+                $this->updateLifecycleEvents($wiki);
             } catch (\Exception $ex) {
                 $this->job->markAsFailed();
                 Log::error(
@@ -24,6 +26,22 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
                 );
             }
         }
+    }
+
+    private function updateLifecycleEvents (Wiki $wiki): void {
+        $responses = Http::pool(fn (Pool $pool) => [
+            $pool->get(
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1'
+            ),
+            $pool->get(
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json'
+            ),
+        ]);
+
+        $wiki->wikiLifecycleEvents()->updateOrCreate([
+            'first_edited' => data_get($responses[0]->json(), 'query.pages.0.revisions.0.timestamp'),
+            'last_edited' => data_get($responses[1]->json(), 'query.recentchanges.0.timestamp'),
+        ]);
     }
 
     private function updateSiteStats (Wiki $wiki): void

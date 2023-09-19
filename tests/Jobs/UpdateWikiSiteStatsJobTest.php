@@ -37,14 +37,9 @@ class UpdateWikiSiteStatsJobTest extends TestCase
         ]);
 
         Http::fake(function (Request $request) {
-            if ($request->url() !== getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json') {
-                return Http::response('not found', 404);
-            }
-
-            switch ($request->header('host')[0]) {
-            case 'this.wikibase.cloud':
-                return Http::response(
-                    ['query' => [
+            $responses = [
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => [
+                    'this.wikibase.cloud' => Http::response(['query' => [
                         'statistics' => [
                             'pages' => 1,
                             'articles' => 2,
@@ -56,12 +51,8 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                             'jobs' => 8,
                             'cirrussearch-article-words' => 9
                         ]
-                    ]],
-                    200,
-                );
-            case 'that.wikibase.cloud':
-                return Http::response(
-                    ['query' => [
+                    ]]),
+                    'that.wikibase.cloud' => Http::response(['query' => [
                         'statistics' => [
                             'pages' => 19,
                             'articles' => 18,
@@ -73,12 +64,22 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                             'jobs' => 12,
                             'cirrussearch-article-words' => 11
                         ]
-                    ]],
-                    200,
-                );
-            default:
-                return Http::response('not found', 404);
-            }
+                    ]])
+                ],
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1' => [
+                    'this.wikibase.cloud' => Http::response([]),
+                    'that.wikibase.cloud' => Http::response([]),
+                ],
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json' => [
+                    'this.wikibase.cloud' => Http::response([]),
+                    'that.wikibase.cloud' => Http::response([]),
+                ],
+            ];
+
+            $url = $request->url();
+            $hostHeader = $request->header('host')[0];
+            $match = data_get($responses, $url.'.'.$hostHeader, Http::response('not found', 404));
+            return $match;
         });
 
         $mockJob = $this->createMock(Job::class);
@@ -109,16 +110,19 @@ class UpdateWikiSiteStatsJobTest extends TestCase
         ]);
 
         Http::fake(function (Request $request) {
-            if ($request->url() !== getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json') {
-                return Http::response('not found', 404);
-            }
-
-            switch ($request->header('host')[0]) {
-            case 'fail.wikibase.cloud':
-                return Http::response('DINOSAUR OUTBREAK!', 500);
-            case 'that.wikibase.cloud':
-                return Http::response(
-                    ['query' => [
+            $responses = [
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => [
+                    'fail.wikibase.cloud' => Http::response('DINOSAUR OUTBREAK!', 500),
+                    'incomplete.wikibase.cloud' => Http::response(['query' => [
+                        'statistics' => [
+                            'articles' => 99,
+                            'not' => 129,
+                            'sure' => 11,
+                            'what' => 102,
+                            'happened' => 20
+                        ]
+                    ]]),
+                    'that.wikibase.cloud' => Http::response(['query' => [
                         'statistics' => [
                             'pages' => 1,
                             'articles' => 2,
@@ -130,25 +134,24 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                             'jobs' => 8,
                             'cirrussearch-article-words' => 9
                         ]
-                    ]],
-                    200,
-                );
-            case 'incomplete.wikibase.cloud':
-                return Http::response(
-                    ['query' => [
-                        'statistics' => [
-                            'articles' => 99,
-                            'not' => 129,
-                            'sure' => 11,
-                            'what' => 102,
-                            'happened' => 20
-                        ]
-                    ]],
-                    200,
-                );
-            default:
-                return Http::response('not found', 404);
-            }
+                    ]])
+                ],
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1' => [
+                    'fail.wikibase.cloud' => Http::response([]),
+                    'incomplete.wikibase.cloud' => Http::response([]),
+                    'that.wikibase.cloud' => Http::response([]),
+                ],
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json' => [
+                    'fail.wikibase.cloud' => Http::response([]),
+                    'incomplete.wikibase.cloud' => Http::response([]),
+                    'that.wikibase.cloud' => Http::response([]),
+                ],
+            ];
+
+            $url = $request->url();
+            $hostHeader = $request->header('host')[0];
+            $match = data_get($responses, $url.'.'.$hostHeader, Http::response('not found', 404));
+            return $match;
         });
 
         $mockJob = $this->createMock(Job::class);
