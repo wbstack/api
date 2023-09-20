@@ -9,7 +9,6 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\Request;
-use Illuminate\Database\Eloquent\Model;
 
 class UpdateWikiSiteStatsJobTest extends TestCase
 {
