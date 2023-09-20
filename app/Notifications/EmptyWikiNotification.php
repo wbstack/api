@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\HtmlString;
 
 /**
  * Notification to be sent to empty Wikibase owner if the wiki stay empty longer than 30 days
@@ -39,9 +40,9 @@ class EmptyWikiNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        if (static::$toMailCallback) {
-            return call_user_func(static::$toMailCallback, $notifiable);
-        }
+        // if (static::$toMailCallback) {
+            // return call_user_func(static::$toMailCallback, $notifiable);
+        // }
 
         return (new MailMessage)
             ->subject(Lang::get('Need some help with your Wikibase?'))
@@ -51,6 +52,7 @@ class EmptyWikiNotification extends Notification
             ->line(Lang::get('Getting started'))
             ->line(Lang::get('Data modeling'))
             ->line(Lang::get('Learn by example'))
+            ->line(new HtmlString(Lang::get('<a href="https://example.com/">test link</a>')))
             ->line(Lang::get('Get your questions answered: check the FAQ, ask us or ask the community, either on Telegram or the mailing list.'))
             ->line(Lang::get('Have you reconsidered using Wikibase for this project? We’d love it if you’d tell us why. (You can delete your empty Wikibase(s) from your dashboard.)'))
             ->line(Lang::get('Thanks for using Wikibase Cloud!'));
