@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\WikiDomain;
 
 class PublicWikiResource extends JsonResource
 {
@@ -12,7 +13,7 @@ class PublicWikiResource extends JsonResource
         return [
             'id' => $this->id,
             'description' => $this->description,
-            'domain' => $this->domain,
+            'domain' => WikiDomain::decode($this->domain),
             'sitename' => $this->sitename,
             'wiki_site_stats' => $this->wikiSiteStats,
             'logo_url' => $logoSetting ? $logoSetting->value : null
