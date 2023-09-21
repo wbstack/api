@@ -9,7 +9,6 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\Request;
-use Illuminate\Database\Eloquent\Model;
 
 class UpdateWikiSiteStatsJobTest extends TestCase
 {
@@ -37,14 +36,9 @@ class UpdateWikiSiteStatsJobTest extends TestCase
         ]);
 
         Http::fake(function (Request $request) {
-            if ($request->url() !== getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json') {
-                return Http::response('not found', 404);
-            }
-
-            switch ($request->header('host')[0]) {
-            case 'this.wikibase.cloud':
-                return Http::response(
-                    ['query' => [
+            $responses = [
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => [
+                    'this.wikibase.cloud' => Http::response(['query' => [
                         'statistics' => [
                             'pages' => 1,
                             'articles' => 2,
@@ -56,12 +50,8 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                             'jobs' => 8,
                             'cirrussearch-article-words' => 9
                         ]
-                    ]],
-                    200,
-                );
-            case 'that.wikibase.cloud':
-                return Http::response(
-                    ['query' => [
+                    ]]),
+                    'that.wikibase.cloud' => Http::response(['query' => [
                         'statistics' => [
                             'pages' => 19,
                             'articles' => 18,
@@ -73,12 +63,103 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                             'jobs' => 12,
                             'cirrussearch-article-words' => 11
                         ]
-                    ]],
-                    200,
-                );
-            default:
-                return Http::response('not found', 404);
+                    ]])
+                ],
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1' => [
+                    'this.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'pages' => [
+                                [
+                                    'revisions' => [
+                                        [
+                                            'timestamp' => '2023-02-27T16:57:06Z'
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]),
+                    'that.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'pages' => [
+                                [
+                                    'revisions' => [
+                                        [
+                                            'timestamp' => '2023-05-07T21:31:47Z'
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]),
+                ],
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json' => [
+                    'this.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'recentchanges' => [
+                                [
+                                    'type' => 'new',
+                                    'ns' => 120,
+                                    'title' => 'Item:Q312951',
+                                    'pageid' => 310675,
+                                    'revid' => 830699,
+                                    'old_revid' => 0,
+                                    'rcid' => 829604,
+                                    'timestamp' => '2023-09-16T17:22:33Z'
+                                ],
+                                [
+
+                                    'type' => 'edit',
+                                    'ns' => 4,
+                                    'title' => 'Project:Home',
+                                    'pageid' => 1,
+                                    'revid' => 830698,
+                                    'old_revid' => 830094,
+                                    'rcid' => 829603,
+                                    'timestamp' => '2023-09-16T04:50:03Z'
+                                ]
+                            ]
+                        ]
+                    ]),
+                    'that.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'recentchanges' => [
+                                [
+                                    'type' => 'edit',
+                                    'ns' => 120,
+                                    'title' => 'Item:Q158700',
+                                    'pageid' => 204252,
+                                    'revid' => 438675,
+                                    'old_revid' => 438674,
+                                    'rcid' => 441539,
+                                    'timestamp' => '2023-09-19T11:35:09Z'
+                                ],
+                                [
+                                    'type' => 'edit',
+                                    'ns' => 120,
+                                    'title' => 'Item:Q158700',
+                                    'pageid' => 204252,
+                                    'revid' => 438674,
+                                    'old_revid' => 438673,
+                                    'rcid' => 441538,
+                                    'timestamp' => '2023-09-19T11:33:50Z'
+                                ]
+                            ]
+                        ]
+                    ]),
+                ],
+            ];
+
+            $url = $request->url();
+            $hostHeader = $request->header('host')[0];
+            // N.B.: using `data_get` is not feasible here as the array keys
+            // contain dots
+            if (array_key_exists($url, $responses)) {
+                if (array_key_exists($hostHeader, $responses[$url])) {
+                    return $responses[$url][$hostHeader];
+                }
             }
+            return Http::response('not found', 404);
         });
 
         $mockJob = $this->createMock(Job::class);
@@ -91,9 +172,15 @@ class UpdateWikiSiteStatsJobTest extends TestCase
 
         $stats1 = Wiki::with('wikiSiteStats')->where(['domain' => 'this.wikibase.cloud'])->first()->wikiSiteStats()->first();
         $this->assertEquals($stats1['admins'], 7);
+        $events1 = Wiki::with('wikiLifecycleEvents')->where(['domain' => 'this.wikibase.cloud'])->first()->wikiLifecycleEvents()->first();
+        $this->assertEquals($events1['first_edited']->toIso8601String(), '2023-02-27T16:57:06+00:00');
+        $this->assertEquals($events1['last_edited']->toIso8601String(), '2023-09-16T17:22:33+00:00');
 
         $stats2 = Wiki::with('wikiSiteStats')->where(['domain' => 'that.wikibase.cloud'])->first()->wikiSiteStats()->first();
         $this->assertEquals($stats2['jobs'], 12);
+        $events2 = Wiki::with('wikiLifecycleEvents')->where(['domain' => 'that.wikibase.cloud'])->first()->wikiLifecycleEvents()->first();
+        $this->assertEquals($events2['first_edited']->toIso8601String(), '2023-05-07T21:31:47+00:00');
+        $this->assertEquals($events2['last_edited']->toIso8601String(), '2023-09-19T11:35:09+00:00');
     }
 
     public function testFailure()
@@ -109,16 +196,19 @@ class UpdateWikiSiteStatsJobTest extends TestCase
         ]);
 
         Http::fake(function (Request $request) {
-            if ($request->url() !== getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json') {
-                return Http::response('not found', 404);
-            }
-
-            switch ($request->header('host')[0]) {
-            case 'fail.wikibase.cloud':
-                return Http::response('DINOSAUR OUTBREAK!', 500);
-            case 'that.wikibase.cloud':
-                return Http::response(
-                    ['query' => [
+            $responses = [
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => [
+                    'fail.wikibase.cloud' => Http::response('DINOSAUR OUTBREAK!', 500),
+                    'incomplete.wikibase.cloud' => Http::response(['query' => [
+                        'statistics' => [
+                            'articles' => 99,
+                            'not' => 129,
+                            'sure' => 11,
+                            'what' => 102,
+                            'happened' => 20
+                        ]
+                    ]]),
+                    'that.wikibase.cloud' => Http::response(['query' => [
                         'statistics' => [
                             'pages' => 1,
                             'articles' => 2,
@@ -130,25 +220,42 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                             'jobs' => 8,
                             'cirrussearch-article-words' => 9
                         ]
-                    ]],
-                    200,
-                );
-            case 'incomplete.wikibase.cloud':
-                return Http::response(
-                    ['query' => [
-                        'statistics' => [
-                            'articles' => 99,
-                            'not' => 129,
-                            'sure' => 11,
-                            'what' => 102,
-                            'happened' => 20
+                    ]])
+                ],
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1' => [
+                    'fail.wikibase.cloud' => Http::response([]),
+                    'incomplete.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'pages' => [
+                                [
+                                    'revisions' => [
+                                        [
+                                            'timestamp' => '2023-05-07T21:31:47Z'
+                                        ]
+                                    ]
+                                ]
+                            ]
                         ]
-                    ]],
-                    200,
-                );
-            default:
-                return Http::response('not found', 404);
+                    ]),
+                    'that.wikibase.cloud' => Http::response([]),
+                ],
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json' => [
+                    'fail.wikibase.cloud' => Http::response([]),
+                    'incomplete.wikibase.cloud' => Http::response('haha whoops', 500),
+                    'that.wikibase.cloud' => Http::response([]),
+                ],
+            ];
+
+            $url = $request->url();
+            $hostHeader = $request->header('host')[0];
+            // N.B.: using `data_get` is not feasible here as the array keys
+            // contain dots
+            if (array_key_exists($url, $responses)) {
+                if (array_key_exists($hostHeader, $responses[$url])) {
+                    return $responses[$url][$hostHeader];
+                }
             }
+            return Http::response('not found', 404);
         });
 
         $mockJob = $this->createMock(Job::class);
@@ -165,5 +272,8 @@ class UpdateWikiSiteStatsJobTest extends TestCase
         $stats2 = Wiki::with('wikiSiteStats')->where(['domain' => 'incomplete.wikibase.cloud'])->first()->wikiSiteStats()->first();
         $this->assertEquals($stats2['articles'], 99);
         $this->assertEquals($stats2['images'], 0);
+        $events2 = Wiki::with('wikiLifecycleEvents')->where(['domain' => 'incomplete.wikibase.cloud'])->first()->wikiLifecycleEvents()->first();
+        $this->assertEquals($events2['first_edited']->toIso8601String(), '2023-05-07T21:31:47+00:00');
+        $this->assertEquals($events2['last_edited'], null);
     }
 }

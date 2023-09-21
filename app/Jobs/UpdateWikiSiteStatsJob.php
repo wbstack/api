@@ -6,7 +6,9 @@ use App\Wiki;
 use App\WikiSiteStats;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Client\Pool;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Carbon\Carbon;
 
 class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
 {
@@ -17,6 +19,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         foreach ($allWikis as $wiki) {
             try {
                 $this->updateSiteStats($wiki);
+                $this->updateLifecycleEvents($wiki);
             } catch (\Exception $ex) {
                 $this->job->markAsFailed();
                 Log::error(
@@ -24,6 +27,31 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
                 );
             }
         }
+    }
+
+    private function updateLifecycleEvents (Wiki $wiki): void {
+        $responses = Http::pool(fn (Pool $pool) => [
+            $pool->as('revisions')->withHeaders(['host' => $wiki->getAttribute('domain')])->get(
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1'
+            ),
+            $pool->as('recentchanges')->withHeaders(['host' => $wiki->getAttribute('domain')])->get(
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json'
+            ),
+        ]);
+
+        $update = [];
+
+        $firstEdited = data_get($responses['revisions']->json(), 'query.pages.0.revisions.0.timestamp');
+        if ($firstEdited) {
+            $update['first_edited'] = Carbon::parse($firstEdited);
+        }
+
+        $lastEdited = data_get($responses['recentchanges']->json(), 'query.recentchanges.0.timestamp');
+        if ($lastEdited) {
+            $update['last_edited'] = Carbon::parse($lastEdited);
+        }
+
+        $wiki->wikiLifecycleEvents()->updateOrCreate($update);
     }
 
     private function updateSiteStats (Wiki $wiki): void
