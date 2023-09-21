@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7f9043a1fd97871a219a252831211715",
+    "content-hash": "ea73985c6c6a4a1ce08afaa54d55eecd",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1339,6 +1339,61 @@
                 "source": "https://github.com/firebase/php-jwt/tree/v5.5.1"
             },
             "time": "2021-11-08T20:18:51+00:00"
+        },
+        {
+            "name": "fomvasss/laravel-punycode",
+            "version": "1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fomvasss/laravel-punycode.git",
+                "reference": "bc6ed111aa5c31241fe4ccf32c94ff7331a8b16b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fomvasss/laravel-punycode/zipball/bc6ed111aa5c31241fe4ccf32c94ff7331a8b16b",
+                "reference": "bc6ed111aa5c31241fe4ccf32c94ff7331a8b16b",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "5.4.*|5.5.*|5.6.*|^6.0|^7.0|^8.0",
+                "php": ">=5.5.9"
+            },
+            "type": "package",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Fomvasss\\Punycode\\PunycodeServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Fomvasss\\Punycode\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fomin Vasyl",
+                    "email": "fomvasss@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Package for encoding of Unicode for Internationalized Domain Names in Applications (IDNA)",
+            "keywords": [
+                "domain",
+                "idn",
+                "laravel",
+                "punycode"
+            ],
+            "support": {
+                "issues": "https://github.com/fomvasss/laravel-punycode/issues",
+                "source": "https://github.com/fomvasss/laravel-punycode/tree/1.4.0"
+            },
+            "time": "2021-11-03T18:27:10+00:00"
         },
         {
             "name": "fruitcake/laravel-cors",
