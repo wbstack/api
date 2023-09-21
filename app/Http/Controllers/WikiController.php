@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
 use App\Helper\DomainValidator;
+use Fomvasss\Punycode\Facades\Punycode;
 
 class WikiController extends Controller
 {
@@ -32,8 +33,10 @@ class WikiController extends Controller
     public function create(Request $request): \Illuminate\Http\Response
     {
         $user = $request->user();
-        $submittedDomain = strtolower($request->input('domain'));
         
+        $submittedDomain = strtolower($request->input('domain'));
+        $submittedDomain = PunyCode::encode($submittedDomain);
+
         $validator = $this->domainValidator->validate( $submittedDomain );
         $isSubdomain = $this->isSubDomain($submittedDomain);
 
@@ -49,7 +52,7 @@ class WikiController extends Controller
         $dbAssignment = null;
 
         // TODO create with some sort of owner etc?
-        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain) {
+        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain, $submittedDomain) {
             $dbVersion = Config::get('wbstack.wiki_db_use_version');
             $wikiDbCondition = ['wiki_id'=>null, 'version'=>$dbVersion];
 
@@ -70,7 +73,7 @@ class WikiController extends Controller
 
             $wiki = Wiki::create([
                 'sitename' => $request->input('sitename'),
-                'domain' => strtolower($request->input('domain')),
+                'domain'   => $submittedDomain,
             ]);
 
             // Assign storage
@@ -185,8 +188,16 @@ class WikiController extends Controller
       ->with('wikiDbVersion')
       ->with('publicSettings')->first();
 
-        $res['success'] = true;
-        $res['data'] = $wiki;
+        $res = [
+            'success' => true,
+            'data'    => $wiki,
+        ];
+
+        data_set($res, 'data.domain', 
+            Punycode::decode(
+                data_get($res, 'data.domain')
+            )
+        );
 
         return response($res);
     }
