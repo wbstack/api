@@ -1,5 +1,8 @@
 # api
 
+## 8x.25.0 - 21 September 2023
+- Collect timestamps for Wikis' Lifecycle
+
 ## 8x.24.0 - 19 September 2023
 - Fix local app env #648
   - Remove MattAllan\LaravelCodeStyle from local_providers
