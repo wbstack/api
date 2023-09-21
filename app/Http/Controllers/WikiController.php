@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
 use App\Helper\DomainValidator;
-use Fomvasss\Punycode\Facades\Punycode;
 
 class WikiController extends Controller
 {
@@ -35,7 +34,7 @@ class WikiController extends Controller
         $user = $request->user();
         
         $submittedDomain = strtolower($request->input('domain'));
-        $submittedDomain = PunyCode::encode($submittedDomain);
+        $submittedDomain = WikiDomain::encode($submittedDomain);
 
         $validator = $this->domainValidator->validate( $submittedDomain );
         $isSubdomain = $this->isSubDomain($submittedDomain);
@@ -194,7 +193,7 @@ class WikiController extends Controller
         ];
 
         data_set($res, 'data.domain', 
-            Punycode::decode(
+            WikiDomain::decode(
                 data_get($res, 'data.domain')
             )
         );
