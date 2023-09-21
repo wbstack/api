@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Fomvasss\Punycode\Facades\Punycode;
 
 /**
  * App\WikiDomain.
@@ -38,5 +39,15 @@ class WikiDomain extends Model
     public function wiki(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Wiki::class);
+    }
+
+    static public function encode($domain)
+    {
+        return Punycode::encode($domain);
+    }
+
+    static public function decode($domain)
+    {
+        return Punycode::decode($domain);
     }
 }
