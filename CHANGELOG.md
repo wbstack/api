@@ -1,5 +1,8 @@
 # api
 
+## 8x.26.0 - 04 October 2023
+- Add Command to change user email address (`wbs-user:change-email`)
+
 ## 8x.25.0 - 21 September 2023
 - Collect timestamps for Wikis' Lifecycle
 
