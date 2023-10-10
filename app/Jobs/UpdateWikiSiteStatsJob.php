@@ -54,6 +54,21 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         $wiki->wikiLifecycleEvents()->updateOrCreate($update);
     }
 
+    private function updateEmptyWikibaseNotification (Wiki $wiki): void {
+        $responses = Http::pool(fn (Pool $pool) => [
+            $pool->as('revisions')->withHeaders(['host' => $wiki->getAttribute('domain')])->get(
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1'
+            ),
+        ]);
+
+        $update = [];
+
+        $firstEdited = data_get($responses['revisions']->json(), 'query.pages.0.revisions.0.timestamp');
+        if ($firstEdited == null) {
+            $update['domain'] = getenv('PLATFORM_MW_BACKEND_HOST');
+        }
+    }
+
     private function updateSiteStats (Wiki $wiki): void
     {
         $response = Http::withHeaders([
