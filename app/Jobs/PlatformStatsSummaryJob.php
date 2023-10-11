@@ -131,9 +131,6 @@ class PlatformStatsSummaryJob extends Job
     {
         $wikis = Wiki::withTrashed()->with('wikidb')->get();
 
-        $manager->purge('mw');
-        $manager->purge('mysql');
-
         $conn = $manager->connection('mysql');
         $mwConn = $manager->connection('mw');
 
@@ -160,9 +157,6 @@ class PlatformStatsSummaryJob extends Job
 
         $creationStats = $this->getCreationStats();
         $summary = array_merge($summary, $creationStats);
-
-        $manager->purge('mw');
-        $manager->purge('mysql');
 
         // Output to be scraped from logs
         if( !App::runningUnitTests() ) {
