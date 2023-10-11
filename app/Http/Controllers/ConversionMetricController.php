@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 
 class ConversionMetricController extends Controller
 {
+    /**
+     * Produce a downloadable csv file with conversion metrics for all wikis.
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
     public function getConversionMetric(Request $request)
     {
         $allWikis = Wiki::all();
@@ -30,10 +34,15 @@ class ConversionMetricController extends Controller
         return response()->streamDownload(function ($csv_file) {
             echo $csv_file->getContent();
             flush();
-        }, 'conversion_metric_for_all_wikis.txt');
+        }, 'conversion_metric_for_all_wikis.txt', ['Content-Type' => 'text/csv']);
 
     }
+
+    /**
+     * Display the output in json.
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
     public function showJson(){
-        return ConversionMetricResource::collection(Wiki::query()->paginate());
+        return ConversionMetricResource::collection(Wiki::query());
     }
 }
