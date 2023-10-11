@@ -39,7 +39,7 @@ class ConversionMetricTest extends TestCase
             ->assertJsonPath('data', []);
     }
 
-    public function testGetAll()
+    public function testGetJsonAll()
     {
         $wiki = Wiki::factory()->create([
             'domain' => 'one.wikibase.cloud', 'sitename' => 'bsite'
@@ -76,7 +76,7 @@ class ConversionMetricTest extends TestCase
             ->assertJsonPath('data.1.wiki_lifecycle_events.last_edited', $current_date);
     }
 
-    public function testReturnDownloadCsvFile()
+    public function testDownloadCsvFile()
     {
         $wiki = Wiki::factory()->create([
             'domain' => 'one.wikibase.cloud', 'sitename' => 'bsite'

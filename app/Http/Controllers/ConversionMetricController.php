@@ -13,7 +13,7 @@ class ConversionMetricController extends Controller
      * Produce a downloadable csv file with conversion metrics for all wikis.
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function getConversionMetric(Request $request)
+    public function index(Request $request)
     {
         $allWikis = Wiki::all();
         $current_date = Carbon::now();
@@ -22,11 +22,18 @@ class ConversionMetricController extends Controller
 
 
         foreach($allWikis as $wiki){
-            $wikiLifecycleEvent = $wiki->wikiLifecycleEvents()->get();
+            $wikiLastEditedTime = Carbon::parse(($wiki->wikiLifecycleEvents()->get('last_edited')[0])->last_edited);
+            $wikiFirstEditedTime = Carbon::parse(($wiki->wikiLifecycleEvents()->get('first_edited')[0])->first_edited);
+            $wiki_time_to_abandon_days = null;
+            $time_to_engage_days = null;
 
-            $wiki_time_to_abandon_days= $current_date->diffInDays(Carbon::parse($wikiLifecycleEvent->get('last_edited')));
-            $time_to_engage_days= Carbon::parse($wikiLifecycleEvent->get('first_edited'))->diffInDays($wiki->created_at);
-            $wiki_number_of_editors = $wiki->wikiSiteStats()->get('activeusers');
+            if(!is_null($wikiLastEditedTime) && ($current_date->diffInDays($wikiLastEditedTime) >= 90)){
+                $wiki_time_to_abandon_days= $wikiLastEditedTime->diffInDays($wiki->created_at);
+            }
+            if($wikiFirstEditedTime!== null){
+                $time_to_engage_days= $wikiFirstEditedTime->diffInDays($wiki->created_at);
+            }
+            $wiki_number_of_editors = $wiki->wikiSiteStats()->get('activeusers')[0]->activeusers;
 
             fputcsv($csv_file, [$wiki->domain, $wiki_time_to_abandon_days, $time_to_engage_days, $wiki_number_of_editors]);
 
@@ -42,7 +49,8 @@ class ConversionMetricController extends Controller
      * Display the output in json.
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function showJson(){
+    public function show()
+    {
         return ConversionMetricResource::collection(Wiki::query());
     }
 }
