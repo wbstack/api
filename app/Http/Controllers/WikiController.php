@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
 use App\Helper\DomainValidator;
+use App\Helper\DomainHelper;
 
 class WikiController extends Controller
 {
@@ -34,7 +35,7 @@ class WikiController extends Controller
         $user = $request->user();
         
         $submittedDomain = strtolower($request->input('domain'));
-        $submittedDomain = WikiDomain::encode($submittedDomain);
+        $submittedDomain = DomainHelper::encode($submittedDomain);
 
         $validator = $this->domainValidator->validate( $submittedDomain );
         $isSubdomain = $this->isSubDomain($submittedDomain);
