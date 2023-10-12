@@ -192,12 +192,6 @@ class WikiController extends Controller
             'data'    => $wiki,
         ];
 
-        data_set($res, 'data.domain', 
-            WikiDomain::decode(
-                data_get($res, 'data.domain')
-            )
-        );
-
         return response($res);
     }
 

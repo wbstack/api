@@ -13,7 +13,7 @@ class PublicWikiResource extends JsonResource
         return [
             'id' => $this->id,
             'description' => $this->description,
-            'domain' => WikiDomain::decode($this->domain),
+            'domain' => $this->domain,
             'sitename' => $this->sitename,
             'wiki_site_stats' => $this->wikiSiteStats,
             'logo_url' => $logoSetting ? $logoSetting->value : null
