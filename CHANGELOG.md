@@ -1,5 +1,8 @@
 # api
 
+## 8x.25.1 - 12 October 2023
+- Do not purge DB connections in Platform Summary Job
+
 ## 8x.25.0 - 21 September 2023
 - Collect timestamps for Wikis' Lifecycle
 
