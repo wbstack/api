@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Helper\DomainHelper;
 
 /**
  * App\Wiki.
@@ -51,6 +52,15 @@ class Wiki extends Model
         'domain',
         'description',
         'is_featured',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'domain_decoded',
     ];
 
     protected $dates = [
@@ -149,5 +159,14 @@ class Wiki extends Model
     public static function getSiteDirectory( int $wiki_id ): string {
         $siteDir = md5($wiki_id.md5($wiki_id));
         return 'sites/'.$siteDir;
+    }
+
+    /**
+     * Convert the IDN formatted domain name to it's Unicode representation.
+     *
+     * @return string
+     */
+    public function getDomainDecodedAttribute(): string {
+        return DomainHelper::decode($this->domain);
     }
 }
