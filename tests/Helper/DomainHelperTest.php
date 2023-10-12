@@ -27,6 +27,10 @@ class DomainHelperTest extends TestCase {
                 'ドメイン名例.wikibase.cloud',
                 'xn--eckwd4c7cu47r2wf.wikibase.cloud'
             ],
+            'Example IDNA encoding #5 - Emoji' => [
+                '😃.wikibase.cloud',
+                'xn--h28h.wikibase.cloud'
+            ],
             'No double-encoding of "münchen.wikibase.cloud"' => [
                 'xn--mnchen-3ya.wikibase.cloud',
                 'xn--mnchen-3ya.wikibase.cloud',
@@ -62,6 +66,10 @@ class DomainHelperTest extends TestCase {
             'Example IDNA decoding #4 - Japanese' => [
                 'xn--eckwd4c7cu47r2wf.wikibase.cloud',
                 'ドメイン名例.wikibase.cloud',
+            ],
+            'Example IDNA decoding #5 - Emoji' => [
+                'xn--h28h.wikibase.cloud',
+                '😃.wikibase.cloud',
             ],
             'Domain in unicode stays the same' => [
                 'münchen.wikibase.cloud',
