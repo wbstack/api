@@ -17,9 +17,7 @@ namespace App\Helper;
 class DomainHelper {
     // @return string - the domain name encoded in ASCII-compatible form
     static public function encode($string) {
-        $idnaInfo = [];
-
-        $result = idn_to_ascii($string, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46, $idnaInfo);
+        $result = idn_to_ascii($string);
 
         // return the original input if encoding failed
         if (false === $result) {
@@ -31,9 +29,7 @@ class DomainHelper {
 
     // @return string - the domain name in Unicode, encoded in UTF-8
     static public function decode($string) {
-        $idnaInfo = [];
-
-        $result = idn_to_utf8($string, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46, $idnaInfo);
+        $result = idn_to_utf8($string);
 
         // return the original input if decoding failed
         if (false === $result) {
