@@ -23,7 +23,7 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
     $router->post('contact/sendMessage', ['uses' => 'ContactController@sendMessage']);
 
     $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
-    $router->apiResource('wikiConversionData', 'ConversionMetricController')->only(['index', 'show']);
+    $router->apiResource('wikiConversionData', 'ConversionMetricController')->only(['index']);
 
     // Authed
     $router->group(['middleware' => ['auth:api']], function () use ($router) {
