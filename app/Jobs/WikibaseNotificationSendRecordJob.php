@@ -38,8 +38,6 @@ class WikibaseNotificationSendRecordJob extends Job implements ShouldBeUnique
         $now = time();
         $dateDiff = ($now - $createdAt) / (60 * 60 * 24);
 
-        $sitename = $wiki->sitename;
-
         $userID = $wiki->wikiManagers->get('user_id');
         $user = User::whereId($userID);
 
