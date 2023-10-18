@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Wiki;
 use Closure;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -42,7 +43,7 @@ class EmptyWikibaseNotification extends Notification
     {
         return (new MailMessage)
             ->subject(Lang::get('Need some help with your Wikibase?'))
-            ->line(Lang::get('Thanks for creating a Wikibase instance on Wikibase Cloud! That was at least 30 days ago. We couldn’t help but notice that your Wikibase instance remains empty, so we’re checking in to see if we can help.'))
+            ->line(Lang::get('Thanks for creating a Wikibase instance'. 'on Wikibase Cloud! That was at least 30 days ago. We couldn’t help but notice that your Wikibase instance remains empty, so we’re checking in to see if we can help.'))
             ->line(Lang::get('If you’re still planning to use Wikibase for your project but just haven’t gotten around to doing so, no worries -- feel free to ignore this email.'))
             ->line(Lang::get('Are you having trouble getting started? We have some resources that might help:'))
             ->line(new HtmlString(Lang::get('<a href="https://www.mediawiki.org/wiki/Wikibase/Wikibase.cloud/Initial_setup">Getting started</a>')))
