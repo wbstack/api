@@ -3,13 +3,10 @@
 namespace App\Jobs;
 
 use App\Notifications\EmptyWikibaseNotification;
-use App\WikibaseNotificationSendRecord;
-use App\WikiLifecycleEvents;
 use App\Wiki;
 use App\User;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Facades\Log;
-use MediaWiki\User\UserIdentity;
 
 class WikibaseNotificationSendRecordJob extends Job implements ShouldBeUnique
 {
@@ -19,10 +16,10 @@ class WikibaseNotificationSendRecordJob extends Job implements ShouldBeUnique
         foreach ($allWikis as $wiki) {
             try {
                 $this->updateWikibaseNotificationSendRecord($wiki);
-            } catch (\Exception $ex) {
+            } catch (\Exception $exception) {
                 $this->job->markAsFailed();
                 Log::error(
-                    'Failure polling wiki '.$wiki->getAttribute('domain').' for sitestats: '.$ex->getMessage()
+                    'Failure polling wiki '.$wiki->getAttribute('domain').' for sitestats: '.$exception->getMessage()
                 );
             }
         }
@@ -33,13 +30,12 @@ class WikibaseNotificationSendRecordJob extends Job implements ShouldBeUnique
         $update = [];
 
         //Calculate how many days has passed since the wikibase instance was first created
-        $firstEdited = $wiki->wikiLifecycleEvents()->get(['first_edited']);
+        $firstEdited = $wiki->first_edited;
         $createdAt = $wiki->created_at->timestamp;
         $now = time();
         $dateDiff = ($now - $createdAt) / (60 * 60 * 24);
 
-        $userID = $wiki->wikiManagers->get('user_id');
-        $user = User::whereId($userID);
+        $user = $wiki->wikiManagers()->get('user_id')->first()->first();
 
         if ($firstEdited == null && $dateDiff >= 30) {
             try {
