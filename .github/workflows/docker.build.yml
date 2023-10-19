@@ -96,7 +96,7 @@ jobs:
           MSG=$(echo "${{ github.event.head_commit.message }}" | head -n 1)
           echo "msg=$MSG" >> $GITHUB_OUTPUT
       -
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         if: steps.update-check.outputs.match == 'true'
         with:
           path: ./repos/wbaas-deploy-staging
@@ -112,7 +112,7 @@ jobs:
 
             **Changes**: [${{ steps.truncate-commit-message.outputs.msg }}](https://github.com/wbstack/api/commit/${{ github.sha }})
       -
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         if: steps.update-check.outputs.match == 'true'
         with:
           path: ./repos/wbaas-deploy-production
