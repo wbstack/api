@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ConversionMetricResource;
 use App\Wiki;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -11,7 +10,7 @@ class ConversionMetricController extends Controller
 {
     /**
      * Produce a downloadable csv file with conversion metrics for all wikis.
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function index(Request $request)
     {
@@ -37,9 +36,7 @@ class ConversionMetricController extends Controller
             fputcsv($csv_file, [$wiki->domain, $wiki_time_to_abandon_days, $time_to_engage_days, $wiki_number_of_editors]);
 
         }
-        return response()->streamDownload(function () {
-            flush();
-        }, 'conversion_metric_for_all_wikis.txt', ['Content-Type' => 'text/csv']);
+        return response()->download($csv_file, 'conversion_metric_for_all_wikis.csv', ['Content-Type' => 'text/csv']);
 
     }
 }
