@@ -4,39 +4,54 @@ namespace App\Http\Controllers;
 
 use App\Wiki;
 use Carbon\Carbon;
+use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 
 class ConversionMetricController extends Controller
 {
+
+    private string $fileName="conversion_metric_for_all_wikis.csv";
+
     /**
      * Produce a downloadable csv file with conversion metrics for all wikis.
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function index(Request $request)
     {
         $allWikis = Wiki::all();
         $current_date = Carbon::now();
-        $csv_file = fopen('php://output', 'w');
-        fputcsv($csv_file, ['domain_name', 'time_to_engage_days', 'time_since_wiki_abandoned_days', 'number_of_active_editors']);
+        $output = [];
+        
 
         foreach ($allWikis as $wiki) {
-            $wikiLastEditedTime = Carbon::parse(($wiki->wikiLifecycleEvents()->get('last_edited')[0])->last_edited);
-            $wikiFirstEditedTime = Carbon::parse(($wiki->wikiLifecycleEvents()->get('first_edited')[0])->first_edited);
-            $wiki_time_to_abandon_days = null;
+            $lifecycleEvents = $wiki->wikiLifecycleEvents()->first();
+            $wikiLastEditedTime = Carbon::parse($lifecycleEvents['last_edited'] ?? null);
+            $wikiFirstEditedTime = Carbon::parse($lifecycleEvents['first_edited'] ?? null);
+            $time_before_wiki_abandoned_days = null;
             $time_to_engage_days = null;
 
             if (!is_null($wikiLastEditedTime) && ($current_date->diffInDays($wikiLastEditedTime) >= 90)) {
-                $wiki_time_to_abandon_days = $wikiLastEditedTime->diffInDays($wiki->created_at);
+                $time_before_wiki_abandoned_days = $wikiLastEditedTime->diffInDays($wiki->created_at);
             }
             if ($wikiFirstEditedTime !== null) {
                 $time_to_engage_days = $wikiFirstEditedTime->diffInDays($wiki->created_at);
             }
-            $wiki_number_of_editors = $wiki->wikiSiteStats()->get('activeusers')[0]->activeusers;
+            $wiki_number_of_editors = $wiki->wikiSiteStats()->first()['activeusers'] ?? null;
 
-            fputcsv($csv_file, [$wiki->domain, $wiki_time_to_abandon_days, $time_to_engage_days, $wiki_number_of_editors]);
+            $output[] = [$wiki->domain, $time_to_engage_days, $time_before_wiki_abandoned_days, $wiki_number_of_editors];
 
         }
-        return response()->download($csv_file, 'conversion_metric_for_all_wikis.csv', ['Content-Type' => 'text/csv']);
+
+        ob_start();
+		$handle = fopen('php://output', 'r+');
+        fputcsv($handle, ['domain_name', 'time_to_engage_days', 'time_before_wiki_abandoned_days', 'number_of_active_editors']);
+        foreach ($output as $wikiMetrics) {
+            fputcsv($handle, array_values($wikiMetrics));
+        }
+        $csv = $csv = ob_get_clean();
+        return response($csv, 200, [
+			'Content-Type' => 'text/csv',
+			'Content-Disposition' => 'attachment;filename='.$this->fileName
+		]);;
 
     }
 }

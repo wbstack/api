@@ -35,54 +35,34 @@ class ConversionMetricTest extends TestCase
         parent::tearDown();
     }
 
-    public function testEmpty()
-    {
-        $this->instance(
-            ResponseFactory::class, Mockery::mock(ResponseFactory::class, function ($mock) {
-            $mock->shouldReceive('download')
-                ->with([["domain_name,time_to_engage_days,time_since_wiki_abandoned_days,number_of_active_editors"]],
-                'conversion_metric_for_all_wikis.csv')
-                ->once()
-                ->andReturn(['header' => 'data']);
-        }));
-        $response = $this->get($this->route);
-        $response->assertStatus(200);
-    }
-
     public function testDownloadCsv()
     {
-    /*    $this->instance(
-            ResponseFactory::class, Mockery::mock(ResponseFactory::class, function ($mock) {
-            $mock->shouldReceive('download')
-                ->with()
-                ->once()
-                ->andReturn(['header' => 'data']);
-        }));*/
-        $wiki = Wiki::factory()->create([
+        $wikiOne = Wiki::factory()->create([
             'domain' => 'one.wikibase.cloud', 'sitename' => 'bsite'
         ]);
         WikiSiteStats::factory()->create([
-            'wiki_id' => $wiki->id, 'pages' => 77
+            'wiki_id' => $wikiOne->id, 'pages' => 77
         ]);
 
         $current_date = Carbon::now();
-        WikiLifecycleEvents::factory()->create([
-            'first_edited' => $current_date, 'last_edited' => $current_date, 'wiki_id' => $wiki->id,
-        ]);
+        $eventsOne = $wikiOne->wikiLifecycleEvents();
+        $eventsOne->updateOrCreate(['last_edited' => $current_date->subWeeks(1), 'first_edited' => $current_date->subWeeks(2) ]);
 
-        $wiki = Wiki::factory()->create([
-            'domain' => 'two.wikibase.cloud', 'sitename' => 'asite'
+        $wikiTwo = Wiki::factory()->create([
+            'domain' => 'two.wikibase.cloud', 'sitename' => 'bsite'
         ]);
         WikiSiteStats::factory()->create([
-            'wiki_id' => $wiki->id, 'pages' => 66
+            'wiki_id' => $wikiOne->id, 'pages' => 234
         ]);
-        $current_date = Carbon::now();
-        WikiLifecycleEvents::factory()->create([
-            'first_edited' => $current_date, 'last_edited' => $current_date, 'wiki_id' => $wiki->id,
-        ]);
+
+        $eventsTwo = $wikiTwo->wikiLifecycleEvents();
+        $eventsTwo->updateOrCreate(['last_edited' => $current_date, 'first_edited' => $current_date->subDays(3) ]);
 
         $response = $this->get($this->route);
         $response->assertStatus(200)
-            ->assertDownload('conversion_metric_for_all_wikis.csv');;
+            ->assertDownload('conversion_metric_for_all_wikis.csv');
+        $response->assertSee('abandoned');
+        $response->assertSee('one.wikibase.cloud');
+        $response->assertSee('two.wikibase.cloud');
     }
 }
