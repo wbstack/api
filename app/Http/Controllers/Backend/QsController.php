@@ -64,8 +64,6 @@ class QsController extends Controller
                     'wiki_id' => $wikiId,
                     'entityIds' => implode(',', array_unique($entityBatch)),
                 ]);
-                // TODO to the loading on all batches at once? :D
-                $batch->load(['wiki', 'wiki.wikiQueryserviceNamespace']);
                 $newlyCreatedBatches[] = $batch;
             }
 
@@ -75,6 +73,7 @@ class QsController extends Controller
             }
 
             $oldestBatch->update(['done' => 1]);
+            $oldestBatch->load(['wiki', 'wiki.wikiQueryserviceNamespace']);
             return response([$oldestBatch]);
         });
 
