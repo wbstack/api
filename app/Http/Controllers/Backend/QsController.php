@@ -41,8 +41,8 @@ class QsController extends Controller
                 }
             }
 
-            /** @var Collection $batches */
-            $newBatches = [];
+            /** @var Collection $newlyCreatedBatches */
+            $newlyCreatedBatches = [];
             $notDoneBatches = QsBatch::where('done', 0)->with(['wiki', 'wiki.wikiQueryserviceNamespace'])->get();
             // Inset the newly created batches into the table...
             foreach ($wikiBatchesEntities as $wikiId => $entityBatch) {
@@ -66,29 +66,16 @@ class QsController extends Controller
                 ]);
                 // TODO to the loading on all batches at once? :D
                 $batch->load(['wiki', 'wiki.wikiQueryserviceNamespace']);
-                $newBatches[] = $batch;
+                $newlyCreatedBatches[] = $batch;
             }
 
-            // $batches is all the batches, but lets just return one
-            // and for now mark it as done
-            $sorted = collect($newBatches)->sortBy('id');
-
-            if ($sorted->isEmpty()) {
-                /**
-                 * If sorted collection is empty, then look back at the still $notDoneBatches
-                 * and just shove them in...
-                 * This should be done better.
-                 */
-                $sorted = $notDoneBatches;
-            }
-
-            $first = $sorted->first();
-            if ($first === null) {
+            $oldestBatch = collect($newlyCreatedBatches)->merge($notDoneBatches)->sortBy('id')->last();
+            if ($oldestBatch === null) {
                 return response([]);
             }
 
-            $first->update(['done' => 1]);
-            return response([$first]);
+            $oldestBatch->update(['done' => 1]);
+            return response([$oldestBatch]);
         });
 
     }
