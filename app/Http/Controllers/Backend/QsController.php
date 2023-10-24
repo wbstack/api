@@ -67,7 +67,7 @@ class QsController extends Controller
                 $newlyCreatedBatches[] = $batch;
             }
 
-            $oldestBatch = collect($newlyCreatedBatches)->merge($notDoneBatches)->sortBy('created_at')->first();
+            $oldestBatch = collect($newlyCreatedBatches)->merge($notDoneBatches)->sortBy('id')->first();
             if ($oldestBatch === null) {
                 return response([]);
             }
