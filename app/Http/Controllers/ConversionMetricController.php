@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Wiki;
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 
@@ -18,14 +18,22 @@ class ConversionMetricController extends Controller
     public function index(Request $request)
     {
         $allWikis = Wiki::all();
-        $current_date = Carbon::now();
+        $current_date = CarbonImmutable::now();
         $output = [];
         
 
         foreach ($allWikis as $wiki) {
             $lifecycleEvents = $wiki->wikiLifecycleEvents()->first();
-            $wikiLastEditedTime = Carbon::parse($lifecycleEvents['last_edited'] ?? null);
-            $wikiFirstEditedTime = Carbon::parse($lifecycleEvents['first_edited'] ?? null);
+            $wikiLastEditedTime = null;
+            $wikiFirstEditedTime = null;
+            if ($lifecycleEvents !== [] && $lifecycleEvents->count() > 0) {
+                if ($lifecycleEvents['last_edited']) {
+                    $wikiLastEditedTime = CarbonImmutable::parse($lifecycleEvents['last_edited']);    
+                }
+                if ($lifecycleEvents['first_edited']) {
+                    $wikiFirstEditedTime = CarbonImmutable::parse($lifecycleEvents['first_edited']);
+                }
+            }
             $time_before_wiki_abandoned_days = null;
             $time_to_engage_days = null;
 
@@ -33,14 +41,29 @@ class ConversionMetricController extends Controller
                 $time_before_wiki_abandoned_days = $wikiLastEditedTime->diffInDays($wiki->created_at);
             }
             if ($wikiFirstEditedTime !== null) {
+                echo "FirstEdited:" . $wikiFirstEditedTime . "CreatedAt:" .$wiki->created_at . "\n";
                 $time_to_engage_days = $wikiFirstEditedTime->diffInDays($wiki->created_at);
             }
             $wiki_number_of_editors = $wiki->wikiSiteStats()->first()['activeusers'] ?? null;
 
-            $output[] = [$wiki->domain, $time_to_engage_days, $time_before_wiki_abandoned_days, $wiki_number_of_editors];
+            $output[] = [
+                'domain' => $wiki->domain,
+                'time_to_engage_days' => $time_to_engage_days,
+                'time_before_wiki_abandoned_days' => $time_before_wiki_abandoned_days,
+                'number_of_active_editors' => $wiki_number_of_editors
+            ];
 
         }
 
+        if ( $request->wantsJson() ) {
+            return response()->json( $output );
+        }
+
+        return $this->returnCsv($output);
+
+    }
+
+    private function returnCsv( $output ) {
         ob_start();
 		$handle = fopen('php://output', 'r+');
         fputcsv($handle, ['domain_name', 'time_to_engage_days', 'time_before_wiki_abandoned_days', 'number_of_active_editors']);
@@ -52,6 +75,5 @@ class ConversionMetricController extends Controller
 			'Content-Type' => 'text/csv',
 			'Content-Disposition' => 'attachment;filename='.$this->fileName
 		]);;
-
     }
 }
