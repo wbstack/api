@@ -67,14 +67,14 @@ class QsController extends Controller
                 $newlyCreatedBatches[] = $batch;
             }
 
-            $oldestBatch = collect($newlyCreatedBatches)->merge($notDoneBatches)->sortBy('id')->last();
+            $oldestBatch = collect($newlyCreatedBatches)->merge($notDoneBatches)->sortBy('created_at')->first();
             if ($oldestBatch === null) {
                 return response([]);
             }
 
             $oldestBatch->update(['done' => 1]);
             $oldestBatch->load(['wiki', 'wiki.wikiQueryserviceNamespace']);
-            return response([$oldestBatch]);
+            return response($oldestBatch);
         });
 
     }
@@ -83,7 +83,7 @@ class QsController extends Controller
     {
         $rawBatches = $request->input('batches');
         $batches = explode(',', $rawBatches);
-        QsBatch::whereIn('id', $batches)->update('done', 1);
+        QsBatch::whereIn('id', $batches)->update(['done' => 1]);
         return response(1);
     }
 
@@ -91,7 +91,7 @@ class QsController extends Controller
     {
         $rawBatches = $request->input('batches');
         $batches = explode(',', $rawBatches);
-        QsBatch::whereIn('id', $batches)->update('done', 0);
+        QsBatch::whereIn('id', $batches)->update(['done' => 0]);
         return response(1);
     }
 }
