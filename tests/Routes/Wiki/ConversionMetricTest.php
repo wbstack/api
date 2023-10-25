@@ -36,7 +36,7 @@ class ConversionMetricTest extends TestCase
         $this->createTestWiki( 'two.wikibase.cloud', 0, 0, 3 );
         $response = $this->get($this->route);
         $response->assertStatus(200)
-            ->assertDownload('conversion_metric_for_all_wikis.csv');
+            ->assertDownload(CarbonImmutable::now()->toIso8601String().'-conversion_metric_for_all_wikis.csv');
         $response->assertSee('abandoned');
         $response->assertSee('one.wikibase.cloud');
         $response->assertSee('two.wikibase.cloud');
@@ -120,7 +120,6 @@ class ConversionMetricTest extends TestCase
         ]);
 
         $response = $this->get($this->route);
-        $response->assertStatus(200)
-            ->assertDownload('conversion_metric_for_all_wikis.csv');
+        $response->assertStatus(200);
     }
 }

@@ -41,7 +41,6 @@ class ConversionMetricController extends Controller
                 $time_before_wiki_abandoned_days = $wikiLastEditedTime->diffInDays($wiki->created_at);
             }
             if ($wikiFirstEditedTime !== null) {
-                echo "FirstEdited:" . $wikiFirstEditedTime . "CreatedAt:" .$wiki->created_at . "\n";
                 $time_to_engage_days = $wikiFirstEditedTime->diffInDays($wiki->created_at);
             }
             $wiki_number_of_editors = $wiki->wikiSiteStats()->first()['activeusers'] ?? null;
@@ -73,7 +72,7 @@ class ConversionMetricController extends Controller
         $csv = ob_get_clean();
         return response($csv, 200, [
 			'Content-Type' => 'text/csv',
-			'Content-Disposition' => 'attachment;filename='.$this->fileName
+			'Content-Disposition' => 'attachment;filename='.CarbonImmutable::now()->toIso8601String().'-'.$this->fileName
 		]);;
     }
 }
