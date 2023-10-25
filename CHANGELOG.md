@@ -1,5 +1,8 @@
 # api
 
+## 8x.25.3 - 25 October 2023
+- Add support for non-ascii domains
+
 ## 8x.25.2 - 19 October 2023
 - Bump Various Github Actions packages
   - Should be no-op for container images
