@@ -61,14 +61,8 @@ class ConversionMetricTest extends TestCase
             $update['first_edited'] = $current_date->subWeeks($firstEditedWeeksAgo);
         }
         $events->updateOrCreate($update);
+        $wiki->save();
     }
-
-    // un-abandonded wiki never edited
-    // never touched wiki a year old
-    // year old but used for one week
-    // unsued for a year and still in use
-    // started a year ago an still in active use
-
 
     public function testDownloadJson() {
         $this->createTestWiki('new.but.never.edited.wikibase.cloud', 0, null, null);
@@ -78,13 +72,45 @@ class ConversionMetricTest extends TestCase
         $this->createTestWiki('acvtively.used.for.the.last.year.wikibase.cloud', 53, 53, 0 );
         $response = $this->getJson($this->route);
         $response->assertStatus(200);
-        $response->assertJson([
+        $response->assertJsonFragment(
             [
                 'domain' => 'new.but.never.edited.wikibase.cloud',
                 'time_to_engage_days' => null,
                 'time_before_wiki_abandoned_days' => null,
                 'number_of_active_editors' => 0
             ]
-        ]);
+        );
+        $response->assertJsonFragment(
+            [
+                'domain' => 'old.and.never.edited.wikibase.cloud',
+                'time_to_engage_days' => null,
+                'time_before_wiki_abandoned_days' => null,
+                'number_of_active_editors' => 0
+            ]
+        );
+        $response->assertJsonFragment(
+            [
+                'domain' => 'old.and.used.only.one.week.wikibase.cloud',
+                'time_to_engage_days' => 7,
+                'time_before_wiki_abandoned_days' => 14,
+                'number_of_active_editors' => 0
+            ]
+        );
+        $response->assertJsonFragment(
+            [
+                'domain' => 'unused.for.a.year.but.now.active.wikibase.cloud',
+                'time_to_engage_days' => 364,
+                'time_before_wiki_abandoned_days' => null,
+                'number_of_active_editors' => 0
+            ]
+        );
+        $response->assertJsonFragment(
+            [
+                'domain' => 'unused.for.a.year.but.now.active.wikibase.cloud',
+                'time_to_engage_days' => 0,
+                'time_before_wiki_abandoned_days' => null,
+                'number_of_active_editors' => 0
+            ]
+        );
     }
 }
