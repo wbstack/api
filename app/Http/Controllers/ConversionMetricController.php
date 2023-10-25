@@ -70,7 +70,7 @@ class ConversionMetricController extends Controller
         foreach ($output as $wikiMetrics) {
             fputcsv($handle, array_values($wikiMetrics));
         }
-        $csv = $csv = ob_get_clean();
+        $csv = ob_get_clean();
         return response($csv, 200, [
 			'Content-Type' => 'text/csv',
 			'Content-Disposition' => 'attachment;filename='.$this->fileName
