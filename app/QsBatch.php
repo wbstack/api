@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $eventTo
  * @property int $wiki_id
  * @property string $entityIds
+ * @property boolean $pending
  * @property int $done
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -41,6 +42,7 @@ class QsBatch extends Model
         'eventTo',
         'wiki_id',
         'entityIds',
+        'pending',
     ];
 
     /**
