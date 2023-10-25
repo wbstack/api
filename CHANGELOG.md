@@ -1,5 +1,8 @@
 # api
 
+## 8x.25.4 - 25 October 2023
+- Fix response shape in QueryService controller
+
 ## 8x.25.3 - 25 October 2023
 - Add support for non-ascii domains
 - Adjust QueryService updater batch order
