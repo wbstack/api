@@ -113,4 +113,14 @@ class ConversionMetricTest extends TestCase
             ]
         );
     }
+
+    public function testFunctionalWithMissingLifecycleEventsandStats() {
+        $wiki = Wiki::factory()->create([
+            'domain' => 'very.new.wikibase.cloud', 'sitename' => 'bsite'
+        ]);
+
+        $response = $this->get($this->route);
+        $response->assertStatus(200)
+            ->assertDownload('conversion_metric_for_all_wikis.csv');
+    }
 }
