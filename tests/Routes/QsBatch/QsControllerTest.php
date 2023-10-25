@@ -44,8 +44,9 @@ class QsControllerTest extends TestCase
         QsBatch::factory()->create(['id' => 2, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
         QsBatch::factory()->create(['id' => 3, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
         $this->json('GET', $this->route.'/getBatches')
-            ->assertJsonFragment(['id' => 2, 'done' => 1])
-            ->assertJsonPath('wiki.domain', 'test.wikibase.cloud')
+            ->assertJsonPath('0.id', 2)
+            ->assertJsonPath('0.done', 1)
+            ->assertJsonPath('0.wiki.domain', 'test.wikibase.cloud')
             ->assertStatus(200);
     }
 
@@ -57,8 +58,9 @@ class QsControllerTest extends TestCase
         EventPageUpdate::factory()->create(['wiki_id' => 111, 'namespace' => 120, 'title' => 'name']);
 
         $this->json('GET', $this->route.'/getBatches')
-            ->assertJsonFragment(['id' => 1, 'done' => 1])
-            ->assertJsonPath('wiki.domain', 'test.wikibase.cloud')
+            ->assertJsonPath('0.id', 1)
+            ->assertJsonPath('0.done', 1)
+            ->assertJsonPath('0.wiki.domain', 'test.wikibase.cloud')
             ->assertStatus(200);
 
         $this->assertEquals(QsBatch::query()->count(), 3);
