@@ -74,7 +74,7 @@ class QsController extends Controller
 
             $oldestBatch->update(['done' => 1]);
             $oldestBatch->load(['wiki', 'wiki.wikiQueryserviceNamespace']);
-            return response($oldestBatch);
+            return response([$oldestBatch]);
         });
 
     }
