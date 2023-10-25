@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -25,12 +26,15 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereEventFrom($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereEventTo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereIn($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereWikiId($value)
  * @mixin \Eloquent
  */
 class QsBatch extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'done',
         'eventFrom',
