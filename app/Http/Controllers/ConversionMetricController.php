@@ -26,7 +26,7 @@ class ConversionMetricController extends Controller
             $lifecycleEvents = $wiki->wikiLifecycleEvents()->first();
             $wikiLastEditedTime = null;
             $wikiFirstEditedTime = null;
-            if ($lifecycleEvents !== [] && $lifecycleEvents->count() > 0) {
+            if (false !== empty($lifecycleEvents)) {
                 if ($lifecycleEvents['last_edited']) {
                     $wikiLastEditedTime = CarbonImmutable::parse($lifecycleEvents['last_edited']);    
                 }
