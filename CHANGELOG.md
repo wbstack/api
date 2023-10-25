@@ -1,5 +1,8 @@
 # api
 
+## 8x.25.5 - 25 October 2023
+- Add Conversion Metrics endpoint
+
 ## 8x.25.4 - 25 October 2023
 - Fix response shape in QueryService controller
 
