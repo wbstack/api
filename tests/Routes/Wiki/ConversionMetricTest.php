@@ -42,14 +42,14 @@ class ConversionMetricTest extends TestCase
         $response->assertSee('two.wikibase.cloud');
     }
 
-    private function createTestWiki( $name, $createdWeeksAgo, $firstEditedWeeksAgo, $lastEditedWeeksAgo) {
+    private function createTestWiki( $name, $createdWeeksAgo, $firstEditedWeeksAgo, $lastEditedWeeksAgo, $active_users = 0) {
         $current_date = CarbonImmutable::now();
         
         $wiki = Wiki::factory()->create([
             'domain' => $name, 'sitename' => 'bsite'
         ]);
         WikiSiteStats::factory()->create([
-            'wiki_id' => $wiki->id, 'pages' => 77
+            'wiki_id' => $wiki->id, 'pages' => 77, 'activeusers' => $active_users
         ]);
         $wiki->created_at = $current_date->subWeeks($createdWeeksAgo);
         $events = $wiki->wikiLifecycleEvents();
@@ -68,8 +68,8 @@ class ConversionMetricTest extends TestCase
         $this->createTestWiki('new.but.never.edited.wikibase.cloud', 0, null, null);
         $this->createTestWiki('old.and.never.edited.wikibase.cloud', 53, null, null );
         $this->createTestWiki('old.and.used.only.one.week.wikibase.cloud', 53, 52, 51 );
-        $this->createTestWiki('unused.for.a.year.but.now.active.wikibase.cloud', 53, 1, 0 );
-        $this->createTestWiki('acvtively.used.for.the.last.year.wikibase.cloud', 53, 53, 0 );
+        $this->createTestWiki('unused.for.a.year.but.now.active.wikibase.cloud', 53, 1, 0, 4 );
+        $this->createTestWiki('acvtively.used.for.the.last.year.wikibase.cloud', 53, 53, 0, 5 );
         $response = $this->getJson($this->route);
         $response->assertStatus(200);
         $response->assertJsonFragment(
@@ -101,7 +101,7 @@ class ConversionMetricTest extends TestCase
                 'domain' => 'unused.for.a.year.but.now.active.wikibase.cloud',
                 'time_to_engage_days' => 364,
                 'time_before_wiki_abandoned_days' => null,
-                'number_of_active_editors' => 0
+                'number_of_active_editors' => 4
             ]
         );
         $response->assertJsonFragment(
@@ -109,7 +109,7 @@ class ConversionMetricTest extends TestCase
                 'domain' => 'unused.for.a.year.but.now.active.wikibase.cloud',
                 'time_to_engage_days' => 0,
                 'time_before_wiki_abandoned_days' => null,
-                'number_of_active_editors' => 0
+                'number_of_active_editors' => 5
             ]
         );
     }
