@@ -70,6 +70,7 @@ class ConversionMetricTest extends TestCase
         $this->createTestWiki('old.and.used.only.one.week.wikibase.cloud', 53, 52, 51 );
         $this->createTestWiki('unused.for.a.year.but.now.active.wikibase.cloud', 53, 1, 0, 4 );
         $this->createTestWiki('acvtively.used.for.the.last.year.wikibase.cloud', 53, 53, 0, 5 );
+        $this->createTestWiki('creation.time.after.first.edit.wikibase.cloud', 0, 53, 0, 1 );
         $response = $this->getJson($this->route);
         $response->assertStatus(200);
         $response->assertJsonFragment(
@@ -110,6 +111,14 @@ class ConversionMetricTest extends TestCase
                 'time_to_engage_days' => 0,
                 'time_before_wiki_abandoned_days' => null,
                 'number_of_active_editors' => 5
+            ]
+        );
+        $response->assertJsonFragment(
+            [
+                'domain' => 'creation.time.after.first.edit.wikibase.cloud',
+                'time_to_engage_days' => -371,
+                'time_before_wiki_abandoned_days' => null,
+                'number_of_active_editors' => 1
             ]
         );
     }
