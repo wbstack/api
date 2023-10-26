@@ -22,4 +22,5 @@ return [
     'signup_throttling_limit' => env('WBSTACK_SIGNUP_THROTTLING_LIMIT', ''),
     'signup_throttling_range' => env('WBSTACK_SIGNUP_THROTTLING_RANGE', ''),
 
+    'qs_batch_pending_timeout' => env('WBSTACK_QS_BATCH_PENDING_TIMEOUT', 'PT30S'),
 ];
