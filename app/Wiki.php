@@ -86,11 +86,11 @@ class Wiki extends Model
     {
         return $this->hasOne(WikiLifecycleEvents::class);
     }
-
-    public function wikibaseNotificationSendRecord(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->hasOne(WikibaseNotificationSendRecord::class);
-    }
+//
+//    public function notificationSent(): \Illuminate\Database\Eloquent\Relations\HasOne
+//    {
+//        return $this->hasOne(NotificationSent::class);
+//    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
