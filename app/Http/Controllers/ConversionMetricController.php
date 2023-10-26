@@ -37,11 +37,11 @@ class ConversionMetricController extends Controller
             $time_before_wiki_abandoned_days = null;
             $time_to_engage_days = null;
 
-            if (!is_null($wikiLastEditedTime) && ($current_date->diffInDays($wikiLastEditedTime) >= 90)) {
-                $time_before_wiki_abandoned_days = $wikiLastEditedTime->diffInDays($wiki->created_at);
+            if (!is_null($wikiLastEditedTime) && ($wikiLastEditedTime->diffInDays($current_date, false) >= 90)) {
+                $time_before_wiki_abandoned_days = $wiki->created_at->diffInDays($wikiLastEditedTime, false);
             }
             if ($wikiFirstEditedTime !== null) {
-                $time_to_engage_days = $wikiFirstEditedTime->diffInDays($wiki->created_at);
+                $time_to_engage_days = $wiki->created_at->diffInDays($wikiFirstEditedTime, false);
             }
             $wiki_number_of_editors = $wiki->wikiSiteStats()->first()['activeusers'] ?? null;
 
@@ -49,7 +49,10 @@ class ConversionMetricController extends Controller
                 'domain' => $wiki->domain,
                 'time_to_engage_days' => $time_to_engage_days,
                 'time_before_wiki_abandoned_days' => $time_before_wiki_abandoned_days,
-                'number_of_active_editors' => $wiki_number_of_editors
+                'number_of_active_editors' => $wiki_number_of_editors,
+                'wiki_creation_time' => $wiki->created_at,
+                'first_edited_time' => $wikiFirstEditedTime,
+                'last_edited_time' => $wikiLastEditedTime
             ];
 
         }
@@ -65,7 +68,7 @@ class ConversionMetricController extends Controller
     private function returnCsv( $output ) {
         ob_start();
 		$handle = fopen('php://output', 'r+');
-        fputcsv($handle, ['domain_name', 'time_to_engage_days', 'time_before_wiki_abandoned_days', 'number_of_active_editors']);
+        fputcsv($handle, ['domain_name', 'time_to_engage_days', 'time_before_wiki_abandoned_days', 'number_of_active_editors', 'wiki_creation_time', 'first_edited_time', 'last_edited_time']);
         foreach ($output as $wikiMetrics) {
             fputcsv($handle, array_values($wikiMetrics));
         }

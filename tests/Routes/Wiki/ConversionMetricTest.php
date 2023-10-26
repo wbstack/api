@@ -1,6 +1,7 @@
 <?php
 
 namespace Tests\Routes\Wiki;
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
@@ -21,12 +22,16 @@ class ConversionMetricTest extends TestCase
         Wiki::query()->delete();
         WikiSiteStats::query()->delete();
         WikiSetting::query()->delete();
+        Carbon::setTestNow(Carbon::parse('first day of October 2023'));
+        CarbonImmutable::setTestNow(Carbon::parse('first day of October 2023'));
     }
 
     public function tearDown(): void {
         Wiki::query()->delete();
         WikiSiteStats::query()->delete();
         WikiSetting::query()->delete();
+        Carbon::setTestNow();
+        CarbonImmutable::setTestNow();
         parent::tearDown();
     }
 
@@ -70,6 +75,7 @@ class ConversionMetricTest extends TestCase
         $this->createTestWiki('old.and.used.only.one.week.wikibase.cloud', 53, 52, 51 );
         $this->createTestWiki('unused.for.a.year.but.now.active.wikibase.cloud', 53, 1, 0, 4 );
         $this->createTestWiki('acvtively.used.for.the.last.year.wikibase.cloud', 53, 53, 0, 5 );
+        $this->createTestWiki('creation.time.after.first.edit.wikibase.cloud', 0, 53, 0, 1 );
         $response = $this->getJson($this->route);
         $response->assertStatus(200);
         $response->assertJsonFragment(
@@ -77,7 +83,9 @@ class ConversionMetricTest extends TestCase
                 'domain' => 'new.but.never.edited.wikibase.cloud',
                 'time_to_engage_days' => null,
                 'time_before_wiki_abandoned_days' => null,
-                'number_of_active_editors' => 0
+                'number_of_active_editors' => 0,
+                'first_edited_time' => null,
+                'last_edited_time' => null
             ]
         );
         $response->assertJsonFragment(
@@ -93,7 +101,10 @@ class ConversionMetricTest extends TestCase
                 'domain' => 'old.and.used.only.one.week.wikibase.cloud',
                 'time_to_engage_days' => 7,
                 'time_before_wiki_abandoned_days' => 14,
-                'number_of_active_editors' => 0
+                'number_of_active_editors' => 0,
+                'wiki_creation_time' => CarbonImmutable::now()->subWeeks(53),
+                'first_edited_time' => CarbonImmutable::now()->subWeeks(52),
+                'last_edited_time' => CarbonImmutable::now()->subWeeks(51),
             ]
         );
         $response->assertJsonFragment(
@@ -110,6 +121,14 @@ class ConversionMetricTest extends TestCase
                 'time_to_engage_days' => 0,
                 'time_before_wiki_abandoned_days' => null,
                 'number_of_active_editors' => 5
+            ]
+        );
+        $response->assertJsonFragment(
+            [
+                'domain' => 'creation.time.after.first.edit.wikibase.cloud',
+                'time_to_engage_days' => -371,
+                'time_before_wiki_abandoned_days' => null,
+                'number_of_active_editors' => 1
             ]
         );
     }
