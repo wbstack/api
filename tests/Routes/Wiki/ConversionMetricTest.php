@@ -1,6 +1,7 @@
 <?php
 
 namespace Tests\Routes\Wiki;
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
@@ -21,6 +22,8 @@ class ConversionMetricTest extends TestCase
         Wiki::query()->delete();
         WikiSiteStats::query()->delete();
         WikiSetting::query()->delete();
+        Carbon::setTestNow(Carbon::parse('first day of October 2023'));
+        CarbonImmutable::setTestNow(Carbon::parse('first day of October 2023'));
     }
 
     public function tearDown(): void {
@@ -78,7 +81,9 @@ class ConversionMetricTest extends TestCase
                 'domain' => 'new.but.never.edited.wikibase.cloud',
                 'time_to_engage_days' => null,
                 'time_before_wiki_abandoned_days' => null,
-                'number_of_active_editors' => 0
+                'number_of_active_editors' => 0,
+                'first_edited_time' => null,
+                'last_edited_time' => null
             ]
         );
         $response->assertJsonFragment(
@@ -94,7 +99,10 @@ class ConversionMetricTest extends TestCase
                 'domain' => 'old.and.used.only.one.week.wikibase.cloud',
                 'time_to_engage_days' => 7,
                 'time_before_wiki_abandoned_days' => 14,
-                'number_of_active_editors' => 0
+                'number_of_active_editors' => 0,
+                'wiki_creation_time' => CarbonImmutable::now()->subWeeks(53),
+                'first_edited_time' => CarbonImmutable::now()->subWeeks(52),
+                'last_edited_time' => CarbonImmutable::now()->subWeeks(51),
             ]
         );
         $response->assertJsonFragment(
