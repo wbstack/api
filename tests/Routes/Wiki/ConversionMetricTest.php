@@ -30,6 +30,8 @@ class ConversionMetricTest extends TestCase
         Wiki::query()->delete();
         WikiSiteStats::query()->delete();
         WikiSetting::query()->delete();
+        Carbon::setTestNow();
+        CarbonImmutable::setTestNow();
         parent::tearDown();
     }
 
