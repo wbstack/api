@@ -1,5 +1,8 @@
 # api
 
+## 8x.25.6 - 25 October 2023
+- Add additional raw info to Conversion Metrics
+
 ## 8x.25.5 - 25 October 2023
 - Add Conversion Metrics endpoint
 
