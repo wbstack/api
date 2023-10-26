@@ -14,7 +14,7 @@ class QsBatchesAddPendingColumn extends Migration
     public function up()
     {
         Schema::table('qs_batches', function (Blueprint $table) {
-            $table->boolean('pending')->default(false);
+            $table->timestampTz('pending_since')->nullable()->default(null);
         });
     }
 
@@ -26,7 +26,7 @@ class QsBatchesAddPendingColumn extends Migration
     public function down()
     {
         Schema::table('qs_batches', function (Blueprint $table) {
-            $table->dropColumn('pending');
+            $table->dropColumn('pending_since');
         });
     }
 }
