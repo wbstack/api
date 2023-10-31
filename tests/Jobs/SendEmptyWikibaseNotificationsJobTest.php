@@ -3,17 +3,12 @@
 namespace Tests\Jobs;
 
 use App\Jobs\SendEmptyWikibaseNotificationsJob;
-use App\Jobs\UpdateWikiSiteStatsJob;
 use App\Notifications\EmptyWikibaseNotification;
 use App\User;
 use App\Wiki;
 use App\WikiManager;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Queue;
-use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 

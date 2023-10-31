@@ -4,8 +4,6 @@ namespace App\Jobs;
 
 use App\Notifications\EmptyWikibaseNotification;
 use App\Wiki;
-use App\User;
-use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Facades\Log;
