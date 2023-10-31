@@ -7,7 +7,7 @@ use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\PruneEventPageUpdatesTable;
 use App\Jobs\PruneQueryserviceBatchesTable;
-use App\Jobs\RequeuePendingBatches;
+use App\Jobs\RequeuePendingBatchesJob;
 use App\Jobs\SandboxCleanupJob;
 use App\Jobs\PollForMediaWikiJobsJob;
 use App\Jobs\UpdateWikiSiteStatsJob;
@@ -35,7 +35,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
         $schedule->job(new PruneEventPageUpdatesTable)->everyFifteenMinutes();
         $schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes();
-        $schedule->job(new RequeuePendingBatches)->everyFifteenMinutes();
+        $schedule->job(new RequeuePendingBatchesJob)->everyFifteenMinutes();
 
         // Sandbox
         // TODO this should maybe only be run when sandbox as a whole is loaded?

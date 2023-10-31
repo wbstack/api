@@ -41,13 +41,14 @@ class QsControllerTest extends TestCase
     public function testGetOldestBatch (): void
     {
         Wiki::factory()->create(['id' => 99, 'domain' => 'test.wikibase.cloud']);
-        QsBatch::factory()->create(['id' => 1, 'done' => 1, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
-        QsBatch::factory()->create(['pending_since' => Carbon::now()->subMinutes(4), 'id' => 2, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
-        QsBatch::factory()->create(['id' => 3, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['id' => 1, 'done' => 0, 'failed' => true, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['id' => 2, 'done' => 1, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['pending_since' => Carbon::now()->subMinutes(4), 'id' => 3, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
         QsBatch::factory()->create(['id' => 4, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['id' => 5, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
 
         $response = $this->json('GET', $this->route.'/getBatches')
-            ->assertJsonPath('0.id', 3)
+            ->assertJsonPath('0.id', 4)
             ->assertJsonPath('0.done', 0)
             ->assertJsonPath('0.wiki.domain', 'test.wikibase.cloud')
             ->assertStatus(200);

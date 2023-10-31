@@ -44,7 +44,9 @@ class QsController extends Controller
 
             /** @var Collection $newlyCreatedBatches */
             $newlyCreatedBatches = [];
-            $notDoneBatches = QsBatch::where([['done', '=', 0], ['pending_since', '=', null]])
+            $notDoneBatches = QsBatch::where([
+                ['done', '=', 0], ['pending_since', '=', null], ['failed', '=', false]
+            ])
                 ->with(['wiki', 'wiki.wikiQueryserviceNamespace'])->get();
             // Inset the newly created batches into the table...
             foreach ($wikiBatchesEntities as $wikiId => $entityBatch) {
@@ -86,7 +88,10 @@ class QsController extends Controller
     {
         $rawBatches = $request->input('batches');
         $batches = explode(',', $rawBatches);
-        QsBatch::whereIn('id', $batches)->update(['done' => 1, 'pending_since' => null]);
+        QsBatch::whereIn('id', $batches)->increment(
+            'processing_attempts', 1,
+            ['done' => 1, 'pending_since' => null]
+        );
         return response(1);
     }
 
@@ -94,7 +99,10 @@ class QsController extends Controller
     {
         $rawBatches = $request->input('batches');
         $batches = explode(',', $rawBatches);
-        QsBatch::whereIn('id', $batches)->update(['done' => 0, 'pending_since' => null]);
+        QsBatch::whereIn('id', $batches)->increment(
+            'processing_attempts', 1,
+            ['done' => 0, 'pending_since' => null]
+        );
         return response(1);
     }
 }
