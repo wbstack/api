@@ -21,7 +21,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
                 $this->updateSiteStats($wiki);
                 $this->updateLifecycleEvents($wiki);
             } catch (\Exception $ex) {
-//                $this->job->markAsFailed();
+                $this->job->markAsFailed();
                 var_dump($ex);
                 Log::error(
                     'Failure polling wiki '.$wiki->getAttribute('domain').' for sitestats: '.$ex->getMessage()
