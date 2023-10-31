@@ -15,12 +15,12 @@ use Illuminate\Support\HtmlString;
 
 class EmptyWikibaseNotification extends Notification
 {
-    /**
-     * The callback that should be used to build the mail message.
-     *
-     * @var Closure|null
-     */
-    public static ?Closure $toMailCallback;
+//    /**
+//     * The callback that should be used to build the mail message.
+//     *
+//     * @var Closure|null
+//     */
+//    public static ?Closure $toMailCallback;
 
     /**
      * Build the mail representation of the notification.
@@ -41,6 +41,7 @@ class EmptyWikibaseNotification extends Notification
      */
     public function toMail($notifiable)
     {
+        echo($notifiable);
         return (new MailMessage)
             ->subject(Lang::get('Need some help with your Wikibase?'))
             ->line(Lang::get('Thanks for creating a Wikibase instance'. 'on Wikibase Cloud! That was at least 30 days ago. We couldn’t help but notice that your Wikibase instance remains empty, so we’re checking in to see if we can help.'))
@@ -54,14 +55,14 @@ class EmptyWikibaseNotification extends Notification
             ->line(Lang::get('Thanks for using Wikibase Cloud!'));
     }
 
-    /**
-     * Set a callback that should be used when building the notification mail message.
-     *
-     * @param \Closure $callback
-     * @return void
-     */
-    public static function toMailUsing(Closure $callback)
-    {
-        static::$toMailCallback = $callback;
-    }
+//    /**
+//     * Set a callback that should be used when building the notification mail message.
+//     *
+//     * @param \Closure $callback
+//     * @return void
+//     */
+//    public static function toMailUsing(Closure $callback)
+//    {
+//        static::$toMailCallback = $callback;
+//    }
 }

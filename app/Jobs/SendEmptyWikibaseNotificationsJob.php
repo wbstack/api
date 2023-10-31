@@ -17,7 +17,6 @@ class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
         $allWikis = Wiki::all();
         foreach ($allWikis as $wiki) {
                 $this->sendEmptyWikibaseNotification($wiki);
-
         }
     }
 
