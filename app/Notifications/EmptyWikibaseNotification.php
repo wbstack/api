@@ -15,12 +15,16 @@ use Illuminate\Support\HtmlString;
 
 class EmptyWikibaseNotification extends Notification
 {
-//    /**
-//     * The callback that should be used to build the mail message.
-//     *
-//     * @var Closure|null
-//     */
-//    public static ?Closure $toMailCallback;
+    /**
+     * Create a notification instance.
+     *
+     * @param string $sitename
+     * @return void
+     */
+    public function __construct(string $sitename)
+    {
+        $this->sitename = $sitename;
+    }
 
     /**
      * Build the mail representation of the notification.
@@ -43,7 +47,7 @@ class EmptyWikibaseNotification extends Notification
     {
         return (new MailMessage)
             ->subject(Lang::get('Need some help with your Wikibase?'))
-            ->line(Lang::get('Thanks for creating a Wikibase instance'. 'on Wikibase Cloud! That was at least 30 days ago. We couldn’t help but notice that your Wikibase instance remains empty, so we’re checking in to see if we can help.'))
+            ->line(Lang::get('Thanks for creating a Wikibase instance '.$this->sitename.' on Wikibase Cloud! That was at least 30 days ago. We couldn’t help but notice that your Wikibase instance remains empty, so we’re checking in to see if we can help.'))
             ->line(Lang::get('If you’re still planning to use Wikibase for your project but just haven’t gotten around to doing so, no worries -- feel free to ignore this email.'))
             ->line(Lang::get('Are you having trouble getting started? We have some resources that might help:'))
             ->line(new HtmlString(Lang::get('<a href="https://www.mediawiki.org/wiki/Wikibase/Wikibase.cloud/Initial_setup">Getting started</a>')))
@@ -53,15 +57,4 @@ class EmptyWikibaseNotification extends Notification
             ->line(new HtmlString(Lang::get('Have you reconsidered using Wikibase for this project? We’d love it if you’d <a href="https://www.wikibase.cloud/contact">tell us why</a>. (You can delete your empty Wikibase(s) from your <a href="https://www.wikibase.cloud/dashboard">dashboard</a>.)')))
             ->line(Lang::get('Thanks for using Wikibase Cloud!'));
     }
-
-//    /**
-//     * Set a callback that should be used when building the notification mail message.
-//     *
-//     * @param \Closure $callback
-//     * @return void
-//     */
-//    public static function toMailUsing(Closure $callback)
-//    {
-//        static::$toMailCallback = $callback;
-//    }
 }
