@@ -35,7 +35,7 @@ class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
 
         if ($firstEdited == null && $emptyWikibaseDays >= 30) {
             $user = $wiki->wikiManagers()->first();
-            $user->notify(new EmptyWikibaseNotification());
+            $user->notify(new EmptyWikibaseNotification($wiki->sitename));
             $wiki->wikibaseNotificationSentRecord()->updateOrCreate(['notification_type'=>'empty_wikibase_notification']);
         }
     }
