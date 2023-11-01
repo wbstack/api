@@ -41,7 +41,6 @@ class EmptyWikibaseNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        echo($notifiable);
         return (new MailMessage)
             ->subject(Lang::get('Need some help with your Wikibase?'))
             ->line(Lang::get('Thanks for creating a Wikibase instance'. 'on Wikibase Cloud! That was at least 30 days ago. We couldn’t help but notice that your Wikibase instance remains empty, so we’re checking in to see if we can help.'))
