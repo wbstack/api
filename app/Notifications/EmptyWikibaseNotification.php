@@ -15,6 +15,8 @@ use Illuminate\Support\HtmlString;
 
 class EmptyWikibaseNotification extends Notification
 {
+    private string $sitename;
+
     /**
      * Create a notification instance.
      *
