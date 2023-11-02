@@ -17,6 +17,8 @@ class CreateWikibaseNotificationSentRecordsTable extends Migration
             $table->id();
             $table->timestamps();
 
+            $table->unsignedInteger('wiki_id');
+            $table->foreign('wiki_id')->references('id')->on('wikis');
             $table->string('notification_type') -> nullable();
         });
     }
