@@ -86,8 +86,7 @@ class QsController extends Controller
 
     public function markBatchesDone(Request $request): \Illuminate\Http\Response
     {
-        $rawBatches = $request->input('batches');
-        $batches = explode(',', $rawBatches);
+        $batches = (array) $request->json()->get('batches');
         QsBatch::whereIn('id', $batches)->increment(
             'processing_attempts', 1,
             ['done' => 1, 'pending_since' => null]
@@ -97,8 +96,7 @@ class QsController extends Controller
 
     public function markBatchesFailed(Request $request): \Illuminate\Http\Response
     {
-        $rawBatches = $request->input('batches');
-        $batches = explode(',', $rawBatches);
+        $batches = (array) $request->json()->get('batches');
         QsBatch::whereIn('id', $batches)->increment(
             'processing_attempts', 1,
             ['done' => 0, 'pending_since' => null]

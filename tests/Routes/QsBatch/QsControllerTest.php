@@ -79,7 +79,7 @@ class QsControllerTest extends TestCase
         QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(3), 'id' => 3, 'done' => 0, 'eventFrom' => 3, 'eventTo' => 4, 'wiki_id' => 1, 'entityIds' => 'e,f']);
         QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(4), 'id' => 4, 'done' => 0, 'eventFrom' => 4, 'eventTo' => 5, 'wiki_id' => 6, 'entityIds' => 'g,h']);
 
-        $this->json('POST', $this->route.'/markDone', ['batches' => '2,3'])
+        $this->json('POST', $this->route.'/markDone', ['batches' => [2, 3]])
             ->assertStatus(200);
 
         $this->assertEquals(QsBatch::where('id', 1)->first()->done, 1);
@@ -97,7 +97,7 @@ class QsControllerTest extends TestCase
         QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(3), 'id' => 3, 'done' => 0, 'eventFrom' => 3, 'eventTo' => 4, 'wiki_id' => 1, 'entityIds' => 'e,f']);
         QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(4), 'id' => 4, 'done' => 1, 'eventFrom' => 4, 'eventTo' => 5, 'wiki_id' => 6, 'entityIds' => 'g,h']);
 
-        $this->json('POST', $this->route.'/markFailed', ['batches' => '1,2'])
+        $this->json('POST', $this->route.'/markFailed', ['batches' => [1, 2]])
             ->assertStatus(200);
 
         $this->assertEquals(QsBatch::where('id', 1)->first()->done, 0);
