@@ -1,5 +1,8 @@
 # api
 
+## 8x.25.7 - 8 November 2023
+- Title column for event_page_update data is now a `text` field
+
 ## 8x.25.6 - 25 October 2023
 - Add additional raw info to Conversion Metrics
 
