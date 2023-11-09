@@ -6,17 +6,19 @@ use App\Jobs\SendEmptyWikibaseNotificationsJob;
 use App\Notifications\EmptyWikibaseNotification;
 use App\User;
 use App\Wiki;
+use App\WikiLifecycleEvents;
 use App\WikiManager;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
+use function Amp\Promise\first;
 
 class SendEmptyWikibaseNotificationsJobTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testEmptyWikibaseNotification_Success()
+    public function testEmptyWikibaseNotifications_Success()
     {
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())
@@ -30,9 +32,11 @@ class SendEmptyWikibaseNotificationsJobTest extends TestCase
     public function testEmptyWikibaseNotifications_SendNotification()
     {
         Notification::fake();
-        $user = User::factory()->create();
+        $user = User::factory()->create(['verified' => true]);
         $wiki = Wiki::factory()->create(['created_at' => '2022-12-31 16:00:00']);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+        $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => null]);
+//        $wiki->wikibaseNotificationSentRecord()->updateOrCreate(['notification_type' => null]);
 
         $job = new SendEmptyWikibaseNotificationsJob();
         $job->handle();
@@ -41,5 +45,35 @@ class SendEmptyWikibaseNotificationsJobTest extends TestCase
             $user->select('email')->get(),
             EmptyWikibaseNotification::class
         );
+    }
+
+    public function testEmptyWikibaseNotifications_ActiveWiki()
+    {
+        Notification::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $wiki = Wiki::factory()->create(['created_at' => '2022-12-31 16:00:00']);
+        $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+
+        $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => '2023-01-01 16:00:00']);
+
+        $job = new SendEmptyWikibaseNotificationsJob();
+        $job->handle();
+
+        Notification::assertNothingSent();
+    }
+
+    public function testEmptyWikibaseNotifications_EmptyNotificationReceived()
+    {
+        Notification::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $wiki = Wiki::factory()->create(['created_at' => '2022-12-31 16:00:00']);
+        $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+
+        $wiki->wikibaseNotificationSentRecord()->updateOrCreate(['notification_type' => 'empty_wikibase_notification']);
+
+        $job = new SendEmptyWikibaseNotificationsJob();
+        $job->handle();
+
+        Notification::assertNothingSent();
     }
 }
