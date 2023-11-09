@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Config;
 use App\QsBatch;
 use Carbon\Carbon;
 
-class RequeuePendingBatchesJob extends Job
+class RequeuePendingQsBatchesJob extends Job
 {
     private $pendingTimeout;
     private $markFailedAfter;

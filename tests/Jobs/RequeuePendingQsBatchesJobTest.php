@@ -3,13 +3,13 @@
 namespace Tests\Jobs;
 
 use App\QsBatch;
-use App\Jobs\RequeuePendingBatchesJob;
+use App\Jobs\RequeuePendingQsBatchesJob;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Contracts\Queue\Job;
 use Carbon\Carbon;
 
-class RequeuePendingBatchesJobTest extends TestCase
+class RequeuePendingQsBatchesJobTest extends TestCase
 {
 
     use RefreshDatabase;
@@ -31,7 +31,7 @@ class RequeuePendingBatchesJobTest extends TestCase
         QsBatch::factory()->create(['processing_attempts' => 3, 'id' => 3, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 1, 'entityIds' => 'a,b']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new RequeuePendingBatchesJob();
+        $job = new RequeuePendingQsBatchesJob();
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
