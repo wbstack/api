@@ -94,7 +94,7 @@ class QsController extends Controller
         return response(1);
     }
 
-    public function markBatchesFailed(Request $request): \Illuminate\Http\Response
+    public function markBatchesNotDone(Request $request): \Illuminate\Http\Response
     {
         $batches = (array) $request->json()->get('batches');
         QsBatch::whereIn('id', $batches)->increment(
