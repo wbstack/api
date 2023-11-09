@@ -20,4 +20,9 @@ class WikibaseNotificationSentRecord extends Model
     protected $casts = [
         'notification_type' => 'string',
     ];
+
+    public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Wiki::class);
+    }
 }
