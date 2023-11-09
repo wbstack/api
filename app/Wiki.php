@@ -113,6 +113,11 @@ class Wiki extends Model
         return $this->hasMany(WikiSetting::class);
     }
 
+    public function notification(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(WikibaseNotificationSentRecord::class);
+    }
+
     public function publicSettings()
     {
         return $this->settings()->whereIn('name',

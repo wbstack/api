@@ -6,6 +6,7 @@ use App\Jobs\SendEmptyWikibaseNotificationsJob;
 use App\Notifications\EmptyWikibaseNotification;
 use App\User;
 use App\Wiki;
+use App\WikibaseNotificationSentRecord;
 use App\WikiLifecycleEvents;
 use App\WikiManager;
 use Illuminate\Contracts\Queue\Job;
@@ -54,7 +55,7 @@ class SendEmptyWikibaseNotificationsJobTest extends TestCase
         $wiki = Wiki::factory()->create(['created_at' => '2022-12-31 16:00:00']);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
-        $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => '2023-01-01 16:00:00']);
+        WikiLifecycleEvents::factory()->create(['wiki_id' => $wiki->id, 'first_edited' => '2023-01-01 16:00:00']);
 
         $job = new SendEmptyWikibaseNotificationsJob();
         $job->handle();
@@ -69,7 +70,7 @@ class SendEmptyWikibaseNotificationsJobTest extends TestCase
         $wiki = Wiki::factory()->create(['created_at' => '2022-12-31 16:00:00']);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
-        $wiki->wikibaseNotificationSentRecord()->updateOrCreate(['notification_type' => 'empty_wikibase_notification']);
+        WikibaseNotificationSentRecord::factory()->create(['wiki_id' => $wiki->id, 'notification_type' => 'empty_wikibase_notification']);
 
         $job = new SendEmptyWikibaseNotificationsJob();
         $job->handle();

@@ -48,7 +48,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->job(new UpdateWikiSiteStatsJob)->dailyAt('19:00');
 
-        $schedule->job(new SendEmptyWikibaseNotificationsJob)->monthly();
+        $schedule->job(new SendEmptyWikibaseNotificationsJob)->dailyAt('21:00');
     }
 
     /**
