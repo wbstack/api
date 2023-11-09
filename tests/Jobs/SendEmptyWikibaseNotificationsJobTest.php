@@ -14,6 +14,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 use function Amp\Promise\first;
+use Carbon\Carbon;
 
 class SendEmptyWikibaseNotificationsJobTest extends TestCase
 {
@@ -55,7 +56,8 @@ class SendEmptyWikibaseNotificationsJobTest extends TestCase
         $wiki = Wiki::factory()->create(['created_at' => '2022-12-31 16:00:00']);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
-        WikiLifecycleEvents::factory()->create(['wiki_id' => $wiki->id, 'first_edited' => '2023-01-01 16:00:00']);
+        $first_edited = Carbon::now()->subDays(20);
+        WikiLifecycleEvents::factory()->create(['wiki_id' => $wiki->id, 'first_edited' => $first_edited->toDateTimeString()]);
 
         $job = new SendEmptyWikibaseNotificationsJob();
         $job->handle();
