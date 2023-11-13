@@ -21,7 +21,7 @@ class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
                 $this->sendEmptyWikibaseNotification($wiki);
             } catch (\Exception $exception) {
                 Log::error(
-                    'Failure polling wiki '.$wiki->getAttribute('domain').' for sitestats: '.$exception->getMessage()
+                    'Failure processing wiki '.$wiki->getAttribute('domain').' for EmptyWikibaseNotification check: '.$exception->getMessage()
                 );
             }
         }
