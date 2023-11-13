@@ -8,7 +8,6 @@ use App\WikibaseNotificationSentRecord;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Arr;
 
 class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
 {
@@ -23,6 +22,7 @@ class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
                 Log::error(
                     'Failure processing wiki '.$wiki->getAttribute('domain').' for EmptyWikibaseNotification check: '.$exception->getMessage()
                 );
+                $this->fail();
             }
         }
     }
@@ -36,14 +36,12 @@ class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
 
         $firstEdited = $wiki->wikiLifecycleEvents->first_edited;
 
-        $sentNotification = WikibaseNotificationSentRecord::where('wiki_id', $wiki->id)->get(['notification_type'])->first(); //we want not just checking the 1st one but any 'empty_wikibase_notification'
-        $sentNotificationCheck = false;
+        $emptyWikiNotificationCount = WikibaseNotificationSentRecord::where([
+            'wiki_id' => $wiki->id,
+            'notification_type' => 'empty_wikibase_notification']
+        )->count();
 
-        if (Arr::accessible($sentNotification)) {
-            $sentNotificationCheck = ($sentNotification['notification_type'] == 'empty_wikibase_notification');
-        }
-
-        if ($firstEdited == null && $emptyWikibaseDays >= 30 && $sentNotificationCheck == false) {
+        if ($firstEdited == null && $emptyWikibaseDays >= 30 && $emptyWikiNotificationCount == 0) {
             return true;
         }
     }
