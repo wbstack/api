@@ -1,5 +1,8 @@
 # api
 
+## 8x.26.0 - 13 November 2023
+- Introduce pending state for QueryService Batches
+
 ## 8x.25.7 - 8 November 2023
 - Title column for event_page_update data is now a `text` field
 
