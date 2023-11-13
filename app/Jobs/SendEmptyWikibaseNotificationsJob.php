@@ -17,7 +17,9 @@ class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
 
         foreach ($wikis as $wiki) {
             try {
-                $this->sendEmptyWikibaseNotification($wiki);
+                if ($this->checkIfWikiIsOldAndEmpty($wiki)) {
+                    $this->sendEmptyWikibaseNotification($wiki);
+                }
             } catch (\Exception $exception) {
                 Log::error(
                     'Failure processing wiki '.$wiki->getAttribute('domain').' for EmptyWikibaseNotification check: '.$exception->getMessage()
@@ -38,7 +40,7 @@ class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
 
         $emptyWikiNotificationCount = WikibaseNotificationSentRecord::where([
             'wiki_id' => $wiki->id,
-            'notification_type' => 'empty_wikibase_notification']
+            'notification_type' => EmptyWikibaseNotification::class]
         )->count();
 
         if ($firstEdited == null && $emptyWikibaseDays >= 30 && $emptyWikiNotificationCount == 0) {
@@ -50,10 +52,8 @@ class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
 
     public function sendEmptyWikibaseNotification (Wiki $wiki): void
     {
-        if ($this->checkIfWikiIsOldAndEmpty($wiki)) {
-            $user = $wiki->wikiManagers()->first();
-            $user->notify(new EmptyWikibaseNotification($wiki->sitename));
-            $wiki->wikibaseNotificationSentRecord()->updateOrCreate(['notification_type' => 'empty_wikibase_notification']);
-        }
+        $user = $wiki->wikiManagers()->first();
+        $user->notify(new EmptyWikibaseNotification($wiki->sitename));
+        $wiki->wikibaseNotificationSentRecord()->updateOrCreate(['notification_type' => EmptyWikibaseNotification::class]);
     }
 }

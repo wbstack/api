@@ -73,7 +73,7 @@ class SendEmptyWikibaseNotificationsJobTest extends TestCase
         $wiki = Wiki::factory()->create(['created_at' => '2022-12-31 16:00:00']);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
-        WikibaseNotificationSentRecord::factory()->create(['wiki_id' => $wiki->id, 'notification_type' => 'empty_wikibase_notification']);
+        WikibaseNotificationSentRecord::factory()->create(['wiki_id' => $wiki->id, 'notification_type' => EmptyWikibaseNotification::class]);
 
         $job = new SendEmptyWikibaseNotificationsJob();
         $job->handle();
