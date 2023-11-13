@@ -43,6 +43,8 @@ class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
 
         if ($firstEdited == null && $emptyWikibaseDays >= 30 && $emptyWikiNotificationCount == 0) {
             return true;
+        } else {
+            return false;
         }
     }
 
