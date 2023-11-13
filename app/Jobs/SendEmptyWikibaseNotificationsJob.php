@@ -13,7 +13,7 @@ class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
 {
     public function handle (): void
     {
-        $wikis = Wiki::with(['notification', 'wikiLifecycleEvents'])->get();
+        $wikis = Wiki::with(['wikiLifecycleEvents'])->get();
 
         foreach ($wikis as $wiki) {
             try {
