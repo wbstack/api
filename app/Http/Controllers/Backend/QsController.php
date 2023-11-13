@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\QsBatch;
+use Carbon\Carbon;
 use App\EventPageUpdate;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -43,7 +44,10 @@ class QsController extends Controller
 
             /** @var Collection $newlyCreatedBatches */
             $newlyCreatedBatches = [];
-            $notDoneBatches = QsBatch::where('done', 0)->with(['wiki', 'wiki.wikiQueryserviceNamespace'])->get();
+            $notDoneBatches = QsBatch::where([
+                ['done', '=', 0], ['pending_since', '=', null], ['failed', '=', false]
+            ])
+                ->with(['wiki', 'wiki.wikiQueryserviceNamespace'])->get();
             // Inset the newly created batches into the table...
             foreach ($wikiBatchesEntities as $wikiId => $entityBatch) {
 
@@ -63,6 +67,7 @@ class QsController extends Controller
                     'eventTo'=> $lastEventId,
                     'wiki_id' => $wikiId,
                     'entityIds' => implode(',', array_unique($entityBatch)),
+                    'pending_since' => null,
                 ]);
                 $newlyCreatedBatches[] = $batch;
             }
@@ -72,7 +77,7 @@ class QsController extends Controller
                 return response([]);
             }
 
-            $oldestBatch->update(['done' => 1]);
+            $oldestBatch->update(['pending_since' => Carbon::now()]);
             $oldestBatch->load(['wiki', 'wiki.wikiQueryserviceNamespace']);
             return response([$oldestBatch]);
         });
@@ -81,17 +86,21 @@ class QsController extends Controller
 
     public function markBatchesDone(Request $request): \Illuminate\Http\Response
     {
-        $rawBatches = $request->input('batches');
-        $batches = explode(',', $rawBatches);
-        QsBatch::whereIn('id', $batches)->update(['done' => 1]);
+        $batches = (array) $request->json()->get('batches');
+        QsBatch::whereIn('id', $batches)->increment(
+            'processing_attempts', 1,
+            ['done' => 1, 'pending_since' => null]
+        );
         return response(1);
     }
 
-    public function markBatchesFailed(Request $request): \Illuminate\Http\Response
+    public function markBatchesNotDone(Request $request): \Illuminate\Http\Response
     {
-        $rawBatches = $request->input('batches');
-        $batches = explode(',', $rawBatches);
-        QsBatch::whereIn('id', $batches)->update(['done' => 0]);
+        $batches = (array) $request->json()->get('batches');
+        QsBatch::whereIn('id', $batches)->increment(
+            'processing_attempts', 1,
+            ['done' => 0, 'pending_since' => null]
+        );
         return response(1);
     }
 }

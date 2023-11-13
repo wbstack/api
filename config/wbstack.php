@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     'subdomain_suffix' => env('WBSTACK_SUBDOMAIN_SUFFIX', '.wiki.opencura.com'),
 
     'ui_url' => env('WBSTACK_UI_URL', 'https://wbstack.com'),
@@ -22,4 +21,6 @@ return [
     'signup_throttling_limit' => env('WBSTACK_SIGNUP_THROTTLING_LIMIT', ''),
     'signup_throttling_range' => env('WBSTACK_SIGNUP_THROTTLING_RANGE', ''),
 
+    'qs_batch_pending_timeout' => env('WBSTACK_QS_BATCH_PENDING_TIMEOUT', 'PT300S'),
+    'qs_batch_mark_failed_after' => intval(env('WBSTACK_QS_BATCH_MARK_FAILED_AFTER', '3')),
 ];
