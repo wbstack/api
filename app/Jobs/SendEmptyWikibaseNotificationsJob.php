@@ -53,7 +53,7 @@ class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
     public function sendEmptyWikibaseNotification (Wiki $wiki): void
     {
         $user = $wiki->wikiManagers()->first();
+        $wiki->wikibaseNotificationSentRecord()->create(['notification_type' => EmptyWikibaseNotification::class]);
         $user->notify(new EmptyWikibaseNotification($wiki->sitename));
-        $wiki->wikibaseNotificationSentRecord()->updateOrCreate(['notification_type' => EmptyWikibaseNotification::class]);
     }
 }
