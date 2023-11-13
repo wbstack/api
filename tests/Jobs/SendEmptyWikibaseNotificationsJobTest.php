@@ -19,6 +19,7 @@ class SendEmptyWikibaseNotificationsJobTest extends TestCase
 {
     use RefreshDatabase;
 
+    // the job does not fail in general
     public function testEmptyWikibaseNotifications_Success()
     {
         $mockJob = $this->createMock(Job::class);
@@ -30,6 +31,7 @@ class SendEmptyWikibaseNotificationsJobTest extends TestCase
         $job->handle();
     }
 
+    // empty wikis, that are older than 30 days, trigger a notification
     public function testEmptyWikibaseNotifications_SendNotification()
     {
         Notification::fake();
@@ -37,7 +39,6 @@ class SendEmptyWikibaseNotificationsJobTest extends TestCase
         $wiki = Wiki::factory()->create(['created_at' => '2022-12-31 16:00:00']);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => null]);
-//        $wiki->wikibaseNotificationSentRecord()->updateOrCreate(['notification_type' => null]);
 
         $job = new SendEmptyWikibaseNotificationsJob();
         $job->handle();
@@ -48,6 +49,7 @@ class SendEmptyWikibaseNotificationsJobTest extends TestCase
         );
     }
 
+    // non-empty wikis which are older than 30 days do not trigger notifications
     public function testEmptyWikibaseNotifications_ActiveWiki()
     {
         Notification::fake();
@@ -63,6 +65,7 @@ class SendEmptyWikibaseNotificationsJobTest extends TestCase
         Notification::assertNothingSent();
     }
 
+    // notifications do not get sent again
     public function testEmptyWikibaseNotifications_EmptyNotificationReceived()
     {
         Notification::fake();
