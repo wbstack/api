@@ -8,12 +8,13 @@ use App\WikibaseNotificationSentRecord;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Arr;
 
 class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
 {
     public function handle (): void
     {
-        $wikis = Wiki::with('notification')->get();
+        $wikis = Wiki::with(['notification', 'wikiLifecycleEvents'])->get();
 
         foreach ($wikis as $wiki) {
             try {
@@ -33,12 +34,16 @@ class SendEmptyWikibaseNotificationsJob extends Job implements ShouldBeUnique
         $now = CarbonImmutable::now();
         $emptyWikibaseDays = $createdAt->diffInDays($now);
 
-        $firstEdited = $wiki->first_edited;
+        $firstEdited = $wiki->wikiLifecycleEvents->first_edited;
 
         $sentNotification = WikibaseNotificationSentRecord::where('wiki_id', $wiki->id)->get(['notification_type'])->first(); //we want not just checking the 1st one but any 'empty_wikibase_notification'
-        echo $sentNotification;
+        $sentNotificationCheck = false;
 
-        if ($firstEdited == null && $emptyWikibaseDays >= 30 && $sentNotification['notification_type'] != 'empty_wikibase_notification') {
+        if (Arr::accessible($sentNotification)) {
+            $sentNotificationCheck = ($sentNotification['notification_type'] == 'empty_wikibase_notification');
+        }
+
+        if ($firstEdited == null && $emptyWikibaseDays >= 30 && $sentNotificationCheck == false) {
             return true;
         }
     }
