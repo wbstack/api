@@ -3,7 +3,9 @@
 namespace App\Exceptions;
 
 use GlueDev\Laravel\Stackdriver\StackdriverExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -13,7 +15,10 @@ class Handler extends ExceptionHandler
      *
      * @var array
      */
-    protected $dontReport = [];
+    protected $dontReport = [
+        NotFoundHttpException::class,
+        ValidationException::class,
+    ];
 
     /**
      * A list of the inputs that are never flashed for validation exceptions.
