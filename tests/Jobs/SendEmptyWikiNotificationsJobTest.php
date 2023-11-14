@@ -82,9 +82,13 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
     // notifications do not get sent again
     public function testEmptyWikiNotifications_EmptyNotificationReceived()
     {
+        $thresholdDaysAgo = Carbon::now()->subDays(
+            config('wbstack.wiki_empty_notification_threshold')
+        )->toDateTimeString();
+
         Notification::fake();
         $user = User::factory()->create(['verified' => true]);
-        $wiki = Wiki::factory()->create(['created_at' => '2022-12-31 16:00:00']);
+        $wiki = Wiki::factory()->create(['created_at' => $thresholdDaysAgo]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         WikiNotificationSentRecord::factory()->create(['wiki_id' => $wiki->id, 'notification_type' => EmptyWikiNotification::TYPE]);
