@@ -94,7 +94,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
         WikiNotificationSentRecord::factory()->create([
             'wiki_id' => $wiki->id,
             'notification_type' => EmptyWikiNotification::TYPE,
-            'user_id' => $manager->id,
+            'user_id' => $manager->user_id,
         ]);
 
         $job = new SendEmptyWikiNotificationsJob();
