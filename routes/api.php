@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Config;
 /**
  * This route file is loaded in the RouteServiceProvider optionally when an env var is set.
  * You'll find that service in the Providers directory.
- * @var \Laravel\Lumen\Routing\Router $router
+ * @var Illuminate\Routing\Router $router
  */
 $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
 
