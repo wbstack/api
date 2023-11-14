@@ -60,6 +60,8 @@ class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique
         $wikiManagers = $wiki->wikiManagers()->get();
 
         foreach($wikiManagers as $wikiManager) {
+            // we think the order here matters, so that people do not get spammed in case creating a record fails
+            // discussed here https://github.com/wbstack/api/pull/656#discussion_r1392443739
             $wiki->wikiNotificationSentRecords()->create([
                 'notification_type' => EmptyWikiNotification::TYPE,
                 'user_id' => $wikiManager->pivot->user_id,
