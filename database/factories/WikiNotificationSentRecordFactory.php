@@ -2,18 +2,18 @@
 
 namespace Database\Factories;
 
-use App\Notifications\EmptyWikibaseNotification;
-use App\WikibaseNotificationSentRecord;
+use App\Notifications\EmptyWikiNotification;
+use App\WikiNotificationSentRecord;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class WikibaseNotificationSentRecordFactory extends Factory
+class WikiNotificationSentRecordFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = WikibaseNotificationSentRecord::class;
+    protected $model = WikiNotificationSentRecord::class;
 
     /**
      * Define the model's default state.

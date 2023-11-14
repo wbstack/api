@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateWikibaseNotificationSentRecordsTable extends Migration
+class CreateWikiNotificationSentRecordsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateWikibaseNotificationSentRecordsTable extends Migration
      */
     public function up()
     {
-        Schema::create('wikibase_notification_sent_records', function (Blueprint $table) {
+        Schema::create('wiki_notification_sent_records', function (Blueprint $table) {
             $table->foreign('wiki_id')->references('id')->on('wikis');
 
             $table->id();
@@ -32,6 +32,6 @@ class CreateWikibaseNotificationSentRecordsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('wikibase_notification_sent_records');
+        Schema::dropIfExists('wiki_notification_sent_records');
     }
 }

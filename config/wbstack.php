@@ -9,6 +9,7 @@ return [
     'wiki_db_use_version' => env('WBSTACK_WIKI_DB_USE_VERSION', 'mw1.39-wbs1'),
     'wiki_hard_delete_threshold' => env('WBSTACK_HARD_DELETE_THRESHOLD', 30),
     'wiki_max_per_user' => env('WBSTACK_MAX_PER_USER', false),
+    'wiki_empty_notification_threshold' => env('WBSTACK_EMPTY_NOTIFICATION_THRESHOLD', 30),
 
     'platform_summary_inactive_threshold' => env('WBSTACK_SUMMARY_INACTIVE_THRESHOLD', 60 * 60 * 24 * 90),
     'platform_summary_creation_rate_ranges' => array_filter(

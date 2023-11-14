@@ -2,11 +2,11 @@
 
 namespace Tests\Jobs;
 
-use App\Jobs\SendEmptyWikibaseNotificationsJob;
-use App\Notifications\EmptyWikibaseNotification;
+use App\Jobs\SendEmptyWikiNotificationsJob;
+use App\Notifications\EmptyWikiNotification;
 use App\User;
 use App\Wiki;
-use App\WikibaseNotificationSentRecord;
+use App\WikiNotificationSentRecord;
 use App\WikiLifecycleEvents;
 use App\WikiManager;
 use Illuminate\Contracts\Queue\Job;
@@ -14,68 +14,82 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 use function Amp\Promise\first;
+use Carbon\Carbon;
 
-class SendEmptyWikibaseNotificationsJobTest extends TestCase
+class SendEmptyWikiNotificationsJobTest extends TestCase
 {
     use RefreshDatabase;
 
     // the job does not fail in general
-    public function testEmptyWikibaseNotifications_Success()
+    public function testEmptyWikiNotifications_Success()
     {
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())
                 ->method('fail')
                 ->withAnyParameters();
-        $job = new SendEmptyWikibaseNotificationsJob();
+        $job = new SendEmptyWikiNotificationsJob();
         $job->setJob($mockJob);
         $job->handle();
     }
 
     // empty wikis, that are older than 30 days, trigger a notification
-    public function testEmptyWikibaseNotifications_SendNotification()
+    public function testEmptyWikiNotifications_SendNotification()
     {
+        $thresholdDaysAgo = Carbon::now()->subDays(
+            config('wbstack.wiki_empty_notification_threshold')
+        )->toDateTimeString();
+
         Notification::fake();
         $user = User::factory()->create(['verified' => true]);
-        $wiki = Wiki::factory()->create(['created_at' => '2022-12-31 16:00:00']);
+        $wiki = Wiki::factory()->create(['created_at' => $thresholdDaysAgo]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => null]);
 
-        $job = new SendEmptyWikibaseNotificationsJob();
+        $job = new SendEmptyWikiNotificationsJob();
         $job->handle();
 
         Notification::assertSentTo(
             $user->select('email')->get(),
-            EmptyWikibaseNotification::class
+            EmptyWikiNotification::class
         );
     }
 
     // non-empty wikis which are older than 30 days do not trigger notifications
-    public function testEmptyWikibaseNotifications_ActiveWiki()
+    public function testEmptyWikiNotifications_ActiveWiki()
     {
+        $doubleThresholdDaysAgo = Carbon::now()->subDays(
+            config('wbstack.wiki_empty_notification_threshold') * 2
+        )->toDateTimeString();
+
+        $now = Carbon::now()->toDateTimeString();
+
         Notification::fake();
         $user = User::factory()->create(['verified' => true]);
-        $wiki = Wiki::factory()->create(['created_at' => '2022-12-31 16:00:00']);
+        $wiki = Wiki::factory()->create(['created_at' => $doubleThresholdDaysAgo]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
-        WikiLifecycleEvents::factory()->create(['wiki_id' => $wiki->id, 'first_edited' => '2023-01-01 16:00:00']);
+        WikiLifecycleEvents::factory()->create([
+            'wiki_id' => $wiki->id,
+            'first_edited' => $now
+        ]);
 
-        $job = new SendEmptyWikibaseNotificationsJob();
+        $job = new SendEmptyWikiNotificationsJob();
         $job->handle();
 
         Notification::assertNothingSent();
     }
 
     // notifications do not get sent again
-    public function testEmptyWikibaseNotifications_EmptyNotificationReceived()
+    public function testEmptyWikiNotifications_EmptyNotificationReceived()
     {
         Notification::fake();
         $user = User::factory()->create(['verified' => true]);
         $wiki = Wiki::factory()->create(['created_at' => '2022-12-31 16:00:00']);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
-        WikibaseNotificationSentRecord::factory()->create(['wiki_id' => $wiki->id, 'notification_type' => EmptyWikibaseNotification::class]);
+        WikiNotificationSentRecord::factory()->create(['wiki_id' => $wiki->id, 'notification_type' => EmptyWikiNotification::TYPE]);
 
-        $job = new SendEmptyWikibaseNotificationsJob();
+        $job = new SendEmptyWikiNotificationsJob();
         $job->handle();
 
         Notification::assertNothingSent();

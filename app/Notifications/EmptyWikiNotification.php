@@ -13,8 +13,10 @@ use Illuminate\Support\HtmlString;
  * Notification to be sent to empty Wikibase owner if the wiki stay empty longer than 30 days
  */
 
-class EmptyWikibaseNotification extends Notification
+class EmptyWikiNotification extends Notification
 {
+    const TYPE = 'empty_wiki_notification';
+
     private string $sitename;
 
     /**
