@@ -13,7 +13,6 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
-use function Amp\Promise\first;
 use Carbon\Carbon;
 
 class SendEmptyWikiNotificationsJobTest extends TestCase
