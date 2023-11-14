@@ -57,15 +57,15 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
     // non-empty wikis which are older than 30 days do not trigger notifications
     public function testEmptyWikiNotifications_ActiveWiki()
     {
-        $doubleThresholdDaysAgo = Carbon::now()->subDays(
-            config('wbstack.wiki_empty_notification_threshold') * 2
+        $thresholdDaysAgo = Carbon::now()->subDays(
+            config('wbstack.wiki_empty_notification_threshold')
         )->toDateTimeString();
 
         $now = Carbon::now()->toDateTimeString();
 
         Notification::fake();
         $user = User::factory()->create(['verified' => true]);
-        $wiki = Wiki::factory()->create(['created_at' => $doubleThresholdDaysAgo]);
+        $wiki = Wiki::factory()->create(['created_at' => $thresholdDaysAgo]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         WikiLifecycleEvents::factory()->create([

@@ -20,6 +20,7 @@ class CreateWikiNotificationSentRecordsTable extends Migration
             $table->timestamps();
 
             $table->integer('wiki_id')->unsigned();
+            // $table->integer('user_id')->unsigned();
 
             $table->string('notification_type');
         });
