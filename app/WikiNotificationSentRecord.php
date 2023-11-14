@@ -11,6 +11,7 @@ class WikiNotificationSentRecord extends Model
 
     const FIELDS = [
         'notification_type',
+        'user_id'
     ];
 
     protected $fillable = self::FIELDS;
