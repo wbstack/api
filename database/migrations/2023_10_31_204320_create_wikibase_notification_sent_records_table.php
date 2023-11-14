@@ -14,12 +14,14 @@ class CreateWikibaseNotificationSentRecordsTable extends Migration
     public function up()
     {
         Schema::create('wikibase_notification_sent_records', function (Blueprint $table) {
+            $table->foreign('wiki_id')->references('id')->on('wikis');
+
             $table->id();
             $table->timestamps();
 
             $table->integer('wiki_id')->unsigned();
 
-            $table->string('notification_type') -> nullable();
+            $table->string('notification_type');
         });
     }
 
