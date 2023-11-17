@@ -11,6 +11,7 @@ use App\Jobs\RequeuePendingQsBatchesJob;
 use App\Jobs\SandboxCleanupJob;
 use App\Jobs\PollForMediaWikiJobsJob;
 use App\Jobs\UpdateWikiSiteStatsJob;
+use App\Jobs\SendEmptyWikiNotificationsJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -48,6 +49,8 @@ class Kernel extends ConsoleKernel
         $schedule->job(new PollForMediaWikiJobsJob)->everyFifteenMinutes();
 
         $schedule->job(new UpdateWikiSiteStatsJob)->dailyAt('19:00');
+
+        $schedule->job(new SendEmptyWikiNotificationsJob)->dailyAt('21:00');
     }
 
     /**

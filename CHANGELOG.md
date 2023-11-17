@@ -1,5 +1,8 @@
 # api
 
+## 8x.27.0 - 14 November 2023
+- Add daily execution of empty wiki notifications (T344689)
+
 ## 8x.26.0 - 13 November 2023
 - Introduce pending state for QueryService Batches
 

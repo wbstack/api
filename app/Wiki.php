@@ -97,6 +97,11 @@ class Wiki extends Model
         return $this->hasOne(WikiLifecycleEvents::class);
     }
 
+    public function wikiNotificationSentRecords(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(WikiNotificationSentRecord::class);
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      *
