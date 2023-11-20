@@ -104,7 +104,7 @@ class CreateQueryserviceBatchesTest extends TestCase
         $job = new CreateQueryserviceBatchesJob();
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
-            ->method('fail');
+        ->method('fail');
         $job->handle();
 
         // This wiki should have created an entirely new batch
@@ -122,5 +122,29 @@ class CreateQueryserviceBatchesTest extends TestCase
         $this->assertEquals($existingBatches->values()->get(2)->entityIds, 'P11,P12,P13,P14,P15,P16,P17,P18,P19,P20');
         // The batch that has been updated is pushed to the bottom as it's being recreated with a new id
         $this->assertEquals($existingBatches->values()->get(3)->entityIds, 'Q11,Q12');
+    }
+
+    function testBackpressure(): void {
+        Wiki::factory()->create(['id' => 99, 'domain' => 'test.wikibase.cloud']);
+        EventPageUpdate::factory()->create(['id' => 124, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q1']);
+        EventPageUpdate::factory()->create(['id' => 125, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q2']);
+        EventPageUpdate::factory()->create(['id' => 126, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q3']);
+        EventPageUpdate::factory()->create(['id' => 127, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q4']);
+        EventPageUpdate::factory()->create(['id' => 128, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q5']);
+        EventPageUpdate::factory()->create(['id' => 129, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q6']);
+        EventPageUpdate::factory()->create(['id' => 130, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q7']);
+        EventPageUpdate::factory()->create(['id' => 131, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q8']);
+        EventPageUpdate::factory()->create(['id' => 132, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q9']);
+        EventPageUpdate::factory()->create(['id' => 133, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q11']);
+        EventPageUpdate::factory()->create(['id' => 134, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q12']);
+
+        $mockJob = $this->createMock(Job::class);
+        $job = new CreateQueryserviceBatchesJob();
+        $job->setJob($mockJob);
+        $mockJob->expects($this->never())
+        ->method('fail');
+        $job->handle();
+
+        $this->assertEquals(2, QsBatch::query()->count());
     }
 }

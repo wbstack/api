@@ -52,7 +52,9 @@ class CreateQueryserviceBatchesJob extends Job
             }
 
             $notDoneBatches = QsBatch::where([
-                ['done', '=', 0], ['pending_since', '=', null], ['failed', '=', false]
+                ['done', '=', 0],
+                ['pending_since', '=', null],
+                ['failed', '=', false],
             ])->get();
 
             // Insert the newly created batches into the table...
@@ -71,15 +73,18 @@ class CreateQueryserviceBatchesJob extends Job
                     }
                 }
 
-                // Insert the new batch
-                QsBatch::create([
-                    'done' => 0,
-                    'eventFrom' => $batchesUpToEventId,
-                    'eventTo'=> $lastEventId,
-                    'wiki_id' => $wikiId,
-                    'entityIds' => implode(',', array_unique($entityBatch)),
-                    'pending_since' => null,
-                ]);
+                $chunks = array_chunk(array_unique($entityBatch), $this->entityLimit);
+                foreach ($chunks as $chunk) {
+                    // Insert the new batch
+                    QsBatch::create([
+                        'done' => 0,
+                        'eventFrom' => $batchesUpToEventId,
+                        'eventTo'=> $lastEventId,
+                        'wiki_id' => $wikiId,
+                        'entityIds' => implode(',', $chunk),
+                        'pending_since' => null,
+                    ]);
+                }
             }
         });
     }
