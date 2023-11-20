@@ -37,6 +37,8 @@ class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique
         $now = CarbonImmutable::now();
         $emptyWikiDays = $createdAt->diffInDays($now);
 
+        dd($wiki->wikiLifecycleEvents);
+
         $firstEdited = $wiki->wikiLifecycleEvents->first_edited;
 
         $emptyWikiNotificationCount = WikiNotificationSentRecord::where([
