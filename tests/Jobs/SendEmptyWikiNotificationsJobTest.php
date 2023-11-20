@@ -19,6 +19,17 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function setUp(): void {
+        // Other tests leave dangling wikis around so we need to clean them up
+        parent::setUp();
+        Wiki::query()->delete();
+    }
+
+    public function tearDown(): void {
+        Wiki::query()->delete();
+        parent::tearDown();
+    }
+
     // the job does not fail in general
     public function testEmptyWikiNotifications_Success()
     {
