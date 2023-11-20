@@ -23,8 +23,8 @@ class CreateQueryserviceBatchesJob extends Job
     public function handle(): void
     {
         DB::transaction(function () {
-            // Get ID of the latest batch that we have created (or 0)
-            $maxIdBatch = QsBatch::orderBy('id', 'desc')->first();
+            // Get the latest batch that we have created (or 0)
+            $maxIdBatch = QsBatch::orderBy('eventTo', 'desc')->first();
             if ($maxIdBatch) {
                 $batchesUpToEventId = $maxIdBatch->eventTo;
             } else {
@@ -58,22 +58,30 @@ class CreateQueryserviceBatchesJob extends Job
             ])->get();
 
             // Insert the newly created batches into the table...
-            foreach ($wikiBatchesEntities as $wikiId => $entityBatch) {
+            foreach ($wikiBatchesEntities as $wikiId => $entityIdsFromEvents) {
                 // If we already have a not done batch for this same wiki, then merge that into a new batch
                 foreach ($notDoneBatches as $qsBatch) {
-                    if ($qsBatch->wiki_id == $wikiId) {
-                        $entitiesOnBatch = explode(',', $qsBatch->entityIds);
-                        if (count($entitiesOnBatch) >= $this->entityLimit) {
-                            continue;
-                        }
-                        $entityBatch = array_merge($entityBatch, $entitiesOnBatch);
-                        // Delete the old batch
-                        $qsBatch->delete();
-                        break;
+                    if ($qsBatch->wiki_id !== $wikiId) {
+                        continue;
                     }
+
+                    $entitiesOnBatch = explode(',', $qsBatch->entityIds);
+                    $tentativeMerge = array_unique(array_merge($entityIdsFromEvents, $entitiesOnBatch));
+                    if (count($tentativeMerge) >= $this->entityLimit) {
+                        continue;
+                    }
+
+                    $qsBatch->update([
+                        'entityIds' => implode(',', $tentativeMerge),
+                        'eventFrom' => $batchesUpToEventId,
+                        'eventTo'=> $lastEventId,
+                    ]);
+                    // after updating, we need to skip the creation below
+                    // so we continue the outer loop instead
+                    continue 2;
                 }
 
-                $chunks = array_chunk(array_unique($entityBatch), $this->entityLimit);
+                $chunks = array_chunk($entityIdsFromEvents, $this->entityLimit);
                 foreach ($chunks as $chunk) {
                     // Insert the new batch
                     QsBatch::create([
