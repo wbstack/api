@@ -28,6 +28,7 @@ class CreateQueryserviceBatchesJob extends Job
             // Get events after the point that batch was created
             // TODO maybe filter by NS here?
             $events = EventPageUpdate::where('id', '>', $batchesUpToEventId)->get();
+
             $wikiBatchesEntities = [];
             $lastEventId = 0;
             foreach ($events as $event) {
@@ -43,13 +44,12 @@ class CreateQueryserviceBatchesJob extends Job
                 }
             }
 
-            /** @var Collection $newlyCreatedBatches */
             $notDoneBatches = QsBatch::where([
                 ['done', '=', 0], ['pending_since', '=', null], ['failed', '=', false]
-            ]);
-            // Inset the newly created batches into the table...
-            foreach ($wikiBatchesEntities as $wikiId => $entityBatch) {
+            ])->get();
 
+            // Insert the newly created batches into the table...
+            foreach ($wikiBatchesEntities as $wikiId => $entityBatch) {
                 // If we already have a not done batch for this same wiki, then merge that into a new batch
                 foreach ($notDoneBatches as $qsBatch) {
                     if ($qsBatch->wiki_id == $wikiId) {
