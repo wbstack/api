@@ -19,19 +19,6 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function setUp(): void {
-        // Other tests leave dangling wikis around so we need to clean them up
-        parent::setUp();
-        Wiki::query()->delete();
-        WikiLifecycleEvents::query()->delete();
-    }
-
-    public function tearDown(): void {
-        WikiLifecycleEvents::query()->delete();
-        Wiki::query()->delete();
-        parent::tearDown();
-    }
-
     // the job does not fail in general
     public function testEmptyWikiNotifications_Success()
     {
@@ -66,7 +53,6 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
         );
     }
 
-
     // fresh wiki that does not have lifecycle event records yet
     public function testEmptyWikiNotifications_FreshWiki()
     {
@@ -78,6 +64,13 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $job = new SendEmptyWikiNotificationsJob();
+
+        $mockJob = $this->createMock(Job::class);
+        $mockJob->expects($this->never())
+                ->method('fail')
+                ->withAnyParameters();
+
+        $job->setJob($mockJob);
         $job->handle();
 
         Notification::assertNothingSent();
