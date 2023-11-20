@@ -23,9 +23,11 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
         // Other tests leave dangling wikis around so we need to clean them up
         parent::setUp();
         Wiki::query()->delete();
+        WikiLifecycleEvents::query()->delete();
     }
 
     public function tearDown(): void {
+        WikiLifecycleEvents::query()->delete();
         Wiki::query()->delete();
         parent::tearDown();
     }
