@@ -1,5 +1,8 @@
 # api
 
+## 8x.27.1 - 20 November 2023
+- Hotfix for functionality added in 8x.27.0 (#686)
+
 ## 8x.27.0 - 14 November 2023
 - Add daily execution of empty wiki notifications (T344689)
 
