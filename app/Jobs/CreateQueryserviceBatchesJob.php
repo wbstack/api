@@ -4,14 +4,21 @@ namespace App\Jobs;
 
 use App\EventPageUpdate;
 use App\QsBatch;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 
 class CreateQueryserviceBatchesJob extends Job
 {
     private const NAMESPACE_ITEM = 120;
     private const NAMESPACE_PROPERTY = 122;
     private const NAMESPACE_LEXEME = 146;
+
+    private int $entityLimit;
+
+    public function __construct()
+    {
+        $this->entityLimit = Config::get('wbstack.qs_batch_entity_limit');
+    }
 
     public function handle(): void
     {
@@ -53,9 +60,14 @@ class CreateQueryserviceBatchesJob extends Job
                 // If we already have a not done batch for this same wiki, then merge that into a new batch
                 foreach ($notDoneBatches as $qsBatch) {
                     if ($qsBatch->wiki_id == $wikiId) {
-                        $entityBatch = array_merge($entityBatch, explode(',', $qsBatch->entityIds));
+                        $entitiesOnBatch = explode(',', $qsBatch->entityIds);
+                        if (count($entitiesOnBatch) >= $this->entityLimit) {
+                            continue;
+                        }
+                        $entityBatch = array_merge($entityBatch, $entitiesOnBatch);
                         // Delete the old batch
                         $qsBatch->delete();
+                        break;
                     }
                 }
 
