@@ -100,10 +100,10 @@ class CreateQueryserviceBatchesTest extends TestCase
             ->method('fail');
         $job->handle();
 
-        $existingBatch = QsBatch::where(['wiki_id' => 88])->first();
+        $existingBatches = QsBatch::where(['wiki_id' => 88])->get();
 
-        $this->assertNotNull($existingBatch);
-        $this->assertEquals($existingBatch->entityIds, 'Q11,Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,Q9,Q10');
-        $this->assertEquals(1, QsBatch::query()->count());
+        $this->assertEquals($existingBatches->count(), 2);
+        $this->assertEquals($existingBatches->values()->get(0)->entityIds, 'Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,Q9,Q10');
+        $this->assertEquals($existingBatches->values()->get(1)->entityIds, 'Q11');
     }
 }
