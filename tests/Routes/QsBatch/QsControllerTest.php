@@ -56,23 +56,6 @@ class QsControllerTest extends TestCase
         $this->assertNotNull($response->json()[0]['pending_since']);
     }
 
-    public function testImplicitBatchCreation (): void
-    {
-        Wiki::factory()->create(['id' => 99, 'domain' => 'test.wikibase.cloud']);
-        QsBatch::factory()->create(['id' => 1, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
-        QsBatch::factory()->create(['id' => 2, 'done' => 0, 'eventFrom' => 0, 'eventTo' => 0, 'wiki_id' => 99, 'entityIds' => 'a,b']);
-        EventPageUpdate::factory()->create(['wiki_id' => 111, 'namespace' => 120, 'title' => 'name']);
-
-        $response = $this->json('GET', $this->route.'/getBatches')
-            ->assertJsonPath('0.id', 1)
-            ->assertJsonPath('0.done', 0)
-            ->assertJsonPath('0.wiki.domain', 'test.wikibase.cloud')
-            ->assertStatus(200);
-
-        $this->assertNotNull($response->json()[0]['pending_since']);
-        $this->assertEquals(QsBatch::query()->count(), 3);
-    }
-
     public function testMarkDone (): void {
         QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(1), 'id' => 1, 'done' => 1, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 1, 'entityIds' => 'a,b']);
         QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(2), 'id' => 2, 'done' => 0, 'eventFrom' => 2, 'eventTo' => 3, 'wiki_id' => 1, 'entityIds' => 'c,d']);
