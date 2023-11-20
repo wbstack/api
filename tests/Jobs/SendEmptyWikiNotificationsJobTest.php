@@ -53,6 +53,29 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
         );
     }
 
+    // fresh wiki that does not have lifecycle event records yet
+    public function testEmptyWikiNotifications_FreshWiki()
+    {
+        $now = Carbon::now()->toDateTimeString();
+
+        Notification::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $wiki = Wiki::factory()->create(['created_at' => $now]);
+        $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+
+        $job = new SendEmptyWikiNotificationsJob();
+
+        $mockJob = $this->createMock(Job::class);
+        $mockJob->expects($this->never())
+                ->method('fail')
+                ->withAnyParameters();
+
+        $job->setJob($mockJob);
+        $job->handle();
+
+        Notification::assertNothingSent();
+    }
+
     // non-empty wikis which are older than 30 days do not trigger notifications
     public function testEmptyWikiNotifications_ActiveWiki()
     {
