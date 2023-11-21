@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\EventPageUpdate;
 use App\QsBatch;
+use App\QsCheckpoint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
@@ -23,21 +24,16 @@ class CreateQueryserviceBatchesJob extends Job
     public function handle(): void
     {
         DB::transaction(function () {
-            // Get the latest batch that we have created (or 0)
-            $maxIdBatch = QsBatch::orderBy('eventTo', 'desc')->first();
-            if ($maxIdBatch) {
-                $batchesUpToEventId = $maxIdBatch->eventTo;
-            } else {
-                // If there are no batches then things just hav not really started yet
-                $batchesUpToEventId = 0;
-            }
+            $lastCheckpoint = QsCheckpoint::get();
 
             // Get events after the point that batch was created
             // TODO maybe filter by NS here?
-            $events = EventPageUpdate::where('id', '>', $batchesUpToEventId)->get();
+            $events = EventPageUpdate::where(
+                'id', '>', $lastCheckpoint
+            )->get();
 
             $wikiBatchesEntities = [];
-            $lastEventId = 0;
+            $latestEventId = $lastCheckpoint;
             foreach ($events as $event) {
                 if (
                     $event->namespace == self::NAMESPACE_ITEM ||
@@ -46,8 +42,8 @@ class CreateQueryserviceBatchesJob extends Job
                 ) {
                     $wikiBatchesEntities[$event->wiki_id][] = $event->title;
                 }
-                if ($event->id > $lastEventId) {
-                    $lastEventId = $event->id;
+                if ($event->id > $latestEventId) {
+                    $latestEventId = $event->id;
                 }
             }
 
@@ -73,8 +69,8 @@ class CreateQueryserviceBatchesJob extends Job
 
                     $qsBatch->update([
                         'entityIds' => implode(',', $tentativeMerge),
-                        'eventFrom' => $batchesUpToEventId,
-                        'eventTo'=> $lastEventId,
+                        'eventFrom' => $lastCheckpoint,
+                        'eventTo'=> $latestEventId,
                     ]);
                     // after updating, we need to skip the creation below
                     // so we continue the outer loop instead
@@ -86,14 +82,16 @@ class CreateQueryserviceBatchesJob extends Job
                     // Insert the new batch
                     QsBatch::create([
                         'done' => 0,
-                        'eventFrom' => $batchesUpToEventId,
-                        'eventTo'=> $lastEventId,
+                        'eventFrom' => $lastCheckpoint,
+                        'eventTo'=> $latestEventId,
                         'wiki_id' => $wikiId,
                         'entityIds' => implode(',', $chunk),
                         'pending_since' => null,
                     ]);
                 }
             }
+
+            QsCheckpoint::set($latestEventId);
         });
     }
 }
