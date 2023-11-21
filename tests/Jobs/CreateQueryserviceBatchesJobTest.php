@@ -55,8 +55,8 @@ class CreateQueryserviceBatchesTest extends TestCase
         Wiki::factory()->create(['id' => 88, 'domain' => 'test1.wikibase.cloud']);
         Wiki::factory()->create(['id' => 99, 'domain' => 'test2.wikibase.cloud']);
         Wiki::factory()->create(['id' => 111, 'domain' => 'test3.wikibase.cloud']);
-        QsBatch::factory()->create(['id' => 1, 'done' => 0, 'eventFrom' => 0, 'eventTo' => 2, 'wiki_id' => 88, 'entityIds' => 'Q23,P1']);
-        QsBatch::factory()->create(['id' => 2, 'done' => 0, 'eventFrom' => 0, 'eventTo' => 0, 'wiki_id' => 99, 'entityIds' => 'Q99,Q100']);
+        QsBatch::factory()->create(['id' => 1, 'done' => 0, 'wiki_id' => 88, 'entityIds' => 'Q23,P1']);
+        QsBatch::factory()->create(['id' => 2, 'done' => 0, 'wiki_id' => 99, 'entityIds' => 'Q99,Q100']);
         QsCheckpoint::set(2);
         EventPageUpdate::factory()->create(['id' => 1, 'wiki_id' => 111, 'namespace' => 120, 'title' => 'Q21']);
         EventPageUpdate::factory()->create(['id' => 3, 'wiki_id' => 111, 'namespace' => 120, 'title' => 'Q12']);
@@ -79,8 +79,8 @@ class CreateQueryserviceBatchesTest extends TestCase
         Wiki::factory()->create(['id' => 88, 'domain' => 'test1.wikibase.cloud']);
         Wiki::factory()->create(['id' => 99, 'domain' => 'test2.wikibase.cloud']);
         Wiki::factory()->create(['id' => 111, 'domain' => 'test3.wikibase.cloud']);
-        QsBatch::factory()->create(['id' => 1, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 88, 'entityIds' => 'Q23,P1']);
-        QsBatch::factory()->create(['id' => 2, 'done' => 0, 'eventFrom' => 0, 'eventTo' => 0, 'wiki_id' => 99, 'entityIds' => 'Q99,Q100']);
+        QsBatch::factory()->create(['id' => 1, 'done' => 0, 'wiki_id' => 88, 'entityIds' => 'Q23,P1']);
+        QsBatch::factory()->create(['id' => 2, 'done' => 0, 'wiki_id' => 99, 'entityIds' => 'Q99,Q100']);
         EventPageUpdate::factory()->create(['id' => 123, 'wiki_id' => 111, 'namespace' => 120, 'title' => 'Q12']);
         EventPageUpdate::factory()->create(['id' => 234, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q34']);
 
@@ -101,14 +101,14 @@ class CreateQueryserviceBatchesTest extends TestCase
     function testBigBatches(): void
     {
         Wiki::factory()->create(['id' => 88, 'domain' => 'test1.wikibase.cloud']);
-        QsBatch::factory()->create(['id' => 1, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 88, 'entityIds' => 'Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,Q9,Q10']);
+        QsBatch::factory()->create(['id' => 1, 'done' => 0, 'wiki_id' => 88, 'entityIds' => 'Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,Q9,Q10']);
         EventPageUpdate::factory()->create(['id' => 123, 'wiki_id' => 88, 'namespace' => 120, 'title' => 'Q11']);
 
         Wiki::factory()->create(['id' => 99, 'domain' => 'test2.wikibase.cloud']);
-        QsBatch::factory()->create(['id' => 2, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,Q9,Q10']);
-        QsBatch::factory()->create(['id' => 3, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'P1,P2,P3,P4,P5,P6,P7,P8,P9,P10']);
-        QsBatch::factory()->create(['id' => 4, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'Q12']);
-        QsBatch::factory()->create(['id' => 5, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'P11,P12,P13,P14,P15,P16,P17,P18,P19,P20']);
+        QsBatch::factory()->create(['id' => 2, 'done' => 0, 'wiki_id' => 99, 'entityIds' => 'Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,Q9,Q10']);
+        QsBatch::factory()->create(['id' => 3, 'done' => 0, 'wiki_id' => 99, 'entityIds' => 'P1,P2,P3,P4,P5,P6,P7,P8,P9,P10']);
+        QsBatch::factory()->create(['id' => 4, 'done' => 0, 'wiki_id' => 99, 'entityIds' => 'Q12']);
+        QsBatch::factory()->create(['id' => 5, 'done' => 0, 'wiki_id' => 99, 'entityIds' => 'P11,P12,P13,P14,P15,P16,P17,P18,P19,P20']);
         EventPageUpdate::factory()->create(['id' => 124, 'wiki_id' => 99, 'namespace' => 120, 'title' => 'Q11']);
 
         $mockJob = $this->createMock(Job::class);

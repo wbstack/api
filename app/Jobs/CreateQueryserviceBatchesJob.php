@@ -69,8 +69,6 @@ class CreateQueryserviceBatchesJob extends Job
 
                     $qsBatch->update([
                         'entityIds' => implode(',', $tentativeMerge),
-                        'eventFrom' => $lastCheckpoint,
-                        'eventTo'=> $latestEventId,
                     ]);
                     // after updating, we need to skip the creation below
                     // so we continue the outer loop instead
@@ -82,8 +80,6 @@ class CreateQueryserviceBatchesJob extends Job
                     // Insert the new batch
                     QsBatch::create([
                         'done' => 0,
-                        'eventFrom' => $lastCheckpoint,
-                        'eventTo'=> $latestEventId,
                         'wiki_id' => $wikiId,
                         'entityIds' => implode(',', $chunk),
                         'pending_since' => null,

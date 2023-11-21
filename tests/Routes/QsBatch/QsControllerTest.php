@@ -41,11 +41,11 @@ class QsControllerTest extends TestCase
     public function testGetOldestBatch (): void
     {
         Wiki::factory()->create(['id' => 99, 'domain' => 'test.wikibase.cloud']);
-        QsBatch::factory()->create(['id' => 1, 'done' => 0, 'failed' => true, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
-        QsBatch::factory()->create(['id' => 2, 'done' => 1, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
-        QsBatch::factory()->create(['pending_since' => Carbon::now()->subMinutes(4), 'id' => 3, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
-        QsBatch::factory()->create(['id' => 4, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
-        QsBatch::factory()->create(['id' => 5, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 99, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['id' => 1, 'done' => 0, 'failed' => true, 'wiki_id' => 99, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['id' => 2, 'done' => 1, 'wiki_id' => 99, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['pending_since' => Carbon::now()->subMinutes(4), 'id' => 3, 'done' => 0, 'wiki_id' => 99, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['id' => 4, 'done' => 0, 'wiki_id' => 99, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['id' => 5, 'done' => 0, 'wiki_id' => 99, 'entityIds' => 'a,b']);
 
         $response = $this->json('GET', $this->route.'/getBatches')
             ->assertJsonPath('0.id', 4)
@@ -57,10 +57,10 @@ class QsControllerTest extends TestCase
     }
 
     public function testMarkDone (): void {
-        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(1), 'id' => 1, 'done' => 1, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 1, 'entityIds' => 'a,b']);
-        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(2), 'id' => 2, 'done' => 0, 'eventFrom' => 2, 'eventTo' => 3, 'wiki_id' => 1, 'entityIds' => 'c,d']);
-        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(3), 'id' => 3, 'done' => 0, 'eventFrom' => 3, 'eventTo' => 4, 'wiki_id' => 1, 'entityIds' => 'e,f']);
-        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(4), 'id' => 4, 'done' => 0, 'eventFrom' => 4, 'eventTo' => 5, 'wiki_id' => 6, 'entityIds' => 'g,h']);
+        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(1), 'id' => 1, 'done' => 1, 'wiki_id' => 1, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(2), 'id' => 2, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'c,d']);
+        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(3), 'id' => 3, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'e,f']);
+        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(4), 'id' => 4, 'done' => 0, 'wiki_id' => 6, 'entityIds' => 'g,h']);
 
         $this->json('POST', $this->route.'/markDone', ['batches' => [2, 3]])
             ->assertStatus(200);
@@ -75,10 +75,10 @@ class QsControllerTest extends TestCase
         $this->assertNotNull(QsBatch::where('id', 4)->first()->pending_since);
     }
     public function testMarkNotDone (): void {
-        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(1), 'id' => 1, 'done' => 1, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 1, 'entityIds' => 'a,b']);
-        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(2), 'id' => 2, 'done' => 0, 'eventFrom' => 2, 'eventTo' => 3, 'wiki_id' => 1, 'entityIds' => 'c,d']);
-        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(3), 'id' => 3, 'done' => 0, 'eventFrom' => 3, 'eventTo' => 4, 'wiki_id' => 1, 'entityIds' => 'e,f']);
-        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(4), 'id' => 4, 'done' => 1, 'eventFrom' => 4, 'eventTo' => 5, 'wiki_id' => 6, 'entityIds' => 'g,h']);
+        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(1), 'id' => 1, 'done' => 1, 'wiki_id' => 1, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(2), 'id' => 2, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'c,d']);
+        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(3), 'id' => 3, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'e,f']);
+        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(4), 'id' => 4, 'done' => 1, 'wiki_id' => 6, 'entityIds' => 'g,h']);
 
         $this->json('POST', $this->route.'/markNotDone', ['batches' => [1, 2]])
             ->assertStatus(200);

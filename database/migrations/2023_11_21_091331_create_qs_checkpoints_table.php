@@ -22,6 +22,11 @@ class CreateQsCheckpointsTable extends Migration
             $table->timestamps();
         });
 
+        Schema::table('qs_batches', function (Blueprint $table) {
+            $table->dropColumn('eventFrom');
+            $table->dropColumn('eventTo');
+        });
+
         QsCheckpoint::init();
     }
 
@@ -33,5 +38,10 @@ class CreateQsCheckpointsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('qs_checkpoints');
+
+        Schema::table('qs_batches', function (Blueprint $table) {
+            $table->integer('eventFrom')->default(0);
+            $table->integer('eventTo')->default(0);
+        });
     }
 }
