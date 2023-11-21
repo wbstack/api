@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\EventPageUpdate;
 use App\QsBatch;
 use App\QsCheckpoint;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
@@ -32,7 +33,7 @@ class CreateQueryserviceBatchesJob extends Job
                 'id', '>', $lastCheckpoint
             )->get();
 
-            $wikiBatchesEntities = [];
+            $newEntitiesFromEvents = [];
             $latestEventId = $lastCheckpoint;
             foreach ($events as $event) {
                 if (
@@ -40,54 +41,63 @@ class CreateQueryserviceBatchesJob extends Job
                     $event->namespace == self::NAMESPACE_PROPERTY ||
                     $event->namespace == self::NAMESPACE_LEXEME
                 ) {
-                    $wikiBatchesEntities[$event->wiki_id][] = $event->title;
+                    $newEntitiesFromEvents[$event->wiki_id][] = $event->title;
                 }
                 if ($event->id > $latestEventId) {
                     $latestEventId = $event->id;
                 }
             }
 
-            $notDoneBatches = QsBatch::where([
-                ['done', '=', 0],
-                ['pending_since', '=', null],
-                ['failed', '=', false],
-            ])->get();
-
-            // Insert the newly created batches into the table...
-            foreach ($wikiBatchesEntities as $wikiId => $entityIdsFromEvents) {
-                // If we already have a not done batch for this same wiki, then merge that into a new batch
-                foreach ($notDoneBatches as $qsBatch) {
-                    if ($qsBatch->wiki_id !== $wikiId) {
-                        continue;
-                    }
-
-                    $entitiesOnBatch = explode(',', $qsBatch->entityIds);
-                    $tentativeMerge = array_unique(array_merge($entityIdsFromEvents, $entitiesOnBatch));
-                    if (count($tentativeMerge) > $this->entityLimit) {
-                        continue;
-                    }
-
-                    $qsBatch->update([
-                        'entityIds' => implode(',', $tentativeMerge),
-                    ]);
-                    // after updating, we need to skip the creation below
-                    // so we continue the outer loop instead
-                    continue 2;
+            foreach ($newEntitiesFromEvents as $wikiId => $entityIdsFromEvents) {
+                $ok = $this->tryToAppendEntitesToExistingBatches($entityIdsFromEvents, $wikiId);
+                if ($ok) {
+                    continue;
                 }
-
-                $chunks = array_chunk($entityIdsFromEvents, $this->entityLimit);
-                foreach ($chunks as $chunk) {
-                    // Insert the new batch
-                    QsBatch::create([
-                        'done' => 0,
-                        'wiki_id' => $wikiId,
-                        'entityIds' => implode(',', $chunk),
-                        'pending_since' => null,
-                    ]);
-                }
+                $this->createNewBatches($entityIdsFromEvents, $wikiId);
             }
 
             QsCheckpoint::set($latestEventId);
         });
+    }
+
+    private function tryToAppendEntitesToExistingBatches(array $entityIdsFromEvents, int $wikiId): bool
+    {
+        $notDoneBatches = QsBatch::where([
+            ['done', '=', 0],
+            ['pending_since', '=', null],
+            ['failed', '=', false],
+            ['wiki_id', '=', $wikiId],
+        ])->get();
+
+        foreach ($notDoneBatches as $qsBatch) {
+            if ($qsBatch->wiki_id !== $wikiId) {
+                continue;
+            }
+
+            $entitiesOnBatch = explode(',', $qsBatch->entityIds);
+            $tentativeMerge = array_unique(array_merge($entityIdsFromEvents, $entitiesOnBatch));
+            if (count($tentativeMerge) > $this->entityLimit) {
+                continue;
+            }
+
+            $qsBatch->update([
+                'entityIds' => implode(',', $tentativeMerge),
+            ]);
+            return true;
+        }
+        return false;
+    }
+
+    private function createNewBatches(array $entityIdsFromEvents, int $wikiId): void
+    {
+        $chunks = array_chunk($entityIdsFromEvents, $this->entityLimit);
+        foreach ($chunks as $chunk) {
+            QsBatch::create([
+                'done' => 0,
+                'wiki_id' => $wikiId,
+                'entityIds' => implode(',', $chunk),
+                'pending_since' => null,
+            ]);
+        }
     }
 }
