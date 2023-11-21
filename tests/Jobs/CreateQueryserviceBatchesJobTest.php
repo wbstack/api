@@ -60,6 +60,7 @@ class CreateQueryserviceBatchesTest extends TestCase
         QsCheckpoint::set(2);
         EventPageUpdate::factory()->create(['id' => 1, 'wiki_id' => 111, 'namespace' => 120, 'title' => 'Q21']);
         EventPageUpdate::factory()->create(['id' => 3, 'wiki_id' => 111, 'namespace' => 120, 'title' => 'Q12']);
+        EventPageUpdate::factory()->create(['id' => 4, 'wiki_id' => 111, 'namespace' => 999, 'title' => 'Q999']);
 
         $mockJob = $this->createMock(Job::class);
         $job = new CreateQueryserviceBatchesJob();

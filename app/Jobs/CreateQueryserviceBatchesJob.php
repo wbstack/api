@@ -44,7 +44,9 @@ class CreateQueryserviceBatchesJob extends Job
     {
         $next = EventPageUpdate::where(
             'id', '>', $lastCheckpoint,
-        )->max('id');
+        )
+            ->whereIn('namespace', [self::NAMESPACE_ITEM, self::NAMESPACE_PROPERTY, self::NAMESPACE_LEXEME])
+            ->max('id');
 
         return $next ? $next : $lastCheckpoint;
     }
@@ -54,17 +56,13 @@ class CreateQueryserviceBatchesJob extends Job
         $newEntitiesFromEvents = [];
 
         $events = EventPageUpdate::where(
-            'id', '>', $lastCheckpoint
-        )->get();
+            'id', '>', $lastCheckpoint,
+        )
+            ->whereIn('namespace', [self::NAMESPACE_ITEM, self::NAMESPACE_PROPERTY, self::NAMESPACE_LEXEME])
+            ->get();
 
         foreach ($events as $event) {
-            if (
-                $event->namespace == self::NAMESPACE_ITEM ||
-                $event->namespace == self::NAMESPACE_PROPERTY ||
-                $event->namespace == self::NAMESPACE_LEXEME
-            ) {
-                $newEntitiesFromEvents[$event->wiki_id][] = $event->title;
-            }
+            $newEntitiesFromEvents[$event->wiki_id][] = $event->title;
         }
 
         return $newEntitiesFromEvents;
