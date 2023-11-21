@@ -67,7 +67,7 @@ class CreateQueryserviceBatchesJob extends Job
 
                     $entitiesOnBatch = explode(',', $qsBatch->entityIds);
                     $tentativeMerge = array_unique(array_merge($entityIdsFromEvents, $entitiesOnBatch));
-                    if (count($tentativeMerge) >= $this->entityLimit) {
+                    if (count($tentativeMerge) > $this->entityLimit) {
                         continue;
                     }
 
