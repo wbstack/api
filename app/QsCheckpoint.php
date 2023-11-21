@@ -2,14 +2,11 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class QsCheckpoint extends Model
 {
-    use HasFactory;
-
     public const CHECKPOINT_ID = 0;
 
     const FIELDS = [
