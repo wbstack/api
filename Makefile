@@ -3,7 +3,7 @@
 
 # Example: make test FILTER=tests/Jobs/ElasticSearchIndexInitTest.php
 test:
-	docker compose exec api bash -c 'LOG_CHANNEL=stderr vendor/bin/phpunit ${FILTER}'
+	docker compose exec api bash -c 'LOG_CHANNEL=stderr LOG_LEVEL=debug vendor/bin/phpunit ${FILTER}'
 
 init:
 	docker compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install && php artisan key:generate'
