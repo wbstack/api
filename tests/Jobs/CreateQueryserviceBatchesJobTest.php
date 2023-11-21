@@ -10,10 +10,13 @@ use App\Jobs\CreateQueryserviceBatchesJob;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Support\Facades\Config;
 
 class CreateQueryserviceBatchesTest extends TestCase
 {
     use RefreshDatabase;
+
+    private int $prevEntityLimit;
 
     public function setUp(): void
     {
@@ -23,6 +26,8 @@ class CreateQueryserviceBatchesTest extends TestCase
         EventPageUpdate::query()->delete();
         QsCheckpoint::query()->delete();
         QsCheckpoint::init();
+        $this->prevEntityLimit = Config::get('wbstack.qs_batch_entity_limit');
+        Config::set('wbstack.qs_batch_entity_limit', 10);
     }
 
     public function tearDown(): void
@@ -31,6 +36,7 @@ class CreateQueryserviceBatchesTest extends TestCase
         QsBatch::query()->delete();
         EventPageUpdate::query()->delete();
         QsCheckpoint::query()->delete();
+        Config::set('wbstack.qs_batch_entity_limit', $this->prevEntityLimit);
         parent::tearDown();
     }
 
