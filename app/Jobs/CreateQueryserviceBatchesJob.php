@@ -27,10 +27,7 @@ class CreateQueryserviceBatchesJob extends Job
         DB::transaction(function () {
             $lastCheckpoint = QsCheckpoint::get();
 
-            $result = $this->getNewEntities($lastCheckpoint);
-            $latestEventId = $result['latestEventId'];
-            $newEntities = $result['newEntities'];
-
+            $newEntities = $this->getNewEntities($lastCheckpoint);
             foreach ($newEntities as $wikiId => $entityIdsFromEvents) {
                 $ok = $this->tryToAppendEntitesToExistingBatches($entityIdsFromEvents, $wikiId);
                 if ($ok) {
@@ -39,14 +36,22 @@ class CreateQueryserviceBatchesJob extends Job
                 $this->createNewBatches($entityIdsFromEvents, $wikiId);
             }
 
-            QsCheckpoint::set($latestEventId);
+            QsCheckpoint::set($this->getLatestEventId($lastCheckpoint));
         });
+    }
+
+    private function getLatestEventId(int $lastCheckpoint): int
+    {
+        $next = EventPageUpdate::where(
+            'id', '>', $lastCheckpoint,
+        )->max('id');
+
+        return $next ? $next : $lastCheckpoint;
     }
 
     private function getNewEntities(int $lastCheckpoint): array
     {
         $newEntitiesFromEvents = [];
-        $latestEventId = $lastCheckpoint;
 
         $events = EventPageUpdate::where(
             'id', '>', $lastCheckpoint
@@ -60,15 +65,9 @@ class CreateQueryserviceBatchesJob extends Job
             ) {
                 $newEntitiesFromEvents[$event->wiki_id][] = $event->title;
             }
-            if ($event->id > $latestEventId) {
-                $latestEventId = $event->id;
-            }
         }
 
-        return [
-            'newEntities' => $newEntitiesFromEvents,
-            'latestEventId' => $latestEventId,
-        ];
+        return $newEntitiesFromEvents;
     }
 
     private function tryToAppendEntitesToExistingBatches(array $entityIdsFromEvents, int $wikiId): bool
