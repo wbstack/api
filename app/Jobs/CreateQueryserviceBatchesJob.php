@@ -27,28 +27,11 @@ class CreateQueryserviceBatchesJob extends Job
         DB::transaction(function () {
             $lastCheckpoint = QsCheckpoint::get();
 
-            // Get events after the point that batch was created
-            // TODO maybe filter by NS here?
-            $events = EventPageUpdate::where(
-                'id', '>', $lastCheckpoint
-            )->get();
+            $result = $this->getNewEntities($lastCheckpoint);
+            $latestEventId = $result['latestEventId'];
+            $newEntities = $result['newEntities'];
 
-            $newEntitiesFromEvents = [];
-            $latestEventId = $lastCheckpoint;
-            foreach ($events as $event) {
-                if (
-                    $event->namespace == self::NAMESPACE_ITEM ||
-                    $event->namespace == self::NAMESPACE_PROPERTY ||
-                    $event->namespace == self::NAMESPACE_LEXEME
-                ) {
-                    $newEntitiesFromEvents[$event->wiki_id][] = $event->title;
-                }
-                if ($event->id > $latestEventId) {
-                    $latestEventId = $event->id;
-                }
-            }
-
-            foreach ($newEntitiesFromEvents as $wikiId => $entityIdsFromEvents) {
+            foreach ($newEntities as $wikiId => $entityIdsFromEvents) {
                 $ok = $this->tryToAppendEntitesToExistingBatches($entityIdsFromEvents, $wikiId);
                 if ($ok) {
                     continue;
@@ -58,6 +41,34 @@ class CreateQueryserviceBatchesJob extends Job
 
             QsCheckpoint::set($latestEventId);
         });
+    }
+
+    private function getNewEntities(int $lastCheckpoint): array
+    {
+        $newEntitiesFromEvents = [];
+        $latestEventId = $lastCheckpoint;
+
+        $events = EventPageUpdate::where(
+            'id', '>', $lastCheckpoint
+        )->get();
+
+        foreach ($events as $event) {
+            if (
+                $event->namespace == self::NAMESPACE_ITEM ||
+                $event->namespace == self::NAMESPACE_PROPERTY ||
+                $event->namespace == self::NAMESPACE_LEXEME
+            ) {
+                $newEntitiesFromEvents[$event->wiki_id][] = $event->title;
+            }
+            if ($event->id > $latestEventId) {
+                $latestEventId = $event->id;
+            }
+        }
+
+        return [
+            'newEntities' => $newEntitiesFromEvents,
+            'latestEventId' => $latestEventId,
+        ];
     }
 
     private function tryToAppendEntitesToExistingBatches(array $entityIdsFromEvents, int $wikiId): bool
