@@ -5,8 +5,8 @@ namespace App\Jobs;
 use App\EventPageUpdate;
 use App\QsBatch;
 use App\QsCheckpoint;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
 
 class CreateQueryserviceBatchesJob extends Job
@@ -29,11 +29,18 @@ class CreateQueryserviceBatchesJob extends Job
 
             [$newEntities, $latestEventId] = $this->getNewEntities($latestCheckpoint);
             foreach ($newEntities as $wikiId => $entityIdsFromEvents) {
-                $success = $this->tryToAppendEntitesToExistingBatches($entityIdsFromEvents, $wikiId);
-                if ($success) {
-                    continue;
+                try {
+                    $success = $this->tryToAppendEntitesToExistingBatches($entityIdsFromEvents, $wikiId);
+                    if ($success) {
+                        continue;
+                    }
+                    $this->createNewBatches($entityIdsFromEvents, $wikiId);
+                } catch (\Exception $ex) {
+                    Log::error(
+                        'Failed to process entities '.implode(',', $entityIdsFromEvents).' for wiki with id '.$wikiId.': '.$ex->getMessage()
+                    );
+                    $this->fail($ex);
                 }
-                $this->createNewBatches($entityIdsFromEvents, $wikiId);
             }
 
             QsCheckpoint::set($latestEventId);
@@ -53,8 +60,8 @@ class CreateQueryserviceBatchesJob extends Job
             return $result;
         }, []);
 
-        $latestEventId = $events->reduce(function (int $eventId, EventPageUpdate $event) {
-            return $event->id > $eventId ? $event->id : $eventId;
+        $latestEventId = $events->reduce(function (int $maxId, EventPageUpdate $event) {
+            return max($event->id, $maxId);
         }, $latestCheckpoint);
 
         return [$newEntitiesFromEvents, $latestEventId];
