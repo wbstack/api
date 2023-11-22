@@ -25,47 +25,39 @@ class CreateQueryserviceBatchesJob extends Job
     public function handle(): void
     {
         DB::transaction(function () {
-            $lastCheckpoint = QsCheckpoint::get();
+            $latestCheckpoint = QsCheckpoint::get();
 
-            $newEntities = $this->getNewEntities($lastCheckpoint);
+            [$newEntities, $latestEventId] = $this->getNewEntities($latestCheckpoint);
             foreach ($newEntities as $wikiId => $entityIdsFromEvents) {
-                $ok = $this->tryToAppendEntitesToExistingBatches($entityIdsFromEvents, $wikiId);
-                if ($ok) {
+                $success = $this->tryToAppendEntitesToExistingBatches($entityIdsFromEvents, $wikiId);
+                if ($success) {
                     continue;
                 }
                 $this->createNewBatches($entityIdsFromEvents, $wikiId);
             }
 
-            QsCheckpoint::set($this->getLatestEventId($lastCheckpoint));
+            QsCheckpoint::set($latestEventId);
         });
     }
 
-    private function getLatestEventId(int $lastCheckpoint): int
+    private function getNewEntities(int $latestCheckpoint): array
     {
-        $next = EventPageUpdate::where(
-            'id', '>', $lastCheckpoint,
-        )
-            ->whereIn('namespace', [self::NAMESPACE_ITEM, self::NAMESPACE_PROPERTY, self::NAMESPACE_LEXEME])
-            ->max('id');
-
-        return $next ? $next : $lastCheckpoint;
-    }
-
-    private function getNewEntities(int $lastCheckpoint): array
-    {
-        $newEntitiesFromEvents = [];
-
         $events = EventPageUpdate::where(
-            'id', '>', $lastCheckpoint,
+            'id', '>', $latestCheckpoint,
         )
             ->whereIn('namespace', [self::NAMESPACE_ITEM, self::NAMESPACE_PROPERTY, self::NAMESPACE_LEXEME])
             ->get();
 
-        foreach ($events as $event) {
-            $newEntitiesFromEvents[$event->wiki_id][] = $event->title;
-        }
+        $newEntitiesFromEvents = $events->reduce(function (array $result, EventPageUpdate $event) {
+            $result[$event->wiki_id][] = $event->title;
+            return $result;
+        }, []);
 
-        return $newEntitiesFromEvents;
+        $latestEventId = $events->reduce(function (int $eventId, EventPageUpdate $event) {
+            return $event->id > $eventId ? $event->id : $eventId;
+        }, $latestCheckpoint);
+
+        return [$newEntitiesFromEvents, $latestEventId];
     }
 
     private function tryToAppendEntitesToExistingBatches(array $entityIdsFromEvents, int $wikiId): bool
