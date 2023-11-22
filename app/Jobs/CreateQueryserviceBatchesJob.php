@@ -70,12 +70,9 @@ class CreateQueryserviceBatchesJob extends Job
         ])->get();
 
         foreach ($notDoneBatches as $qsBatch) {
-            if ($qsBatch->wiki_id !== $wikiId) {
-                continue;
-            }
-
             $entitiesOnBatch = explode(',', $qsBatch->entityIds);
             $tentativeMerge = array_unique(array_merge($entityIdsFromEvents, $entitiesOnBatch));
+
             if (count($tentativeMerge) > $this->entityLimit) {
                 continue;
             }
