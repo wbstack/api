@@ -1,5 +1,8 @@
 # api
 
+## 8x.28.2 - 28 November 2023
+- Temporarily disable job for creating QsBatches
+
 ## 8x.28.1 - 27 November 2023
 - Do not create QsBatches for deleted wikis, deduplicate IDs (T348256)
 
