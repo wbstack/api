@@ -30,9 +30,6 @@ class CreateQueryserviceBatchesJob extends Job
 
             [$newEntities, $latestEventId] = $this->getNewEntities($latestCheckpoint);
             foreach ($newEntities as $wikiId => $entityIdsFromEvents) {
-                if (!Wiki::where(['id' => $wikiId])->exists()) {
-                    continue;
-                }
                 try {
                     $success = $this->tryToAppendEntitesToExistingBatches($entityIdsFromEvents, $wikiId);
                     if ($success) {
@@ -57,6 +54,7 @@ class CreateQueryserviceBatchesJob extends Job
             'id', '>', $latestCheckpoint,
         )
             ->whereIn('namespace', [self::NAMESPACE_ITEM, self::NAMESPACE_PROPERTY, self::NAMESPACE_LEXEME])
+            ->has('wiki')
             ->get();
 
         $newEntitiesFromEvents = $events->reduce(function (array $result, EventPageUpdate $event) {
