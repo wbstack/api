@@ -31,7 +31,10 @@ class RequeuePendingQsBatchesJob extends Job
 
             $threshold = Carbon::now()->subtract(new \DateInterval($this->pendingTimeout));
             QsBatch::where([['pending_since', '<>', null], ['pending_since', '<', $threshold]])
-                ->update(['pending_since' => null, 'done' => 0]);
+                ->increment(
+                    'processing_attempts', 1,
+                    ['pending_since' => null, 'done' => 0]
+                );
         });
     }
 }

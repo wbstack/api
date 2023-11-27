@@ -39,5 +39,6 @@ class RequeuePendingQsBatchesJobTest extends TestCase
 
         $this->assertEquals(QsBatch::where('pending_since', '=', null)->count(), 2);
         $this->assertEquals(QsBatch::where('failed', '=', true)->count(), 1);
+        $this->assertEquals(QsBatch::where('id', '=', 2)->first()->processing_attempts, 1);
     }
 }
