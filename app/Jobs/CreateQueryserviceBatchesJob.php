@@ -94,7 +94,9 @@ class CreateQueryserviceBatchesJob extends Job
 
     private function createNewBatches(array $entityIdsFromEvents, int $wikiId): void
     {
-        $chunks = array_chunk($entityIdsFromEvents, $this->entityLimit);
+        $chunks = array_chunk(
+            array_unique($entityIdsFromEvents), $this->entityLimit,
+        );
         foreach ($chunks as $chunk) {
             QsBatch::create([
                 'done' => 0,
