@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\EventPageUpdate;
 use App\QsBatch;
+use App\Wiki;
 use App\QsCheckpoint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -53,6 +54,7 @@ class CreateQueryserviceBatchesJob extends Job
             'id', '>', $latestCheckpoint,
         )
             ->whereIn('namespace', [self::NAMESPACE_ITEM, self::NAMESPACE_PROPERTY, self::NAMESPACE_LEXEME])
+            ->has('wiki')
             ->get();
 
         $newEntitiesFromEvents = $events->reduce(function (array $result, EventPageUpdate $event) {
@@ -94,7 +96,9 @@ class CreateQueryserviceBatchesJob extends Job
 
     private function createNewBatches(array $entityIdsFromEvents, int $wikiId): void
     {
-        $chunks = array_chunk($entityIdsFromEvents, $this->entityLimit);
+        $chunks = array_chunk(
+            array_unique($entityIdsFromEvents), $this->entityLimit,
+        );
         foreach ($chunks as $chunk) {
             QsBatch::create([
                 'done' => 0,

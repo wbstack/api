@@ -52,6 +52,7 @@ class CreateQueryserviceBatchesTest extends TestCase
 
     public function testBatchCreation (): void
     {
+        Wiki::factory()->create(['id' => 1, 'domain' => 'deleted.wikibase.cloud'])->delete();
         Wiki::factory()->create(['id' => 88, 'domain' => 'test1.wikibase.cloud']);
         Wiki::factory()->create(['id' => 99, 'domain' => 'test2.wikibase.cloud']);
         Wiki::factory()->create(['id' => 111, 'domain' => 'test3.wikibase.cloud']);
@@ -61,6 +62,10 @@ class CreateQueryserviceBatchesTest extends TestCase
         EventPageUpdate::factory()->create(['id' => 1, 'wiki_id' => 111, 'namespace' => 120, 'title' => 'Q21']);
         EventPageUpdate::factory()->create(['id' => 3, 'wiki_id' => 111, 'namespace' => 120, 'title' => 'Q12']);
         EventPageUpdate::factory()->create(['id' => 4, 'wiki_id' => 111, 'namespace' => 999, 'title' => 'Q999']);
+        // This is a duplicate and should therefore only show up once
+        EventPageUpdate::factory()->create(['id' => 5, 'wiki_id' => 111, 'namespace' => 120, 'title' => 'Q12']);
+        // This is a deleted wiki and should create a batch
+        EventPageUpdate::factory()->create(['id' => 6, 'wiki_id' => 1, 'namespace' => 120, 'title' => 'Q152']);
 
         $mockJob = $this->createMock(Job::class);
         $job = new CreateQueryserviceBatchesJob();
@@ -73,6 +78,9 @@ class CreateQueryserviceBatchesTest extends TestCase
         $this->assertNotNull($newBatch);
         $this->assertEquals($newBatch->entityIds, 'Q12');
         $this->assertEquals(QsBatch::query()->count(), 3);
+
+        $batchForDeletedWiki = QsBatch::where(['wiki_id' => 1])->first();
+        $this->assertNull($batchForDeletedWiki);
     }
 
     public function testBatchMerging(): void
