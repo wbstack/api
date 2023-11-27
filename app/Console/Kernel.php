@@ -12,6 +12,7 @@ use App\Jobs\SandboxCleanupJob;
 use App\Jobs\PollForMediaWikiJobsJob;
 use App\Jobs\UpdateWikiSiteStatsJob;
 use App\Jobs\SendEmptyWikiNotificationsJob;
+use App\Jobs\CreateQueryserviceBatchesJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -36,6 +37,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
         $schedule->job(new PruneEventPageUpdatesTable)->everyFifteenMinutes();
         $schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes();
+        $schedule->job(new CreateQueryserviceBatchesJob)->everyMinute();
         $schedule->job(new RequeuePendingQsBatchesJob)->everyFifteenMinutes();
 
         // Sandbox

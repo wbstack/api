@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\Model;
  * App\QsBatch.
  *
  * @property int $id
- * @property int $eventFrom
- * @property int $eventTo
  * @property int $wiki_id
  * @property string $entityIds
  * @property \DateTime $pending_since
@@ -24,8 +22,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereDone($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereEntityIds($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereEventFrom($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereEventTo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereIn($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereUpdatedAt($value)
@@ -38,8 +34,6 @@ class QsBatch extends Model
 
     protected $fillable = [
         'done',
-        'eventFrom',
-        'eventTo',
         'wiki_id',
         'entityIds',
         'pending_since',

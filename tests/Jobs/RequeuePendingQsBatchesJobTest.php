@@ -26,9 +26,9 @@ class RequeuePendingQsBatchesJobTest extends TestCase
     }
 
     public function testRequeue (): void {
-        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(200), 'id' => 1, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 1, 'entityIds' => 'a,b']);
-        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(400), 'id' => 2, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 1, 'entityIds' => 'a,b']);
-        QsBatch::factory()->create(['processing_attempts' => 3, 'id' => 3, 'done' => 0, 'eventFrom' => 1, 'eventTo' => 2, 'wiki_id' => 1, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(200), 'id' => 1, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(400), 'id' => 2, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['processing_attempts' => 3, 'id' => 3, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'a,b']);
 
         $mockJob = $this->createMock(Job::class);
         $job = new RequeuePendingQsBatchesJob();
