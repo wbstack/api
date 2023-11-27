@@ -1,5 +1,8 @@
 # api
 
+## 8x.28.0 - 27 November 2023
+- Limit QsBatch sizes, run batch creation in dedicated job (T348256)
+
 ## 8x.27.1 - 20 November 2023
 - Hotfix for functionality added in 8x.27.0 (#686)
 
