@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\EventPageUpdate;
 use App\QsBatch;
+use App\Wiki;
 use App\QsCheckpoint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -29,6 +30,9 @@ class CreateQueryserviceBatchesJob extends Job
 
             [$newEntities, $latestEventId] = $this->getNewEntities($latestCheckpoint);
             foreach ($newEntities as $wikiId => $entityIdsFromEvents) {
+                if (!Wiki::where(['id' => $wikiId])->exists()) {
+                    continue;
+                }
                 try {
                     $success = $this->tryToAppendEntitesToExistingBatches($entityIdsFromEvents, $wikiId);
                     if ($success) {
