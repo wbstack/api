@@ -1,5 +1,8 @@
 # api
 
+## 8x.28.4 - 28 November 2023
+- Increase timeout for QsBatches job
+
 ## 8x.28.3 - 28 November 2023
 - Reenable job for creating QsBatches
 
