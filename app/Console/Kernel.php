@@ -37,7 +37,9 @@ class Kernel extends ConsoleKernel
         $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
         $schedule->job(new PruneEventPageUpdatesTable)->everyFifteenMinutes();
         $schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes();
-        $schedule->job(new CreateQueryserviceBatchesJob)->everyMinute();
+        // This is disabled so the migration can be applied correctly without
+        // racing against the job.
+        // $schedule->job(new CreateQueryserviceBatchesJob)->never();
         $schedule->job(new RequeuePendingQsBatchesJob)->everyFifteenMinutes();
 
         // Sandbox
