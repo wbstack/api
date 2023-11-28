@@ -8,6 +8,7 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Contracts\Queue\Job;
 use Carbon\Carbon;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 
 class RequeuePendingQsBatchesJobTest extends TestCase
 {
@@ -29,6 +30,12 @@ class RequeuePendingQsBatchesJobTest extends TestCase
         QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(200), 'id' => 1, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'a,b']);
         QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(400), 'id' => 2, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'a,b']);
         QsBatch::factory()->create(['processing_attempts' => 3, 'id' => 3, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'a,b']);
+
+        $mockExceptionHandler = $this->createMock(ExceptionHandler::class);
+        $mockExceptionHandler
+            ->expects($this->once())
+            ->method('report');
+        $this->app->instance(ExceptionHandler::class, $mockExceptionHandler);
 
         $mockJob = $this->createMock(Job::class);
         $job = new RequeuePendingQsBatchesJob();

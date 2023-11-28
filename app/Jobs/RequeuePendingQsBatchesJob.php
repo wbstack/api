@@ -18,23 +18,40 @@ class RequeuePendingQsBatchesJob extends Job
 
     public function handle(): void
     {
-        DB::transaction(function () {
-            tap(QsBatch::where([
+        $failedBatches = $this->markBatchesFailed();
+        foreach ($failedBatches as $batchId) {
+            report("QsBatch with ID ".$batchId."was marked as failed.");
+        }
+
+        $this->requeueStalledBatches();
+    }
+
+    private function markBatchesFailed(): array
+    {
+        return DB::transaction(function () {
+            $failedBatches = QsBatch::where([
                 ['processing_attempts', '>=', $this->markFailedAfter],
                 ['failed', '=', false],
-            ]))
-                ->update(['failed' => true])
+            ])
+                ->select('id')
                 ->get()
-                ->each(function ($batch, $index) {
-                    report("QsBatch with ID ".$batch->id."was marked as failed.");
-                });
-
-            $threshold = Carbon::now()->subtract(new \DateInterval($this->pendingTimeout));
-            QsBatch::where([['pending_since', '<>', null], ['pending_since', '<', $threshold]])
-                ->increment(
-                    'processing_attempts', 1,
-                    ['pending_since' => null, 'done' => 0]
-                );
+                ->pluck('id')
+                ->toArray();
+            QsBatch::whereIn('id', $failedBatches)->update(['failed' => true]);
+            return $failedBatches;
         });
+    }
+
+    private function requeueStalledBatches(): void
+    {
+        $threshold = Carbon::now()->subtract(new \DateInterval($this->pendingTimeout));
+        QsBatch::where([
+            ['pending_since', '<>', null],
+            ['pending_since', '<', $threshold],
+        ])
+            ->increment(
+                'processing_attempts', 1,
+                ['pending_since' => null, 'done' => 0]
+            );
     }
 }
