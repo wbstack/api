@@ -1,5 +1,8 @@
 # api
 
+## 8x.28.6 - 28 November 2023
+- Disable QsBatches job as it fails queue
+
 ## 8x.28.5 - 28 November 2023
 - Hard increase memory_limit for QsBatches job
 
