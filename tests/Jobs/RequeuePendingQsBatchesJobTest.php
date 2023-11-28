@@ -41,7 +41,7 @@ class RequeuePendingQsBatchesJobTest extends TestCase
         $job = new RequeuePendingQsBatchesJob();
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
-          ->method('fail');
+            ->method('fail');
         $job->handle();
 
         $this->assertEquals(QsBatch::where('pending_since', '=', null)->count(), 2);
