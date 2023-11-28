@@ -4,11 +4,11 @@ namespace App\Jobs;
 
 use App\EventPageUpdate;
 use App\QsBatch;
-use App\Wiki;
 use App\QsCheckpoint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Collection;
 
 class CreateQueryserviceBatchesJob extends Job
 {
@@ -27,8 +27,6 @@ class CreateQueryserviceBatchesJob extends Job
 
     public function handle(): void
     {
-        return;
-        /**
         DB::transaction(function () {
             $latestCheckpoint = QsCheckpoint::get();
 
@@ -50,26 +48,24 @@ class CreateQueryserviceBatchesJob extends Job
 
             QsCheckpoint::set($latestEventId);
         });
-         */
     }
 
     private function getNewEntities(int $latestCheckpoint): array
     {
-        $events = EventPageUpdate::where(
+        $newEntitiesFromEvents = [];
+        $latestEventId = $latestCheckpoint;
+
+        EventPageUpdate::where(
             'id', '>', $latestCheckpoint,
         )
             ->whereIn('namespace', [self::NAMESPACE_ITEM, self::NAMESPACE_PROPERTY, self::NAMESPACE_LEXEME])
             ->has('wiki')
-            ->get();
-
-        $newEntitiesFromEvents = $events->reduce(function (array $result, EventPageUpdate $event) {
-            $result[$event->wiki_id][] = $event->title;
-            return $result;
-        }, []);
-
-        $latestEventId = $events->reduce(function (int $maxId, EventPageUpdate $event) {
-            return max($event->id, $maxId);
-        }, $latestCheckpoint);
+            ->chunk(100, function (Collection $chunk) use (&$newEntitiesFromEvents, &$latestEventId) {
+                foreach ($chunk as $event) {
+                    $newEntitiesFromEvents[$event->wiki_id][] = $event->title;
+                    $latestEventId = max($event->id, $latestEventId);
+                }
+            });
 
         return [$newEntitiesFromEvents, $latestEventId];
     }
