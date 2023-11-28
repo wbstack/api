@@ -1,6 +1,9 @@
 # api
 
 
+## 8x.28.9 - 28 November 2023
+- Fix error reporting on detecting failed Qs Batches
+
 ## 8x.28.8 - 28 November 2023
 - Chunk query for all page update events in QsBatches job
 - Reenable QsBatches job
