@@ -1,5 +1,10 @@
 # api
 
+
+## 8x.28.8 - 28 November 2023
+- Chunk query for all page update events in QsBatches job
+- Reenable QsBatches job
+
 ## 8x.28.7 - 28 November 2023
 - Stub QsBatches job so queued job will proceed
 
