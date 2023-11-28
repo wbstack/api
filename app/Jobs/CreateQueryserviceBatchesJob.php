@@ -22,6 +22,8 @@ class CreateQueryserviceBatchesJob extends Job
 
     public function __construct()
     {
+        // TODO: find a better way to do this
+        ini_set('memory_limit', '512M');
         $this->entityLimit = Config::get('wbstack.qs_batch_entity_limit');
     }
 
