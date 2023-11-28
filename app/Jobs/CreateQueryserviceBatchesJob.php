@@ -18,6 +18,8 @@ class CreateQueryserviceBatchesJob extends Job
 
     private int $entityLimit;
 
+    public $timeout = 3600;
+
     public function __construct()
     {
         $this->entityLimit = Config::get('wbstack.qs_batch_entity_limit');
