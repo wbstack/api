@@ -27,6 +27,8 @@ class CreateQueryserviceBatchesJob extends Job
 
     public function handle(): void
     {
+        return;
+        /**
         DB::transaction(function () {
             $latestCheckpoint = QsCheckpoint::get();
 
@@ -48,6 +50,7 @@ class CreateQueryserviceBatchesJob extends Job
 
             QsCheckpoint::set($latestEventId);
         });
+         */
     }
 
     private function getNewEntities(int $latestCheckpoint): array

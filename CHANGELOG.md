@@ -1,5 +1,8 @@
 # api
 
+## 8x.28.7 - 28 November 2023
+- Stub QsBatches job so queued job will proceed
+
 ## 8x.28.6 - 28 November 2023
 - Disable QsBatches job as it fails queue
 
