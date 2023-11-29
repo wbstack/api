@@ -37,7 +37,10 @@ class RequeuePendingQsBatchesJob extends Job
                 ->get()
                 ->pluck('id')
                 ->toArray();
-            QsBatch::whereIn('id', $failedBatches)->update(['failed' => true]);
+            QsBatch::whereIn('id', $failedBatches)->update([
+                'failed' => true,
+                'pending_since' => null,
+            ]);
             return $failedBatches;
         });
     }
@@ -48,10 +51,11 @@ class RequeuePendingQsBatchesJob extends Job
         QsBatch::where([
             ['pending_since', '<>', null],
             ['pending_since', '<', $threshold],
+            ['failed', '=', false],
         ])
             ->increment(
                 'processing_attempts', 1,
-                ['pending_since' => null, 'done' => 0]
+                ['pending_since' => null, 'done' => false]
             );
     }
 }

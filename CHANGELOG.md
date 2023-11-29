@@ -1,5 +1,7 @@
 # api
 
+## 8x.28.10 - 29 November 2023
+- Requeueing should not select failed batches
 
 ## 8x.28.9 - 28 November 2023
 - Fix error reporting on detecting failed Qs Batches
