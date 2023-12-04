@@ -77,7 +77,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.4"
+            "php": "8.1"
         },
         "preferred-install": "dist",
         "sort-packages": true,

@@ -96,7 +96,6 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
                 throw new \RuntimeException("Tried getting table names for wikiDB {$wikiDB->name} but did not find any");
             }
 
-            $pdo->beginTransaction();
 
             // Create the new database
             $pdo->exec(sprintf('CREATE DATABASE %s', $deletedDatabaseName));
@@ -114,16 +113,10 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
             }
 
             $pdo->exec(sprintf('DROP USER %s', $wikiDB->user ));
-
-            $pdo->commit();
         } catch (\Throwable $e) {
-            
-            $pdo->rollBack();
-
             $manager->purge('mw');
             $this->fail( new \RuntimeException('Failed to soft-soft delete '.$wikiDB->name . ': ' . $e->getMessage()) );
             return;
-            
         }
 
         $wikiDB->delete();
