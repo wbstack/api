@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
 use Maclof\Kubernetes\Client;
 use Maclof\Kubernetes\Models\Job as KubernetesJob;
 
@@ -23,10 +24,11 @@ class SpawnQueryserviceUpdaterJob implements ShouldQueue, ShouldBeUnique
     {
         $sortedEntities = explode(',', $entities);
         asort($sortedEntities);
+
         $this->wikiDomain = $wikiDomain;
         $this->entities = implode(',', $sortedEntities);
         $this->sparqlUrl = $sparqlUrl;
-        $this->qsKubernetesNamespace = env('QS_JOB_NAMESPACE', 'qs-jobs');
+        $this->qsKubernetesNamespace = Config::get('wbstack.qs_job_namespace');
     }
 
     public function uniqueId(): string
