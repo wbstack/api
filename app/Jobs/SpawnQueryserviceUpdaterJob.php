@@ -19,17 +19,19 @@ class SpawnQueryserviceUpdaterJob implements ShouldQueue, ShouldBeUnique
     private string $sparqlUrl;
     private string $qsKubernetesNamespace;
 
-    public function __construct (string $wikiDomain, string $entites, string $sparqlUrl)
+    public function __construct (string $wikiDomain, string $entities, string $sparqlUrl)
     {
+        $sortedEntities = explode(',', $entities);
+        asort($sortedEntities);
         $this->wikiDomain = $wikiDomain;
-        $this->entities = $entites;
+        $this->entities = implode(',', $sortedEntities);
         $this->sparqlUrl = $sparqlUrl;
         $this->qsKubernetesNamespace = env('QS_JOB_NAMESPACE', 'qs-jobs');
     }
 
     public function uniqueId(): string
     {
-        return $this->wikiDomain;
+        return $this->wikiDomain.$this->entities;
     }
 
     public function handle (Client $kubernetesClient): void
@@ -55,11 +57,12 @@ class SpawnQueryserviceUpdaterJob implements ShouldQueue, ShouldBeUnique
         $kubernetesClient->setNamespace($this->qsKubernetesNamespace);
         $jobSpec = new KubernetesJob([
             'metadata' => [
-                'name' => 'run-qs-updater-'.hash('sha1', $this->wikiDomain),
+                'name' => 'run-qs-updater-'.hash('sha1', $this->uniqueId()),
                 'namespace' => $this->qsKubernetesNamespace,
                 'labels' => [
                     'app.kubernetes.io/instance' => $this->wikiDomain,
-                    'app.kubernetes.io/name' => 'run-qs-updater'
+                    'app.kubernetes.io/name' => 'run-qs-updater',
+                    'entityPayload' => $this->entities,
                 ]
             ],
             'spec' => [
@@ -106,7 +109,7 @@ class SpawnQueryserviceUpdaterJob implements ShouldQueue, ShouldBeUnique
             return;
         }
         Log::info(
-            'Querysevice Updater for wiki "'.$this->wikiDomain.'" exists or was created with name "'.$jobName.'".'
+            'Queryservice Updater for wiki "'.$this->wikiDomain.'" and entities "'.$this->entities.'" exists or was created with name "'.$jobName.'".'
         );
 
         return;
