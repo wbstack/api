@@ -9,6 +9,7 @@ use App\Jobs\TemporaryDummyJob;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\Request;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class RebuildQueryserviceDataTest extends TestCase
@@ -322,5 +323,42 @@ class RebuildQueryserviceDataTest extends TestCase
         $this->artisan('wbs-qs:rebuild', ['--chunkSize' => 10])->assertExitCode(0);
         Bus::assertNothingDispatched();
         Http::assertSentCount(2);
+    }
+
+    public function testDomainArg()
+    {
+        Bus::fake();
+        $wiki = Wiki::factory()->create(['domain' => 'rebuild.wikibase.cloud']);
+        QueryserviceNamespace::factory()->create([
+            'wiki_id' => $wiki->id,
+            'namespace' => 'test_ns_12345',
+            'backend' => 'test_backend',
+        ]);
+
+        $wiki = Wiki::factory()->create(['domain' => 'whoops.wikibase.cloud']);
+        QueryserviceNamespace::factory()->create([
+            'wiki_id' => $wiki->id,
+            'namespace' => 'test_ns_23456',
+            'backend' => 'test_backend',
+        ]);
+
+        Http::fake(function (Request $request) {
+            $hostHeader = $request->header('host')[0];
+            if ($hostHeader !== 'rebuild.wikibase.cloud') {
+                return Http::response('The dinosaurs escaped!!!', 500);
+            }
+            return Http::response([
+                'query' => [
+                    'allpages' => [],
+                ],
+            ], 200);
+        });
+
+        $this->artisan(
+            'wbs-qs:rebuild',
+            ['--chunkSize' => 10, '--domain' => ['whoops.wikibase.cloud']]
+        )->assertExitCode(1);
+        Bus::assertNothingDispatched();
+        Http::assertSentCount(1);
     }
 }

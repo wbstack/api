@@ -16,7 +16,7 @@ class RebuildQueryserviceData extends Command
     private const NAMESPACE_PROPERTY = 122;
     private const NAMESPACE_LEXEME = 146;
 
-    protected $signature = 'wbs-qs:rebuild {--domain=} {--chunkSize=50} {--sparqlUrlFormat=http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql}';
+    protected $signature = 'wbs-qs:rebuild {--domain=*} {--chunkSize=50} {--sparqlUrlFormat=http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql}';
 
     protected $description = 'Rebuild the queryservice data for a certain wiki or all wikis';
 
@@ -30,11 +30,11 @@ class RebuildQueryserviceData extends Command
         $this->sparqlUrlFormat = $this->option('sparqlUrlFormat');
         $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
 
-        $wikiDomain = $this->option('domain');
+        $wikiDomains = $this->option('domain');
         $exitCode = 0;
 
-        $wikis = $wikiDomain
-            ? Wiki::where(['domain' => $wikiDomain])->get()
+        $wikis = count($wikiDomains) !== 0
+            ? Wiki::whereIn('domain', $wikiDomains)->get()
             : Wiki::query()->get();
 
         foreach ($wikis as $wiki) {
