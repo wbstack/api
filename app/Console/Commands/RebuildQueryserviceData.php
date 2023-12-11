@@ -78,7 +78,7 @@ class RebuildQueryserviceDataCommand extends Command
                 dispatch(
                     new TemporaryDummyJob(
                         $wiki->domain,
-                        $entityChunk,
+                        implode(',', $entityChunk),
                         $sparqlUrl,
                     )
                 );

@@ -3,11 +3,11 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class TemporaryDummyJob implements ShouldQueue
 {
@@ -20,7 +20,9 @@ class TemporaryDummyJob implements ShouldQueue
      */
     public function __construct($domain, $entites, $sparqlUrl)
     {
-        //
+        Log::info('Dummy Job received domain: '.$domain);
+        Log::info('Dummy Job received entities: '.$entites);
+        Log::info('Dummy Job received sparqlUrl: '.$sparqlUrl);
     }
 
     /**
@@ -30,6 +32,6 @@ class TemporaryDummyJob implements ShouldQueue
      */
     public function handle()
     {
-        //
+        Log::info('Dummy job ran, but did nothing.');
     }
 }
