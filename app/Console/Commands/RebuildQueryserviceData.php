@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Wiki;
 use App\WikiSetting;
+use App\QueryserviceNamespace;
 use App\Jobs\TemporaryDummyJob;
 
 class RebuildQueryserviceData extends Command
@@ -102,8 +103,12 @@ class RebuildQueryserviceData extends Command
 
     private static function getSparqlUrl (Wiki $wiki): string
     {
-        $ns = $wiki->wikiQueryserviceNamespace()->namespace;
-        return 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/'.$ns.'/sparql';
+        $match = QueryserviceNamespace::where(['wiki_id' => $wiki->id])->first();
+        if (!$match) {
+            throw new \Exception('Unable to find queryservice namespace record for wiki '.$wiki->domain);
+        }
+        // TODO: should this template be moved to configuration?
+        return 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/'.$match->namespace.'/sparql';
     }
 
     private function fetchPagesInNamespace(string $wikiDomain, int $namespace): array
@@ -132,7 +137,7 @@ class RebuildQueryserviceData extends Command
             $jsonResponse = $response->json();
             $error = data_get($jsonResponse, 'error');
             if ($error !== null) {
-                throw new \Exception('Error fetching allpages for wiki '.$wikiDomain.': '.$error);
+                throw new \Exception('Error response fetching allpages for wiki '.$wikiDomain.': '.$error);
             }
 
             $pages = data_get($jsonResponse, 'query.allpages', []);
