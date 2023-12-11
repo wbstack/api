@@ -9,7 +9,6 @@ use App\Jobs\TemporaryDummyJob;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class RebuildQueryserviceDataTest extends TestCase
@@ -25,11 +24,6 @@ class RebuildQueryserviceDataTest extends TestCase
         Wiki::query()->delete();
         WikiSetting::query()->delete();
         QueryserviceNamespace::query()->delete();
-
-        $this->prevChunkSize = Config::get('wbstack.qs_rebuild_chunk_size');
-        Config::set('wbstack.qs_rebuild_chunk_size', 10);
-        $this->prevSparqlUrlFormat = Config::get('wbstack.qs_rebuild_sparql_url_format');
-        Config::set('wbstack.qs_rebuild_sparql_url_format', 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql');
     }
 
     public function tearDown(): void
@@ -37,8 +31,6 @@ class RebuildQueryserviceDataTest extends TestCase
         Wiki::query()->delete();
         WikiSetting::query()->delete();
         QueryserviceNamespace::query()->delete();
-        Config::set('wbstack.qs_rebuild_chunk_size', $this->prevChunkSize);
-        Config::set('wbstack.qs_rebuild_sparql_url_format', $this->prevSparqlUrlFormat);
         parent::tearDown();
     }
 
@@ -158,7 +150,7 @@ class RebuildQueryserviceDataTest extends TestCase
             ], 200),
         ]);
 
-        $this->artisan('wbs-qs:rebuild')->assertExitCode(0);
+        $this->artisan('wbs-qs:rebuild', ['chunk-size' => 10])->assertExitCode(0);
         Bus::assertDispatchedTimes(TemporaryDummyJob::class, 2);
         Bus::assertDispatched(TemporaryDummyJob::class, function ($job) {
             if ('rebuild.wikibase.cloud' !== $job->domain) {
@@ -247,7 +239,7 @@ class RebuildQueryserviceDataTest extends TestCase
             ], 400),
         ]);
 
-        $this->artisan('wbs-qs:rebuild')->assertExitCode(0);
+        $this->artisan('wbs-qs:rebuild', ['chunk-size' => 10])->assertExitCode(0);
         Bus::assertDispatched(TemporaryDummyJob::class, function ($job) {
             if ('rebuild.wikibase.cloud' !== $job->domain) {
                 return false;

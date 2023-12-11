@@ -21,7 +21,7 @@ class RebuildQueryserviceData extends Command
      *
      * @var string
      */
-    protected $signature = 'wbs-qs:rebuild {--domain=}';
+    protected $signature = 'wbs-qs:rebuild {--domain=} {--chunkSize=50} {--sparqlUrlFormat=http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql}';
 
     /**
      * The console command description.
@@ -43,9 +43,6 @@ class RebuildQueryserviceData extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->chunkSize = Config::get('wbstack.qs_rebuild_chunk_size');
-        $this->sparqlUrlFormat = Config::get('wbstack.qs_rebuild_sparql_url_format');
-        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
     }
 
     /**
@@ -55,6 +52,10 @@ class RebuildQueryserviceData extends Command
      */
     public function handle()
     {
+        $this->chunkSize = intval($this->option('chunkSize'));
+        $this->sparqlUrlFormat = $this->option('sparqlUrlFormat');
+        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
+
         $wikiDomain = $this->option('domain');
         $exitCode = 0;
 
