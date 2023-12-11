@@ -21,7 +21,7 @@ class RebuildQueryserviceData extends Command
      *
      * @var string
      */
-    protected $signature = 'qs:rebuild {--domain=}';
+    protected $signature = 'wbs-qs:rebuild {--domain=}';
 
     /**
      * The console command description.
