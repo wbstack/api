@@ -292,4 +292,35 @@ class RebuildQueryserviceDataTest extends TestCase
         $this->artisan('wbs-qs:rebuild', ['--chunkSize' => 10])->assertExitCode(1);
         Bus::assertNothingDispatched();
     }
+
+    public function testEmptyWiki()
+    {
+        Bus::fake();
+        $wiki = Wiki::factory()->create(['domain' => 'rebuild.wikibase.cloud']);
+        QueryserviceNamespace::factory()->create([
+            'wiki_id' => $wiki->id,
+            'namespace' => 'test_ns_12345',
+            'backend' => 'test_backend',
+        ]);
+
+        Http::fake([
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max' => Http::response([
+                'query' => [
+                    'allpages' => [],
+                ],
+            ], 200),
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max' => Http::response([
+                'query' => [
+                    'allpages' => [],
+                ],
+            ], 200),
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max' => Http::response([
+                'error' => 'Lexemes not enabled for this wiki',
+            ], 400),
+        ]);
+
+        $this->artisan('wbs-qs:rebuild', ['--chunkSize' => 10])->assertExitCode(0);
+        Bus::assertNothingDispatched();
+        Http::assertSentCount(2);
+    }
 }
