@@ -10,7 +10,7 @@ use App\Wiki;
 use App\WikiSetting;
 use App\Jobs\TemporaryDummyJob;
 
-class RebuildQueryserviceDataCommand extends Command
+class RebuildQueryserviceData extends Command
 {
     private const NAMESPACE_ITEM = 120;
     private const NAMESPACE_PROPERTY = 122;
