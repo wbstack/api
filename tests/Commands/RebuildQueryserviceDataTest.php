@@ -15,9 +15,6 @@ class RebuildQueryserviceDataTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private int $prevChunkSize;
-    private string $prevSparqlUrlFormat;
-
     public function setUp(): void
     {
         parent::setUp();
@@ -150,7 +147,7 @@ class RebuildQueryserviceDataTest extends TestCase
             ], 200),
         ]);
 
-        $this->artisan('wbs-qs:rebuild', ['chunk-size' => 10])->assertExitCode(0);
+        $this->artisan('wbs-qs:rebuild', ['--chunkSize' => 10])->assertExitCode(0);
         Bus::assertDispatchedTimes(TemporaryDummyJob::class, 2);
         Bus::assertDispatched(TemporaryDummyJob::class, function ($job) {
             if ('rebuild.wikibase.cloud' !== $job->domain) {
@@ -239,7 +236,7 @@ class RebuildQueryserviceDataTest extends TestCase
             ], 400),
         ]);
 
-        $this->artisan('wbs-qs:rebuild', ['chunk-size' => 10])->assertExitCode(0);
+        $this->artisan('wbs-qs:rebuild', ['--chunkSize' => 10])->assertExitCode(0);
         Bus::assertDispatched(TemporaryDummyJob::class, function ($job) {
             if ('rebuild.wikibase.cloud' !== $job->domain) {
                 return false;
@@ -253,5 +250,46 @@ class RebuildQueryserviceDataTest extends TestCase
             return true;
         });
         Http::assertSentCount(2);
+    }
+
+    public function testFailure()
+    {
+        Bus::fake();
+        $wiki = Wiki::factory()->create(['domain' => 'rebuild.wikibase.cloud']);
+        QueryserviceNamespace::factory()->create([
+            'wiki_id' => $wiki->id,
+            'namespace' => 'test_ns_12345',
+            'backend' => 'test_backend',
+        ]);
+
+        Http::fake([
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max' => Http::response([
+                'query' => [
+                    'allpages' => [
+                        [
+                            'title' => 'Property:P1',
+                            'namespace' => 120,
+                        ],
+                        [
+                            'title' => 'Property:P9',
+                            'namespace' => 120,
+                        ],
+                        [
+                            'title' => 'Property:P11',
+                            'namespace' => 120,
+                        ],
+                    ],
+                ],
+            ], 200),
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max' => Http::response([
+                'error' => 'THE DINOSAURS ESCAPED!',
+            ], 500),
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max' => Http::response([
+                'error' => 'Lexemes not enabled for this wiki',
+            ], 400),
+        ]);
+
+        $this->artisan('wbs-qs:rebuild', ['--chunkSize' => 10])->assertExitCode(1);
+        Bus::assertNothingDispatched();
     }
 }

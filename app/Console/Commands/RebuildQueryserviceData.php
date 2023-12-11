@@ -16,40 +16,15 @@ class RebuildQueryserviceData extends Command
     private const NAMESPACE_ITEM = 120;
     private const NAMESPACE_PROPERTY = 122;
     private const NAMESPACE_LEXEME = 146;
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+
     protected $signature = 'wbs-qs:rebuild {--domain=} {--chunkSize=50} {--sparqlUrlFormat=http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Rebuild the queryservice data for a certain wiki or all wikis';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
 
     protected int $chunkSize;
     protected string $apiUrl;
     protected string $sparqlUrlFormat;
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
     public function handle()
     {
         $this->chunkSize = intval($this->option('chunkSize'));
