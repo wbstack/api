@@ -28,4 +28,6 @@ return [
     'qs_batch_pending_timeout' => env('WBSTACK_QS_BATCH_PENDING_TIMEOUT', 'PT300S'),
     'qs_batch_mark_failed_after' => intval(env('WBSTACK_QS_BATCH_MARK_FAILED_AFTER', '3')),
     'qs_batch_entity_limit' => intval(env('WBSTACK_QS_BATCH_ENTITY_LIMIT', '10')),
+
+    'qs_rebuild_chunk_size' => intval(env('WBSTACK_QS_REBUILD_CHUNK_SIZE', '50')),
 ];
