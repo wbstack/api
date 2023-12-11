@@ -5,10 +5,14 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
 use App\Wiki;
+use App\WikiSetting;
 use App\Jobs\TemporaryDummyJob;
 
 class RebuildQueryserviceDataCommand extends Command
 {
+    private const NAMESPACE_ITEM = 120;
+    private const NAMESPACE_PROPERTY = 122;
+    private const NAMESPACE_LEXEME = 146;
     /**
      * The name and signature of the console command.
      *
@@ -69,11 +73,33 @@ class RebuildQueryserviceDataCommand extends Command
         return 0;
     }
 
-    private function getEntitiesForWiki (string $wikiDomain): array {
-        return ['Q1'];
+    private function getEntitiesForWiki (Wiki $wiki): array
+    {
+        $items = $this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_ITEM);
+        $properties = $this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_PROPERTY);
+
+        $hasLexemesEnabled = $wiki->settings()->where('name', WikiSetting::wwExtEnableWikibaseLexeme) !== null;
+        $lexemes = $hasLexemesEnabled
+            ? $this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_LEXEME)
+            : [];
+
+        return array_merge($items, $properties, $lexemes);
     }
 
-    private function getSparqlUrl (string $queryserviceNamespace): string {
+    private function getSparqlUrl (string $queryserviceNamespace): string
+    {
         return 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/'.$queryserviceNamespace.'/sparql';
+    }
+
+    private function fetchPagesInNamespace(string $wikiDomain, int $namespace): array
+    {
+        return [];
+    }
+
+    private function stripPrefixes (array $items): array
+    {
+        return array_map(function (string $item) {
+            return preg_replace('/^[a-zA-Z]+:/', '', $item);
+        }, $items);
     }
 }
