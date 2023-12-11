@@ -36,7 +36,6 @@ class RebuildQueryserviceDataCommand extends Command
      */
 
     protected int $chunkSize;
-    protected int $apiPageSize;
     protected string $apiUrl;
 
     public function __construct()
@@ -44,7 +43,6 @@ class RebuildQueryserviceDataCommand extends Command
         parent::__construct();
         $this->chunkSize = Config::get('wbstack.qs_rebuild_chunk_size');
         $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
-        $this->apiPageSize = 500;
     }
 
     /**
@@ -123,7 +121,7 @@ class RebuildQueryserviceDataCommand extends Command
                     'list' => 'allpages',
                     'apnamespace' => $namespace,
                     'apcontinue' => $cursor,
-                    'aplimit' => $this->apiPageSize,
+                    'aplimit' => 'max',
                 ],
             );
 
