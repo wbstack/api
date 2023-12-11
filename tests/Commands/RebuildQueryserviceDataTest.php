@@ -9,11 +9,15 @@ use App\Jobs\TemporaryDummyJob;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class RebuildQueryserviceDataTest extends TestCase
 {
     use DatabaseTransactions;
+
+    private int $prevChunkSize;
+    private string $prevSparqlUrlFormat;
 
     public function setUp(): void
     {
@@ -21,6 +25,11 @@ class RebuildQueryserviceDataTest extends TestCase
         Wiki::query()->delete();
         WikiSetting::query()->delete();
         QueryserviceNamespace::query()->delete();
+
+        $this->prevChunkSize = Config::get('wbstack.qs_rebuild_chunk_size');
+        Config::set('wbstack.qs_rebuild_chunk_size', 10);
+        $this->prevSparqlUrlFormat = Config::get('wbstack.qs_rebuild_sparql_url_format');
+        Config::set('wbstack.qs_rebuild_sparql_url_format', 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql');
     }
 
     public function tearDown(): void
@@ -28,6 +37,8 @@ class RebuildQueryserviceDataTest extends TestCase
         Wiki::query()->delete();
         WikiSetting::query()->delete();
         QueryserviceNamespace::query()->delete();
+        Config::set('wbstack.qs_rebuild_chunk_size', $this->prevChunkSize);
+        Config::set('wbstack.qs_rebuild_sparql_url_format', $this->prevSparqlUrlFormat);
         parent::tearDown();
     }
 
@@ -148,11 +159,24 @@ class RebuildQueryserviceDataTest extends TestCase
         ]);
 
         $this->artisan('wbs-qs:rebuild')->assertExitCode(0);
+        Bus::assertDispatchedTimes(TemporaryDummyJob::class, 2);
         Bus::assertDispatched(TemporaryDummyJob::class, function ($job) {
             if ('rebuild.wikibase.cloud' !== $job->domain) {
                 return false;
             }
-            if ('P1,P9,P11,Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,Q9,L1,L2,L100' !== $job->entites) {
+            if ('P1,P9,P11,Q1,Q2,Q3,Q4,Q5,Q6,Q7' !== $job->entites) {
+                return false;
+            }
+            if ('http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql' !== $job->sparqlUrl) {
+                return false;
+            }
+            return true;
+        });
+        Bus::assertDispatched(TemporaryDummyJob::class, function ($job) {
+            if ('rebuild.wikibase.cloud' !== $job->domain) {
+                return false;
+            }
+            if ('Q8,Q9,L1,L2,L100' !== $job->entites) {
                 return false;
             }
             if ('http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql' !== $job->sparqlUrl) {
