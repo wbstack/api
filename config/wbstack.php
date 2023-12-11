@@ -30,4 +30,5 @@ return [
     'qs_batch_entity_limit' => intval(env('WBSTACK_QS_BATCH_ENTITY_LIMIT', '10')),
 
     'qs_rebuild_chunk_size' => intval(env('WBSTACK_QS_REBUILD_CHUNK_SIZE', '50')),
+    'qs_rebuild_sparql_url_format' => env('WBSTACK_QS_REBUILD_SPARQL_URL_FORMAT', 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql'),
 ];

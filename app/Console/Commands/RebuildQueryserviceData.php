@@ -38,11 +38,13 @@ class RebuildQueryserviceData extends Command
 
     protected int $chunkSize;
     protected string $apiUrl;
+    protected string $sparqlUrlFormat;
 
     public function __construct()
     {
         parent::__construct();
         $this->chunkSize = Config::get('wbstack.qs_rebuild_chunk_size');
+        $this->sparqlUrlFormat = Config::get('wbstack.qs_rebuild_sparql_url_format');
         $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
     }
 
@@ -108,7 +110,7 @@ class RebuildQueryserviceData extends Command
         return $this->stripPrefixes($merged);
     }
 
-    private static function getSparqlUrl (Wiki $wiki): string
+    private function getSparqlUrl (Wiki $wiki): string
     {
         $match = QueryserviceNamespace::where(['wiki_id' => $wiki->id])->first();
         if (!$match) {
@@ -116,8 +118,7 @@ class RebuildQueryserviceData extends Command
                 'Unable to find queryservice namespace record for wiki '.$wiki->domain
             );
         }
-        // TODO: should this template be moved to configuration?
-        return 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/'.$match->namespace.'/sparql';
+        return sprintf($this->sparqlUrlFormat, $match->namespace);
     }
 
     private function fetchPagesInNamespace(string $wikiDomain, int $namespace): array
