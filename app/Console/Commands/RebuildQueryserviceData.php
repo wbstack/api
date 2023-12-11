@@ -68,6 +68,7 @@ class RebuildQueryserviceData extends Command
                 Log::error(
                     'Failed to get prerequisites for enqueuing wiki '.$wiki->domain.', will not dispatch jobs.'
                 );
+                Log::error($ex);
                 $exitCode = 1;
                 break;
             }

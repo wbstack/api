@@ -18,10 +18,16 @@ class TemporaryDummyJob implements ShouldQueue
      *
      * @return void
      */
+    public $domain;
+    public $entites;
+    public $sparqlUrl;
     public function __construct($domain, $entites, $sparqlUrl)
     {
+        $this->domain = $domain;
         Log::info('Dummy Job received domain: '.$domain);
+        $this->entites = $entites;
         Log::info('Dummy Job received entities: '.$entites);
+        $this->sparqlUrl = $sparqlUrl;
         Log::info('Dummy Job received sparqlUrl: '.$sparqlUrl);
     }
 
