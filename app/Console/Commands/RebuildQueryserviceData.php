@@ -92,7 +92,13 @@ class RebuildQueryserviceData extends Command
         $items = $this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_ITEM);
         $properties = $this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_PROPERTY);
 
-        $hasLexemesEnabled = $wiki->settings()->where('name', WikiSetting::wwExtEnableWikibaseLexeme) !== null;
+        $lexemesSetting = WikiSetting::where(
+            [
+                'wiki_id' => $wiki->id,
+                'name' => WikiSetting::wwExtEnableWikibaseLexeme
+            ],
+        )->first();
+        $hasLexemesEnabled = $lexemesSetting !== null && $lexemesSetting->value === '1';
         $lexemes = $hasLexemesEnabled
             ? $this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_LEXEME)
             : [];
@@ -105,7 +111,9 @@ class RebuildQueryserviceData extends Command
     {
         $match = QueryserviceNamespace::where(['wiki_id' => $wiki->id])->first();
         if (!$match) {
-            throw new \Exception('Unable to find queryservice namespace record for wiki '.$wiki->domain);
+            throw new \Exception(
+                'Unable to find queryservice namespace record for wiki '.$wiki->domain
+            );
         }
         // TODO: should this template be moved to configuration?
         return 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/'.$match->namespace.'/sparql';
@@ -115,8 +123,7 @@ class RebuildQueryserviceData extends Command
     {
         $titles = [];
         $cursor = '';
-        while (true)
-        {
+        while (true) {
             $response = Http::withHeaders([
                 'host' => $wikiDomain
             ])->get(
@@ -131,13 +138,17 @@ class RebuildQueryserviceData extends Command
             );
 
             if ($response->failed()) {
-                throw new \Exception('Failed to fetch allpages for wiki '.$wikiDomain);
+                throw new \Exception(
+                    'Failed to fetch allpages for wiki '.$wikiDomain
+                );
             }
 
             $jsonResponse = $response->json();
             $error = data_get($jsonResponse, 'error');
             if ($error !== null) {
-                throw new \Exception('Error response fetching allpages for wiki '.$wikiDomain.': '.$error);
+                throw new \Exception(
+                    'Error response fetching allpages for wiki '.$wikiDomain.': '.$error
+                );
             }
 
             $pages = data_get($jsonResponse, 'query.allpages', []);
