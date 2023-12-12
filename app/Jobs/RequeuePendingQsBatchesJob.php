@@ -20,7 +20,7 @@ class RequeuePendingQsBatchesJob extends Job
     {
         $failedBatches = $this->markBatchesFailed();
         foreach ($failedBatches as $batchId) {
-            report("QsBatch with ID ".$batchId."was marked as failed.");
+            report("QsBatch with ID ".$batchId." was marked as failed.");
         }
 
         $this->requeueStalledBatches();
