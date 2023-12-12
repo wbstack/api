@@ -31,6 +31,7 @@ class RequeuePendingQsBatchesJobTest extends TestCase
         QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(400), 'id' => 2, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'a,b']);
         QsBatch::factory()->create(['processing_attempts' => 3, 'id' => 3, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'a,b']);
         QsBatch::factory()->create(['failed' => 1, 'processing_attempts' => 4, 'id' => 4, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'a,b']);
+        QsBatch::factory()->create(['failed' => 0, 'processing_attempts' => 3, 'id' => 5, 'done' => 1, 'wiki_id' => 1, 'entityIds' => 'a,b']);
 
         $mockExceptionHandler = $this->createMock(ExceptionHandler::class);
         $mockExceptionHandler
@@ -45,10 +46,11 @@ class RequeuePendingQsBatchesJobTest extends TestCase
             ->method('fail');
         $job->handle();
 
-        $this->assertEquals(QsBatch::where('pending_since', '=', null)->count(), 3);
+        $this->assertEquals(QsBatch::where('pending_since', '=', null)->count(), 4);
         $this->assertEquals(QsBatch::where('failed', '=', true)->count(), 2);
         $this->assertEquals(QsBatch::where('id', '=', 2)->first()->processing_attempts, 1);
         $this->assertEquals(QsBatch::where('id', '=', 4)->first()->processing_attempts, 4);
         $this->assertEquals(QsBatch::where('id', '=', 4)->first()->pending_since, null);
+        $this->assertEquals(QsBatch::where('id', '=', 5)->first()->failed, 0);
     }
 }

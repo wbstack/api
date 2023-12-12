@@ -32,6 +32,7 @@ class RequeuePendingQsBatchesJob extends Job
             $failedBatches = QsBatch::where([
                 ['processing_attempts', '>=', $this->markFailedAfter],
                 ['failed', '=', false],
+                ['done', '=', false]
             ])
                 ->select('id')
                 ->get()
