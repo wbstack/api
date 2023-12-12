@@ -15,10 +15,10 @@ class SpawnQueryserviceUpdaterJob implements ShouldQueue, ShouldBeUnique
 {
     use InteractsWithQueue, Queueable;
 
-    private string $wikiDomain;
-    private string $entities;
-    private string $sparqlUrl;
-    private string $qsKubernetesNamespace;
+    public string $wikiDomain;
+    public string $entities;
+    public string $sparqlUrl;
+    public string $qsKubernetesNamespace;
 
     public function __construct (string $wikiDomain, string $entities, string $sparqlUrl)
     {

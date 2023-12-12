@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Wiki;
 use App\WikiSetting;
 use App\QueryserviceNamespace;
-use App\Jobs\TemporaryDummyJob;
+use App\Jobs\SpawnQueryserviceUpdaterJob;
 
 class RebuildQueryserviceData extends Command
 {
@@ -53,7 +53,7 @@ class RebuildQueryserviceData extends Command
             $entityChunks = array_chunk($entities, $this->chunkSize);
             foreach ($entityChunks as $entityChunk) {
                 dispatch(
-                    new TemporaryDummyJob(
+                    new SpawnQueryserviceUpdaterJob(
                         $wiki->domain,
                         implode(',', $entityChunk),
                         $sparqlUrl,

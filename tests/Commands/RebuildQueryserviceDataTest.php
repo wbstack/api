@@ -5,7 +5,7 @@ namespace Tests\Commands;
 use App\Wiki;
 use App\QueryserviceNamespace;
 use App\WikiSetting;
-use App\Jobs\TemporaryDummyJob;
+use App\Jobs\SpawnQueryserviceUpdaterJob;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
@@ -149,12 +149,12 @@ class RebuildQueryserviceDataTest extends TestCase
         ]);
 
         $this->artisan('wbs-qs:rebuild', ['--chunkSize' => 10])->assertExitCode(0);
-        Bus::assertDispatchedTimes(TemporaryDummyJob::class, 2);
-        Bus::assertDispatched(TemporaryDummyJob::class, function ($job) {
-            if ('rebuild.wikibase.cloud' !== $job->domain) {
+        Bus::assertDispatchedTimes(SpawnQueryserviceUpdaterJob::class, 2);
+        Bus::assertDispatched(SpawnQueryserviceUpdaterJob::class, function ($job) {
+            if ('rebuild.wikibase.cloud' !== $job->wikiDomain) {
                 return false;
             }
-            if ('P1,P9,P11,Q1,Q2,Q3,Q4,Q5,Q6,Q7' !== $job->entites) {
+            if (10 !== count(explode(',', $job->entities))) {
                 return false;
             }
             if ('http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql' !== $job->sparqlUrl) {
@@ -162,11 +162,11 @@ class RebuildQueryserviceDataTest extends TestCase
             }
             return true;
         });
-        Bus::assertDispatched(TemporaryDummyJob::class, function ($job) {
-            if ('rebuild.wikibase.cloud' !== $job->domain) {
+        Bus::assertDispatched(SpawnQueryserviceUpdaterJob::class, function ($job) {
+            if ('rebuild.wikibase.cloud' !== $job->wikiDomain) {
                 return false;
             }
-            if ('Q8,Q9,L1,L2,L100' !== $job->entites) {
+            if (5 !== count(explode(',', $job->entities))) {
                 return false;
             }
             if ('http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql' !== $job->sparqlUrl) {
@@ -238,11 +238,11 @@ class RebuildQueryserviceDataTest extends TestCase
         ]);
 
         $this->artisan('wbs-qs:rebuild', ['--chunkSize' => 10])->assertExitCode(0);
-        Bus::assertDispatched(TemporaryDummyJob::class, function ($job) {
-            if ('rebuild.wikibase.cloud' !== $job->domain) {
+        Bus::assertDispatched(SpawnQueryserviceUpdaterJob::class, function ($job) {
+            if ('rebuild.wikibase.cloud' !== $job->wikiDomain) {
                 return false;
             }
-            if ('P1,P9,P11,Q1,Q2,Q3,Q4,Q5' !== $job->entites) {
+            if (8 !== count(explode(',', $job->entities))) {
                 return false;
             }
             if ('http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql' !== $job->sparqlUrl) {
