@@ -64,7 +64,7 @@ class SpawnQueryserviceUpdaterJob implements ShouldQueue, ShouldBeUnique
                 'labels' => [
                     'app.kubernetes.io/instance' => $this->wikiDomain,
                     'app.kubernetes.io/name' => 'run-qs-updater',
-                    'entityPayload' => $this->entities,
+                    'entityPayload' => str_replace(',', '', $this->entities),
                 ]
             ],
             'spec' => [
