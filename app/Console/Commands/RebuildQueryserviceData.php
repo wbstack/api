@@ -111,6 +111,7 @@ class RebuildQueryserviceData extends Command
                     'apnamespace' => $namespace,
                     'apcontinue' => $cursor,
                     'aplimit' => 'max',
+                    'format' => 'json',
                 ],
             );
 
