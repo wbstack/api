@@ -1,5 +1,8 @@
 # api
 
+## 8x.28.11 - 12 December 2023
+- Batches that are done shall never be marked failed
+
 ## 8x.28.10 - 29 November 2023
 - Requeueing should not select failed batches
 
