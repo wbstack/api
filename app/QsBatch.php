@@ -37,6 +37,8 @@ class QsBatch extends Model
         'wiki_id',
         'entityIds',
         'pending_since',
+        'failed',
+        'processing_attempts',
     ];
 
     protected $casts = [
