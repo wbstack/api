@@ -43,9 +43,9 @@ class RebuildQueryserviceData extends Command
                 $sparqlUrl = $this->getSparqlUrl($wiki);
             } catch (\Exception $ex) {
                 Log::error(
-                    'Failed to get prerequisites for enqueuing wiki '.$wiki->domain.', will not dispatch jobs.'
+                    'Failed to get prerequisites for enqueuing wiki '.$wiki->domain.', will not dispatch jobs.',
+                    [$ex],
                 );
-                Log::error($ex);
                 $exitCode = 1;
                 break;
             }
