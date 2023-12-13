@@ -37,6 +37,9 @@ class RebuildQueryserviceData extends Command
             ? Wiki::whereIn('domain', $wikiDomains)->get()
             : Wiki::query()->get();
 
+        $jobTotal = 0;
+        $skippedWikis = 0;
+        $processedWikis = 0;
         foreach ($wikis as $wiki) {
             try {
                 $entities = $this->getEntitiesForWiki($wiki);
@@ -47,6 +50,7 @@ class RebuildQueryserviceData extends Command
                     [$ex],
                 );
                 $exitCode = 1;
+                $skippedWikis += 1;
                 break;
             }
 
@@ -60,8 +64,14 @@ class RebuildQueryserviceData extends Command
                     )
                 );
             }
+            $jobTotal += count($entityChunks);
+            $processedWikis += 1;
+            Log::info('Dispatched '.count($entityChunks).' jobs for wiki '.$wiki->domain.'.');
         }
 
+        Log::info(
+            'Done. Jobs dispatched: '.$jobTotal.' Wikis processed: '.$processedWikis.' Wikis skipped: '.$skippedWikis
+        );
         return $exitCode;
     }
 
