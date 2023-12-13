@@ -92,7 +92,8 @@ class RebuildQueryserviceData extends Command
             : [];
 
         $merged = array_merge($items, $properties, $lexemes);
-        return $this->stripPrefixes($merged);
+        $this->stripPrefixes($merged);
+        return $merged;
     }
 
     private function getSparqlUrl (Wiki $wiki): string
@@ -154,10 +155,11 @@ class RebuildQueryserviceData extends Command
         return $titles;
     }
 
-    private static function stripPrefixes (array $items): array
+    private static function stripPrefixes (array &$items): void
     {
-        return array_map(function (string $item) {
-            return preg_replace('/^[a-zA-Z]+:/', '', $item);
-        }, $items);
+        foreach ($items as &$item) {
+            $e = explode(':', $item);
+            $item = end($e);
+        }
     }
 }
