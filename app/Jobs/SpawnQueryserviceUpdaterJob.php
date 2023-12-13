@@ -64,7 +64,6 @@ class SpawnQueryserviceUpdaterJob implements ShouldQueue, ShouldBeUnique
                 'labels' => [
                     'app.kubernetes.io/instance' => $this->wikiDomain,
                     'app.kubernetes.io/name' => 'run-qs-updater',
-                    'entityPayload' => str_replace(',', '', $this->entities),
                 ]
             ],
             'spec' => [
@@ -102,11 +101,11 @@ class SpawnQueryserviceUpdaterJob implements ShouldQueue, ShouldBeUnique
 
         $job = $kubernetesClient->jobs()->apply($jobSpec);
         $jobName = data_get($job, 'metadata.name');
-        if (!$jobName) {
+        if (data_get($job, 'status') === 'Failure' || !$jobName) {
             // The k8s client does not fail reliably on 4xx responses, so checking the name
             // currently serves as poor man's error handling.
             $this->fail(
-                new \RuntimeException('Queryservice Updater creation for wiki "'.$this->wikiDomain.'" failed.')
+                new \RuntimeException('Queryservice Updater creation for wiki "'.$this->wikiDomain.'" failed with message: '.data_get($job, 'message', 'n/a'))
             );
             return;
         }

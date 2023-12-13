@@ -66,7 +66,7 @@ class RebuildQueryserviceData extends Command
             }
             $jobTotal += count($entityChunks);
             $processedWikis += 1;
-            Log::info('Dispatched '.count($entityChunks).' jobs for wiki '.$wiki->domain.'.');
+            Log::info('Dispatched '.count($entityChunks).' job(s) for wiki '.$wiki->domain.'.');
         }
 
         Log::info(
