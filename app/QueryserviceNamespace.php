@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * App\QueryserviceNamespace.
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class QueryserviceNamespace extends Model
 {
+    use HasFactory;
     /**
      * The attributes that are mass assignable.
      *
