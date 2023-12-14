@@ -18,7 +18,7 @@ if [ "$role" = "app" ]; then
 elif [ "$role" = "queue" ]; then
 
     echo "Running the $queue_name queue..."
-    php /var/www/html/artisan queue:work --verbose --tries=5 --timeout=90 --queue=$queue_name
+    php /var/www/html/artisan queue:work --verbose --tries=5 --timeout=90 --queue="$queue_name"
 
 elif [ "$role" = "scheduler" ]; then
 
