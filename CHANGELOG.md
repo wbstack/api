@@ -1,5 +1,8 @@
 # api
 
+## 8x.30.0 - 14 December 2023
+- Allow passing a queue name to the worker
+
 ## 8x.29.1 - 13 December 2023
 - Try to fix memory exhaustion issue when running wbs-qs:rebuild command
 
