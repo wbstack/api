@@ -1,5 +1,8 @@
 # api
 
+## 8x.31.0 - 14 December 2023
+- Dispatch jobs for rebuilding Queryservice data to non-default queue
+
 ## 8x.30.0 - 14 December 2023
 - Allow passing a queue name to the worker
 

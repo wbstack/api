@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use App\Wiki;
 use App\WikiSetting;
 use App\QueryserviceNamespace;
@@ -16,18 +17,20 @@ class RebuildQueryserviceData extends Command
     private const NAMESPACE_PROPERTY = 122;
     private const NAMESPACE_LEXEME = 146;
 
-    protected $signature = 'wbs-qs:rebuild {--domain=*} {--chunkSize=50} {--sparqlUrlFormat=http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql}';
+    protected $signature = 'wbs-qs:rebuild {--domain=*} {--chunkSize=50} {--queueName=manual-intervention} {--sparqlUrlFormat=http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql}';
 
     protected $description = 'Rebuild the queryservice data for a certain wiki or all wikis';
 
     protected int $chunkSize;
     protected string $apiUrl;
     protected string $sparqlUrlFormat;
+    protected string $queueName;
 
     public function handle()
     {
         $this->chunkSize = intval($this->option('chunkSize'));
         $this->sparqlUrlFormat = $this->option('sparqlUrlFormat');
+        $this->queueName = $this->option('queueName');
         $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
 
         $wikiDomains = $this->option('domain');
@@ -56,13 +59,11 @@ class RebuildQueryserviceData extends Command
 
             $entityChunks = array_chunk($entities, $this->chunkSize);
             foreach ($entityChunks as $entityChunk) {
-                dispatch(
-                    new SpawnQueryserviceUpdaterJob(
-                        $wiki->domain,
-                        implode(',', $entityChunk),
-                        $sparqlUrl,
-                    )
-                );
+                Queue::pushOn($this->queueName, new SpawnQueryserviceUpdaterJob(
+                    $wiki->domain,
+                    implode(',', $entityChunk),
+                    $sparqlUrl,
+                ));
             }
             $jobTotal += count($entityChunks);
             $processedWikis += 1;
