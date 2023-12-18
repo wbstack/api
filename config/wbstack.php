@@ -29,6 +29,6 @@ return [
     'qs_batch_mark_failed_after' => intval(env('WBSTACK_QS_BATCH_MARK_FAILED_AFTER', '3')),
     'qs_batch_entity_limit' => intval(env('WBSTACK_QS_BATCH_ENTITY_LIMIT', '10')),
 
-    'api_job_namespace' => env('API_JOB_NAMESPACE') || env('WBSTACK_API_JOB_NAMESPACE', 'api-jobs'),
+    'api_job_namespace' => env('API_JOB_NAMESPACE', env('WBSTACK_API_JOB_NAMESPACE', 'api-jobs')),
     'qs_job_namespace' => env('WBSTACK_QS_JOB_NAMESPACE', 'qs-jobs'),
 ];

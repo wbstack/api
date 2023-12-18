@@ -1,5 +1,8 @@
 # api
 
+## 8x.31.1 - 18 December 2023
+- Fix namespace lookup for api-jobs
+
 ## 8x.31.0 - 14 December 2023
 - Dispatch jobs for rebuilding Queryservice data to non-default queue
 
