@@ -83,7 +83,8 @@
         "sort-packages": true,
         "optimize-autoloader": true,
         "allow-plugins": {
-            "composer/package-versions-deprecated": true
+            "composer/package-versions-deprecated": true,
+            "php-http/discovery": false
         }
     },
     "minimum-stability": "dev",
