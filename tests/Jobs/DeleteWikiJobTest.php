@@ -20,7 +20,6 @@ use Illuminate\Database\DatabaseManager;
 
 class DeleteWikiJobTest extends TestCase
 {
-    use DatabaseTransactions;
     use DispatchesJobs;
 
     private $wiki;
