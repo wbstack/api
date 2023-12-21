@@ -1,5 +1,8 @@
 # api
 
+## 8x.32.0 - 21 December 2023
+- Update to PHP 8.1
+
 ## 8x.31.1 - 18 December 2023
 - Fix namespace lookup for api-jobs
 
