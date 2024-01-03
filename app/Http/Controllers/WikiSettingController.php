@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Rules\SettingCaptchaQuestions;
 use App\Rules\SettingWikibaseManifestEquivEntities;
 use App\WikiManager;
 use App\WikiSetting;
@@ -26,6 +27,8 @@ class WikiSettingController extends Controller
             'wwWikibaseStringLengthMultilang' => ['required', 'integer', 'between:250,2500'],
             'wikibaseFedPropsEnable' => ['required', 'boolean'],
             'wikibaseManifestEquivEntities' => ['required', 'json', new SettingWikibaseManifestEquivEntities()],
+            'wwUseQuestyCaptcha' => ['required', 'boolean'],
+            'wwCaptchaQuestions' => [ 'required', 'json', new SettingCaptchaQuestions()]
         ];
     }
 
