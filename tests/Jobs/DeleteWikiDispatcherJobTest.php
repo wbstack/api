@@ -34,7 +34,7 @@ class DeleteWikiDispatcherJobTest extends TestCase
     public function setUp(): void {
         parent::setUp();
         Log::swap(new LogFake);
-        Storage::fake('gcs-public-static');
+        Storage::fake('s3');
         $this->wiki = $this->getWiki();
     }
 
@@ -120,10 +120,10 @@ class DeleteWikiDispatcherJobTest extends TestCase
         $this->assertNotNull($nsAssignment);
 
         WikiSetting::factory()->create(
-            [ 
+            [
                 'wiki_id' => $this->wiki->id,
                 'name' => WikiSetting::wwExtEnableElasticSearch,
-                'value' => true 
+                'value' => true
             ]
         );
 
@@ -147,7 +147,7 @@ class DeleteWikiDispatcherJobTest extends TestCase
     public function testActuallyRunningJobsThatDelete()
     {
         $this->wiki->update(['domain' => 'asdasdaf' . Config::get('wbstack.subdomain_suffix')]);
-        
+
         // create db to be deleted
         $job = new ProvisionWikiDbJob('great_job', 'the_test_database', null);
         $job->handle( $this->app->make('db') );
@@ -159,7 +159,7 @@ class DeleteWikiDispatcherJobTest extends TestCase
 
         $this->assertTrue( $res );
         $this->assertNotNull( WikiDb::where([ 'wiki_id' => $this->wiki->id ])->first() );
-        
+
         $mockJob = $this->createMock(Job::class);
         $job = new DeleteWikiDispatcherJob();
         $job->setJob($mockJob);

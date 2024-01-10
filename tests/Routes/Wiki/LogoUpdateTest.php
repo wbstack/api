@@ -18,7 +18,7 @@ class LogoUpdateTest extends TestCase
 
     public function testUpdate()
     {
-        $storage = Storage::fake('gcs-public-static');
+        $storage = Storage::fake('s3');
         $file = UploadedFile::fake()->createWithContent("logo_200x200.png", file_get_contents(__DIR__ . "/../../data/logo_200x200.png"));
 
         $user = User::factory()->create(['verified' => true]);
