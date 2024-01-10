@@ -7,7 +7,7 @@ use Tests\TestCase;
 use Illuminate\Contracts\Queue\Job;
 use App\Jobs\SpawnQueryserviceUpdaterJob;
 use Maclof\Kubernetes\Client;
-use Http\Adapter\Guzzle6\Client as Guzzle6Client;
+use Http\Adapter\Guzzle7\Client as GuzzleClient;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
@@ -33,7 +33,7 @@ class SpawnQueryserviceUpdaterJobTest extends TestCase
         ]);
 
         $handlerStack = HandlerStack::create($mock);
-        $mockGuzzle = Guzzle6Client::createWithConfig([
+        $mockGuzzle = GuzzleClient::createWithConfig([
             'handler' => $handlerStack,
             'verify' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
         ]);
@@ -81,7 +81,7 @@ class SpawnQueryserviceUpdaterJobTest extends TestCase
         ]);
 
         $handlerStack = HandlerStack::create($mock);
-        $mockGuzzle = Guzzle6Client::createWithConfig([
+        $mockGuzzle = GuzzleClient::createWithConfig([
             'handler' => $handlerStack,
             'verify' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
         ]);

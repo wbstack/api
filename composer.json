@@ -14,7 +14,7 @@
         "fruitcake/laravel-cors": "^2.0",
         "gluedev/laravel-stackdriver": "dev-develop#7fb3e78ce949dd341b5418f876c3ff74d8c1ff92",
         "google/recaptcha": "^1.2",
-        "guzzlehttp/guzzle": "^6.3",
+        "guzzlehttp/guzzle": "^7.8",
         "guzzlehttp/psr7": "^1.9",
         "hackzilla/password-generator": "^1.6",
         "illuminate/mail": "^8.48",
@@ -29,7 +29,7 @@
         "maclof/kubernetes-client": "^0.26.0",
         "mxl/laravel-job": "^1.2",
         "percymamedy/laravel-dev-booter": "^3.0",
-        "php-http/guzzle6-adapter": "^2.0",
+        "php-http/guzzle7-adapter": "^1.0",
         "php-http/message": "^1.16",
         "php-http/message-factory": "^1.1",
         "predis/predis": "^1.1"
