@@ -1,5 +1,8 @@
 # api
 
+## 8x.34.0 - 11 January
+- Use S3 driver for accessing static files in GCP buckets
+
 ## 8x.33.0 - 03 January
 - Add QuestyCaptcha Setting
 
