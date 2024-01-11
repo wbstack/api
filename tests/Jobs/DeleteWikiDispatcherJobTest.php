@@ -34,7 +34,7 @@ class DeleteWikiDispatcherJobTest extends TestCase
     public function setUp(): void {
         parent::setUp();
         Log::swap(new LogFake);
-        Storage::fake('s3');
+        Storage::fake('s3-static');
         $this->wiki = $this->getWiki();
     }
 

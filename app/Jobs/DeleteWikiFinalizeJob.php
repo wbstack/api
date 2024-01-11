@@ -97,7 +97,7 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
 
     public function deleteSiteDirectory( int $wiki_id ): bool {
         try {
-            $disk = Storage::disk('s3');
+            $disk = Storage::disk('s3-static');
             if (! $disk instanceof Cloud) {
                 $this->fail(new \RuntimeException("Invalid storage (not cloud)."));
                 return false;
