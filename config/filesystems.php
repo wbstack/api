@@ -55,16 +55,16 @@ $fileSystems = [
             'visibility' => 'public',
         ],
 
-        's3' => [
+        's3-static' => [
             'driver' => 's3',
-            'key' => env('STORAGE_ACCESS_KEY'),
-            'secret' => env('STORAGE_SECRET_KEY'),
-            'region' => env('STORAGE_REGION', 'us-east-1'),
-            'bucket' => env('STORAGE_BUCKET_NAME'),
-            'url' => env('STORAGE_URL', 'htps://storage.googleapis.com'),
-            'endpoint' => env('STORAGE_ENDPOINT', 'https://storage.googleapis.com'),
-            'bucket_endpoint' => false,
-            'use_path_style_endpoint' => true,
+            'key' => env('STATIC_STORAGE_ACCESS_KEY'),
+            'secret' => env('STATIC_STORAGE_SECRET_KEY'),
+            'region' => env('STATIC_STORAGE_REGION', 'us-east-1'),
+            'bucket' => env('STATIC_STORAGE_BUCKET_NAME'),
+            'url' => env('STATIC_STORAGE_URL'),
+            'endpoint' => env('STATIC_STORAGE_ENDPOINT'),
+            'bucket_endpoint' => boolval(env('STATIC_STORAGE_USE_BUCKET_ENDPOINT', '0')),
+            'use_path_style_endpoint' => boolval(env('STATIC_STORAGE_USE_PATH_STYLE_ENDPOINT', '1')),
         ],
     ],
 ];
