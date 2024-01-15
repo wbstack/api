@@ -77,7 +77,9 @@ class CreateQueryserviceBatchesJob extends Job
             ['pending_since', '=', null],
             ['failed', '=', false],
             ['wiki_id', '=', $wikiId],
-        ])->get();
+        ])
+            ->lockForUpdate()
+            ->get();
 
         foreach ($notDoneBatches as $qsBatch) {
             $entitiesOnBatch = explode(',', $qsBatch->entityIds);

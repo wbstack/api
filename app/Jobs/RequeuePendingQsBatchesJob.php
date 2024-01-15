@@ -35,6 +35,7 @@ class RequeuePendingQsBatchesJob extends Job
                 ['done', '=', false]
             ])
                 ->select('id')
+                ->lockForUpdate()
                 ->get()
                 ->pluck('id')
                 ->toArray();
