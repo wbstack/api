@@ -138,6 +138,8 @@ class Wiki extends Model
             'wwWikibaseStringLengthMultilang',
             'wikibaseFedPropsEnable',
             'wikibaseManifestEquivEntities',
+            'wwUseQuestyCaptcha',
+            'wwCaptchaQuestions',
         ]
     );
     }
