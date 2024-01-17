@@ -46,7 +46,7 @@ class SetWikiLogoTest extends TestCase
      */
     public function testSetLogoFails($wikiKey, $wikiValue, $logoPath)
     {
-        $storage = Storage::fake('s3-static');
+        $storage = Storage::fake('static-assets');
         $this->assertJobFails($wikiKey, $wikiValue, $logoPath);
 
         if ($wikiKey === 'id') {
@@ -66,7 +66,7 @@ class SetWikiLogoTest extends TestCase
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         // $wiki = Wiki::firstWhere($wikiKey, $wikiValue);
-        $storage = Storage::fake('s3-static');
+        $storage = Storage::fake('static-assets');
         $logoDir = Wiki::getLogosDirectory($wiki->id);
 
         // get the previous logo and favicon settings

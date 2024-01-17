@@ -55,7 +55,7 @@ $fileSystems = [
             'visibility' => 'public',
         ],
 
-        's3-static' => [
+        'static-assets' => [
             'driver' => 's3',
             'key' => env('STATIC_STORAGE_ACCESS_KEY'),
             'secret' => env('STATIC_STORAGE_SECRET_KEY'),
