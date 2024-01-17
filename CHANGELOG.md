@@ -1,5 +1,8 @@
 # api
 
+## 8x.35.1 - 22 January 2024
+- Use S3 driver for accessing static files in GCP buckets, using proper ACLs
+
 ## 8x.35.0 - 19 January 2024
 - Use pessimistic DB locks during Query Service Batch transactions
 
@@ -7,7 +10,7 @@
 - Add missing QuestyCaptcha settings to wiki details response
 - Revert "Use S3 driver for accessing static files in GCP buckets"
 
-## 8x.34.0 - 17 January 2024
+## 8x.34.0 - 17 January
 - Use S3 driver for accessing static files in GCP buckets
 
 ## 8x.33.0 - 03 January 2024
