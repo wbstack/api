@@ -1,6 +1,6 @@
 # api
 
-## 8x.34.0 - 11 January
+## 8x.34.0 - 17 January
 - Use S3 driver for accessing static files in GCP buckets
 
 ## 8x.33.0 - 03 January
