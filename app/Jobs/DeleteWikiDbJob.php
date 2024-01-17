@@ -9,7 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Database\DatabaseManager;
 
 /**
- * Prepends the MW Database, User with `deleted_` prefix and deletes WikiDB relation for a wiki 
+ * Prepends the MW Database, User with `deleted_` prefix and deletes WikiDB relation for a wiki
  */
 class DeleteWikiDbJob extends Job implements ShouldBeUnique
 {
@@ -65,15 +65,15 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
             if (! $conn instanceof \Illuminate\Database\Connection) {
                throw new \RuntimeException('Must be run on a PDO based DB connection');
             }
-    
+
             $pdo = $conn->getPdo();
             $timestamp = Carbon::now()->timestamp;
             $deletedDatabaseName = "mwdb_deleted_{$timestamp}_{$this->wikiId}";
-    
+
             if ($pdo->exec('USE '.$wikiDB->name) === false) {
                 throw new \RuntimeException('Failed to use database with dbname: '.$wikiDB->name);
             }
-    
+
 
             $tables = [];
             $result = $pdo->query('SHOW TABLES')->fetchAll();
@@ -88,7 +88,7 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
                 if(count($values) !== 1) {
                     throw new \RuntimeException("Tried getting table names for wikiDB {$wikiDB->name} but failed");
                 }
-    
+
                 $tables[] = $values[0];
             }
 
@@ -107,6 +107,9 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique
                 $replacedCount = 0;
                 $tableWithoutPrefix = str_replace($wikiDB->prefix . '_', '', $table, $replacedCount );
                 if ($replacedCount !== 1) {
+                    /**
+                     * @psalm-suppress InvalidCast
+                     */
                     throw new \RuntimeException("Did not find prefix '{$wikiDB->prefix}' in tablename '{$table}' ");
                 }
                 $pdo->exec(sprintf('RENAME TABLE %s.%s TO %s.%s', $wikiDB->name, $table, $deletedDatabaseName, $tableWithoutPrefix));
