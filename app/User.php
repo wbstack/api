@@ -133,7 +133,7 @@ class User extends Authenticatable implements MustVerifyEmail
 	 *
 	 * @return bool
 	 */
-	function offsetExists($offset) {
+	function offsetExists($offset): bool {
 		return parent::offsetExists($offset);
 	}
 
@@ -144,7 +144,7 @@ class User extends Authenticatable implements MustVerifyEmail
 	 *
 	 * @return mixed
 	 */
-	function offsetGet($offset) {
+	function offsetGet($offset): mixed {
 		return parent::offsetGet($offset);
 	}
 
@@ -156,7 +156,7 @@ class User extends Authenticatable implements MustVerifyEmail
 	 *
 	 * @return void
 	 */
-	function offsetSet($offset, $value) {
+	function offsetSet($offset, $value): void {
 		parent::offsetSet($offset, $value);
 	}
 
@@ -167,7 +167,7 @@ class User extends Authenticatable implements MustVerifyEmail
 	 *
 	 * @return void
 	 */
-	function offsetUnset($offset) {
+	function offsetUnset($offset): void {
 		parent::offsetUnset($offset);
 	}
 
@@ -185,7 +185,7 @@ class User extends Authenticatable implements MustVerifyEmail
 	 *
 	 * @return string
 	 */
-	function broadcastChannel() {
+	function broadcastChannel(): string {
 		return parent::broadcastChannel();
 	}
 
@@ -196,16 +196,16 @@ class User extends Authenticatable implements MustVerifyEmail
 	 *
 	 * @return string
 	 */
-	function toJson($options = 0) {
+	function toJson($options = 0): string {
 		return parent::toJson($options);
 	}
 
 	/**
 	 * Convert the object into something JSON serializable.
 	 *
-	 * @return array
+	 * @return mixed
 	 */
-	function jsonSerialize() {
+	function jsonSerialize(): mixed {
 		return parent::jsonSerialize();
 	}
 
