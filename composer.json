@@ -8,7 +8,7 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "cviebrock/eloquent-sluggable": "^8.0",
+        "cviebrock/eloquent-sluggable": "^9.0",
         "doctrine/dbal": "^3.1",
         "firebase/php-jwt": "^5.4",
         "fruitcake/laravel-cors": "^2.0",
@@ -17,15 +17,15 @@
         "guzzlehttp/guzzle": "^7.8",
         "guzzlehttp/psr7": "^1.9",
         "hackzilla/password-generator": "^1.6",
-        "illuminate/mail": "^8.48",
-        "illuminate/redis": "^8.48",
+        "illuminate/mail": "^9.0",
+        "illuminate/redis": "^9.0",
         "intervention/image": "^2.5",
-        "laravel/framework": "^8.48",
+        "laravel/framework": "^9.0",
         "laravel/passport": "^10.1",
         "laravel/tinker": "^2.6",
         "laravel/ui": "^3.3",
         "lcobucci/jwt": "^4.1",
-        "league/flysystem-aws-s3-v3": "^1.0",
+        "league/flysystem-aws-s3-v3": "^3.22",
         "maclof/kubernetes-client": "^0.26.0",
         "mxl/laravel-job": "^1.2",
         "percymamedy/laravel-dev-booter": "^3.0",
@@ -35,13 +35,13 @@
         "predis/predis": "^1.1"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": ">=2.8.0 <2.9.2",
+        "barryvdh/laravel-ide-helper": "2.13",
         "fakerphp/faker": "^1.17",
         "mockery/mockery": "^1.4",
         "phpunit/phpunit": "^9.5",
-        "psalm/plugin-laravel": "^1.4",
-        "timacdonald/log-fake": "^1.9",
-        "vimeo/psalm": "^4.8"
+        "psalm/plugin-laravel": "^2.8",
+        "timacdonald/log-fake": "^2.1",
+        "vimeo/psalm": "^5.19"
     },
     "repositories": [
         {
