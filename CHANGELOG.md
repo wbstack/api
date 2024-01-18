@@ -1,5 +1,8 @@
 # api
 
+## 8x.34.1 - 18 January
+- Explicitly make files uploaded to GCS publicly readable
+
 ## 8x.34.0 - 17 January
 - Use S3 driver for accessing static files in GCP buckets
 
