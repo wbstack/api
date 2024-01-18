@@ -35,7 +35,7 @@
         "superbalist/laravel-google-cloud-storage": "^2.2"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": ">=2.8.0 <2.9.2",
+        "barryvdh/laravel-ide-helper": "^2.13.0",
         "fakerphp/faker": "^1.17",
         "mockery/mockery": "^1.4",
         "phpunit/phpunit": "^9.5",
