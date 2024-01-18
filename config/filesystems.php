@@ -55,18 +55,33 @@ $fileSystems = [
             'visibility' => 'public',
         ],
 
-        'static-assets' => [
-            'driver' => 's3',
-            'key' => env('STATIC_STORAGE_ACCESS_KEY'),
-            'secret' => env('STATIC_STORAGE_SECRET_KEY'),
-            'region' => env('STATIC_STORAGE_REGION', 'us-east-1'),
-            'bucket' => env('STATIC_STORAGE_BUCKET_NAME'),
-            'url' => env('STATIC_STORAGE_URL'),
-            'endpoint' => env('STATIC_STORAGE_ENDPOINT'),
-            'bucket_endpoint' => boolval(env('STATIC_STORAGE_USE_BUCKET_ENDPOINT', '0')),
-            'use_path_style_endpoint' => boolval(env('STATIC_STORAGE_USE_PATH_STYLE_ENDPOINT', '1')),
+//        's3' => [
+//            'driver' => 's3',
+//            'key' => env('AWS_ACCESS_KEY_ID'),
+//            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+//            'region' => env('AWS_DEFAULT_REGION'),
+//            'bucket' => env('AWS_BUCKET'),
+//            'url' => env('AWS_URL'),
+//        ],
+
+        // https://github.com/Superbalist/laravel-google-cloud-storage
+        'gcs-public-static' => [
+            'driver' => 'gcs',
+            'project_id' => env('GOOGLE_CLOUD_PROJECT_ID', 'your-project-id'),
+            'key_file' => env('GOOGLE_CLOUD_STORAGE_KEY_FILE', null), // optional: /path/to/service-account.json
+            'bucket' => env('GOOGLE_CLOUD_STORAGE_BUCKET', 'your-bucket'),
+            'path_prefix' => env('GOOGLE_CLOUD_STORAGE_PATH_PREFIX', null), // optional: /default/path/to/apply/in/bucket
+            'storage_api_uri' => env('GOOGLE_CLOUD_STORAGE_API_URI', null), // see: Public URLs below
+            'visibility' => 'public', // optional: public|private
         ],
+
     ],
+
 ];
+
+
+if (env('APP_ENV') === 'local' || env('APP_ENV') === 'testing') {
+    $fileSystems['disks']['gcs-public-static'] = $fileSystems['disks']['public'];
+}
 
 return $fileSystems;
