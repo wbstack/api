@@ -66,7 +66,7 @@ class SetWikiLogo extends Job
         $logosDir = Wiki::getLogosDirectory($wiki->id);
 
         // Upload the local image to the cloud storage
-        $storage->putFileAs($logosDir, new File($this->logoPath), "raw.png");
+        $storage->putFileAs($logosDir, new File($this->logoPath), "raw.png", ['visibilty' => 'public']);
 
         // Store a conversion for the actual site logo
         $reducedPath = $logosDir . '/135.png';
@@ -75,7 +75,8 @@ class SetWikiLogo extends Job
         }
         $storage->writeStream(
             $reducedPath,
-            Image::make($this->logoPath)->resize(135, 135)->stream()->detach()
+            Image::make($this->logoPath)->resize(135, 135)->stream()->detach(),
+            ['visibility' => 'public'],
         );
 
         // Store a conversion for the favicon
@@ -85,7 +86,8 @@ class SetWikiLogo extends Job
         }
         $storage->writeStream(
             $faviconPath,
-            Image::make($this->logoPath)->resize(64, 64)->stream()->detach()
+            Image::make($this->logoPath)->resize(64, 64)->stream()->detach(),
+            ['visibility' => 'public'],
         );
 
         // Get the urls
