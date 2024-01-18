@@ -1,9 +1,13 @@
 # api
 
-## 8x.34.0 - 17 January
+## 8x.34.1 - 18 January 2024
+- Add missing QuestyCaptcha settings to wiki details response
+- Revert "Use S3 driver for accessing static files in GCP buckets"
+
+## 8x.34.0 - 17 January 2024
 - Use S3 driver for accessing static files in GCP buckets
 
-## 8x.33.0 - 03 January
+## 8x.33.0 - 03 January 2024
 - Add QuestyCaptcha Setting
 
 ## 8x.32.0 - 21 December 2023
