@@ -55,7 +55,7 @@ class SetWikiLogo extends Job
         $wiki = $wikis->first();
 
         // Get the cloud disk we use to store logos
-        $storage = Storage::disk('static-assets');
+        $storage = Storage::disk('gcs-public-static');
         if (!$storage instanceof FilesystemAdapter) {
             # TODO: Use a more specific exception?
             $this->fail(new \RuntimeException("Invalid storage (not cloud)"));

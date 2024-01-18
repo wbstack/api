@@ -21,7 +21,7 @@ class DeleteWikiFinalizeJobTest extends TestCase
 
     public function setUp(): void {
         parent::setUp();
-        Storage::fake('static-assets');
+        Storage::fake('gcs-public-static');
     }
 
     public function testDeleteWiki()
@@ -112,10 +112,10 @@ class DeleteWikiFinalizeJobTest extends TestCase
 
         $siteDir = Wiki::getSiteDirectory($wiki->id);
 
-        Storage::disk('static-assets')
+        Storage::disk('gcs-public-static')
             ->makeDirectory($siteDir);
 
-        Storage::disk('static-assets')->assertExists($siteDir);
+        Storage::disk('gcs-public-static')->assertExists($siteDir);
 
         $request = $this->createMock(HttpRequest::class);
         $request->expects($this->never())->method('execute');
@@ -129,6 +129,6 @@ class DeleteWikiFinalizeJobTest extends TestCase
         $this->assertNull( WikiSetting::whereId($setting->id)->first() );
 
         // site dir gone
-        Storage::disk('static-assets')->assertMissing($siteDir);
+        Storage::disk('gcs-public-static')->assertMissing($siteDir);
     }
 }
