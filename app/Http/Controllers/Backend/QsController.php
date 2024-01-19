@@ -19,6 +19,7 @@ class QsController extends Controller
                 ['failed', '=', false]
             ])
                 ->orderBy('id')
+                ->lockForUpdate()
                 ->first();
 
             if ($oldestBatch === null) {

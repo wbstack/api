@@ -72,12 +72,20 @@ class CreateQueryserviceBatchesJob extends Job
 
     private function tryToAppendEntitesToExistingBatches(array $entityIdsFromEvents, int $wikiId): bool
     {
+        if (DB::transactionLevel() < 1) {
+            throw new \Exception(
+                'This method can only be run within the context of a transaction.'
+            );
+        }
+
         $notDoneBatches = QsBatch::where([
             ['done', '=', 0],
             ['pending_since', '=', null],
             ['failed', '=', false],
             ['wiki_id', '=', $wikiId],
-        ])->get();
+        ])
+            ->lockForUpdate()
+            ->get();
 
         foreach ($notDoneBatches as $qsBatch) {
             $entitiesOnBatch = explode(',', $qsBatch->entityIds);
