@@ -1,5 +1,8 @@
 # api
 
+## 8x.35.0 - 19 January 2024
+- Use pessimistic DB locks during Query Service Batch transactions
+
 ## 8x.34.1 - 18 January 2024
 - Add missing QuestyCaptcha settings to wiki details response
 - Revert "Use S3 driver for accessing static files in GCP buckets"
