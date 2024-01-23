@@ -1,5 +1,8 @@
 # api
 
+## 9x.0.1 - 23 January 2024
+- Fix typo when setting visibility on raw assets
+
 ## 9x.0.0 - 23 January 2024
 - Update Laravel to version 9
 

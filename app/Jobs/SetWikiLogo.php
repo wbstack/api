@@ -66,7 +66,7 @@ class SetWikiLogo extends Job
         $logosDir = Wiki::getLogosDirectory($wiki->id);
 
         // Upload the local image to the cloud storage
-        $storage->putFileAs($logosDir, new File($this->logoPath), "raw.png", ['visibilty' => 'public']);
+        $storage->putFileAs($logosDir, new File($this->logoPath), "raw.png", ['visibility' => 'public']);
 
         // Store a conversion for the actual site logo
         $reducedPath = $logosDir . '/135.png';
