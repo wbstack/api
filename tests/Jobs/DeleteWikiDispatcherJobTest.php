@@ -21,6 +21,7 @@ use App\Jobs\DeleteQueryserviceNamespaceJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use TiMacDonald\Log\LogFake;
+use TiMacDonald\Log\LogEntry;
 use Illuminate\Support\Str;
 use App\Jobs\ProvisionWikiDbJob;
 use App\WikiDb;
@@ -93,8 +94,11 @@ class DeleteWikiDispatcherJobTest extends TestCase
         $job->setJob($mockJob);
         $job->handle();
 
-        Log::assertLogged('info', function ($message, $context) {
-            return Str::contains($message, 'Found no soft deleted wikis over threshold. exiting.');
+        Log::assertLogged(function (LogEntry $log) {
+            if ($log->level !== 'info') {
+                return false;
+            }
+            return Str::contains($log->message, 'Found no soft deleted wikis over threshold. exiting.');
         });
 
         Bus::assertNotDispatched(KubernetesIngressDeleteJob::class);
@@ -132,8 +136,11 @@ class DeleteWikiDispatcherJobTest extends TestCase
         $job->setJob($mockJob);
         $job->handle();
 
-        Log::assertLogged('info', function ($message, $context) {
-            return Str::contains($message, "Dispatching hard delete job chain for id: {$this->wiki->id}");
+        Log::assertLogged(function (LogEntry $log) {
+            if ($log->level !== 'info') {
+                return false;
+            }
+            return Str::contains($log->message, "Dispatching hard delete job chain for id: {$this->wiki->id}");
         });
 
         Bus::assertChained([
@@ -170,8 +177,11 @@ class DeleteWikiDispatcherJobTest extends TestCase
         $this->assertNull( Wiki::whereId($this->wiki->id)->first() );
         $this->assertNull( WikiDb::where([ 'wiki_id' => $this->wiki->id ])->first() );
 
-        Log::assertLogged('info', function ($message, $context) {
-            return Str::contains($message, "Dispatching hard delete job chain for id: {$this->wiki->id}");
+        Log::assertLogged(function (LogEntry $log) {
+            if ($log->level !== 'info') {
+                return false;
+            }
+            return Str::contains($log->message, "Dispatching hard delete job chain for id: {$this->wiki->id}");
         });
 
         $mockJob->expects($this->never())->method('fail');

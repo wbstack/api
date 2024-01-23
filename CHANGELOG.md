@@ -1,5 +1,8 @@
 # api
 
+## 9x.0.0 - 23 January 2024
+- Update Laravel to version 9
+
 ## 8x.35.1 - 22 January 2024
 - Use S3 driver for accessing static files in GCP buckets, using proper ACLs
 

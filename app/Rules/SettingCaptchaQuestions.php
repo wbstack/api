@@ -25,6 +25,9 @@ class SettingCaptchaQuestions implements Rule
             if (!is_string($question)) {
                 return false;
             }
+            /**
+             * @psalm-suppress NoValue
+             */
             if (strlen($question) > 200) {
                 return false;
             }
@@ -34,7 +37,7 @@ class SettingCaptchaQuestions implements Rule
             if (!is_array($answers)) {
                 return false;
             }
-            if (count($answers) === 0) {
+            if (count((array) $answers) === 0) {
                 return false;
             }
             foreach ($answers as $answer) {
