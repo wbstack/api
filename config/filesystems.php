@@ -46,6 +46,7 @@ $fileSystems = [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
+            'throw' => false,
         ],
 
         'public' => [
@@ -53,6 +54,7 @@ $fileSystems = [
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
+            'throw' => false,
         ],
 
         'static-assets' => [
@@ -65,6 +67,7 @@ $fileSystems = [
             'endpoint' => env('STATIC_STORAGE_ENDPOINT'),
             'bucket_endpoint' => boolval(env('STATIC_STORAGE_USE_BUCKET_ENDPOINT', '0')),
             'use_path_style_endpoint' => boolval(env('STATIC_STORAGE_USE_PATH_STYLE_ENDPOINT', '1')),
+            'throw' => false,
         ],
     ],
 ];

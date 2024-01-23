@@ -47,7 +47,7 @@ class Kernel extends HttpKernel
         'throttle.signup' => \App\Http\Middleware\ThrottleSignup::class,
         //'throttle' => App\Http\Middleware\ThrottleRequests::class,
         //'auth' => App\Http\Middleware\Authenticate::class,
-        'cors' => \Fruitcake\Cors\HandleCors::class,
+        'cors' => \Illuminate\Http\Middleware\HandleCors::class,
     ];
 
     /**
