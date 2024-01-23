@@ -1,6 +1,6 @@
 # api
 
-## 9x.0.0 - 17 January
+## 9x.0.0 - 23 January 2024
 - Update Laravel to version 9
 
 ## 8x.35.1 - 22 January 2024
