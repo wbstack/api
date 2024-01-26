@@ -53,8 +53,11 @@ class Handler extends ExceptionHandler
             $formattedProjectName = $reportErrorsServiceClient->projectName(
                 config('credentials.projectId')
             );
+
+            Log::debug(__FILE__, ['pre new ReportedErrorEvent']);
             $event = new ReportedErrorEvent();
-    
+            Log::debug(__FILE__, ['post new ReportedErrorEvent']);
+
             try {
                 $response = $reportErrorsServiceClient->reportErrorEvent($formattedProjectName, $event);
                 Log::debug(__FILE__, [$response]);
