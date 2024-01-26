@@ -46,7 +46,9 @@ class Handler extends ExceptionHandler
      */
     public function report(Throwable $e)
     {
+        Log::debug(__FILE__, ['starting error reporting']);
         if (config('stackdriver.enabled')) {
+            Log::debug(__FILE__, ['stackdriver error reporting enabled']);
             $reportErrorsServiceClient = new ReportErrorsServiceClient();
             $formattedProjectName = $reportErrorsServiceClient->projectName(
                 config('credentials.projectId')
@@ -58,8 +60,11 @@ class Handler extends ExceptionHandler
                 Log::debug(__FILE__, [$response]);
             } finally {
                 $reportErrorsServiceClient->close();
+                Log::debug(__FILE__, ['stackdriver error reporting finale']);
             }    
         }
+
+        Log::debug(__FILE__, [$e]);
 
         parent::report($e);
     }
