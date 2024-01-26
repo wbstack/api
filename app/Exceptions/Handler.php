@@ -8,6 +8,7 @@ use Throwable;
 
 use Google\Cloud\ErrorReporting\V1beta1\ReportErrorsServiceClient;
 use Google\Cloud\ErrorReporting\V1beta1\ReportedErrorEvent;
+use Google\Cloud\ErrorReporting\V1beta1\ServiceContext;
 
 class Handler extends ExceptionHandler
 {
@@ -46,31 +47,33 @@ class Handler extends ExceptionHandler
      */
     public function report(Throwable $e)
     {
-        Log::debug(__FILE__, ['>>> starting error reporting']);
+        Log::debug(__FILE__, ['>>>>>>>> starting error reporting']);
+        Log::debug(__FILE__, [$e->getMessage()]);
+
         if (config('stackdriver.enabled')) {
-            Log::debug(__FILE__, ['stackdriver error reporting enabled']);
-            $reportErrorsServiceClient = new ReportErrorsServiceClient();
+            Log::debug(__FILE__, ['reporting error via stackdrier']);
+            $reportErrorsServiceClient = new ReportErrorsServiceClient([
+                'credentials' => config('stackdriver.credentials.keyFilePath'),
+            ]);
 
             $formattedProjectName = $reportErrorsServiceClient->projectName(
                 config('stackdriver.credentials.projectId')
             );
 
-            $event = new ReportedErrorEvent();
+            // $eventServiceContext = new ServiceContext();
+            $event = (new ReportedErrorEvent())
+                // ->setServiceContext($eventServiceContext)
+                ->setMessage($e);
             try {
                 $response = $reportErrorsServiceClient->reportErrorEvent($formattedProjectName, $event);
                 Log::debug(__FILE__, [$response]);
             } finally {
                 $reportErrorsServiceClient->close();
-                Log::debug(__FILE__, ['stackdriver error reporting finale']);
-            }    
+            }
         }
-
-        Log::debug(__FILE__, ['pre exception logging']);
-        Log::debug(__FILE__, [$e]);
-        Log::debug(__FILE__, ['pre parent::report']);
-
+        
         parent::report($e);
 
-        Log::debug(__FILE__, ['<<< finished error reporting']);
+        Log::debug(__FILE__, ['<<<<<<<< finished error reporting']);
     }
 }
