@@ -3,12 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Support\Facades\Log;
 use Throwable;
-
-use Google\Cloud\ErrorReporting\V1beta1\ReportErrorsServiceClient;
-use Google\Cloud\ErrorReporting\V1beta1\ReportedErrorEvent;
-use Google\Cloud\ErrorReporting\V1beta1\ServiceContext;
 
 class Handler extends ExceptionHandler
 {
@@ -40,40 +35,12 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * Report or log an exception.
-     *
-     * @param  \Throwable  $e
-     * @return void
+     * Register the exception handling callbacks for the application.
      */
-    public function report(Throwable $e)
+    public function register()
     {
-        Log::debug(__FILE__, ['>>>>>>>> starting error reporting']);
-        Log::debug(__FILE__, [$e->getMessage()]);
-
-        if (config('stackdriver.enabled')) {
-            Log::debug(__FILE__, ['reporting error via stackdrier']);
-            $reportErrorsServiceClient = new ReportErrorsServiceClient([
-                'credentials' => config('stackdriver.credentials.keyFilePath'),
-            ]);
-
-            $formattedProjectName = $reportErrorsServiceClient->projectName(
-                config('stackdriver.credentials.projectId')
-            );
-
-            // $eventServiceContext = new ServiceContext();
-            $event = (new ReportedErrorEvent())
-                // ->setServiceContext($eventServiceContext)
-                ->setMessage($e);
-            try {
-                $response = $reportErrorsServiceClient->reportErrorEvent($formattedProjectName, $event);
-                Log::debug(__FILE__, [$response]);
-            } finally {
-                $reportErrorsServiceClient->close();
-            }
-        }
-        
-        parent::report($e);
-
-        Log::debug(__FILE__, ['<<<<<<<< finished error reporting']);
+        $this->reportable(function (Throwable $e) {
+            (new \Absszero\ErrorReporting)->report($e);
+        });
     }
 }
