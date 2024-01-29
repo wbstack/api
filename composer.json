@@ -8,11 +8,11 @@
     "license": "MIT",
     "type": "project",
     "require": {
+        "absszero/laravel-stackdriver-error-reporting": "^1.7",
         "cviebrock/eloquent-sluggable": "^9.0",
         "doctrine/dbal": "^3.1",
         "firebase/php-jwt": "^5.4",
         "fruitcake/laravel-cors": "^2.0",
-        "google/cloud-error-reporting": "^0.21.0",
         "google/recaptcha": "^1.2",
         "guzzlehttp/guzzle": "^7.8",
         "guzzlehttp/psr7": "^1.9",
