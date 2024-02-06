@@ -8,7 +8,7 @@ return [
     'versionId' => env('STACKDRIVER_ERROR_REPORTING_VERSION_ID', '1.0.0'),
     'LoggingClient' => [
         // The project ID from the Google Developer's Console.
-        'projectId' => env('STACKDRIVER_PROJECT_ID', env('GOOGLE_CLOUD_PROJECT')),
+        'projectId' => env('STACKDRIVER_PROJECT_ID', env('GOOGLE_CLOUD_PROJECT_ID')),
         // The full path to your service account credentials .json file retrieved from the Google Developers Console.
         'keyFilePath' => env('STACKDRIVER_KEY_FILE_PATH', ''),
         // Seconds to wait before timing out the request.
@@ -32,6 +32,5 @@ return [
             'callPeriod' => 2.0,
             'workerNum' => 1,
         ],
-
     ]
 ];
