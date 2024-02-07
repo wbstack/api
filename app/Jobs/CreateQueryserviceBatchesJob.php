@@ -47,7 +47,7 @@ class CreateQueryserviceBatchesJob extends Job
             }
 
             QsCheckpoint::set($latestEventId);
-        });
+        }, 3);
     }
 
     private function getNewEntities(int $latestCheckpoint): array

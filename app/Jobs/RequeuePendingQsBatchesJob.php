@@ -44,7 +44,7 @@ class RequeuePendingQsBatchesJob extends Job
                 'pending_since' => null,
             ]);
             return $failedBatches;
-        });
+        }, 3);
     }
 
     private function requeueStalledBatches(): void
