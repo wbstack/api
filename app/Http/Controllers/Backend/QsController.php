@@ -29,7 +29,7 @@ class QsController extends Controller
             $oldestBatch->update(['pending_since' => Carbon::now()]);
             $oldestBatch->load(['wiki', 'wiki.wikiQueryserviceNamespace']);
             return response([$oldestBatch]);
-        });
+        }, 3);
 
     }
 
