@@ -1,5 +1,8 @@
 # api
 
+## 9x.0.2 - 07 February 2024
+- Retry DB transactions that lock
+
 ## 9x.0.1 - 23 January 2024
 - Fix typo when setting visibility on raw assets
 
