@@ -22,7 +22,7 @@ jobs:
     - name: Install dependencies
       uses: php-actions/composer@v6
       with:
-        php_version: 8.1
+        php_version: 8.2
         command: install
 
     - name: Copy example .env file
