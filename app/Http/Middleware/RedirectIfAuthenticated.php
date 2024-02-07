@@ -3,7 +3,9 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * The purpose of RedirectIfAuthenticated is to keep an already authenticated user
@@ -17,15 +19,16 @@ class RedirectIfAuthenticated
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  string|null  $guard
-     * @return mixed
      */
-    public function handle($request, Closure $next, $guard = null)
+    public function handle(Request $request, Closure $next, string ...$guards): Response
     {
-        if (Auth::guard($guard)->check()) {
-            return response()->json('Endpoint not needed', 400);
-            //return redirect('/home');
-        }
+        $guards = empty($guards) ? [null] : $guards;
 
+        foreach ($guards as $guard) {
+            if (Auth::guard($guard)->check()) {
+                return response()->json('Endpoint not needed', 400);
+            }
+        }
         return $next($request);
     }
 }
