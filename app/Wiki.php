@@ -63,8 +63,8 @@ class Wiki extends Model
         'domain_decoded',
     ];
 
-    protected $dates = [
-        'deleted_at',
+    protected $casts = [
+        'deleted_at' => 'datetime',
     ];
 
     public function wikiDbVersion()
