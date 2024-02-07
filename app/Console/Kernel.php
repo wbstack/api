@@ -48,6 +48,9 @@ class Kernel extends ConsoleKernel
         // Schedule site stat updates for each wiki and platform-summary
         $schedule->command('schedule:stats')->dailyAt('7:00');
 
+        // https://laravel.com/docs/10.x/upgrade#redis-cache-tags
+        $schedule->command('cache:prune-stale-tags')->hourly();
+
         $schedule->job(new PollForMediaWikiJobsJob)->everyFifteenMinutes();
 
         $schedule->job(new UpdateWikiSiteStatsJob)->dailyAt('19:00');
