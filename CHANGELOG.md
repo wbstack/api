@@ -1,5 +1,9 @@
 # api
 
+## 9x.0.3 - 08 February 2024
+- Replace stackdriver package (#731)
+- Update GitHub Actions (#683 #723 #732 #733 #734)
+
 ## 9x.0.2 - 07 February 2024
 - Retry DB transactions that lock
 
