@@ -2,7 +2,6 @@
 
 namespace App\Exceptions;
 
-use GlueDev\Laravel\Stackdriver\StackdriverExceptionHandler;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -36,14 +35,12 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * Report or log an exception.
-     *
-     * @param  \Throwable  $e
-     * @return void
+     * Register the exception handling callbacks for the application.
      */
-    public function report(Throwable $e)
+    public function register()
     {
-        StackdriverExceptionHandler::report($e);
-        parent::report($e);
+        $this->reportable(function (Throwable $e) {
+            (new \Absszero\ErrorReporting)->report($e);
+        });
     }
 }
