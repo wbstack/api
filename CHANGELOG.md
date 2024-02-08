@@ -1,5 +1,8 @@
 # api
 
+## 9x.0.3 - 08 February 2024
+- Updates a number of github action dependencies
+
 ## 9x.0.2 - 07 February 2024
 - Retry DB transactions that lock
 
