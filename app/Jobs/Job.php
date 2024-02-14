@@ -10,6 +10,14 @@ use Illuminate\Support\Facades\Config;
 
 abstract class Job implements ShouldQueue
 {
+
+    public const QUEUE_NAME_PROVISIONING = 'provisioning';
+    public const QUEUE_NAME_QUERYSERVICE = 'queryservice';
+    public const QUEUE_NAME_CLEANUP = 'cleanup';
+    public const QUEUE_NAME_STATISTICS = 'statistics';
+    public const QUEUE_NAME_RECURRING = 'recurring';
+    public const QUEUE_NAME_MW_JOBS = 'mw-jobs';
+
     /*
     |--------------------------------------------------------------------------
     | Queueable Jobs

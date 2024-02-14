@@ -19,6 +19,7 @@ class KubernetesIngressDeleteJob extends Job
     public function __construct( $wikiId )
     {
         $this->id = $wikiId;
+        $this->onQueue(self::QUEUE_NAME_CLEANUP);
     }
 
     /**
@@ -39,7 +40,7 @@ class KubernetesIngressDeleteJob extends Job
         }
 
         $exists = $client->ingresses()->exists( KubernetesIngressCreate::getKubernetesIngressName($this->id) );
-        
+
         // just exit if there is nothing no need to fail
         if ( !$exists ) {
             return;

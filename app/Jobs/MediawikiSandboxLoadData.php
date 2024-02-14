@@ -14,6 +14,7 @@ class MediawikiSandboxLoadData extends Job
     {
         $this->wikiDomain = $wikiDomain;
         $this->dataSet = $dataSet;
+        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
     }
 
     /**

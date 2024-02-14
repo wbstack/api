@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Log;
 
 class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique
 {
+    public function __construct()
+    {
+        $this->onQueue(self::QUEUE_NAME_RECURRING);
+    }
     public function handle (): void
     {
         $wikis = Wiki::with(['wikiLifecycleEvents'])
@@ -68,7 +72,7 @@ class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique
                 'notification_type' => EmptyWikiNotification::TYPE,
                 'user_id' => $wikiManager->pivot->user_id,
             ]);
-            $wikiManager->notify(new EmptyWikiNotification($wiki->sitename));    
+            $wikiManager->notify(new EmptyWikiNotification($wiki->sitename));
         }
     }
 }

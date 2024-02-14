@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\DB;
 
 class PruneEventPageUpdatesTable extends Job
 {
+    public function __construct()
+    {
+        $this->onQueue(self::QUEUE_NAME_QUERYSERVICE);
+    }
     public function handle(): void
     {
         // Assume that we only need the latest 100k page update events

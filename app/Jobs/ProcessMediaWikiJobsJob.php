@@ -3,15 +3,15 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
 use Maclof\Kubernetes\Client;
+use App\Jobs\Job;
 use Maclof\Kubernetes\Models\Job as KubernetesJob;
 
-class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
+class ProcessMediaWikiJobsJob extends Job implements ShouldBeUnique
 {
     use InteractsWithQueue, Queueable;
 
@@ -22,6 +22,7 @@ class ProcessMediaWikiJobsJob implements ShouldQueue, ShouldBeUnique
     {
         $this->wikiDomain = $wikiDomain;
         $this->jobsKubernetesNamespace = Config::get('wbstack.api_job_namespace');
+        $this->onQueue(self::QUEUE_NAME_MW_JOBS);
     }
 
     public function uniqueId(): string

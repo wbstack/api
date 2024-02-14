@@ -18,6 +18,7 @@ class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
     public function __construct( $wikiId )
     {
         $this->wikiId = $wikiId;
+        $this->onQueue(self::QUEUE_NAME_CLEANUP);
     }
 
     /**
@@ -46,7 +47,7 @@ class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
             $this->fail(new \RuntimeException("Wiki {$this->wikiId} is not marked for deletion."));
             return;
         }
-        
+
         $qsNamespace = QueryserviceNamespace::whereWikiId($this->wikiId)->first();
 
         if( !$qsNamespace ) {

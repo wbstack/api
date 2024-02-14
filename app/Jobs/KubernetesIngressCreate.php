@@ -25,6 +25,7 @@ class KubernetesIngressCreate extends Job
     {
         $this->id = $wikiId;
         $this->wikiDomain = $wikiDomain;
+        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
     }
 
     public static function getKubernetesIngressName( $wikiId ): string {

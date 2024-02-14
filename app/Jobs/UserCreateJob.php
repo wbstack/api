@@ -20,6 +20,7 @@ class UserCreateJob extends Job
         $this->email = $email;
         $this->password = $password;
         $this->verified = false;
+        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
     }
 
     /**

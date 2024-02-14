@@ -62,6 +62,7 @@ class ProvisionWikiDbJob extends Job
         $this->dbName = $dbName;
         $this->maxFree = $maxFree;
         $this->newSqlFile = config('wbstack.wiki_db_provision_version');
+        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
     }
 
     private function doesMaxFreeSayWeShouldStop(): bool
@@ -165,7 +166,7 @@ class ProvisionWikiDbJob extends Job
             }
         }
         if($aboveMariaDb1059 >= 0) {
-            // GRANT the user access to see slave status 
+            // GRANT the user access to see slave status
             // Mariadb versions > 10.5.9 https://mariadb.com/kb/en/grant/#replica-monitor
             // https://mariadb.com/docs/reference/mdb/privileges/BINLOG_MONITOR/ required to query "SHOW MASTER STATUS"
             // GRANT REPLICA MONITOR, BINLOG MONITOR ON *.* TO 'mwu_36be7164b0'@'%'

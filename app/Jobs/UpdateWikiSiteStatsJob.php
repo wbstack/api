@@ -13,6 +13,12 @@ use Carbon\Carbon;
 class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
 {
     public $timeout = 3600;
+
+    public function __construct()
+    {
+        $this->onQueue(self::QUEUE_NAME_STATISTICS);
+    }
+
     public function handle (): void
     {
         $allWikis = Wiki::all();

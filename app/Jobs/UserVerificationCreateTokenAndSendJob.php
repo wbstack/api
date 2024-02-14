@@ -39,6 +39,7 @@ class UserVerificationCreateTokenAndSendJob extends Job
         if (! class_exists($notificationClass)) {
             throw new \InvalidArgumentException("$notificationClass not found for notification");
         }
+        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
     }
 
     /**

@@ -21,6 +21,7 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
     public function __construct( $wikiId )
     {
         $this->wikiId = $wikiId;
+        $this->onQueue(self::QUEUE_NAME_CLEANUP);
     }
 
     /**

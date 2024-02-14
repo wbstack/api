@@ -6,6 +6,10 @@ use App\UserVerificationToken;
 
 class ExpireOldUserVerificationTokensJob extends Job
 {
+    public function __construct()
+    {
+        $this->onQueue(self::QUEUE_NAME_CLEANUP);
+    }
     /**
      * @return void
      */

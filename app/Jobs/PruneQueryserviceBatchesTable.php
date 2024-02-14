@@ -7,6 +7,11 @@ use Carbon\Carbon;
 
 class PruneQueryserviceBatchesTable extends Job
 {
+    public function __construct()
+    {
+        $this->onQueue(self::QUEUE_NAME_QUERYSERVICE);
+    }
+
     public function handle(): void
     {
         QsBatch::where([

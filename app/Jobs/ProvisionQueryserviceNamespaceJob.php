@@ -33,6 +33,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
 
         $this->namespace = $namespace;
         $this->maxFree = $maxFree;
+        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
     }
 
     private function doesMaxFreeSayWeShouldStop(): bool
@@ -98,7 +99,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
                 $this->fail(
                     new \RuntimeException("The namespace: {$this->namespace} already exists. response: " . $response)
                 );
-                return;                
+                return;
             } else {
                 $this->fail(
                     new \RuntimeException('Valid response, but couldn\'t find "CREATED: " in: '.$response)

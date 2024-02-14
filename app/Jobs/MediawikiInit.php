@@ -17,6 +17,7 @@ class MediawikiInit extends Job
         $this->wikiDomain = $wikiDomain;
         $this->username = $username;
         $this->email = $email;
+        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
     }
 
     /**
@@ -43,7 +44,7 @@ class MediawikiInit extends Job
             ],
         ]);
 
-        $rawResponse = $request->execute(); 
+        $rawResponse = $request->execute();
         $err = $request->error();
         $request->close();
 

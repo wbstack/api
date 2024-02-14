@@ -8,10 +8,11 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
+use App\Jobs\Job;
 use Maclof\Kubernetes\Client;
 use Maclof\Kubernetes\Models\Job as KubernetesJob;
 
-class SpawnQueryserviceUpdaterJob implements ShouldQueue, ShouldBeUnique
+class SpawnQueryserviceUpdaterJob extends Job implements ShouldBeUnique
 {
     use InteractsWithQueue, Queueable;
 

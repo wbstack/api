@@ -28,6 +28,7 @@ class SetWikiLogo extends Job
         $this->wikiKey = $wikiKey;
         $this->wikiValue = $wikiValue;
         $this->logoPath = $logoPath;
+        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
     }
 
     public function handle(): void

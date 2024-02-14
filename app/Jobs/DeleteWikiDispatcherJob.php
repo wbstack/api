@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Config;
 
 class DeleteWikiDispatcherJob extends Job
 {
+    public function __construct()
+    {
+        $this->onQueue(self::QUEUE_NAME_CLEANUP);
+    }
+
     /**
      * @return void
      */

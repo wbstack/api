@@ -11,6 +11,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class PollForMediaWikiJobsJob extends Job implements ShouldQueue, ShouldBeUnique
 {
     public $timeout = 3600;
+
+    public function __construct ()
+    {
+        $this->onQueue(self::QUEUE_NAME_MW_JOBS);
+    }
     public function handle (): void
     {
         $allWikiDomains = Wiki::all()->pluck('domain');

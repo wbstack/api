@@ -48,6 +48,7 @@ class MediawikiUpdate extends Job
         $this->to = $to;
         // TODO in an ideal world the target backend would be known by the application somehow?
         $this->targetBackendHost = $targetBackendHost;
+        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
     }
 
     /**
