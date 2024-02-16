@@ -39,12 +39,6 @@
         "timacdonald/log-fake": "^2.1",
         "vimeo/psalm": "^5.19"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/deer-wmde/laravel-stackdriver"
-        }
-    ],
     "autoload": {
         "classmap": [
             "database/seeds",
