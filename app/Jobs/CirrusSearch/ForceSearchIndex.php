@@ -11,7 +11,7 @@ use App\Wiki;
  * 
  * Example:
  * 
- * php artisan job:dispatchNow CirrusSearch\\ForceSearchIndex id 1 0 1000
+ * php artisan job:dispatchSync CirrusSearch\\ForceSearchIndex id 1 0 1000
  */
 class ForceSearchIndex extends CirrusSearchJob
 {
