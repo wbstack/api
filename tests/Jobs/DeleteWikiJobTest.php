@@ -51,7 +51,7 @@ class DeleteWikiJobTest extends TestCase
         $job->setJob($mockJob);
         $mockJob->expects($this->once())
             ->method('fail');
-        $this->dispatchNow($job);
+        $this->dispatchSync($job);
     }
 
     public function testDeletesWiki()
@@ -172,7 +172,8 @@ class DeleteWikiJobTest extends TestCase
         $job->handle($mockMananger);
     }
 
-    public function failureProvider() {
+    static public function failureProvider()
+    {
 
         yield [
             -1,

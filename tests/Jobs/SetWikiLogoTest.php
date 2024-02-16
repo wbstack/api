@@ -28,7 +28,7 @@ class SetWikiLogoTest extends TestCase
         $job->setJob($mockJob);
         $mockJob->expects($this->once())
             ->method('fail');
-        $this->dispatchNow($job);
+        $this->dispatchSync($job);
     }
 
     private function assertJobSucceeds(string $wikiKey, string $wikiValue, string $logoPath)
@@ -38,7 +38,7 @@ class SetWikiLogoTest extends TestCase
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
-        $this->dispatchNow($job);
+        $this->dispatchSync($job);
     }
 
     /**
@@ -108,14 +108,14 @@ class SetWikiLogoTest extends TestCase
         $this->assertStringEndsWith($logoDir . '/64.ico', $currentFaviconSettingURL['path']);
     }
 
-    public function validProvider()
+    static public function validProvider()
     {
         # $wikiKey, $wikiValue, $logoPath
         yield ['id', 42, __DIR__ . "/../data/logo_200x200.png"];
         yield ['domain', 'example.test.dev', __DIR__ . "/../data/logo_200x200.png"];
     }
 
-    public function invalidProvider()
+    static public function invalidProvider()
     {
         # $wikiKey, $wikiValue, $logoPath
         yield "id doesn't exist" => ['id', 999, __DIR__ . "/../data/logo_200x200.png"];

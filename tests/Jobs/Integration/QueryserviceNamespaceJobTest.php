@@ -46,7 +46,7 @@ class QueryserviceNamespaceJobTest extends TestCase
         $namespace = 'testnamespace';
         $job = new ProvisionQueryserviceNamespaceJob($namespace);
         $job->setJob($mockJob);
-        $this->dispatchNow($job);
+        $this->dispatchSync($job);
 
         DB::table('queryservice_namespaces')->where(['namespace'=>$namespace])->limit(1)->update(['wiki_id' => $wiki->id]);
 
@@ -56,7 +56,7 @@ class QueryserviceNamespaceJobTest extends TestCase
 
         $job = new DeleteQueryserviceNamespaceJob($wiki->id);
         $job->setJob($mockJob);
-        $this->dispatchNow($job);
+        $this->dispatchSync($job);
 
         $this->assertNull(
             QueryserviceNamespace::whereWikiId($wiki->id)->first()

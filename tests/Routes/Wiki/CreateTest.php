@@ -83,7 +83,7 @@ class CreateTest extends TestCase
         );
     }
 
-    public function createProvider() {
+    static public function createProvider() {
 
         yield [
             true // elasticsearch enabled for new wikis

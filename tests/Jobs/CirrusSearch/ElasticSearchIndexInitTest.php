@@ -49,7 +49,7 @@ class ElasticSearchIndexInitTest extends TestCase
         $job->setJob($mockJob);
         $mockJob->expects($this->once())
             ->method('fail');
-        $this->dispatchNow($job);
+        $this->dispatchSync($job);
     }
 
     public function testSuccess()

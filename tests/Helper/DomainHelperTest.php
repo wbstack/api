@@ -9,7 +9,7 @@ class DomainHelperTest extends TestCase {
     /**
      * @return string[][]
      */
-    public function provideUnicodeDomains(): array {
+    static public function provideUnicodeDomains(): array {
         return [
             'Example IDNA encoding' => [
                 'bücher.example',
@@ -49,7 +49,7 @@ class DomainHelperTest extends TestCase {
     /**
      * @return string[][]
      */
-    public function provideAsciiDomains(): array {
+    static public function provideAsciiDomains(): array {
         return [
             'Example IDNA decoding' => [
                 'xn--bcher-kva.example',
