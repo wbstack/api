@@ -12,7 +12,7 @@ WORKDIR /tmp/src2
 RUN composer install --no-dev --no-progress --optimize-autoloader
 
 
-FROM php:8.1-apache
+FROM php:8.2-apache
 
 RUN apt-get update \
 	# Needed for the imagick php extension install
