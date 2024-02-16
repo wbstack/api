@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Support\Facades\Config;
 
-class CreateQueryserviceBatchesTest extends TestCase
+class CreateQueryserviceBatchesJobTest extends TestCase
 {
     use RefreshDatabase;
 
