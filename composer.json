@@ -8,11 +8,6 @@
     "license": "MIT",
     "type": "project",
     "require": {
-<<<<<<< HEAD
-        "fruitcake/laravel-cors": "^2.0",
-=======
-        "absszero/laravel-stackdriver-error-reporting": "^1.7",
->>>>>>> b47c222 (replace `gluedev/laravel-stackdriver`)
         "cviebrock/eloquent-sluggable": "^10.0",
         "doctrine/dbal": "^3.1",
         "firebase/php-jwt": "^6.10",
