@@ -8,6 +8,7 @@
     "license": "MIT",
     "type": "project",
     "require": {
+        "absszero/laravel-stackdriver-error-reporting": "^1.7",
         "cviebrock/eloquent-sluggable": "^10.0",
         "doctrine/dbal": "^3.1",
         "firebase/php-jwt": "^6.10",
