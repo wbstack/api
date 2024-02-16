@@ -1,5 +1,8 @@
 # api
 
+## 9x.1.0 - 16 Februrary 2024
+- Switching to PHP 8.2
+
 ## 9x.0.3 - 08 February 2024
 - Replace stackdriver package (#731)
 - Update GitHub Actions (#683 #723 #732 #733 #734)
