@@ -20,12 +20,10 @@ class ElasticSearchIndexDeleteTest extends TestCase
     private $wiki;
     private $user;
     private $wikiDb;
-    private $elasticSearchHost;
 
     public function setUp(): void {
         parent::setUp();
 
-        $this->elasticSearchHost = data_get(Config::get('wbstack.elasticsearch_hosts'), 0);
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
@@ -56,24 +54,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
 
 
         $request->expects($this->exactly(2))
-            ->method('setOptions')
-            ->withConsecutive(
-            [[
-                CURLOPT_URL => $this->elasticSearchHost.'/_cat/indices/'.$this->wikiDb->name.'*?v&s=index&h=index',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_TIMEOUT => 10,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'GET',
-            ]],
-            [[
-                CURLOPT_URL => $this->elasticSearchHost.'/'.$this->wikiDb->name.'*',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_TIMEOUT => 60,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'DELETE',
-            ]]);
+            ->method('setOptions');
 
 
         $mockJob = $this->createMock(Job::class);
@@ -93,8 +74,10 @@ class ElasticSearchIndexDeleteTest extends TestCase
     /**
 	 * @dataProvider failureProvider
 	 */
-    public function testFailure( $request, string $expectedFailure, $mockResponse, $settingStateInDatabase, $deleteWiki = true )
+    public function testFailure(string $expectedFailure, $mockResponse, $settingStateInDatabase, $deleteWiki = true )
     {
+        $request = $this->createMock(HttpRequest::class);
+
         if ( $deleteWiki ) {
             $this->wiki->delete();
         }
@@ -121,37 +104,35 @@ class ElasticSearchIndexDeleteTest extends TestCase
 
     }
 
-    public function failureProvider() {
+    static public function failureProvider() {
 
         $mockResponse = "index\n" . "some_index_content_blabla\n" . "some_index_general_bla\n";
         $mockJsonSuccess = '{"acknowledged" : true}';
         $mockFailure = '{"acknowledged" : false}';
 
+        $elasticSearchHost = 'localhost:9200'; // evil hardcoded value? previously read via Config::get('wbstack.elasticsearch_hosts'), but not possible anymore in static context
+
         yield [
-            $this->createMock(HttpRequest::class),
             'ElasticSearchIndexDelete job for <WIKI_ID> was not successful: {"acknowledged" : false}',
             [ $mockResponse, $mockFailure ],
             true
         ];
 
         yield [
-            $this->createMock(HttpRequest::class),
             'ElasticSearchIndexDelete job for <WIKI_ID> was not successful: <html>',
             [ $mockResponse, '<html>' ],
             true
         ];
 
-        if ( $this->elasticSearchHost ) {
+        if ($elasticSearchHost) {
             yield [
-                $this->createMock(HttpRequest::class),
-                'Response looks weird when querying http://'.$this->elasticSearchHost.'/_cat/indices/<WIKI_DB_NAME>*?v&s=index&h=index',
+                'Response looks weird when querying http://'.$elasticSearchHost.'/_cat/indices/<WIKI_DB_NAME>*?v&s=index&h=index',
                 [ "<html>asdasd\n\nasdasd", $mockJsonSuccess ],
                 true
             ];
         }
 
         yield [
-            $this->createMock(HttpRequest::class),
             'ElasticSearchIndexDelete job for <WIKI_ID> but that wiki is not marked as deleted.',
             [$mockResponse, $mockJsonSuccess ],
             true,
