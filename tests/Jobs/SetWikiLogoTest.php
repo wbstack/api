@@ -14,7 +14,6 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Tests\TestCase;
-use Psalm\Type\Union;
 
 class SetWikiLogoTest extends TestCase
 {
@@ -28,7 +27,7 @@ class SetWikiLogoTest extends TestCase
         $job->setJob($mockJob);
         $mockJob->expects($this->once())
             ->method('fail');
-        $this->dispatchSync($job);
+        $job->handle();
     }
 
     private function assertJobSucceeds(string $wikiKey, string $wikiValue, string $logoPath)
@@ -38,7 +37,7 @@ class SetWikiLogoTest extends TestCase
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
-        $this->dispatchSync($job);
+        $job->handle();
     }
 
     /**
