@@ -68,7 +68,7 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique
                     continue;
                 }
 
-                $this->fail(new \RuntimeException("WikiDb for ${$wiki->id} still exists"));
+                $this->fail(new \RuntimeException("WikiDb for {$wiki->id} still exists"));
             }
             return;
         }
