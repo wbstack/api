@@ -25,6 +25,13 @@ class ForceSearchIndex extends CirrusSearchJob
         $this->toId = $toId;
         parent::__construct($wiki->id);
     }
+
+    public function uniqueId() {
+        return parent::uniqueId() . '_'
+            . $this->fromId . '_'
+            . $this->toId;
+    }
+
     public function fromId(): int {
         return $this->fromId;
     }
