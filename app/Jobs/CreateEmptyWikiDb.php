@@ -11,7 +11,7 @@ use Illuminate\Database\DatabaseManager;
  * To be deleted after migration
  *
  * Example usage that will always provision a new DB:
- * php artisan job:dispatchSync CreateEmptyWikiDb
+ * php artisan job:dispatch CreateEmptyWikiDb
  */
 class CreateEmptyWikiDb extends Job
 {

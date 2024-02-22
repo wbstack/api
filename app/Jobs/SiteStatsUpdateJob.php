@@ -12,7 +12,7 @@ use Illuminate\Bus\Batchable;
 *
 * Job that updates site_stats table in mediawiki by calling initSiteStats.php
 *
-* Example: php artisan job:dispatchSync SiteStatsUpdateJob
+* Example: php artisan job:dispatch SiteStatsUpdateJob
 */
 class SiteStatsUpdateJob extends Job
 {

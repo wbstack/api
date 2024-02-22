@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\App;
 *  TODO The stats from wiki statistics doesn't add up https://github.com/wbstack/mediawiki/issues/59
 *  We need to fix that before we can get total pages/edits/users
 *
-* Example: php artisan job:dispatchSync PlatformStatsSummaryJob
+* Example: php artisan job:dispatch PlatformStatsSummaryJob
 */
 class PlatformStatsSummaryJob extends Job
 {

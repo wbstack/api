@@ -12,7 +12,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
  * 
  * Example:
  * 
- * php artisan job:dispatchSync CirrusSearch\\QueueSearchIndexBatches 1
+ * php artisan job:dispatch CirrusSearch\\QueueSearchIndexBatches 1
  */
 class QueueSearchIndexBatches extends CirrusSearchJob
 {

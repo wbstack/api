@@ -8,7 +8,7 @@ use Illuminate\Database\DatabaseManager;
 
 /**
  * Example usage that will always provision a new DB:
- * php artisan job:dispatchSync ProvisionWikiDbJob
+ * php artisan job:dispatch ProvisionWikiDbJob
  */
 class ProvisionWikiDbJob extends Job
 {
