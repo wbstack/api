@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c34ad70c6423a950cec473c9824ffbba",
+    "content-hash": "533ed179c813d1e791b3732dfb1ac379",
     "packages": [
         {
             "name": "absszero/laravel-stackdriver-error-reporting",
@@ -2676,16 +2676,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v10.44.0",
+            "version": "v10.45.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "1199dbe361787bbe9648131a79f53921b4148cf6"
+                "reference": "dcf5d1d722b84ad38a5e053289130b6962f830bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/1199dbe361787bbe9648131a79f53921b4148cf6",
-                "reference": "1199dbe361787bbe9648131a79f53921b4148cf6",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/dcf5d1d722b84ad38a5e053289130b6962f830bd",
+                "reference": "dcf5d1d722b84ad38a5e053289130b6962f830bd",
                 "shasum": ""
             },
             "require": {
@@ -2878,7 +2878,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2024-02-13T16:01:16+00:00"
+            "time": "2024-02-21T14:07:36+00:00"
         },
         {
             "name": "laravel/passport",
@@ -4118,16 +4118,16 @@
         },
         {
             "name": "maclof/kubernetes-client",
-            "version": "0.29.0",
+            "version": "0.30.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maclof/kubernetes-client.git",
-                "reference": "2c1034c11f078daccc516dd96012630d7e1d0545"
+                "reference": "94aa37b89fed7f4e8bd82b9a4fd372097af86936"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maclof/kubernetes-client/zipball/2c1034c11f078daccc516dd96012630d7e1d0545",
-                "reference": "2c1034c11f078daccc516dd96012630d7e1d0545",
+                "url": "https://api.github.com/repos/maclof/kubernetes-client/zipball/94aa37b89fed7f4e8bd82b9a4fd372097af86936",
+                "reference": "94aa37b89fed7f4e8bd82b9a4fd372097af86936",
                 "shasum": ""
             },
             "require": {
@@ -4137,7 +4137,7 @@
                 "php-http/discovery": "^1.0",
                 "ratchet/pawl": "^0.3",
                 "softcreatr/jsonpath": "^0.5 || ^0.7 || ^0.8",
-                "symfony/yaml": "^4.0|^5.0|^6.0"
+                "symfony/yaml": "^4.0|^5.0|^6.0|^7.0"
             },
             "require-dev": {
                 "mockery/mockery": "~1.2",
@@ -4171,9 +4171,9 @@
             ],
             "support": {
                 "issues": "https://github.com/maclof/kubernetes-client/issues",
-                "source": "https://github.com/maclof/kubernetes-client/tree/0.29.0"
+                "source": "https://github.com/maclof/kubernetes-client/tree/0.30.0"
             },
-            "time": "2023-08-28T13:42:22+00:00"
+            "time": "2024-02-12T21:59:30+00:00"
         },
         {
             "name": "monolog/monolog",
