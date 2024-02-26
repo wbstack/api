@@ -68,7 +68,7 @@ class WikiController extends Controller
             $maxWikis = config('wbstack.wiki_max_per_user');
 
             if ( config('wbstack.wiki_max_per_user') !== false && $numWikis > config('wbstack.wiki_max_per_user')) {
-                abort(403, "Too many wikis. Your new total of {$numWikis} would exceed the limit of ${maxWikis} per user.");
+                abort(403, "Too many wikis. Your new total of {$numWikis} would exceed the limit of {$maxWikis} per user.");
             }
 
             $wiki = Wiki::create([
@@ -114,22 +114,22 @@ class WikiController extends Controller
             ]);
 
             // TODO maybe always make these run in a certain order..?
-            $this->dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
+            dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
             // Only dispatch a job to add a k8s ingress IF we are using a custom domain...
             if (! $isSubdomain) {
-                $this->dispatch(new KubernetesIngressCreate($wiki->id, $wiki->domain));
+                dispatch(new KubernetesIngressCreate($wiki->id, $wiki->domain));
             }
         });
 
 
         // dispatch elasticsearch init job to enable the feature
         if ( Config::get('wbstack.elasticsearch_enabled_by_default') ) {
-            $this->dispatch(new ElasticSearchIndexInit($wiki->id));
+            dispatch(new ElasticSearchIndexInit($wiki->id));
         }
         
         // opportunistic dispatching of jobs to make sure storage pools are topped up
-        $this->dispatch(new ProvisionWikiDbJob(null, null, 10));
-        $this->dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
+        dispatch(new ProvisionWikiDbJob(null, null, 10));
+        dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
 
         $res['success'] = true;
         $res['message'] = 'Success!';

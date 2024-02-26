@@ -5,7 +5,6 @@ namespace Tests\Jobs\CirrusSearch;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
-use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Http\Curl\HttpRequest;
 use App\WikiManager;
 use App\WikiSetting;
@@ -13,11 +12,9 @@ use App\Wiki;
 use Illuminate\Contracts\Queue\Job;
 use App\WikiDb;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Support\Facades\DB;
 use PHPUnit\TextUI\RuntimeException;
 use App\Jobs\CirrusSearch\QueueSearchIndexBatches;
 use App\Jobs\CirrusSearch\ForceSearchIndex;
-use Illuminate\Support\Facades\Bus;
 use Queue;
 
 class QueueSearchIndexBatchesTest extends TestCase

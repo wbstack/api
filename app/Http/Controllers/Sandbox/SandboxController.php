@@ -86,12 +86,12 @@ class SandboxController extends Controller
         // For now only schedule this job for 1 dataSet type
         // As the extension API is dumb currently
         if ($dataSet === 'library') {
-            $this->dispatch(new MediawikiSandboxLoadData($domain, $dataSet));
+            dispatch(new MediawikiSandboxLoadData($domain, $dataSet));
         }
 
         // opportunistic dispatching of jobs to make sure storage pools are topped up
-        $this->dispatch(new ProvisionWikiDbJob(null, null, 10));
-        $this->dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
+        dispatch(new ProvisionWikiDbJob(null, null, 10));
+        dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
 
         $res['success'] = true;
         $res['message'] = 'Success!';

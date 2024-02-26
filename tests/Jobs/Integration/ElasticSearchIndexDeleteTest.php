@@ -101,7 +101,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
         $mockJob->expects($this->never())->method('fail');
         $job = new ElasticSearchIndexDelete( $this->wiki->id);
         $job->setJob($mockJob);
-        $this->dispatchNow($job);
+        $this->dispatchSync($job);
 
         // feature should get disabled
         $this->assertNull( WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->first());

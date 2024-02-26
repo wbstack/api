@@ -41,7 +41,7 @@ class SetSetting extends Command
                 'wiki_id' => $wiki->id,
                 'name' => $settingKey,
             ])->delete();
-            $this->line("Deleted setting ${settingKey} for wiki id ${wikiId}");
+            $this->line("Deleted setting {$settingKey} for wiki id {$wikiId}");
             return;
         }
 
@@ -54,7 +54,7 @@ class SetSetting extends Command
                 'value' => $settingValue,
             ]
         );
-        $this->line("Set setting ${settingKey} to ${settingValue} for wiki id ${wikiId}");
+        $this->line("Set setting {$settingKey} to {$settingValue} for wiki id {$wikiId}");
 
         return 0;
     }

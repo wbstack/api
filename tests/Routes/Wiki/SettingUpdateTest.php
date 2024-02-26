@@ -52,7 +52,7 @@ class SettingUpdateTest extends TestCase
           ->assertStatus(401);
     }
 
-    public function provideValidSettings()
+    static public function provideValidSettings()
     {
         yield ['wgDefaultSkin', 'vector', 'vector'];
         yield ['wwExtEnableConfirmAccount', '1', '1'];
@@ -105,7 +105,7 @@ class SettingUpdateTest extends TestCase
           );
     }
 
-    public function provideValidSettingsBadValues()
+    static public function provideValidSettingsBadValues()
     {
         yield ['wgDefaultSkin', 'foo'];
         yield ['wwExtEnableConfirmAccount', 'foo'];

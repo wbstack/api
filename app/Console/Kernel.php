@@ -22,9 +22,8 @@ class Kernel extends ConsoleKernel
      * Define the application's command schedule.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
      */
-    protected function schedule(Schedule $schedule)
+    protected function schedule(Schedule $schedule): void
     {
         // Make sure that the DB and QS pools are always populated somewhat.
         // This will create at most 1 new entry for each per minute...
@@ -48,6 +47,9 @@ class Kernel extends ConsoleKernel
         // Schedule site stat updates for each wiki and platform-summary
         $schedule->command('schedule:stats')->dailyAt('7:00');
 
+        // https://laravel.com/docs/10.x/upgrade#redis-cache-tags
+        $schedule->command('cache:prune-stale-tags')->hourly();
+
         $schedule->job(new PollForMediaWikiJobsJob)->everyFifteenMinutes();
 
         $schedule->job(new UpdateWikiSiteStatsJob)->dailyAt('19:00');
@@ -57,10 +59,8 @@ class Kernel extends ConsoleKernel
 
     /**
      * Register the commands for the application.
-     *
-     * @return void
      */
-    protected function commands()
+    protected function commands(): void
     {
         $this->load(__DIR__.'/Commands');
         $this->load(__DIR__.'/Commands/User');

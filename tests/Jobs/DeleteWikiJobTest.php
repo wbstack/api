@@ -2,7 +2,6 @@
 
 namespace Tests\Jobs;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use App\Jobs\DeleteWikiDbJob;
 use App\User;
@@ -51,7 +50,7 @@ class DeleteWikiJobTest extends TestCase
         $job->setJob($mockJob);
         $mockJob->expects($this->once())
             ->method('fail');
-        $this->dispatchNow($job);
+        $job->handle($this->app->make('db'));
     }
 
     public function testDeletesWiki()
@@ -172,7 +171,8 @@ class DeleteWikiJobTest extends TestCase
         $job->handle($mockMananger);
     }
 
-    public function failureProvider() {
+    static public function failureProvider()
+    {
 
         yield [
             -1,

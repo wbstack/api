@@ -12,20 +12,16 @@ class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->bind(HttpRequest::class, CurlRequest::class);
     }
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         Queue::failing(function (JobFailed $event) {
             $name = data_get($event->job->payload(), 'data.commandName');
