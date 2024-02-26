@@ -1,5 +1,12 @@
 # api
 
+## 10x.0.0 - 26 February 2024
+- Update Laravel to v10.10 - T341797
+  - schedule redis stale tag pruning
+  - refactor: `dispatchNow` was removed
+- Update to PHPUnit v10.5
+- fix: Implemented ForceSearchIndex::uniqueId T358106
+
 ## 9x.1.0 - 16 Februrary 2024
 - Switching to PHP 8.2
 
