@@ -14,7 +14,7 @@ class PollForMediaWikiJobsJob extends Job implements ShouldQueue, ShouldBeUnique
 
     public function __construct ()
     {
-        $this->onQueue(self::QUEUE_NAME_MW_JOBS);
+        $this->onQueue(Queue::MediawikiJobs);
     }
     public function handle (): void
     {

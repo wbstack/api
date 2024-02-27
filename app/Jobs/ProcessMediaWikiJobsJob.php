@@ -13,8 +13,6 @@ use Maclof\Kubernetes\Models\Job as KubernetesJob;
 
 class ProcessMediaWikiJobsJob extends Job implements ShouldBeUnique
 {
-    use InteractsWithQueue, Queueable;
-
     private string $wikiDomain;
     private string $jobsKubernetesNamespace;
 
@@ -22,7 +20,7 @@ class ProcessMediaWikiJobsJob extends Job implements ShouldBeUnique
     {
         $this->wikiDomain = $wikiDomain;
         $this->jobsKubernetesNamespace = Config::get('wbstack.api_job_namespace');
-        $this->onQueue(self::QUEUE_NAME_MW_JOBS);
+        $this->onQueue(Queue::MediawikiJobs);
     }
 
     public function uniqueId(): string

@@ -13,7 +13,7 @@ class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique
 {
     public function __construct()
     {
-        $this->onQueue(self::QUEUE_NAME_RECURRING);
+        $this->onQueue(Queue::Recurring);
     }
     public function handle (): void
     {

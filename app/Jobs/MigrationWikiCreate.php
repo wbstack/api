@@ -35,7 +35,7 @@ class MigrationWikiCreate extends Job
     {
         $this->email = $email;
         $this->wikiDetailsFilepath = $wikiDetailsFilepath;
-        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
+        $this->onQueue(Queue::Provisioning);
     }
 
     /**

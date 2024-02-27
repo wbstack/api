@@ -8,16 +8,17 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Config;
 
+enum Queue: string {
+    case Provisioning = 'provisioning';
+    case Queryservice = 'queryservice';
+    case Cleanup = 'cleanup';
+    case Statistics = 'statistics';
+    case Recurring = 'recurring';
+    case MediawikiJobs = 'mw-jobs';
+}
+
 abstract class Job implements ShouldQueue
 {
-
-    public const QUEUE_NAME_PROVISIONING = 'provisioning';
-    public const QUEUE_NAME_QUERYSERVICE = 'queryservice';
-    public const QUEUE_NAME_CLEANUP = 'cleanup';
-    public const QUEUE_NAME_STATISTICS = 'statistics';
-    public const QUEUE_NAME_RECURRING = 'recurring';
-    public const QUEUE_NAME_MW_JOBS = 'mw-jobs';
-
     /*
     |--------------------------------------------------------------------------
     | Queueable Jobs
@@ -28,10 +29,22 @@ abstract class Job implements ShouldQueue
     | provides access to the "queueOn" and "delay" queue helper methods.
     |
     */
-    use InteractsWithQueue, Queueable, SerializesModels;
+    use InteractsWithQueue, SerializesModels;
+    use Queueable {
+        onQueue as protected parentOnQueue;
+    }
 
     public function backoff(): array
     {
         return Config::get('queue.backoff');
+    }
+
+    public function onQueue(Queue|string $queue)
+    {
+        if (is_string($queue)) {
+            $this->parentOnQueue($queue);
+            return;
+        }
+        $this->parentOnQueue($queue->value);
     }
 }

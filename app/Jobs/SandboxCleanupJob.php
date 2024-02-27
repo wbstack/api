@@ -9,7 +9,7 @@ class SandboxCleanupJob extends Job
 {
     public function __construct()
     {
-        $this->onQueue(self::QUEUE_NAME_CLEANUP);
+        $this->onQueue(Queue::Queryservice);
     }
 
     public function handle(): void

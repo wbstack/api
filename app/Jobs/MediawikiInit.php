@@ -17,7 +17,7 @@ class MediawikiInit extends Job
         $this->wikiDomain = $wikiDomain;
         $this->username = $username;
         $this->email = $email;
-        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
+        $this->onQueue(Queue::Provisioning);
     }
 
     /**

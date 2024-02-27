@@ -62,7 +62,7 @@ class ProvisionWikiDbJob extends Job
         $this->dbName = $dbName;
         $this->maxFree = $maxFree;
         $this->newSqlFile = config('wbstack.wiki_db_provision_version');
-        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
+        $this->onQueue(Queue::Provisioning);
     }
 
     private function doesMaxFreeSayWeShouldStop(): bool

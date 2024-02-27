@@ -22,7 +22,7 @@ class CreateQueryserviceBatchesJob extends Job
 
     public function __construct()
     {
-        $this->onQueue(self::QUEUE_NAME_QUERYSERVICE);
+        $this->onQueue(Queue::Queryservice);
         $this->entityLimit = Config::get('wbstack.qs_batch_entity_limit');
     }
 

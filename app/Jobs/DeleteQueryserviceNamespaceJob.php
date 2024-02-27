@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\QueryserviceNamespace;
-use App\Http\Curl\CurlRequest;
 use App\Http\Curl\HttpRequest;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\Wiki;
@@ -18,7 +17,7 @@ class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
     public function __construct( $wikiId )
     {
         $this->wikiId = $wikiId;
-        $this->onQueue(self::QUEUE_NAME_CLEANUP);
+        $this->onQueue(Queue::Cleanup);
     }
 
     /**

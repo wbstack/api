@@ -14,7 +14,7 @@ class RequeuePendingQsBatchesJob extends Job
     public function __construct() {
         $this->pendingTimeout = Config::get('wbstack.qs_batch_pending_timeout');
         $this->markFailedAfter = Config::get('wbstack.qs_batch_mark_failed_after');
-        $this->onQueue(self::QUEUE_NAME_QUERYSERVICE);
+        $this->onQueue(Queue::Queryservice);
     }
 
     public function handle(): void

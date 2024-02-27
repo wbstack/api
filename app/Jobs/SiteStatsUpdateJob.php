@@ -22,7 +22,7 @@ class SiteStatsUpdateJob extends Job
 
     public function __construct( $wiki_id ) {
         $this->wiki_id = $wiki_id;
-        $this->onQueue(self::QUEUE_NAME_STATISTICS);
+        $this->onQueue(Queue::Statistics);
     }
 
     public function handle( HttpRequest $request ): void

@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\WikiDb;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\DatabaseManager;
 
 /**
@@ -27,7 +26,7 @@ class CreateEmptyWikiDb extends Job
 
     public function __construct(string $prefix)
     {
-        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
+        $this->onQueue(Queue::Provisioning);
         $this->dbName = 'mwdb_wbstack_'.substr(bin2hex(random_bytes(48)), 0, 10);
         $this->dbUser = 'mwu_'.substr(bin2hex(random_bytes(48)), 0, 10);
         $this->dbPassword = substr(bin2hex(random_bytes(48)), 0, 14);

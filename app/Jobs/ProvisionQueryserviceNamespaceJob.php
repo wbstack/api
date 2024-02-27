@@ -33,7 +33,7 @@ class ProvisionQueryserviceNamespaceJob extends Job
 
         $this->namespace = $namespace;
         $this->maxFree = $maxFree;
-        $this->onQueue(self::QUEUE_NAME_PROVISIONING);
+        $this->onQueue(Queue::Provisioning);
     }
 
     private function doesMaxFreeSayWeShouldStop(): bool

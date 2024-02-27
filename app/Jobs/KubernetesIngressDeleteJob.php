@@ -19,7 +19,7 @@ class KubernetesIngressDeleteJob extends Job
     public function __construct( $wikiId )
     {
         $this->id = $wikiId;
-        $this->onQueue(self::QUEUE_NAME_CLEANUP);
+        $this->onQueue(Queue::Cleanup);
     }
 
     /**

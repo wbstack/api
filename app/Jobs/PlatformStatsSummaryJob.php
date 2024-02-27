@@ -34,7 +34,7 @@ class PlatformStatsSummaryJob extends Job
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
         $this->creationRateRanges = Config::get('wbstack.platform_summary_creation_rate_ranges');
-        $this->onQueue(self::QUEUE_NAME_STATISTICS);
+        $this->onQueue(Queue::Statistics);
     }
 
     private function isNullOrEmpty( $value ): bool {

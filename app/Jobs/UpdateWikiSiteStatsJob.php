@@ -16,7 +16,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
 
     public function __construct()
     {
-        $this->onQueue(self::QUEUE_NAME_STATISTICS);
+        $this->onQueue(Queue::Statistics);
     }
 
     public function handle (): void

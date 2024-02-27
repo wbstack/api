@@ -9,7 +9,7 @@ class PruneQueryserviceBatchesTable extends Job
 {
     public function __construct()
     {
-        $this->onQueue(self::QUEUE_NAME_QUERYSERVICE);
+        $this->onQueue(Queue::Queryservice);
     }
 
     public function handle(): void

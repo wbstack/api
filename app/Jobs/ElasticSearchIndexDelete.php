@@ -19,7 +19,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
     public function __construct( int $wikiId)
     {
         $this->wikiId = $wikiId;
-        $this->onQueue(self::QUEUE_NAME_CLEANUP);
+        $this->onQueue(Queue::Cleanup);
     }
 
     /**
