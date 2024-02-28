@@ -4,7 +4,6 @@ set -e
 
 role=${CONTAINER_ROLE:-app}
 env=${APP_ENV:-production}
-queue_name=${QUEUE_NAME:-default}
 
 # if [ "$env" != "local" ]; then
 #     echo "Caching configuration..."
@@ -17,8 +16,7 @@ if [ "$role" = "app" ]; then
 
 elif [ "$role" = "queue" ]; then
 
-    echo "Running the $queue_name queue..."
-    php /var/www/html/artisan queue:work --verbose --tries=5 --timeout=90 --queue="$queue_name"
+    php /var/www/html/artisan horizon
 
 elif [ "$role" = "scheduler" ]; then
 
