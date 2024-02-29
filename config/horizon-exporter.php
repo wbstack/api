@@ -1,8 +1,7 @@
 <?php
 return [
+    "enabled" => getenv('ROUTES_LOAD_BACKEND') == 1,
     "namespace" => 'platform_api',
-    "enabled" => env('HORIZON_PROMETHEUS_EXPORTER_ENABLED', true),
-
     /**
      * You can change the default endpoint to something other than metrics.
      * Keep in mind that the change needs to be reflected in your Prometheus configuration as well.
