@@ -24,6 +24,7 @@ jobs:
       with:
         php_version: 8.2
         command: install
+        args: --ignore-platform-reqs
 
     - name: Copy example .env file
       run: cp .env.example .env
