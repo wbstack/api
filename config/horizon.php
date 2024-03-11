@@ -182,40 +182,16 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'redis',
-            'queue' => ['default', 'manual-intervention'],
-            'balance' => 'auto',
-            'autoScalingStrategy' => 'time',
-            'maxProcesses' => 1,
-            'maxTime' => 0,
-            'maxJobs' => 0,
-            'memory' => 128,
-            'tries' => 1,
-            'timeout' => 60,
-            'nice' => 0,
-        ],
-    ],
-
-    'environments' => [
-        'production' => [
-            'supervisor-1' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
-            ],
-        ],
-
-        'staging' => [
-            'supervisor-1' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
-            ],
-        ],
-
-        'local' => [
-            'supervisor-1' => [
-                'maxProcesses' => 3,
-            ],
+            'queue' => explode(',', env('QUEUE_NAMES', 'default')),
+            'balance' => env('HORIZON_BALANCING_STRATEGY', 'auto'),
+            'autoScalingStrategy' => env('HORIZON_AUTO_SCALING_STRATEGY', 'time'),
+            'maxProcesses' => intval(env('HORIZON_MAX_PROCESSES', 1)),
+            'minProcesses' => intval(env('HORIZON_MIN_PROCESSES', 1)),
+            'maxShift' => intval(env('HORIZON_MAX_SHIFT', 1)),
+            'coolDown' => intval(env('HORIZON_COOL_DOWN', 3)),
+            'memory' => intval(env('HORIZON_MEMORY', 128)),
+            'tries' => intval(env('HORIZON_TRIES', 1)),
+            'timeout' => intval(env('HORIZON_TIMEOUT', 60)),
         ],
     ],
 ];
