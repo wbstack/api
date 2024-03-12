@@ -14,9 +14,14 @@ if [ "$role" = "app" ]; then
 
     exec apache2-foreground
 
-elif [ "$role" = "queue" ]; then
+elif [ "$role" = "queue" ] && [ "$HORIZON_ENABLED" = "1" ]; then
 
     php /var/www/html/artisan horizon
+
+elif [ "$role" = "queue" ]; then
+
+    echo "Running the $queue_name queue..."
+    php /var/www/html/artisan queue:work --verbose --tries=5 --timeout=90 --queue="$queue_name"
 
 elif [ "$role" = "scheduler" ]; then
 
