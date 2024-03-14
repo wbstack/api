@@ -194,4 +194,9 @@ return [
             'timeout' => intval(env('HORIZON_TIMEOUT', 60)),
         ],
     ],
+    'environments' => [
+        'local' => ['supervisor-1' => []],
+        'staging' => ['supervisor-1' => []],
+        'production' => ['supervisor-1' => []],
+    ],
 ];
