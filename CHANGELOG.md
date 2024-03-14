@@ -1,5 +1,8 @@
 # api
 
+## 10x.1.1 - 14 March 2024
+- Declare Horizon configuration stubs for all known environments
+
 ## 10x.1.0 - 14 March 2024
 - Use Laravel Horizon to supervise queue workers if enabled T342866
 
