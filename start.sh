@@ -4,7 +4,6 @@ set -e
 
 role=${CONTAINER_ROLE:-app}
 env=${APP_ENV:-production}
-queue_name=${QUEUE_NAME:-default}
 
 # if [ "$env" != "local" ]; then
 #     echo "Caching configuration..."
@@ -14,6 +13,10 @@ queue_name=${QUEUE_NAME:-default}
 if [ "$role" = "app" ]; then
 
     exec apache2-foreground
+
+elif [ "$role" = "queue" ] && [ "$HORIZON_ENABLED" = "1" ]; then
+
+    php /var/www/html/artisan horizon
 
 elif [ "$role" = "queue" ]; then
 

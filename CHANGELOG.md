@@ -1,5 +1,8 @@
 # api
 
+## 10x.1.0 - 14 March 2024
+- Use Laravel Horizon to supervise queue workers if enabled T342866
+
 ## 10x.0.0 - 26 February 2024
 - Update Laravel to v10.10 - T341797
   - schedule redis stale tag pruning
