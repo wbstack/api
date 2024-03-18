@@ -1,5 +1,9 @@
 # api
 
+
+## 10x.1.2 - 8 March 2024
+- Add `superset` to list of forbidden subdomains
+
 ## 10x.1.1 - 14 March 2024
 - Declare Horizon configuration stubs for all known environments
 
