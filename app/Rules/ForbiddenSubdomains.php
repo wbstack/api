@@ -161,6 +161,7 @@ return [
     'stats',
     'status',
     'store',
+    'superset',
     'support',
     'survey',
     'surveys',
