@@ -1,5 +1,8 @@
 # api
 
+## 10x.1.2 - 25 March 2024
+- Define default job timeout at class level
+
 ## 10x.1.1 - 14 March 2024
 - Declare Horizon configuration stubs for all known environments
 

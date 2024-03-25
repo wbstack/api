@@ -191,7 +191,7 @@ return [
             'coolDown' => intval(env('HORIZON_COOL_DOWN', 3)),
             'memory' => intval(env('HORIZON_MEMORY', 128)),
             'tries' => intval(env('HORIZON_TRIES', 1)),
-            'timeout' => intval(env('HORIZON_TIMEOUT', 60)),
+            'timeout' => intval(env('HORIZON_TIMEOUT', 3600)),
         ],
     ],
     'environments' => [

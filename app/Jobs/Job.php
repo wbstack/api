@@ -22,6 +22,8 @@ abstract class Job implements ShouldQueue
     */
     use InteractsWithQueue, Queueable, SerializesModels;
 
+    public $timeout = 60;
+
     public function backoff(): array
     {
         return Config::get('queue.backoff');
