@@ -7,6 +7,7 @@ use App\Http\Curl\HttpRequest;
 use Illuminate\Contracts\Queue\Job;
 use App\Jobs\ElasticSearchAliasInit;
 use App\WikiDb;
+use App\Wiki;
 
 class ElasticSearchAliasInitTest extends TestCase
 {
@@ -16,9 +17,9 @@ class ElasticSearchAliasInitTest extends TestCase
 
     public function setUp(): void {
         parent::setUp();
-        $this->wikiId = 1;
+        $this->wikiId = Wiki::factory()->create()->id;
+        $this->dbName = WikiDb::factory()->create( [ 'wiki_id' => $this->wikiId ] )->name;
         $this->prefix = 'testing_1';
-        $this->dbName = WikiDb::where( 'wiki_id', $this->wikiId )->pluck( 'name' )->first();
         putenv( 'ELASTICSEARCH_SHARED_INDEX' );
     }
 
