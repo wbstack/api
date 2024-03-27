@@ -6,7 +6,7 @@ use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ProvisionWikiDbJob;
-use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
+use App\Jobs\ElasticSearchAliasInit;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
@@ -124,7 +124,7 @@ class WikiController extends Controller
 
         // dispatch elasticsearch init job to enable the feature
         if ( Config::get('wbstack.elasticsearch_enabled_by_default') ) {
-            dispatch(new ElasticSearchIndexInit($wiki->id));
+            dispatch(new ElasticSearchAliasInit($wiki->id));
         }
         
         // opportunistic dispatching of jobs to make sure storage pools are topped up
