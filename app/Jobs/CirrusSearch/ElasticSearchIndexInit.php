@@ -13,6 +13,10 @@ class ElasticSearchIndexInit extends CirrusSearchJob
         parent::__construct( $wikiId );
     }
 
+    public function cluster(): string {
+        return $this->cluster;
+    }
+
     function apiModule(): string {
         return 'wbstackElasticSearchInit';
     }

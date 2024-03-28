@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\User;
 use Illuminate\Support\Facades\Queue;
 use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
+use App\Jobs\ElasticSearchAliasInit;
 use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\MediawikiInit;
 use App\WikiSetting;
@@ -27,9 +28,15 @@ class CreateTest extends TestCase
     /**
 	 * @dataProvider createProvider
 	 */
-    public function testWikiCreateDispatchesSomeJobs( $elasticSearchEnabledForNewWikis )
+    public function testWikiCreateDispatchesSomeJobs( $elasticSearchConfig )
     {
-        Config::set('wbstack.elasticsearch_enabled_by_default', $elasticSearchEnabledForNewWikis );
+        $enabledForNewWikis = $elasticSearchConfig[ 'enabledForNewWikis' ];
+        $clusterToIndex = $elasticSearchConfig[ 'clusterToIndex' ] ?? null;
+        $sharedIndex = $elasticSearchConfig[ 'sharedIndex' ] ?? null;
+
+        Config::set( 'wbstack.elasticsearch_enabled_by_default', $enabledForNewWikis );
+        Config::set( 'wbstack.elasticsearch_cluster_to_index', $clusterToIndex );
+        Config::set( 'wbstack.elasticsearch_shared_index', $sharedIndex );
 
         // seed up ready db
         $manager = $this->app->make('db');
@@ -64,10 +71,19 @@ class CreateTest extends TestCase
 
         Queue::assertPushed( ProvisionWikiDbJob::class, 1);
         Queue::assertPushed( MediawikiInit::class, 1);
-        if( $elasticSearchEnabledForNewWikis ) {
-            Queue::assertPushed( ElasticSearchIndexInit::class, 1);
+
+        if ( $enabledForNewWikis && $clusterToIndex ) {
+            Queue::assertPushed( function ( ElasticSearchIndexInit $job ) use ( $clusterToIndex ) {
+                return $job->cluster() === $clusterToIndex;
+            } );
         } else {
             Queue::assertNotPushed( ElasticSearchIndexInit::class );
+        }
+
+        if ( $enabledForNewWikis && $sharedIndex ) {
+            Queue::assertPushed( ElasticSearchAliasInit::class, 1 );
+        } else {
+            Queue::assertNotPushed( ElasticSearchAliasInit::class );
         }
 
         $id = $response->original['data']['id'];
@@ -79,19 +95,34 @@ class CreateTest extends TestCase
 
         $this->assertSame(
             1,
-            WikiSetting::where( [ 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => $elasticSearchEnabledForNewWikis, 'wiki_id' => $id ] )->count()
+            WikiSetting::where( [ 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => $enabledForNewWikis, 'wiki_id' => $id ] )->count()
         );
     }
 
     static public function createProvider() {
+        yield [ [
+            'enabledForNewWikis' => true,
+            'clusterToIndex' => 'all',
+            'sharedIndex' => 'testing_1'
+        ] ];
 
-        yield [
-            true // elasticsearch enabled for new wikis
-        ];
+        yield [ [
+            'enabledForNewWikis' => true,
+            'clusterToIndex' => 'default',
+        ] ];
 
-        yield [
-            false // elasticsearch disabled for new wikis
-        ];
+        yield [ [
+            'enabledForNewWikis' => true,
+            'sharedIndex' => 'testing_1'
+        ] ];
+
+        yield [ [
+            'enabledForNewWikis' => true
+        ] ];
+
+        yield [ [
+            'enabledForNewWikis' => false
+        ] ];
     }
 
     public function testCreateWikiLimitsNumWikisPerUser()
