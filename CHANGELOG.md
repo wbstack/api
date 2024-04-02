@@ -1,5 +1,8 @@
 # api
 
+## 10x.1.3 - 2 April 2024
+- Disregard QsBatches without associated wikis in Controller
+
 ## 10x.1.2 - 25 March 2024
 - Define default job timeout at class level
 
