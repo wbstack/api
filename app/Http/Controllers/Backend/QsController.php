@@ -13,11 +13,12 @@ class QsController extends Controller
     public function getBatches(Request $request): \Illuminate\Http\Response
     {
         return DB::transaction(function () {
-            $oldestBatch = QsBatch::where([
-                ['done', '=', 0],
-                ['pending_since', '=', null],
-                ['failed', '=', false]
-            ])
+            $oldestBatch = QsBatch::has('wiki')
+                ->where([
+                    ['done', '=', 0],
+                    ['pending_since', '=', null],
+                    ['failed', '=', false]
+                ])
                 ->orderBy('id')
                 ->lockForUpdate()
                 ->first();
