@@ -34,7 +34,7 @@ class QsControllerTest extends TestCase
     public function testGetEmpty (): void
     {
         $this->json('GET', $this->route.'/getBatches')
-            ->assertJsonCount(0)
+            ->assertExactJson([])
             ->assertStatus(200);
     }
 
@@ -42,7 +42,7 @@ class QsControllerTest extends TestCase
     {
         QsBatch::factory()->create(['id' => 1, 'done' => 0, 'wiki_id' => 99, 'entityIds' => 'a,b']);
         $this->json('GET', $this->route.'/getBatches')
-            ->assertJsonCount(0)
+            ->assertExactJson([])
             ->assertStatus(200);
     }
 
