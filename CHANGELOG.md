@@ -1,5 +1,8 @@
 # api
 
+## 10x.2.1 - 9 April 2024
+- Add Wiki deletion Reason DB table
+
 ## 10x.2.0 - 8 April 2024
 - Add Prometheus metrics for failed and pending QsBatches
 
