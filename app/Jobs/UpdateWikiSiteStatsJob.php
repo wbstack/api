@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Wiki;
 use App\WikiSiteStats;
-use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +25,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
             try {
                 $this->updateSiteStats($wiki);
                 $this->updateLifecycleEvents($wiki);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $this->job->markAsFailed();
                 Log::error(
                     'Failure polling wiki '.$wiki->getAttribute('domain').' for sitestats: '.$ex->getMessage()
@@ -69,7 +68,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         );
 
         if ($response->failed()) {
-            throw new Exception('Request failed with reason '.$response->body());
+            throw new \Exception('Request failed with reason '.$response->body());
         }
 
         $responseBody = $response->json();
@@ -85,9 +84,6 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         });
     }
 
-    /**
-     * @throws Exception
-     */
     private function updateEntitiesCount (Wiki $wiki): void
     {
         $item = $this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_ITEM);
@@ -104,9 +100,6 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         $wiki->wikiEntitiesCount()->updateOrCreate($update);
     }
 
-    /**
-     * @throws Exception
-     */
     private function fetchPagesInNamespace(string $wikiDomain, int $namespace): array
     {
         $titles = [];
@@ -127,7 +120,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
             );
 
             if ($response->failed()) {
-                throw new Exception(
+                throw new \Exception(
                     'Failed to fetch allpages for wiki '.$wikiDomain
                 );
             }
@@ -135,7 +128,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
             $jsonResponse = $response->json();
             $error = data_get($jsonResponse, 'error');
             if ($error !== null) {
-                throw new Exception(
+                throw new \Exception(
                     'Error response fetching allpages for wiki '.$wikiDomain.': '.$error
                 );
             }
