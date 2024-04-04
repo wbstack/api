@@ -21,7 +21,7 @@ class UpdateWikiEntitiesCountJobTest extends TestCase
         parent::tearDown();
     }
 
-    public function TestSuccess()
+    public function testSuccess()
     {
         Wiki::factory()->create([
             'domain' => 'testwiki.wikibase.cloud'
