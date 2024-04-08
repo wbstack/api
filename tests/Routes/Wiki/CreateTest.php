@@ -31,12 +31,14 @@ class CreateTest extends TestCase
     public function testWikiCreateDispatchesSomeJobs( $elasticSearchConfig )
     {
         $enabledForNewWikis = $elasticSearchConfig[ 'enabledForNewWikis' ];
-        $clusterToIndex = $elasticSearchConfig[ 'clusterToIndex' ] ?? null;
-        $sharedIndex = $elasticSearchConfig[ 'sharedIndex' ] ?? null;
+        $clusterWithoutSharedIndex = $elasticSearchConfig[ 'clusterWithoutSharedIndex' ] ?? null;
+        $sharedIndexHost = $elasticSearchConfig[ 'sharedIndexHost' ] ?? null;
+        $sharedIndexPrefix = $elasticSearchConfig[ 'sharedIndexPrefix' ] ?? null;
 
         Config::set( 'wbstack.elasticsearch_enabled_by_default', $enabledForNewWikis );
-        Config::set( 'wbstack.elasticsearch_cluster_to_index', $clusterToIndex );
-        Config::set( 'wbstack.elasticsearch_shared_index', $sharedIndex );
+        Config::set( 'wbstack.elasticsearch_cluster_without_shared_index', $clusterWithoutSharedIndex );
+        Config::set( 'wbstack.elasticsearch_shared_index_host', $sharedIndexHost );
+        Config::set( 'wbstack.elasticsearch_shared_index_prefix', $sharedIndexPrefix );
 
         // seed up ready db
         $manager = $this->app->make('db');
@@ -72,15 +74,15 @@ class CreateTest extends TestCase
         Queue::assertPushed( ProvisionWikiDbJob::class, 1);
         Queue::assertPushed( MediawikiInit::class, 1);
 
-        if ( $enabledForNewWikis && $clusterToIndex ) {
-            Queue::assertPushed( function ( ElasticSearchIndexInit $job ) use ( $clusterToIndex ) {
-                return $job->cluster() === $clusterToIndex;
+        if ( $enabledForNewWikis && $clusterWithoutSharedIndex ) {
+            Queue::assertPushed( function ( ElasticSearchIndexInit $job ) use ( $clusterWithoutSharedIndex ) {
+                return $job->cluster() === $clusterWithoutSharedIndex;
             } );
         } else {
             Queue::assertNotPushed( ElasticSearchIndexInit::class );
         }
 
-        if ( $enabledForNewWikis && $sharedIndex ) {
+        if ( $enabledForNewWikis && $sharedIndexHost && $sharedIndexPrefix ) {
             Queue::assertPushed( ElasticSearchAliasInit::class, 1 );
         } else {
             Queue::assertNotPushed( ElasticSearchAliasInit::class );
@@ -102,18 +104,25 @@ class CreateTest extends TestCase
     static public function createProvider() {
         yield [ [
             'enabledForNewWikis' => true,
-            'clusterToIndex' => 'all',
-            'sharedIndex' => 'testing_1'
+            'clusterWithoutSharedIndex' => 'all',
+            'sharedIndexHost' => 'somehost',
+            'sharedIndexPrefix' => 'testing_1'
         ] ];
 
         yield [ [
             'enabledForNewWikis' => true,
-            'clusterToIndex' => 'default',
+            'clusterWithoutSharedIndex' => 'default',
         ] ];
 
         yield [ [
             'enabledForNewWikis' => true,
-            'sharedIndex' => 'testing_1'
+            'sharedIndexHost' => 'somehost',
+            'sharedIndexPrefix' => 'testing_1'
+        ] ];
+
+        yield [ [
+            'enabledForNewWikis' => true,
+            'sharedIndexPrefix' => 'testing_1'
         ] ];
 
         yield [ [

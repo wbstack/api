@@ -19,7 +19,7 @@ class ElasticSearchAliasInit extends Job
     public function __construct( int $wikiId, string $sharedPrefix = null )
     {
         $this->wikiId = $wikiId;
-        $this->sharedPrefix = $sharedPrefix ?? getenv( 'ELASTICSEARCH_SHARED_INDEX' );
+        $this->sharedPrefix = $sharedPrefix ?? getenv( 'ELASTICSEARCH_SHARED_INDEX_PREFIX' );
     }
 
     /**
@@ -72,7 +72,7 @@ class ElasticSearchAliasInit extends Job
         }
 
         $request->setOptions( [
-            CURLOPT_URL => getenv( 'ELASTICSEARCH_HOST' ) . '/_aliases',
+            CURLOPT_URL => getenv( 'ELASTICSEARCH_SHARED_INDEX_HOST' ) . '/_aliases',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 60 * 15,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,

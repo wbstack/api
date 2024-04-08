@@ -125,13 +125,14 @@ class WikiController extends Controller
 
         // dispatch elasticsearch init job to enable the feature
         if ( Config::get('wbstack.elasticsearch_enabled_by_default') ) {
-            $clusterToIndex = Config::get('wbstack.elasticsearch_cluster_to_index');
-            $sharedIndex = Config::get('wbstack.elasticsearch_shared_index');
+            $clusterWithoutSharedIndex = Config::get('wbstack.elasticsearch_cluster_without_shared_index');
+            $sharedIndexHost = Config::get('wbstack.elasticsearch_shared_index_host');
+            $sharedIndexPrefix = Config::get('wbstack.elasticsearch_shared_index_prefix');
 
-            if ( $clusterToIndex ) {
-                dispatch(new ElasticSearchIndexInit($wiki->id, $clusterToIndex));
+            if ( $clusterWithoutSharedIndex ) {
+                dispatch(new ElasticSearchIndexInit($wiki->id, $clusterWithoutSharedIndex));
             }
-            if ( $sharedIndex ) {
+            if ( $sharedIndexHost && $sharedIndexPrefix ) {
                 dispatch(new ElasticSearchAliasInit($wiki->id));
             }
         }

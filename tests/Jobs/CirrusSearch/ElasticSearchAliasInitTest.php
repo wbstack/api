@@ -20,7 +20,7 @@ class ElasticSearchAliasInitTest extends TestCase
         $this->wikiId = Wiki::factory()->create()->id;
         $this->dbName = WikiDb::factory()->create( [ 'wiki_id' => $this->wikiId ] )->name;
         $this->prefix = 'testing_1';
-        putenv( 'ELASTICSEARCH_SHARED_INDEX' );
+        putenv( 'ELASTICSEARCH_SHARED_INDEX_PREFIX' );
     }
 
     private function buildAlias( string $index, string $alias ) {
@@ -40,7 +40,7 @@ class ElasticSearchAliasInitTest extends TestCase
             ->method('setOptions')
             ->with(
                 [
-                    CURLOPT_URL => getenv( 'ELASTICSEARCH_HOST' ) . '/_aliases',
+                    CURLOPT_URL => getenv( 'ELASTICSEARCH_SHARED_INDEX_HOST' ) . '/_aliases',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_TIMEOUT => 60 * 15,
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
@@ -111,7 +111,7 @@ class ElasticSearchAliasInitTest extends TestCase
     public function testSuccessWithPrefixEnv()
     {
         $this->prefix = 'env_1';
-        putenv( "ELASTICSEARCH_SHARED_INDEX=$this->prefix" );
+        putenv( "ELASTICSEARCH_SHARED_INDEX_PREFIX=$this->prefix" );
 
         $request = $this->getMockRequest();
         $request->method( 'execute' )
