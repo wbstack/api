@@ -1,5 +1,8 @@
 # api
 
+## 10x.2.0 - 8 April 2024
+- Add Prometheus metrics for failed and pending QsBatches
+
 ## 10x.1.3 - 2 April 2024
 - Disregard QsBatches without associated wikis in Controller
 
