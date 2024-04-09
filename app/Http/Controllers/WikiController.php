@@ -10,11 +10,11 @@ use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
+use App\WikiDeletionReason;
 use App\WikiDomain;
 use App\WikiManager;
 use App\WikiSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
@@ -33,7 +33,7 @@ class WikiController extends Controller
     public function create(Request $request): \Illuminate\Http\Response
     {
         $user = $request->user();
-        
+
         $submittedDomain = strtolower($request->input('domain'));
         $submittedDomain = DomainHelper::encode($submittedDomain);
 
@@ -126,7 +126,7 @@ class WikiController extends Controller
         if ( Config::get('wbstack.elasticsearch_enabled_by_default') ) {
             dispatch(new ElasticSearchIndexInit($wiki->id));
         }
-        
+
         // opportunistic dispatching of jobs to make sure storage pools are topped up
         dispatch(new ProvisionWikiDbJob(null, null, 10));
         dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
@@ -161,6 +161,11 @@ class WikiController extends Controller
 
         // Delete the wiki
         Wiki::find($wikiId)->delete();
+        WikiDeletionReason::create([
+            'deletion_reason' => $request->input('deletion_reason'),
+            'wiki_id'   => $wikiId,
+        ]);
+
 
         // Return a success
         return response()->json('Success', 200);
