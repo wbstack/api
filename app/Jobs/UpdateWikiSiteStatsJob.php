@@ -6,6 +6,7 @@ use App\Wiki;
 use App\WikiSiteStats;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Client\Pool;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Carbon\Carbon;
@@ -74,7 +75,9 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
                 $update[$field] = $value;
             }
         }
-
-        $wiki->wikiSiteStats()->updateOrCreate(['wiki_id' => $wiki->id], $update);
+        DB::transaction(function () use ($wiki, $update) {
+            WikiSiteStats::lock()
+            $wiki->wikiSiteStats()->updateOrCreate(['wiki_id' => $wiki->id], $update);
+        });
     }
 }
