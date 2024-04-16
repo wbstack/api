@@ -25,8 +25,13 @@ class EnforceSiteStatsConstraint extends Migration
      */
     public function down()
     {
+        // foreign key constraints need to be disabled as per https://github.com/laravel/framework/issues/13873
+        Schema::disableForeignKeyConstraints();
         Schema::table('wiki_site_stats', function (Blueprint $table) {
-            $table->dropUnique('wiki_id');
+            // The column name HAS to be wrapped in an array so Laravel can
+            // figure out the relation name.
+            $table->dropUnique(['wiki_id']);
         });
+        Schema::enableForeignKeyConstraints();
     }
 }
