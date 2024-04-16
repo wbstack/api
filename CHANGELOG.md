@@ -1,5 +1,8 @@
 # api
 
+## 10x.2.1 - 17 April 2024
+- Prevent duplicate entries per wiki in wiki_site_stats table
+
 ## 10x.2.0 - 8 April 2024
 - Add Prometheus metrics for failed and pending QsBatches
 
