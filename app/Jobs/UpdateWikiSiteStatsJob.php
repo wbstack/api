@@ -76,8 +76,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
             }
         }
         DB::transaction(function () use ($wiki, $update) {
-            WikiSiteStats::lock()
-            $wiki->wikiSiteStats()->updateOrCreate(['wiki_id' => $wiki->id], $update);
+            $wiki->wikiSiteStats()->lockForUpdate()->updateOrCreate(['wiki_id' => $wiki->id], $update);
         });
     }
 }
