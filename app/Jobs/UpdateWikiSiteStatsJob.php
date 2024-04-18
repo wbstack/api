@@ -25,6 +25,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
             try {
                 $this->updateSiteStats($wiki);
                 $this->updateLifecycleEvents($wiki);
+                $this->updateEntitiesCount($wiki);
             } catch (\Exception $ex) {
                 $this->job->markAsFailed();
                 Log::error(

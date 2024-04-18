@@ -146,7 +146,6 @@ class RebuildQueryserviceData extends Command
                 return $page['title'];
             }, $pages));
 
-
             $nextCursor = data_get($jsonResponse, 'continue.apcontinue');
             if ($nextCursor === null) {
                 break;
