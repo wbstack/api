@@ -27,7 +27,6 @@ class ElasticSearchAliasInit extends Job
      */
     public function handle( HttpRequest $request )
     {
-        $timeStart = microtime( true );
         Log::info( __METHOD__ . ": Updating Elasticsearch aliases for $this->wikiId" );
 
         if ( !$this->sharedPrefix ) {
@@ -95,15 +94,13 @@ class ElasticSearchAliasInit extends Job
 
         $json = json_decode( $rawResponse, true );
         if ( $json[ 'acknowledged' ] !== true ) {
-            Log::error( __METHOD__ . ": Updating Elasticsearch aliases failed for $this->wikiId" );
+            Log::error( __METHOD__ . ": Updating Elasticsearch aliases failed for $this->wikiId with $rawResponse" );
             $this->fail(
-                new \RuntimeException( "Updating Elasticsearch aliases failed for $this->wikiId" )
+                new \RuntimeException( "Updating Elasticsearch aliases failed for $this->wikiId with $rawResponse" )
             );
             return;
         }
 
-        $timeEnd = microtime( true );
-        $executionTime = ( $timeEnd - $timeStart );
-        Log::info( __METHOD__ . ": Updating Elasticsearch aliases finished for $this->wikiId in $executionTime s" );
+        Log::info( __METHOD__ . ": Updating Elasticsearch aliases finished for $this->wikiId" );
     }
 }

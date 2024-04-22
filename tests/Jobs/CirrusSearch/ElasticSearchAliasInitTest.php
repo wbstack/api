@@ -23,6 +23,14 @@ class ElasticSearchAliasInitTest extends TestCase
         putenv( 'ELASTICSEARCH_SHARED_INDEX_PREFIX' );
     }
 
+    public function tearDown(): void
+    {
+        putenv( 'ELASTICSEARCH_SHARED_INDEX_PREFIX' );
+        Wiki::query()->delete();
+        WikiDb::query()->delete();
+        parent::tearDown();
+    }
+
     private function buildAlias( string $index, string $alias ) {
         return [
             'add' => [
@@ -86,7 +94,7 @@ class ElasticSearchAliasInitTest extends TestCase
         $mockJob = $this->createMock( Job::class );
         $mockJob->expects( $this->once() )
                 ->method( 'fail' )
-                ->with( new \RuntimeException( "Updating Elasticsearch aliases failed for $this->wikiId" ) );
+                ->with( new \RuntimeException( "Updating Elasticsearch aliases failed for $this->wikiId with {\"acknowledged\":false}" ) );
 
         $job = new ElasticSearchAliasInit( $this->wikiId, $this->prefix );
         $job->setJob( $mockJob );

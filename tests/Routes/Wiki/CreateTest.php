@@ -66,14 +66,6 @@ class CreateTest extends TestCase
             ]
         );
 
-        $response->assertStatus(200)
-            ->assertJsonPath('data.domain', 'derp.com')
-            ->assertJsonPath('data.name', null)
-            ->assertJsonPath('success', true );
-
-        Queue::assertPushed( ProvisionWikiDbJob::class, 1);
-        Queue::assertPushed( MediawikiInit::class, 1);
-
         if ( $enabledForNewWikis && $clusterWithoutSharedIndex ) {
             Queue::assertPushed( function ( ElasticSearchIndexInit $job ) use ( $clusterWithoutSharedIndex ) {
                 return $job->cluster() === $clusterWithoutSharedIndex;
@@ -88,17 +80,33 @@ class CreateTest extends TestCase
             Queue::assertNotPushed( ElasticSearchAliasInit::class );
         }
 
-        $id = $response->original['data']['id'];
+        if ( $enabledForNewWikis && !$clusterWithoutSharedIndex && !( $sharedIndexHost && $sharedIndexPrefix ) ) {
+            $response->assertStatus( 503 )
+                ->assertJsonPath( 'message', 'Search enabled, but its configuration is invalid' );
 
-        $this->assertSame(
-            1,
-            WikiSetting::where( [ 'name' => WikiSetting::wgSecretKey, 'wiki_id' => $id ] )->count()
-        );
+            Queue::assertNotPushed( ProvisionWikiDbJob::class );
+            Queue::assertNotPushed( MediawikiInit::class );
+        } else {
+            $response->assertStatus( 200 )
+                ->assertJsonPath( 'data.domain', 'derp.com' )
+                ->assertJsonPath( 'data.name', null )
+                ->assertJsonPath( 'success', true );
 
-        $this->assertSame(
-            1,
-            WikiSetting::where( [ 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => $enabledForNewWikis, 'wiki_id' => $id ] )->count()
-        );
+            Queue::assertPushed( ProvisionWikiDbJob::class, 1 );
+            Queue::assertPushed( MediawikiInit::class, 1 );
+
+            $id = $response->original[ 'data' ][ 'id' ];
+
+            $this->assertSame(
+                1,
+                WikiSetting::where( [ 'name' => WikiSetting::wgSecretKey, 'wiki_id' => $id ] )->count()
+            );
+
+            $this->assertSame(
+                1,
+                WikiSetting::where( [ 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => $enabledForNewWikis, 'wiki_id' => $id ] )->count()
+            );
+        }
     }
 
     static public function createProvider() {
