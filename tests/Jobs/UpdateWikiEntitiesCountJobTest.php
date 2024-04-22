@@ -3,11 +3,14 @@
 namespace Tests\Jobs;
 
 use App\Jobs\SiteStatsUpdateJob;
+use App\Jobs\UpdateWikiEntitiesCountJob;
 use App\Jobs\UpdateWikiSiteStatsJob;
 use App\Wiki;
 use App\WikiEntitiesCount;
+use App\WikiSetting;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\MockObject\Exception;
 use Tests\TestCase;
@@ -41,7 +44,8 @@ class UpdateWikiEntitiesCountJobTest extends TestCase
      */
     public function testSuccess()
     {
-        Wiki::factory()->create(['domain' => 'testwiki.wikibase.cloud']);
+        Bus::fake();
+        $wiki = Wiki::factory()->create(['domain' => 'testwiki.wikibase.cloud']);
 
         Http::fake([
             getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
@@ -119,15 +123,13 @@ class UpdateWikiEntitiesCountJobTest extends TestCase
         $mockJob->expects($this->never())
             ->method('fail')
             ->withAnyParameters();
-        $job = new UpdateWikiSiteStatsJob();
+        $job = new UpdateWikiEntitiesCountJob();
         $job->setJob($mockJob);
         $job->handle();
 
+        $event = Wiki::with('wikiEntitiesCount')->where(['domain' => 'testwiki.wikibase.cloud'])->first()->wikiEntitiesCount()->first();
 
-        $wiki = Wiki::with('wikiEntitiesCount')->where(['domain' => 'testwiki.wikibase.cloud'])->first();
-        echo $wiki;
-        $items_count = $wiki->wikiEntitiesCount->items_count;
-//        $this->assertEquals(9, $event['items_count']);
-//        $this->assertEquals(3, $event['properties_count']);
+        $this->assertEquals(9, $event['items_count']);
+        $this->assertEquals(3, $event['properties_count']);
     }
 }

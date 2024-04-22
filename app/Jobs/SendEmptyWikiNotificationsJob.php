@@ -68,7 +68,7 @@ class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique
                 'notification_type' => EmptyWikiNotification::TYPE,
                 'user_id' => $wikiManager->pivot->user_id,
             ]);
-            $wikiManager->notify(new EmptyWikiNotification($wiki->sitename));    
+            $wikiManager->notify(new EmptyWikiNotification($wiki->sitename));
         }
     }
 }
