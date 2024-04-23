@@ -14,6 +14,7 @@ class PruneQueryserviceBatchesTable extends Job
             ['pending_since', '=', null],
             ['updated_at', '<', Carbon::now()->subMonths(1)],
         ])
+            ->union(QsBatch::doesntHave('wiki'))
             ->orderBy('id', 'ASC')
             ->take(250)
             ->delete();

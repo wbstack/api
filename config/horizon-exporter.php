@@ -20,7 +20,9 @@ return [
         \LKDevelopment\HorizonPrometheusExporter\Exporter\CurrentProccesesPerQueue::class,
         \LKDevelopment\HorizonPrometheusExporter\Exporter\FailedJobsPerHour::class,
         \LKDevelopment\HorizonPrometheusExporter\Exporter\HorizonStatus::class,
-        \LKDevelopment\HorizonPrometheusExporter\Exporter\RecentJobs::class
+        \LKDevelopment\HorizonPrometheusExporter\Exporter\RecentJobs::class,
+        \App\Metrics\FailedQsBatches::class,
+        \App\Metrics\PendingQsBatches::class,
     ],
 
     /**

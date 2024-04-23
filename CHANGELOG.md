@@ -1,5 +1,14 @@
 # api
 
+## 10x.2.1 - 17 April 2024
+- Prevent duplicate entries per wiki in wiki_site_stats table
+
+## 10x.2.0 - 8 April 2024
+- Add Prometheus metrics for failed and pending QsBatches
+
+## 10x.1.3 - 2 April 2024
+- Disregard QsBatches without associated wikis in Controller
+
 ## 10x.1.2 - 25 March 2024
 - Define default job timeout at class level
 

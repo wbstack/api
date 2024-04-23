@@ -50,11 +50,11 @@ class PublicWikiTest extends TestCase
             'wiki_id' => $wiki->id, 'pages' => 77
         ]);
 
-        Wiki::factory()->create([
+        $wiki2 = Wiki::factory()->create([
             'domain' => 'two.wikibase.cloud'
         ]);
         WikiSiteStats::factory()->create([
-            'wiki_id' => $wiki->id, 'pages' => 66
+            'wiki_id' => $wiki2->id, 'pages' => 66
         ]);
 
         $this->json('GET', $this->route.'/'.$wiki->id)
