@@ -1,5 +1,8 @@
 # api
 
+## 10x.3.0 - 23 April 2024
+- Add job for creating aliases in Elasticsearch
+
 ## 10x.2.1 - 17 April 2024
 - Prevent duplicate entries per wiki in wiki_site_stats table
 
