@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Config;
 $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
 
     // POST
-    $router->post('auth/login', ['uses' => 'Auth\LoginController@login']);
+    $router->post('auth/login', ['middleware' => ['cookies'], 'uses' => 'Auth\LoginController@postLogin']);
+    $router->get('auth/login', ['middleware' => ['auth:api'], 'uses' => 'Auth\LoginController@getLogin']);
     // TODO actually use logout route in VUE app..
     $router->post('auth/logout', ['uses' => 'Auth\LoginController@logout']);
     $router->post('user/register', [
@@ -30,7 +31,6 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
 
         // user
         $router->group(['prefix' => 'user'], function () use ($router) {
-            $router->post('self', ['uses' => 'UserController@getSelf']);
             $router->post('sendVerifyEmail', ['uses' => 'UserVerificationTokenController@createAndSendForUser']);
         });
 

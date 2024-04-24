@@ -7,6 +7,7 @@ use App\User;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 class LoginController extends Controller
 {
@@ -18,7 +19,12 @@ class LoginController extends Controller
         return 'email';
     }
 
-    public function login(Request $request): ?\Illuminate\Http\JsonResponse
+    public function getLogin(Request $request)
+    {
+        return $request->user();
+    }
+
+    public function postLogin(Request $request): ?\Illuminate\Http\JsonResponse
     {
         // Validation
         $rules = [
@@ -39,8 +45,8 @@ class LoginController extends Controller
         $data = [
           'email' => $request->get('email'),
           'password'  =>  $request->get('password'),
-          //'is_active' => true
-      ];
+        ];
+
         if (Auth::attempt($data)) {
             $this->clearLoginAttempts($request);
 
@@ -49,11 +55,21 @@ class LoginController extends Controller
 
             return response()->json([
               'user'  =>  $user, // <- we're sending the user info for frontend usage
-              'token' =>  $user->createToken('yourAppName')->accessToken, // <- token is generated and sent back to the front end
-          ]);
+            ])->withCookie(
+                Cookie::make(
+                    'laravel_token',
+                    $user->createToken('yourAppName')->accessToken,
+                    60 * 24 * 30,
+                    '/api',
+                    null,
+                    null,
+                    true,
+                    false,
+                    'strict',
+                ),
+            );
         } else {
             $this->incrementLoginAttempts($request);
-
             return response()->json('Unauthorized', 401);
         }
     }
