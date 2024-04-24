@@ -8,13 +8,7 @@ use Illuminate\Support\Facades\Config;
  * @var Illuminate\Routing\Router $router
  */
 $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
-
-    // POST
-    $router->post('auth/login', ['middleware' => ['cookies'], 'uses' => 'Auth\LoginController@postLogin']);
-    $router->get('auth/login', ['middleware' => ['auth:api'], 'uses' => 'Auth\LoginController@getLogin']);
-    $router->delete('auth/login', ['middleware' => ['auth:api'], 'uses' => 'Auth\LoginController@deleteLogin']);
     // TODO actually use logout route in VUE app..
-    $router->post('auth/logout', ['uses' => 'Auth\LoginController@logout']);
     $router->post('user/register', [
         'middleware' => ['throttle.signup:'.Config::get('wbstack.signup_throttling_limit').','.Config::get('wbstack.signup_throttling_range')],
         'uses' => 'Auth\RegisterController@register'
@@ -27,8 +21,11 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
     $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
     $router->apiResource('wikiConversionData', 'ConversionMetricController')->only(['index']);
 
+    $router->post('auth/login', ['middleware' => ['cookies'], 'uses' => 'Auth\LoginController@postLogin']);
     // Authed
     $router->group(['middleware' => ['auth:api']], function () use ($router) {
+        $router->get('auth/login', ['uses' => 'Auth\LoginController@getLogin']);
+        $router->delete('auth/login', ['uses' => 'Auth\LoginController@deleteLogin']);
 
         // user
         $router->group(['prefix' => 'user'], function () use ($router) {
