@@ -24,6 +24,14 @@ class LoginController extends Controller
         return $request->user();
     }
 
+    public function deleteLogin(Request $request)
+    {
+        return response()
+            ->json()
+            ->setStatusCode(204)
+            ->withCookie(Cookie::forget('laravel_token'));
+    }
+
     public function postLogin(Request $request): ?\Illuminate\Http\JsonResponse
     {
         // Validation

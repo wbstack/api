@@ -12,6 +12,7 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
     // POST
     $router->post('auth/login', ['middleware' => ['cookies'], 'uses' => 'Auth\LoginController@postLogin']);
     $router->get('auth/login', ['middleware' => ['auth:api'], 'uses' => 'Auth\LoginController@getLogin']);
+    $router->delete('auth/login', ['middleware' => ['auth:api'], 'uses' => 'Auth\LoginController@deleteLogin']);
     // TODO actually use logout route in VUE app..
     $router->post('auth/logout', ['uses' => 'Auth\LoginController@logout']);
     $router->post('user/register', [
