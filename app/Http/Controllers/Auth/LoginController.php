@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Config;
 
 class LoginController extends Controller
 {
@@ -19,9 +20,33 @@ class LoginController extends Controller
         return 'email';
     }
 
+    private static function getCookie(string $token): \Symfony\Component\HttpFoundation\Cookie
+    {
+        if ($token === "") {
+            return Cookie::forget(
+                Config::get('auth.cookies.key'),
+                Config::get('auth.cookies.path'),
+            );
+        } else {
+            return Cookie::make(
+                Config::get('auth.cookies.key'),
+                $token,
+                Config::get('auth.cookies.ttl_minutes'),
+                Config::get('auth.cookies.path'),
+                null,
+                null,
+                true,
+                false,
+                Config::get('auth.cookies.same_site'),
+            );
+        }
+    }
+
     public function getLogin(Request $request)
     {
-        return $request->user();
+        return response()->json([
+            'user' => $request->user(),
+        ]);
     }
 
     public function deleteLogin(Request $request)
@@ -29,7 +54,7 @@ class LoginController extends Controller
         return response()
             ->json()
             ->setStatusCode(204)
-            ->withCookie(Cookie::forget('laravel_token'));
+            ->withCookie($this->getCookie(''));
     }
 
     public function postLogin(Request $request): ?\Illuminate\Http\JsonResponse
@@ -64,17 +89,7 @@ class LoginController extends Controller
             return response()->json([
               'user'  =>  $user, // <- we're sending the user info for frontend usage
             ])->withCookie(
-                Cookie::make(
-                    'laravel_token',
-                    $user->createToken('yourAppName')->accessToken,
-                    60 * 24 * 30,
-                    '/api',
-                    null,
-                    null,
-                    true,
-                    false,
-                    'strict',
-                ),
+                $this->getCookie($user->createToken('yourAppName')->accessToken)
             );
         } else {
             $this->incrementLoginAttempts($request);

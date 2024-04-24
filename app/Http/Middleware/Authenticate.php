@@ -5,17 +5,16 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
 
 class Authenticate extends Middleware
 {
     public function handle($request, Closure $next, ...$guards)
     {
         try {
-            $token = $request->cookie('laravel_token');
+            $token = $request->cookie(Config::get('auth.cookies.key'));
             if ($token) {
                 $request->headers->set('Authorization', 'Bearer '.$token);
-                Log::info("Header ".$request->header('Authorization'));
             }
             $this->authenticate($request, $guards);
         } catch (AuthenticationException $e) {

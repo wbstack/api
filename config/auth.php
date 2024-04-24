@@ -100,4 +100,11 @@ return [
         ],
     ],
 
+    'cookies' => [
+        'key' => 'laravel_token',
+        'path' => '/api',
+        'ttl_minutes' => 60 * 24 * 30,
+        'same_site' => 'strict',
+    ]
+
 ];
