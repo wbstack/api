@@ -71,7 +71,7 @@ class ElasticSearchIndexInitTest extends TestCase
         $request->expects($this->once())
             ->method('setOptions')
             ->with([
-                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json',
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json&cluster=all',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 1234,

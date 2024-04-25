@@ -7,6 +7,7 @@ use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
+use App\Jobs\ElasticSearchAliasInit;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
@@ -32,6 +33,16 @@ class WikiController extends Controller
 
     public function create(Request $request): \Illuminate\Http\Response
     {
+        $clusterWithoutSharedIndex = Config::get('wbstack.elasticsearch_cluster_without_shared_index');
+        $sharedIndexHost = Config::get('wbstack.elasticsearch_shared_index_host');
+        $sharedIndexPrefix = Config::get('wbstack.elasticsearch_shared_index_prefix');
+
+        if (Config::get('wbstack.elasticsearch_enabled_by_default')) {
+            if (!$clusterWithoutSharedIndex && !($sharedIndexHost && $sharedIndexPrefix)) {
+                abort(503, 'Search enabled, but its configuration is invalid');
+            }
+        }
+
         $user = $request->user();
         
         $submittedDomain = strtolower($request->input('domain'));
@@ -121,10 +132,14 @@ class WikiController extends Controller
             }
         });
 
-
         // dispatch elasticsearch init job to enable the feature
-        if ( Config::get('wbstack.elasticsearch_enabled_by_default') ) {
-            dispatch(new ElasticSearchIndexInit($wiki->id));
+        if (Config::get('wbstack.elasticsearch_enabled_by_default')) {
+            if ($clusterWithoutSharedIndex) {
+                dispatch(new ElasticSearchIndexInit($wiki->id, $clusterWithoutSharedIndex));
+            }
+            if ($sharedIndexHost && $sharedIndexPrefix) {
+                dispatch(new ElasticSearchAliasInit($wiki->id));
+            }
         }
         
         // opportunistic dispatching of jobs to make sure storage pools are topped up
