@@ -14,10 +14,6 @@ use Carbon\Carbon;
 class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
 {
     public $timeout = 3600;
-    private const NAMESPACE_ITEM = 120;
-    private const NAMESPACE_PROPERTY = 122;
-    protected string $apiUrl;
-
     public function handle (): void
     {
         $allWikis = Wiki::all();
