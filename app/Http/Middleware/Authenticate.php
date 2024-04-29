@@ -12,6 +12,10 @@ class Authenticate extends Middleware
     public function handle($request, Closure $next, ...$guards)
     {
         try {
+            // Passport wants to read tokens from Authorization headers, so
+            // we'll pass on a value if set in a cookie. This means the
+            // cookie value will take precendence over the header in case both
+            // are set.
             $token = $request->cookie(Config::get('auth.cookies.key'));
             if ($token) {
                 $request->headers->set('Authorization', 'Bearer '.$token);

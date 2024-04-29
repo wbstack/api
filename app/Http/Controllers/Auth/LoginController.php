@@ -22,24 +22,25 @@ class LoginController extends Controller
 
     private static function getCookie(string $token): \Symfony\Component\HttpFoundation\Cookie
     {
-        if ($token === "") {
-            return Cookie::forget(
-                Config::get('auth.cookies.key'),
-                Config::get('auth.cookies.path'),
-            );
-        } else {
-            return Cookie::make(
-                Config::get('auth.cookies.key'),
-                $token,
-                Config::get('auth.cookies.ttl_minutes'),
-                Config::get('auth.cookies.path'),
-                null,
-                null,
-                true,
-                false,
-                Config::get('auth.cookies.same_site'),
-            );
-        }
+        return Cookie::make(
+            Config::get('auth.cookies.key'),
+            $token,
+            Config::get('auth.cookies.ttl_minutes'),
+            Config::get('auth.cookies.path'),
+            null,
+            null,
+            true,
+            false,
+            Config::get('auth.cookies.same_site'),
+        );
+    }
+
+    private static function deleteCookie(): \Symfony\Component\HttpFoundation\Cookie
+    {
+        return Cookie::forget(
+            Config::get('auth.cookies.key'),
+            Config::get('auth.cookies.path'),
+        );
     }
 
     public function getLogin(Request $request)
@@ -54,7 +55,7 @@ class LoginController extends Controller
         return response()
             ->json()
             ->setStatusCode(204)
-            ->withCookie($this->getCookie(''));
+            ->withCookie($this->deleteCookie());
     }
 
     public function postLogin(Request $request): ?\Illuminate\Http\JsonResponse
