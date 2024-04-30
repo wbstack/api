@@ -17,6 +17,7 @@ use App\Jobs\PlatformStatsSummaryJob;
 
 class PlatformStatsSummaryJobTest extends TestCase
 {
+    use RefreshDatabase;
 
     private $numWikis = 5;
     private $wikis = [];
