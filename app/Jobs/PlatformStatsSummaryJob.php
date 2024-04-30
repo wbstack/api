@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Wiki;
 use App\User;
+use App\WikiEntitiesCount;
 use Illuminate\Database\DatabaseManager;
 use PDO;
 use Carbon\Carbon;
@@ -52,6 +53,19 @@ class PlatformStatsSummaryJob extends Job
         }
         return $result;
     }
+//
+//    public function getEntitesCountStats(): array {
+//        $total_items_count = 0;
+//        $total_properties_count = 0;
+//        $entities_count = [];
+//        $allWiki = WikiEntitiesCount::all();
+//        foreach ($allWiki as $wiki) {
+//            $total_items_count +=  $wiki['items_count'];
+//            $total_properties_count += $wiki['properties_count'];
+//            $entites_count = [$total_items_count , $total_properties_count];
+//        }
+//        return $entites_count = [$total_items_count , $total_properties_count];
+//    }
 
     public function prepareStats( array $allStats, $wikis): array {
 
@@ -60,6 +74,8 @@ class PlatformStatsSummaryJob extends Job
         $inactive = [];
         $emptyWikis = [];
         $nonDeletedStats = [];
+        $items_count = [];
+        $properties_count = [];
 
         $currentTime = Carbon::now()->timestamp;
 
@@ -106,12 +122,18 @@ class PlatformStatsSummaryJob extends Job
             }
 
             $activeWikis[] = $wiki;
+
+            $entities_count = $wiki->wikiEntitiesCount()->first();
+            array_push($items_count, $entities_count['items_count']);
+            array_push($properties_count, $entities_count['properties_count']);
         }
 
         $totalNonDeletedUsers = array_sum(array_column($nonDeletedStats, 'users'));
         $totalNonDeletedActiveUsers = array_sum(array_column($nonDeletedStats, 'active_users'));
         $totalNonDeletedPages = array_sum(array_column($nonDeletedStats, 'pages'));
         $totalNonDeletedEdits = array_sum(array_column($nonDeletedStats, 'edits'));
+        $totalItemsCount = array_sum($items_count);
+        $totalPropertiesCount = array_sum($properties_count);
 
         return [
             'platform_summary_version' => $this->platformSummaryStatsVersion,
@@ -124,6 +146,8 @@ class PlatformStatsSummaryJob extends Job
             'total_non_deleted_active_users' => $totalNonDeletedActiveUsers,
             'total_non_deleted_pages' => $totalNonDeletedPages,
             'total_non_deleted_edits' => $totalNonDeletedEdits,
+            'total_items_count' => $totalItemsCount,
+            'total_properties_count' => $totalPropertiesCount,
         ];
     }
 

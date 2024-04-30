@@ -2,6 +2,7 @@
 
 namespace Tests\Jobs;
 
+use App\WikiEntitiesCount;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\User;
@@ -81,12 +82,12 @@ class PlatformStatsSummaryJobTest extends TestCase
 
         $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
-        
+
         $wikis = [
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki1.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->subDays(90)->timestamp, 'domain' => 'wiki3.com' ] ),
-            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com' ] )
+            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com' ] ),
         ];
 
         foreach($wikis as $wiki) {
@@ -97,7 +98,12 @@ class PlatformStatsSummaryJobTest extends TestCase
                 'version' => 'asdasdasdas',
                 'prefix' => 'asdasd',
                 'wiki_id' => $wiki->id
-            ]);  
+            ]);
+            WikiEntitiesCount::create([
+                'wiki_id' => $wiki->id,
+                'items_count' => 10,
+                'properties_count' => 10
+            ]);
         }
         $stats = [
             [   // inactive
@@ -143,10 +149,10 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "platform_summary_version" => "v1"
             ],
         ];
-          
+
 
        $groups =  $job->prepareStats($stats, $wikis);
-    
+
        $this->assertEquals(
             [
                 "total" => 4,
@@ -158,9 +164,11 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "total_non_deleted_active_users" => 1,
                 "total_non_deleted_pages" => 2,
                 "total_non_deleted_edits" => 1,
-                "platform_summary_version" => "v1"
+                "platform_summary_version" => "v1",
+                "total_items_count" => 10,
+                "total_properties_count" => 10
             ],
-            $groups, 
+            $groups,
         );
     }
     function testCreationStats() {
