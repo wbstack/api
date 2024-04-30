@@ -53,19 +53,6 @@ class PlatformStatsSummaryJob extends Job
         }
         return $result;
     }
-//
-//    public function getEntitesCountStats(): array {
-//        $total_items_count = 0;
-//        $total_properties_count = 0;
-//        $entities_count = [];
-//        $allWiki = WikiEntitiesCount::all();
-//        foreach ($allWiki as $wiki) {
-//            $total_items_count +=  $wiki['items_count'];
-//            $total_properties_count += $wiki['properties_count'];
-//            $entites_count = [$total_items_count , $total_properties_count];
-//        }
-//        return $entites_count = [$total_items_count , $total_properties_count];
-//    }
 
     public function prepareStats( array $allStats, $wikis): array {
 

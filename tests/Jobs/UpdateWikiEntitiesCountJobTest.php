@@ -40,6 +40,10 @@ class UpdateWikiEntitiesCountJobTest extends TestCase
         Bus::fake();
         Wiki::factory()->create(['domain' => 'testwiki1.wikibase.cloud']);
 
+        //Faking an API query that contain all pages in NAMESPACE 120 (properties) and 122 (items)
+        //The API query that returns all pages with NAMESPACE 122 (items) was divided into 2 batches to test if the job...
+        //...is able to get all the data in case the wiki has a big database and the query couldn't return everything in one go
+        //more info: https://www.mediawiki.org/wiki/API:Continue
         Http::fake([
             getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
@@ -161,27 +165,27 @@ class UpdateWikiEntitiesCountJobTest extends TestCase
         $this->assertEquals(0, $event['properties_count']);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function testFailure()
+    public function testMediawikiApiResponseError()
     {
         Bus::fake();
         Wiki::factory()->create(['domain' => 'testwiki3.wikibase.cloud']);
 
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([]),
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([])
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([],500),
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([],500)
         ]);
 
         $mockJob = $this->createMock(Job::class);
         $job = new UpdateWikiEntitiesCountJob();
+        $mockJob->expects($this->never())
+            ->method('fail')
+            ->withAnyParameters();
         $job->setJob($mockJob);
         $job->handle();
 
-        $event = Wiki::with('wikiEntitiesCount')->where(['domain' => 'testwiki3.wikibase.cloud'])->first()->wikiEntitiesCount()->first();
+        $result = Wiki::with('wikiEntitiesCount')->where(['domain' => 'testwiki3.wikibase.cloud'])->first()->wikiEntitiesCount()->count();
 
-        $this->assertEquals(null, $event['items_count']);
-        $this->assertEquals(null, $event['properties_count']);
+        $this->assertEquals(0, $result);
+        $this->assertEquals(0, $result);
     }
 }
