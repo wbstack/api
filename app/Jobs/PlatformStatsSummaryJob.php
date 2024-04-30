@@ -108,11 +108,15 @@ class PlatformStatsSummaryJob extends Job
                 }
             }
 
-            $activeWikis[] = $wiki;
-
             $entities_count = $wiki->wikiEntitiesCount()->first();
-            array_push($items_count, $entities_count['items_count']);
-            array_push($properties_count, $entities_count['properties_count']);
+            print_r($entities_count);
+            //items and properties count
+            if( !is_null($wiki->deleted_at) ){
+                array_push($items_count, $entities_count['items_count']);
+                array_push($properties_count, $entities_count['properties_count']);
+            }
+
+            $activeWikis[] = $wiki;
         }
 
         $totalNonDeletedUsers = array_sum(array_column($nonDeletedStats, 'users'));
