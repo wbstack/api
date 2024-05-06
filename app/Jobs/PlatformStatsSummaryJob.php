@@ -75,8 +75,10 @@ class PlatformStatsSummaryJob extends Job
 
             //items and properties counts
             $entities_count = $wiki->wikiEntitiesCount()->first();
-            array_push($items_count, $entities_count['items_count']);
-            array_push($properties_count, $entities_count['properties_count']);
+            if ($entities_count !== null && isset($entities_count['items_count'])){
+                array_push($items_count, $entities_count['items_count']);
+                array_push($properties_count, $entities_count['properties_count']);
+            }
 
             $wikiDb = $wiki->wikiDb()->first();
 
