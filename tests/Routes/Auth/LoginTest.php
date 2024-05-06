@@ -46,4 +46,19 @@ class LoginTest extends TestCase
         $userResponsePart = $response->json('user');
         $this->assertEquals($user->email, $userResponsePart['email']);
     }
+    public function testGet()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user, 'api')
+          ->get($this->route)
+          ->assertStatus(200);
+    }
+
+    public function testDelete()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user, 'api')
+          ->delete($this->route)
+          ->assertStatus(204);
+    }
 }
