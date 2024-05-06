@@ -14,7 +14,6 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
-        \Illuminate\Http\Middleware\HandleCors::class,
         \Illuminate\Http\Middleware\TrustProxies::class,
     ];
 
@@ -47,7 +46,6 @@ class Kernel extends HttpKernel
         'throttle.signup' => \App\Http\Middleware\ThrottleSignup::class,
         //'throttle' => App\Http\Middleware\ThrottleRequests::class,
         //'auth' => App\Http\Middleware\Authenticate::class,
-        'cors' => \Illuminate\Http\Middleware\HandleCors::class,
     ];
 
     /**

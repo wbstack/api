@@ -96,8 +96,15 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => 'password_resets',
-            'expire' => 60,
+            'expire' => 30,
         ],
     ],
+
+    'cookies' => [
+        'key' => 'laravel_token',
+        'path' => '/api',
+        'ttl_minutes' => 60 * 24 * 30,
+        'same_site' => 'strict',
+    ]
 
 ];

@@ -41,8 +41,24 @@ class LoginTest extends TestCase
         $user = User::factory()->create(['password' => password_hash($password, PASSWORD_DEFAULT)]);
         $response = $this->json('POST', $this->route, ['email' => $user->email, 'password' => $password]);
         $response->assertStatus(200);
-        $response->assertJsonStructure(['user' => ['email'], 'token']);
+        $response->assertJsonStructure(['user' => ['email']]);
+        $response->assertCookie('laravel_token');
         $userResponsePart = $response->json('user');
         $this->assertEquals($user->email, $userResponsePart['email']);
+    }
+    public function testGet()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user, 'api')
+          ->get($this->route)
+          ->assertStatus(200);
+    }
+
+    public function testDelete()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user, 'api')
+          ->delete($this->route)
+          ->assertStatus(204);
     }
 }
