@@ -21,7 +21,7 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
     $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
     $router->apiResource('wikiConversionData', 'ConversionMetricController')->only(['index']);
 
-    $router->post('auth/login', ['middleware' => ['cookies'], 'uses' => 'Auth\LoginController@postLogin']);
+    $router->post('auth/login', ['uses' => 'Auth\LoginController@postLogin']);
     // Authed
     $router->group(['middleware' => ['auth:api']], function () use ($router) {
         $router->get('auth/login', ['uses' => 'Auth\LoginController@getLogin']);

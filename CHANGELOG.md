@@ -1,5 +1,8 @@
 # api
 
+## 10x.4.0 - 6 May 2024
+- Allow cookie based authentication
+
 ## 10x.3.0 - 23 April 2024
 - Add job for creating aliases in Elasticsearch
 
