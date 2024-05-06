@@ -73,6 +73,11 @@ class PlatformStatsSummaryJob extends Job
                 continue;
             }
 
+            //items and properties counts
+            $entities_count = $wiki->wikiEntitiesCount()->first();
+            array_push($items_count, $entities_count['items_count']);
+            array_push($properties_count, $entities_count['properties_count']);
+
             $wikiDb = $wiki->wikiDb()->first();
 
             if( !$wikiDb ) {
@@ -106,14 +111,6 @@ class PlatformStatsSummaryJob extends Job
                     $inactive[] = $wiki;
                     continue;
                 }
-            }
-
-            $entities_count = $wiki->wikiEntitiesCount()->first();
-            print_r($entities_count);
-            //items and properties count
-            if( !is_null($wiki->deleted_at) ){
-                array_push($items_count, $entities_count['items_count']);
-                array_push($properties_count, $entities_count['properties_count']);
             }
 
             $activeWikis[] = $wiki;
