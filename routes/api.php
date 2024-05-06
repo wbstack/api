@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AuthorisedUsersForDeletedWikiMetricsMiddleware;
 use Illuminate\Support\Facades\Config;
 
 /**
@@ -20,6 +21,8 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
 
     $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
     $router->apiResource('wikiConversionData', 'ConversionMetricController')->only(['index']);
+    $router->apiResource('deletedWikiMetrics', 'DeletedWikiMetricsController')->only(['index'])
+        ->middleware(AuthorisedUsersForDeletedWikiMetricsMiddleware::class);
 
     $router->post('auth/login', ['uses' => 'Auth\LoginController@postLogin']);
     // Authed
