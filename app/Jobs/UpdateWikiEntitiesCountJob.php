@@ -23,7 +23,7 @@ class UpdateWikiEntitiesCountJob extends Job implements ShouldBeUnique
             } catch (\Exception $ex) {
                 $this->job->markAsFailed();
                 Log::error(
-                    'Failure polling wiki '.$wiki->getAttribute('domain').' for sitestats: '.$ex->getMessage()
+                    'Failure polling wiki '.$wiki->getAttribute('domain').' for item and property counts: '.$ex->getMessage()
                 );
             }
         }
