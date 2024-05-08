@@ -86,7 +86,8 @@ class PlatformStatsSummaryJobTest extends TestCase
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki1.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->subDays(90)->timestamp, 'domain' => 'wiki3.com' ] ),
-            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com' ] )
+            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com' ] ),
+            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki5.com' ] )
         ];
 
         foreach($wikis as $wiki) {
@@ -100,13 +101,23 @@ class PlatformStatsSummaryJobTest extends TestCase
             ]);  
         }
         $stats = [
-            [   // inactive
+            [   // inactive but recent enough to have a lastEdit
                 "wiki" => "wiki1.com",
-                "edits" => NULL,
-                "pages" => NULL,
-                "users" => NULL,
+                "edits" => 1,
+                "pages" => 1,
+                "users" => 1,
                 "active_users" => NULL,
-                "lastEdit" => Carbon::now()->subDays(90)->timestamp,
+                "lastEdit" => Carbon::now()->subDays(100)->timestamp,
+                "first100UsingOauth" => "0",
+                "platform_summary_version" => "v1"
+            ],
+            [   // inactive but so old that mediawiki reports no last edit
+                "wiki" => "wiki5.com",
+                "edits" => 1,
+                "pages" => 1,
+                "users" => 1,
+                "active_users" => NULL,
+                "lastEdit" => NULL,
                 "first100UsingOauth" => "0",
                 "platform_summary_version" => "v1"
             ],
@@ -149,15 +160,15 @@ class PlatformStatsSummaryJobTest extends TestCase
     
        $this->assertEquals(
             [
-                "total" => 4,
+                "total" => 5,
                 "deleted" => 1,
                 "active" => 1,
-                "inactive" => 1,
+                "inactive" => 2,
                 "empty" => 1,
-                "total_non_deleted_users" => 3,
+                "total_non_deleted_users" => 5,
                 "total_non_deleted_active_users" => 1,
-                "total_non_deleted_pages" => 2,
-                "total_non_deleted_edits" => 1,
+                "total_non_deleted_pages" => 4,
+                "total_non_deleted_edits" => 3,
                 "platform_summary_version" => "v1"
             ],
             $groups, 

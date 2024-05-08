@@ -57,7 +57,7 @@ class PlatformStatsSummaryJob extends Job
 
         $deletedWikis = [];
         $activeWikis = [];
-        $inactive = [];
+        $inactiveWikis = [];
         $emptyWikis = [];
         $nonDeletedStats = [];
 
@@ -94,18 +94,19 @@ class PlatformStatsSummaryJob extends Job
 
             $nonDeletedStats[] = $stats;
 
-            // is it just inactive?
+            // is it active?
             if(!is_null($stats['lastEdit'])){
                 $lastTimestamp = intVal($stats['lastEdit']);
                 $diff = $currentTime - $lastTimestamp;
 
-                if ($diff >= $this->inactiveThreshold) {
-                    $inactive[] = $wiki;
+                if ($diff <= $this->inactiveThreshold) {
+                    $activeWikis[] = $wiki;
                     continue;
                 }
             }
 
-            $activeWikis[] = $wiki;
+            // if it's neither deleted, empty or active it must be inactive
+            $inactiveWikis[] = $wiki;
         }
 
         $totalNonDeletedUsers = array_sum(array_column($nonDeletedStats, 'users'));
@@ -118,7 +119,7 @@ class PlatformStatsSummaryJob extends Job
             'total' => count($wikis),
             'deleted' => count($deletedWikis),
             'active' => count($activeWikis),
-            'inactive' => count($inactive),
+            'inactive' => count($inactiveWikis),
             'empty' => count($emptyWikis),
             'total_non_deleted_users' => $totalNonDeletedUsers,
             'total_non_deleted_active_users' => $totalNonDeletedActiveUsers,
