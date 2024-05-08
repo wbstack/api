@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Wiki;
 use App\User;
+use App\WikiEntitiesCount;
 use Illuminate\Database\DatabaseManager;
 use PDO;
 use Carbon\Carbon;
@@ -60,6 +61,8 @@ class PlatformStatsSummaryJob extends Job
         $inactive = [];
         $emptyWikis = [];
         $nonDeletedStats = [];
+        $items_count = [];
+        $properties_count = [];
 
         $currentTime = Carbon::now()->timestamp;
 
@@ -68,6 +71,13 @@ class PlatformStatsSummaryJob extends Job
             if( !is_null($wiki->deleted_at) ) {
                 $deletedWikis[] = $wiki;
                 continue;
+            }
+
+            //items and properties counts
+            $entities_count = $wiki->wikiEntitiesCount()->first();
+            if ($entities_count !== null && isset($entities_count['items_count'])){
+                array_push($items_count, $entities_count['items_count']);
+                array_push($properties_count, $entities_count['properties_count']);
             }
 
             $wikiDb = $wiki->wikiDb()->first();
@@ -112,6 +122,8 @@ class PlatformStatsSummaryJob extends Job
         $totalNonDeletedActiveUsers = array_sum(array_column($nonDeletedStats, 'active_users'));
         $totalNonDeletedPages = array_sum(array_column($nonDeletedStats, 'pages'));
         $totalNonDeletedEdits = array_sum(array_column($nonDeletedStats, 'edits'));
+        $totalItemsCount = array_sum($items_count);
+        $totalPropertiesCount = array_sum($properties_count);
 
         return [
             'platform_summary_version' => $this->platformSummaryStatsVersion,
@@ -124,6 +136,8 @@ class PlatformStatsSummaryJob extends Job
             'total_non_deleted_active_users' => $totalNonDeletedActiveUsers,
             'total_non_deleted_pages' => $totalNonDeletedPages,
             'total_non_deleted_edits' => $totalNonDeletedEdits,
+            'total_items_count' => $totalItemsCount,
+            'total_properties_count' => $totalPropertiesCount,
         ];
     }
 

@@ -10,6 +10,7 @@ use App\Jobs\PruneQueryserviceBatchesTable;
 use App\Jobs\RequeuePendingQsBatchesJob;
 use App\Jobs\SandboxCleanupJob;
 use App\Jobs\PollForMediaWikiJobsJob;
+use App\Jobs\UpdateWikiEntitiesCountJob;
 use App\Jobs\UpdateWikiSiteStatsJob;
 use App\Jobs\SendEmptyWikiNotificationsJob;
 use App\Jobs\CreateQueryserviceBatchesJob;
@@ -55,6 +56,9 @@ class Kernel extends ConsoleKernel
         $schedule->job(new UpdateWikiSiteStatsJob)->dailyAt('19:00');
 
         $schedule->job(new SendEmptyWikiNotificationsJob)->dailyAt('21:00');
+
+        $schedule->job(new UpdateWikiEntitiesCountJob)->dailyAt('20:00');
+
     }
 
     /**

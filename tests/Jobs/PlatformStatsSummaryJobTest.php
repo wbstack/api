@@ -2,6 +2,7 @@
 
 namespace Tests\Jobs;
 
+use App\WikiEntitiesCount;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\User;
@@ -16,6 +17,7 @@ use App\Jobs\PlatformStatsSummaryJob;
 
 class PlatformStatsSummaryJobTest extends TestCase
 {
+    use RefreshDatabase;
 
     private $numWikis = 5;
     private $wikis = [];
@@ -81,12 +83,12 @@ class PlatformStatsSummaryJobTest extends TestCase
 
         $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
-        
+
         $wikis = [
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki1.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->subDays(90)->timestamp, 'domain' => 'wiki3.com' ] ),
-            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com' ] )
+            Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com' ] ),
         ];
 
         foreach($wikis as $wiki) {
@@ -97,8 +99,16 @@ class PlatformStatsSummaryJobTest extends TestCase
                 'version' => 'asdasdasdas',
                 'prefix' => 'asdasd',
                 'wiki_id' => $wiki->id
-            ]);  
+            ]);
         }
+        foreach($wikis as $wiki) {
+            WikiEntitiesCount::create([
+                'items_count' => 10,
+                'properties_count' => 10,
+                'wiki_id' => $wiki->id,
+            ]);
+        }
+
         $stats = [
             [   // inactive
                 "wiki" => "wiki1.com",
@@ -108,7 +118,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "active_users" => NULL,
                 "lastEdit" => Carbon::now()->subDays(90)->timestamp,
                 "first100UsingOauth" => "0",
-                "platform_summary_version" => "v1"
+                "platform_summary_version" => "v1",
             ],
             [   // empty
                 "wiki" => "wiki2.com",
@@ -118,7 +128,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "active_users" => NULL,
                 "lastEdit" => NULL,
                 "first100UsingOauth" => "0",
-                "platform_summary_version" => "v1"
+                "platform_summary_version" => "v1",
             ],
 
             [   // active
@@ -129,7 +139,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "active_users" => 1,
                 "lastEdit" => Carbon::now()->timestamp,
                 "first100UsingOauth" => "0",
-                "platform_summary_version" => "v1"
+                "platform_summary_version" => "v1",
             ],
 
             [   // deleted
@@ -143,10 +153,10 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "platform_summary_version" => "v1"
             ],
         ];
-          
+
 
        $groups =  $job->prepareStats($stats, $wikis);
-    
+
        $this->assertEquals(
             [
                 "total" => 4,
@@ -158,9 +168,11 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "total_non_deleted_active_users" => 1,
                 "total_non_deleted_pages" => 2,
                 "total_non_deleted_edits" => 1,
-                "platform_summary_version" => "v1"
+                "platform_summary_version" => "v1",
+                "total_items_count" => 30,
+                "total_properties_count" => 30
             ],
-            $groups, 
+            $groups,
         );
     }
     function testCreationStats() {
