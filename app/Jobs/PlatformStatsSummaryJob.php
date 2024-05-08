@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Wiki;
 use App\User;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Facades\Http;
 use PDO;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -31,9 +32,15 @@ class PlatformStatsSummaryJob extends Job
     private $creationRateRanges;
 
     private $platformSummaryStatsVersion = "v1";
+
+    private const NAMESPACE_ITEM = 122;
+    private const NAMESPACE_PROPERTY = 120;
+    private string $apiUrl;
+
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
         $this->creationRateRanges = Config::get('wbstack.platform_summary_creation_rate_ranges');
+        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
     }
 
     private function isNullOrEmpty( $value ): bool {
@@ -60,6 +67,8 @@ class PlatformStatsSummaryJob extends Job
         $inactiveWikis = [];
         $emptyWikis = [];
         $nonDeletedStats = [];
+        $items_count = [];
+        $properties_count = [];
 
         $currentTime = Carbon::now()->timestamp;
 
@@ -69,6 +78,10 @@ class PlatformStatsSummaryJob extends Job
                 $deletedWikis[] = $wiki;
                 continue;
             }
+
+            //add items and properties counts of the wiki to the corresponded arrays
+            array_push($items_count, count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_ITEM)));
+            array_push($properties_count, count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_PROPERTY)));
 
             $wikiDb = $wiki->wikiDb()->first();
 
@@ -113,6 +126,8 @@ class PlatformStatsSummaryJob extends Job
         $totalNonDeletedActiveUsers = array_sum(array_column($nonDeletedStats, 'active_users'));
         $totalNonDeletedPages = array_sum(array_column($nonDeletedStats, 'pages'));
         $totalNonDeletedEdits = array_sum(array_column($nonDeletedStats, 'edits'));
+        $totalItemsCount = array_sum($items_count);
+        $totalPropertiesCount = array_sum($properties_count);
 
         return [
             'platform_summary_version' => $this->platformSummaryStatsVersion,
@@ -125,6 +140,8 @@ class PlatformStatsSummaryJob extends Job
             'total_non_deleted_active_users' => $totalNonDeletedActiveUsers,
             'total_non_deleted_pages' => $totalNonDeletedPages,
             'total_non_deleted_edits' => $totalNonDeletedEdits,
+            'total_items_count' => $totalItemsCount,
+            'total_properties_count' => $totalPropertiesCount
         ];
     }
 
@@ -163,7 +180,54 @@ class PlatformStatsSummaryJob extends Job
         if( !App::runningUnitTests() ) {
             print( json_encode($summary) . PHP_EOL );
         }
+    }
 
+    private function fetchPagesInNamespace(string $wikiDomain, int $namespace): array
+    {
+        $titles = [];
+        $cursor = '';
+        while (true) {
+            $response = Http::withHeaders([
+                'host' => $wikiDomain
+            ])->get(
+                $this->apiUrl,
+                [
+                    'action' => 'query',
+                    'list' => 'allpages',
+                    'apnamespace' => $namespace,
+                    'apcontinue' => $cursor,
+                    'aplimit' => 'max',
+                    'format' => 'json',
+                ],
+            );
+
+            if ($response->failed()) {
+                throw new \Exception(
+                    'Failed to fetch allpages for wiki '.$wikiDomain
+                );
+            }
+
+            $jsonResponse = $response->json();
+            $error = data_get($jsonResponse, 'error');
+            if ($error !== null) {
+                throw new \Exception(
+                    'Error response fetching allpages for wiki '.$wikiDomain.': '.$error
+                );
+            }
+
+            $pages = data_get($jsonResponse, 'query.allpages', []);
+            $titles = array_merge($titles, array_map(function (array $page) {
+                return $page['title'];
+            }, $pages));
+
+            $nextCursor = data_get($jsonResponse, 'continue.apcontinue');
+            if ($nextCursor === null) {
+                break;
+            }
+            $cursor = $nextCursor;
+        }
+
+        return $titles;
     }
 
     private $wikiStatsQuery = <<<EOD
