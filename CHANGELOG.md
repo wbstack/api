@@ -1,5 +1,8 @@
 # api
 
+## 10x.5.0 - 8 May 2024
+- Fix PlatformSummaryStatsJob for inactive wikis
+
 ## 10x.4.0 - 6 May 2024
 - Allow cookie based authentication
 
