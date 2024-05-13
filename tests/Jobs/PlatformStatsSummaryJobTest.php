@@ -103,7 +103,6 @@ class PlatformStatsSummaryJobTest extends TestCase
                 'prefix' => 'asdasd',
                 'wiki_id' => $wiki->id
             ]);
-            Bus::fake();
             //Generate some items/properties for testing, each wiki will have 3 props and 9 items
             Http::fake([
                 getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
@@ -211,8 +210,8 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "total_non_deleted_pages" => 4,
                 "total_non_deleted_edits" => 3,
                 "platform_summary_version" => "v1",
-                "total_items_count" => 36,
-                "total_properties_count" => 12
+                "total_items_count" => 4*9, //there are 4 non-deleted wikis and each has 4 items
+                "total_properties_count" => 4*3 //there are 4 non-deleted wikis and each has 4 properties
             ],
             $groups,
         );
