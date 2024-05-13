@@ -2,11 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Helper\MWTimestampHelper;
 use App\Wiki;
 use App\User;
 use Illuminate\Database\DatabaseManager;
 use PDO;
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\App;
@@ -42,7 +43,7 @@ class PlatformStatsSummaryJob extends Job
 
     public function getCreationStats(): array {
         $result = [];
-        $now = Carbon::now();
+        $now = CarbonImmutable::now();
         foreach ($this->creationRateRanges as $range) {
             $limit = $now->clone()->sub(new \DateInterval($range));
             $wikis = Wiki::where('created_at', '>=', $limit)->count();
@@ -61,7 +62,7 @@ class PlatformStatsSummaryJob extends Job
         $emptyWikis = [];
         $nonDeletedStats = [];
 
-        $currentTime = Carbon::now()->timestamp;
+        $currentTime = CarbonImmutable::now();
 
         foreach( $wikis as $wiki ) {
 
@@ -96,8 +97,8 @@ class PlatformStatsSummaryJob extends Job
 
             // is it active?
             if(!is_null($stats['lastEdit'])){
-                $lastTimestamp = intVal($stats['lastEdit']);
-                $diff = $currentTime - $lastTimestamp;
+                $lastTimestamp = MWTimestampHelper::getCarbonFromMWTimestamp(intVal($stats['lastEdit']));
+                $diff = $lastTimestamp->diffInSeconds($currentTime);
 
                 if ($diff <= $this->inactiveThreshold) {
                     $activeWikis[] = $wiki;
@@ -144,15 +145,18 @@ class PlatformStatsSummaryJob extends Job
 
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
 
-        // prepare the first query
+        // Prepare a query for the Platform API DB to
+        // construct an SQL query we will
+        // run to get the actual stats
         $statement = $pdo->prepare($this->wikiStatsQuery);
         $statement->execute();
 
-        // produces the stats query
+        // Run the first query to construct the second query
         $result = $statement->fetchAll(PDO::FETCH_ASSOC)[0];
         $query = array_values($result)[0];
 
-        // use mw PDO to talk to mediawiki dbs
+        // Execute the second query using the mw
+        // PDO to talk to mediawiki dbs
         $allStats = $mediawikiPdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
         $summary = $this->prepareStats( $allStats, $wikis );
 
