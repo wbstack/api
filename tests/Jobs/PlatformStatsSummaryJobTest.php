@@ -2,6 +2,8 @@
 
 namespace Tests\Jobs;
 
+use App\Helper\MWTimestampHelper;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
@@ -89,7 +91,7 @@ class PlatformStatsSummaryJobTest extends TestCase
         $wikis = [
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki1.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com' ] ),
-            Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->subDays(90)->timestamp, 'domain' => 'wiki3.com' ] ),
+            Wiki::factory()->create( [ 'deleted_at' => CarbonImmutable::now()->subDays(90)->timestamp, 'domain' => 'wiki3.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki4.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki5.com' ] )
         ];
@@ -148,7 +150,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "pages" => 1,
                 "users" => 1,
                 "active_users" => NULL,
-                "lastEdit" => Carbon::now()->subDays(100)->timestamp,
+                "lastEdit" => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()->subDays(100)),
                 "first100UsingOauth" => "0",
                 "platform_summary_version" => "v1"
             ],
@@ -179,7 +181,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "pages" => 2,
                 "users" => 3,
                 "active_users" => 1,
-                "lastEdit" => Carbon::now()->timestamp,
+                "lastEdit" => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()),
                 "first100UsingOauth" => "0",
                 "platform_summary_version" => "v1"
             ],
@@ -190,7 +192,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "pages" => 2,
                 "users" => 3,
                 "active_users" => 0,
-                "lastEdit" => Carbon::now()->timestamp,
+                "lastEdit" => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()),
                 "first100UsingOauth" => "0",
                 "platform_summary_version" => "v1"
             ],
