@@ -3,6 +3,7 @@
 namespace Tests\Jobs;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 use App\User;
@@ -64,6 +65,8 @@ class PlatformStatsSummaryJobTest extends TestCase
     }
     public function testQueryGetsStats()
     {
+        Bus::fake();
+        Http::fake();
         $this->seedWikis();
         $manager = $this->app->make('db');
 
@@ -101,6 +104,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 'prefix' => 'asdasd',
                 'wiki_id' => $wiki->id
             ]);
+            Bus::fake();
             //Generate some items/properties for testing, each wiki will have 3 props and 9 items
             Http::fake([
                 getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
@@ -194,9 +198,9 @@ class PlatformStatsSummaryJobTest extends TestCase
             ],
         ];
 
-       $groups =  $job->prepareStats($stats, $wikis);
+        $groups =  $job->prepareStats($stats, $wikis);
 
-       $this->assertEquals(
+        $this->assertEquals(
             [
                 "total" => 5,
                 "deleted" => 1,
@@ -249,8 +253,8 @@ class PlatformStatsSummaryJobTest extends TestCase
                 'users_created_PT24H' => 2,
                 'users_created_P30D' => 2,
             ],
-             $stats,
-         );
+            $stats,
+        );
 
     }
 }

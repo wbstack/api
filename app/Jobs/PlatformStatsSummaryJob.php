@@ -45,6 +45,7 @@ class PlatformStatsSummaryJob extends Job
 
     private function isNullOrEmpty( $value ): bool {
         return is_null($value) || intVal($value) === 0;
+
     }
 
     public function getCreationStats(): array {
