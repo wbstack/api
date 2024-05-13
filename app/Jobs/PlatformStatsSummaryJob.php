@@ -81,8 +81,8 @@ class PlatformStatsSummaryJob extends Job
             }
 
             //add items and properties counts of the wiki to the corresponded arrays
-            array_push($items_count, count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_ITEM)));
-            array_push($properties_count, count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_PROPERTY)));
+            array_push($itemsCount, count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_ITEM)));
+            array_push($propertiesCount, count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_PROPERTY)));
 
             $wikiDb = $wiki->wikiDb()->first();
 
@@ -127,8 +127,8 @@ class PlatformStatsSummaryJob extends Job
         $totalNonDeletedActiveUsers = array_sum(array_column($nonDeletedStats, 'active_users'));
         $totalNonDeletedPages = array_sum(array_column($nonDeletedStats, 'pages'));
         $totalNonDeletedEdits = array_sum(array_column($nonDeletedStats, 'edits'));
-        $totalItemsCount = array_sum($items_count);
-        $totalPropertiesCount = array_sum($properties_count);
+        $totalItemsCount = array_sum($itemsCount);
+        $totalPropertiesCount = array_sum($propertiesCount);
 
         return [
             'platform_summary_version' => $this->platformSummaryStatsVersion,
