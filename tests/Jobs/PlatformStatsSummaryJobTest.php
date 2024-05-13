@@ -5,7 +5,6 @@ namespace Tests\Jobs;
 use App\Helper\MWTimestampHelper;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 use App\User;
@@ -212,8 +211,8 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "total_non_deleted_pages" => 4,
                 "total_non_deleted_edits" => 3,
                 "platform_summary_version" => "v1",
-                "total_items_count" => 4*9, //there are 4 non-deleted wikis and each has 4 items
-                "total_properties_count" => 4*3 //there are 4 non-deleted wikis and each has 4 properties
+                "total_items_count" => 4*9, //there are 4 non-deleted wikis and each has 9 items
+                "total_properties_count" => 4*3 //there are 4 non-deleted wikis and each has 3 properties
             ],
             $groups,
         );
