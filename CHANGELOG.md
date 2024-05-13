@@ -1,5 +1,8 @@
 # api
 
+## 10x.6.0 - 13 May 2024
+- Fix PlatformSummaryStatsJob for inactive wikis again
+
 ## 10x.5.0 - 8 May 2024
 - Fix PlatformSummaryStatsJob for inactive wikis
 
