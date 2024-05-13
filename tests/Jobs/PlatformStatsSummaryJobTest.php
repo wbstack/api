@@ -65,7 +65,6 @@ class PlatformStatsSummaryJobTest extends TestCase
     }
     public function testQueryGetsStats()
     {
-        Bus::fake();
         Http::fake();
         $this->seedWikis();
         $manager = $this->app->make('db');
