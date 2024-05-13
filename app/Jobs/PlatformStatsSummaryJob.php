@@ -68,8 +68,8 @@ class PlatformStatsSummaryJob extends Job
         $inactiveWikis = [];
         $emptyWikis = [];
         $nonDeletedStats = [];
-        $items_count = [];
-        $properties_count = [];
+        $itemsCount = [];
+        $propertiesCount = [];
 
         $currentTime = Carbon::now()->timestamp;
 
