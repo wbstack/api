@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Traits;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -13,6 +14,8 @@ use App\Jobs\SpawnQueryserviceUpdaterJob;
 
 class RebuildQueryserviceData extends Command
 {
+    use Traits\PageFetcher;
+
     private const NAMESPACE_ITEM = 120;
     private const NAMESPACE_PROPERTY = 122;
     private const NAMESPACE_LEXEME = 146;
@@ -22,7 +25,6 @@ class RebuildQueryserviceData extends Command
     protected $description = 'Rebuild the queryservice data for a certain wiki or all wikis';
 
     protected int $chunkSize;
-    protected string $apiUrl;
     protected string $sparqlUrlFormat;
     protected string $queueName;
 
@@ -31,7 +33,6 @@ class RebuildQueryserviceData extends Command
         $this->chunkSize = intval($this->option('chunkSize'));
         $this->sparqlUrlFormat = $this->option('sparqlUrlFormat');
         $this->queueName = $this->option('queueName');
-        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
 
         $wikiDomains = $this->option('domain');
         $exitCode = 0;
@@ -106,54 +107,6 @@ class RebuildQueryserviceData extends Command
             );
         }
         return sprintf($this->sparqlUrlFormat, $match->namespace);
-    }
-
-    private function fetchPagesInNamespace(string $wikiDomain, int $namespace): array
-    {
-        $titles = [];
-        $cursor = '';
-        while (true) {
-            $response = Http::withHeaders([
-                'host' => $wikiDomain
-            ])->get(
-                $this->apiUrl,
-                [
-                    'action' => 'query',
-                    'list' => 'allpages',
-                    'apnamespace' => $namespace,
-                    'apcontinue' => $cursor,
-                    'aplimit' => 'max',
-                    'format' => 'json',
-                ],
-            );
-
-            if ($response->failed()) {
-                throw new \Exception(
-                    'Failed to fetch allpages for wiki '.$wikiDomain
-                );
-            }
-
-            $jsonResponse = $response->json();
-            $error = data_get($jsonResponse, 'error');
-            if ($error !== null) {
-                throw new \Exception(
-                    'Error response fetching allpages for wiki '.$wikiDomain.': '.$error
-                );
-            }
-
-            $pages = data_get($jsonResponse, 'query.allpages', []);
-            $titles = array_merge($titles, array_map(function (array $page) {
-                return $page['title'];
-            }, $pages));
-
-            $nextCursor = data_get($jsonResponse, 'continue.apcontinue');
-            if ($nextCursor === null) {
-                break;
-            }
-            $cursor = $nextCursor;
-        }
-
-        return $titles;
     }
 
     private static function stripPrefixes (array &$items): void
