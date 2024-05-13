@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Traits;
 use App\Wiki;
 use App\User;
 use Illuminate\Database\DatabaseManager;
@@ -28,6 +29,8 @@ use Illuminate\Support\Facades\App;
 */
 class PlatformStatsSummaryJob extends Job
 {
+    use Traits\PageFetcher;
+
     private $inactiveThreshold;
     private $creationRateRanges;
 
@@ -35,12 +38,11 @@ class PlatformStatsSummaryJob extends Job
 
     private const NAMESPACE_ITEM = 122;
     private const NAMESPACE_PROPERTY = 120;
-    private string $apiUrl;
+
 
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
         $this->creationRateRanges = Config::get('wbstack.platform_summary_creation_rate_ranges');
-        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
     }
 
     private function isNullOrEmpty( $value ): bool {
@@ -181,54 +183,6 @@ class PlatformStatsSummaryJob extends Job
         if( !App::runningUnitTests() ) {
             print( json_encode($summary) . PHP_EOL );
         }
-    }
-
-    private function fetchPagesInNamespace(string $wikiDomain, int $namespace): array
-    {
-        $titles = [];
-        $cursor = '';
-        while (true) {
-            $response = Http::withHeaders([
-                'host' => $wikiDomain
-            ])->get(
-                $this->apiUrl,
-                [
-                    'action' => 'query',
-                    'list' => 'allpages',
-                    'apnamespace' => $namespace,
-                    'apcontinue' => $cursor,
-                    'aplimit' => 'max',
-                    'format' => 'json',
-                ],
-            );
-
-            if ($response->failed()) {
-                throw new \Exception(
-                    'Failed to fetch allpages for wiki '.$wikiDomain
-                );
-            }
-
-            $jsonResponse = $response->json();
-            $error = data_get($jsonResponse, 'error');
-            if ($error !== null) {
-                throw new \Exception(
-                    'Error response fetching allpages for wiki '.$wikiDomain.': '.$error
-                );
-            }
-
-            $pages = data_get($jsonResponse, 'query.allpages', []);
-            $titles = array_merge($titles, array_map(function (array $page) {
-                return $page['title'];
-            }, $pages));
-
-            $nextCursor = data_get($jsonResponse, 'continue.apcontinue');
-            if ($nextCursor === null) {
-                break;
-            }
-            $cursor = $nextCursor;
-        }
-
-        return $titles;
     }
 
     private $wikiStatsQuery = <<<EOD
