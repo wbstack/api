@@ -32,6 +32,8 @@ class PlatformStatsSummaryJob extends Job
 {
     use Traits\PageFetcher;
 
+    public $timeout = 3600;
+
     private $inactiveThreshold;
     private $creationRateRanges;
 
@@ -40,10 +42,10 @@ class PlatformStatsSummaryJob extends Job
     private const NAMESPACE_ITEM = 122;
     private const NAMESPACE_PROPERTY = 120;
 
-
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
         $this->creationRateRanges = Config::get('wbstack.platform_summary_creation_rate_ranges');
+        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
     }
 
     private function isNullOrEmpty( $value ): bool {

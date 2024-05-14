@@ -11,7 +11,10 @@ trait PageFetcher
     //this function is used to fetch pages on namespace
     function fetchPagesInNamespace(string $wikiDomain, int $namespace): array
     {
-        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
+        if (empty($this->apiUrl)) {
+            throw new \RuntimeException('API URL has not been set.');
+        }
+
         $titles = [];
         $cursor = '';
         while (true) {
