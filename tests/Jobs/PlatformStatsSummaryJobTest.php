@@ -5,6 +5,7 @@ namespace Tests\Jobs;
 use App\Helper\MWTimestampHelper;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 use App\User;
 use App\Wiki;
@@ -18,6 +19,7 @@ use App\Jobs\PlatformStatsSummaryJob;
 
 class PlatformStatsSummaryJobTest extends TestCase
 {
+    use RefreshDatabase;
 
     private $numWikis = 5;
     private $wikis = [];
@@ -64,6 +66,7 @@ class PlatformStatsSummaryJobTest extends TestCase
     }
     public function testQueryGetsStats()
     {
+        Http::fake();
         $this->seedWikis();
         $manager = $this->app->make('db');
 
@@ -83,7 +86,7 @@ class PlatformStatsSummaryJobTest extends TestCase
 
         $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
-        
+
         $wikis = [
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki1.com' ] ),
             Wiki::factory()->create( [ 'deleted_at' => null, 'domain' => 'wiki2.com' ] ),
@@ -100,8 +103,45 @@ class PlatformStatsSummaryJobTest extends TestCase
                 'version' => 'asdasdasdas',
                 'prefix' => 'asdasd',
                 'wiki_id' => $wiki->id
-            ]);  
+            ]);
+            //Generate some items/properties for testing, each wiki will have 3 props and 9 items
+            Http::fake([
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+                    'query' => [
+                        'allpages' => [
+                            ['title' => 'Property:P1', 'namespace' => 120],
+                            ['title' => 'Property:P9', 'namespace' => 120],
+                            ['title' => 'Property:P11', 'namespace' => 120],
+                        ],
+                    ],
+                ], 200),
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+                    'continue' => [
+                        'apcontinue' => 'Q6',
+                    ],
+                    'query' => [
+                        'allpages' => [
+                            ['title' => 'Item:Q1', 'namespace' => 122],
+                            ['title' => 'Item:Q2', 'namespace' => 122],
+                            ['title' => 'Item:Q3', 'namespace' => 122],
+                            ['title' => 'Item:Q4', 'namespace' => 122],
+                            ['title' => 'Item:Q5', 'namespace' => 122],
+                        ],
+                    ],
+                ], 200),
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=Q6&aplimit=max&format=json' => Http::response([
+                    'query' => [
+                        'allpages' => [
+                            ['title' => 'Item:Q6', 'namespace' => 122],
+                            ['title' => 'Item:Q7', 'namespace' => 122],
+                            ['title' => 'Item:Q8', 'namespace' => 122],
+                            ['title' => 'Item:Q9', 'namespace' => 122],
+                        ],
+                    ]
+                ], 200)
+            ]);
         }
+
         $stats = [
             [   // inactive but recent enough to have a lastEdit
                 "wiki" => "wiki1.com",
@@ -156,11 +196,10 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "platform_summary_version" => "v1"
             ],
         ];
-          
 
-       $groups =  $job->prepareStats($stats, $wikis);
-    
-       $this->assertEquals(
+        $groups =  $job->prepareStats($stats, $wikis);
+
+        $this->assertEquals(
             [
                 "total" => 5,
                 "deleted" => 1,
@@ -171,9 +210,11 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "total_non_deleted_active_users" => 1,
                 "total_non_deleted_pages" => 4,
                 "total_non_deleted_edits" => 3,
-                "platform_summary_version" => "v1"
+                "platform_summary_version" => "v1",
+                "total_items_count" => 4*9, //there are 4 non-deleted wikis and each has 9 items
+                "total_properties_count" => 4*3 //there are 4 non-deleted wikis and each has 3 properties
             ],
-            $groups, 
+            $groups,
         );
     }
     function testCreationStats() {
@@ -211,8 +252,8 @@ class PlatformStatsSummaryJobTest extends TestCase
                 'users_created_PT24H' => 2,
                 'users_created_P30D' => 2,
             ],
-             $stats,
-         );
+            $stats,
+        );
 
     }
 }

@@ -1,5 +1,8 @@
 # api
 
+## 10x.7.0 - 14 May 2024
+- Add wiki entities counts to PlatformSummaryJob
+- 
 ## 10x.6.0 - 13 May 2024
 - Fix PlatformSummaryStatsJob for inactive wikis again
 

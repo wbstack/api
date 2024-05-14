@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Traits;
 use App\Helper\MWTimestampHelper;
 use App\Wiki;
 use App\User;
@@ -28,17 +29,27 @@ use Illuminate\Support\Facades\App;
 */
 class PlatformStatsSummaryJob extends Job
 {
+    use Traits\PageFetcher;
+
+    public $timeout = 3600;
+
     private $inactiveThreshold;
     private $creationRateRanges;
 
     private $platformSummaryStatsVersion = "v1";
+
+    private const NAMESPACE_ITEM = 122;
+    private const NAMESPACE_PROPERTY = 120;
+
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
         $this->creationRateRanges = Config::get('wbstack.platform_summary_creation_rate_ranges');
+        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
     }
 
     private function isNullOrEmpty( $value ): bool {
         return is_null($value) || intVal($value) === 0;
+
     }
 
     public function getCreationStats(): array {
@@ -61,6 +72,8 @@ class PlatformStatsSummaryJob extends Job
         $inactiveWikis = [];
         $emptyWikis = [];
         $nonDeletedStats = [];
+        $itemsCount = [];
+        $propertiesCount = [];
 
         $currentTime = CarbonImmutable::now();
 
@@ -70,6 +83,10 @@ class PlatformStatsSummaryJob extends Job
                 $deletedWikis[] = $wiki;
                 continue;
             }
+
+            //add items and properties counts of the wiki to the corresponded arrays
+            array_push($itemsCount, count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_ITEM)));
+            array_push($propertiesCount, count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_PROPERTY)));
 
             $wikiDb = $wiki->wikiDb()->first();
 
@@ -114,6 +131,8 @@ class PlatformStatsSummaryJob extends Job
         $totalNonDeletedActiveUsers = array_sum(array_column($nonDeletedStats, 'active_users'));
         $totalNonDeletedPages = array_sum(array_column($nonDeletedStats, 'pages'));
         $totalNonDeletedEdits = array_sum(array_column($nonDeletedStats, 'edits'));
+        $totalItemsCount = array_sum($itemsCount);
+        $totalPropertiesCount = array_sum($propertiesCount);
 
         return [
             'platform_summary_version' => $this->platformSummaryStatsVersion,
@@ -126,6 +145,8 @@ class PlatformStatsSummaryJob extends Job
             'total_non_deleted_active_users' => $totalNonDeletedActiveUsers,
             'total_non_deleted_pages' => $totalNonDeletedPages,
             'total_non_deleted_edits' => $totalNonDeletedEdits,
+            'total_items_count' => $totalItemsCount,
+            'total_properties_count' => $totalPropertiesCount
         ];
     }
 
@@ -167,7 +188,6 @@ class PlatformStatsSummaryJob extends Job
         if( !App::runningUnitTests() ) {
             print( json_encode($summary) . PHP_EOL );
         }
-
     }
 
     private $wikiStatsQuery = <<<EOD
