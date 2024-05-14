@@ -7,7 +7,6 @@ use App\Helper\MWTimestampHelper;
 use App\Wiki;
 use App\User;
 use Illuminate\Database\DatabaseManager;
-use Illuminate\Support\Facades\Http;
 use PDO;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Log;
