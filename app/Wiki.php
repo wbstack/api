@@ -52,6 +52,7 @@ class Wiki extends Model
         'domain',
         'description',
         'is_featured',
+        'wiki_deletion_reason',
     ];
 
     /**
