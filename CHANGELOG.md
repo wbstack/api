@@ -1,5 +1,8 @@
 # api
 
+## 10x.8.0 - 15 May 2024
+- PlatformSummaryStatsJob adjust metric names
+
 ## 10x.7.0 - 14 May 2024
 - Add wiki entities counts to PlatformSummaryJob
 - 
