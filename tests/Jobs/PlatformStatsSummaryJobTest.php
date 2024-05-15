@@ -143,7 +143,7 @@ class PlatformStatsSummaryJobTest extends TestCase
         }
 
         $stats = [
-            [   // inactive but recent enough to have a lastEdit
+            [   // no edits in last 90days but recent enough to have a lastEdit
                 "wiki" => "wiki1.com",
                 "edits" => 1,
                 "pages" => 1,
@@ -153,7 +153,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "first100UsingOauth" => "0",
                 "platform_summary_version" => "v1"
             ],
-            [   // inactive but so old that mediawiki reports no last edit
+            [   // no edits in last 90 days so old that mediawiki reports no last edit
                 "wiki" => "wiki5.com",
                 "edits" => 1,
                 "pages" => 1,
@@ -174,7 +174,7 @@ class PlatformStatsSummaryJobTest extends TestCase
                 "platform_summary_version" => "v1"
             ],
 
-            [   // active
+            [   // edited within last 90 days
                 "wiki" => "wiki4.com",
                 "edits" => 1,
                 "pages" => 2,
@@ -203,8 +203,8 @@ class PlatformStatsSummaryJobTest extends TestCase
             [
                 "total" => 5,
                 "deleted" => 1,
-                "active" => 1,
-                "inactive" => 2,
+                "edited_last_90_days" => 1,
+                "not_edited_last_90_days" => 2,
                 "empty" => 1,
                 "total_non_deleted_users" => 5,
                 "total_non_deleted_active_users" => 1,
