@@ -68,8 +68,8 @@ class PlatformStatsSummaryJob extends Job
     public function prepareStats( array $allStats, $wikis): array {
 
         $deletedWikis = [];
-        $activeWikis = [];
-        $inactiveWikis = [];
+        $editedLast90DaysWikis = [];
+        $notEditedLast90DaysWikis = [];
         $emptyWikis = [];
         $nonDeletedStats = [];
         $itemsCount = [];
@@ -112,19 +112,19 @@ class PlatformStatsSummaryJob extends Job
 
             $nonDeletedStats[] = $stats;
 
-            // is it active?
+            // is it edited in the last 90 days?
             if(!is_null($stats['lastEdit'])){
                 $lastTimestamp = MWTimestampHelper::getCarbonFromMWTimestamp(intVal($stats['lastEdit']));
                 $diff = $lastTimestamp->diffInSeconds($currentTime);
 
                 if ($diff <= $this->inactiveThreshold) {
-                    $activeWikis[] = $wiki;
+                    $editedLast90DaysWikis[] = $wiki;
                     continue;
                 }
             }
 
-            // if it's neither deleted, empty or active it must be inactive
-            $inactiveWikis[] = $wiki;
+            // if it's neither deleted, empty or active it must not be edited in the last 90 days
+            $notEditedLast90DaysWikis[] = $wiki;
         }
 
         $totalNonDeletedUsers = array_sum(array_column($nonDeletedStats, 'users'));
@@ -138,8 +138,8 @@ class PlatformStatsSummaryJob extends Job
             'platform_summary_version' => $this->platformSummaryStatsVersion,
             'total' => count($wikis),
             'deleted' => count($deletedWikis),
-            'active' => count($activeWikis),
-            'inactive' => count($inactiveWikis),
+            'edited_last_90_days' => count($editedLast90DaysWikis),
+            'not_edited_last_90_days' => count($notEditedLast90DaysWikis),
             'empty' => count($emptyWikis),
             'total_non_deleted_users' => $totalNonDeletedUsers,
             'total_non_deleted_active_users' => $totalNonDeletedActiveUsers,
