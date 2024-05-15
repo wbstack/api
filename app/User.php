@@ -74,6 +74,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'trial_ends_at',
         'card_brand',
         'card_last_four',
+        'is_admin',
     ];
 
     /**
