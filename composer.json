@@ -22,7 +22,7 @@
         "laravel/passport": "^11.0",
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.4",
-        "lcobucci/jwt": "^4.1",
+        "lcobucci/jwt": "^5.3",
         "league/flysystem-aws-s3-v3": "^3.22",
         "lkaemmerling/laravel-horizon-prometheus-exporter": "^1.7",
         "maclof/kubernetes-client": "^0.29.0",
