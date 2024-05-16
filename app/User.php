@@ -32,7 +32,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Token[] $tokens
  * @property-read int|null $tokens_count
- * @method static \Database\Factories\UserFactory factory(...$parameters)
+ * @method static \Database\Factories\UserFactory   factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User query()
@@ -59,7 +59,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'email', 'password', 'verified',
+        'email', 'password', 'verified', 'is_admin',
     ];
 
     /**
@@ -74,7 +74,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'trial_ends_at',
         'card_brand',
         'card_last_four',
-        'is_admin',
     ];
 
     /**
