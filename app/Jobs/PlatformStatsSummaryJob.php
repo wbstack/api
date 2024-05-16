@@ -38,8 +38,8 @@ class PlatformStatsSummaryJob extends Job
 
     private $platformSummaryStatsVersion = "v1";
 
-    private const NAMESPACE_ITEM = 122;
-    private const NAMESPACE_PROPERTY = 120;
+    private const NAMESPACE_ITEM = 120;
+    private const NAMESPACE_PROPERTY = 122;
 
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
@@ -85,8 +85,18 @@ class PlatformStatsSummaryJob extends Job
             }
 
             //add items and properties counts of the wiki to the corresponded arrays
-            array_push($itemsCount, count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_ITEM)));
-            array_push($propertiesCount, count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_PROPERTY)));
+            try {
+                $nextItemCount = count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_ITEM));
+                array_push($itemsCount, $nextItemCount);
+            } catch (\Exception $ex) {
+                Log::warning("Failed to fetch item count for wiki ".$wiki->domain.", will use 0 instead.");
+            }
+            try {
+                $nextPropertyCount = count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_PROPERTY));
+                array_push($propertiesCount, $nextPropertyCount);
+            } catch (\Exception $ex) {
+                Log::warning("Failed to fetch property count for wiki ".$wiki->domain.", will use 0 instead.");
+            }
 
             $wikiDb = $wiki->wikiDb()->first();
 

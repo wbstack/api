@@ -1,5 +1,8 @@
 # api
 
+## 10x.8.1 - 16 May 2024
+- Fix flipped namespace ids in PlatformSummaryStatsJob
+
 ## 10x.8.0 - 15 May 2024
 - PlatformSummaryStatsJob adjust metric names
 
