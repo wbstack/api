@@ -106,36 +106,36 @@ class PlatformStatsSummaryJobTest extends TestCase
             ]);
             //Generate some items/properties for testing, each wiki will have 3 props and 9 items
             Http::fake([
-                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                     'query' => [
                         'allpages' => [
-                            ['title' => 'Property:P1', 'namespace' => 120],
-                            ['title' => 'Property:P9', 'namespace' => 120],
-                            ['title' => 'Property:P11', 'namespace' => 120],
+                            ['title' => 'Property:P1', 'namespace' => 122],
+                            ['title' => 'Property:P9', 'namespace' => 122],
+                            ['title' => 'Property:P11', 'namespace' => 122],
                         ],
                     ],
                 ], 200),
-                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
                     'continue' => [
                         'apcontinue' => 'Q6',
                     ],
                     'query' => [
                         'allpages' => [
-                            ['title' => 'Item:Q1', 'namespace' => 122],
-                            ['title' => 'Item:Q2', 'namespace' => 122],
-                            ['title' => 'Item:Q3', 'namespace' => 122],
-                            ['title' => 'Item:Q4', 'namespace' => 122],
-                            ['title' => 'Item:Q5', 'namespace' => 122],
+                            ['title' => 'Item:Q1', 'namespace' => 120],
+                            ['title' => 'Item:Q2', 'namespace' => 120],
+                            ['title' => 'Item:Q3', 'namespace' => 120],
+                            ['title' => 'Item:Q4', 'namespace' => 120],
+                            ['title' => 'Item:Q5', 'namespace' => 120],
                         ],
                     ],
                 ], 200),
-                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=Q6&aplimit=max&format=json' => Http::response([
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=Q6&aplimit=max&format=json' => Http::response([
                     'query' => [
                         'allpages' => [
-                            ['title' => 'Item:Q6', 'namespace' => 122],
-                            ['title' => 'Item:Q7', 'namespace' => 122],
-                            ['title' => 'Item:Q8', 'namespace' => 122],
-                            ['title' => 'Item:Q9', 'namespace' => 122],
+                            ['title' => 'Item:Q6', 'namespace' => 120],
+                            ['title' => 'Item:Q7', 'namespace' => 120],
+                            ['title' => 'Item:Q8', 'namespace' => 120],
+                            ['title' => 'Item:Q9', 'namespace' => 120],
                         ],
                     ]
                 ], 200)
