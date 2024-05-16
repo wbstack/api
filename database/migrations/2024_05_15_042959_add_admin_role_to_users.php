@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // is_admin is 0 for plain users and an integer > 0 for admins
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_admin')->default(false);
+            $table->integer('is_admin')->default(false);
         });
     }
 
