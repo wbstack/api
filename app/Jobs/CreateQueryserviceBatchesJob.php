@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Constants\MediawikiNamespace;
 use App\EventPageUpdate;
 use App\QsBatch;
 use App\QsCheckpoint;
@@ -12,10 +13,6 @@ use Illuminate\Support\Collection;
 
 class CreateQueryserviceBatchesJob extends Job
 {
-    private const NAMESPACE_ITEM = 120;
-    private const NAMESPACE_PROPERTY = 122;
-    private const NAMESPACE_LEXEME = 146;
-
     private int $entityLimit;
 
     public $timeout = 3600;
@@ -58,7 +55,7 @@ class CreateQueryserviceBatchesJob extends Job
         EventPageUpdate::where(
             'id', '>', $latestCheckpoint,
         )
-            ->whereIn('namespace', [self::NAMESPACE_ITEM, self::NAMESPACE_PROPERTY, self::NAMESPACE_LEXEME])
+            ->whereIn('namespace', [MediawikiNamespace::item, MediawikiNamespace::property, MediawikiNamespace::lexeme])
             ->has('wiki')
             ->chunk(100, function (Collection $chunk) use (&$newEntitiesFromEvents, &$latestEventId) {
                 foreach ($chunk as $event) {

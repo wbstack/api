@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Constants\MediawikiNamespace;
 use Illuminate\Support\Facades\Http;
 
 trait PageFetcher
@@ -9,7 +10,7 @@ trait PageFetcher
     private string $apiUrl;
 
     //this function is used to fetch pages on namespace
-    function fetchPagesInNamespace(string $wikiDomain, int $namespace): array
+    function fetchPagesInNamespace(string $wikiDomain, MediawikiNamespace $namespace): array
     {
         if (empty($this->apiUrl)) {
             throw new \RuntimeException('API URL has not been set.');
@@ -25,7 +26,7 @@ trait PageFetcher
                 [
                     'action' => 'query',
                     'list' => 'allpages',
-                    'apnamespace' => $namespace,
+                    'apnamespace' => $namespace->value,
                     'apcontinue' => $cursor,
                     'aplimit' => 'max',
                     'format' => 'json',
