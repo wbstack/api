@@ -2,6 +2,7 @@
 
 namespace Tests\Commands;
 
+use App\Constants\MediawikiNamespace;
 use App\Wiki;
 use App\QueryserviceNamespace;
 use App\WikiSetting;
@@ -59,25 +60,25 @@ class RebuildQueryserviceDataTest extends TestCase
         ]);
 
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
                             'title' => 'Property:P1',
-                            'namespace' => 120,
+                            'namespace' => MediawikiNamespace::property,
                         ],
                         [
                             'title' => 'Property:P9',
-                            'namespace' => 120,
+                            'namespace' => MediawikiNamespace::property,
                         ],
                         [
                             'title' => 'Property:P11',
-                            'namespace' => 120,
+                            'namespace' => MediawikiNamespace::property,
                         ],
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
                 'continue' => [
                     'apcontinue' => 'Q6',
                 ],
@@ -85,45 +86,45 @@ class RebuildQueryserviceDataTest extends TestCase
                     'allpages' => [
                         [
                             'title' => 'Item:Q1',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                         [
                             'title' => 'Item:Q2',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                         [
                             'title' => 'Item:Q3',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                         [
                             'title' => 'Item:Q4',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                         [
                             'title' => 'Item:Q5',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=Q6&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=Q6&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
                             'title' => 'Item:Q6',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                         [
                             'title' => 'Item:Q7',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                         [
                             'title' => 'Item:Q8',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                         [
                             'title' => 'Item:Q9',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                     ],
                 ]
@@ -188,46 +189,46 @@ class RebuildQueryserviceDataTest extends TestCase
         ]);
 
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
-                'query' => [
-                    'allpages' => [
-                        [
-                            'title' => 'Property:P1',
-                            'namespace' => 120,
-                        ],
-                        [
-                            'title' => 'Property:P9',
-                            'namespace' => 120,
-                        ],
-                        [
-                            'title' => 'Property:P11',
-                            'namespace' => 120,
-                        ],
-                    ],
-                ],
-            ], 200),
             getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
+                            'title' => 'Property:P1',
+                            'namespace' => MediawikiNamespace::property,
+                        ],
+                        [
+                            'title' => 'Property:P9',
+                            'namespace' => MediawikiNamespace::property,
+                        ],
+                        [
+                            'title' => 'Property:P11',
+                            'namespace' => MediawikiNamespace::property,
+                        ],
+                    ],
+                ],
+            ], 200),
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+                'query' => [
+                    'allpages' => [
+                        [
                             'title' => 'Item:Q1',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                         [
                             'title' => 'Item:Q2',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                         [
                             'title' => 'Item:Q3',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                         [
                             'title' => 'Item:Q4',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                         [
                             'title' => 'Item:Q5',
-                            'namespace' => 122,
+                            'namespace' => MediawikiNamespace::item,
                         ],
                     ],
                 ],
@@ -264,20 +265,20 @@ class RebuildQueryserviceDataTest extends TestCase
         ]);
 
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
                             'title' => 'Property:P1',
-                            'namespace' => 120,
+                            'namespace' => MediawikiNamespace::property,
                         ],
                         [
                             'title' => 'Property:P9',
-                            'namespace' => 120,
+                            'namespace' => MediawikiNamespace::property,
                         ],
                         [
                             'title' => 'Property:P11',
-                            'namespace' => 120,
+                            'namespace' => MediawikiNamespace::property,
                         ],
                     ],
                 ],
