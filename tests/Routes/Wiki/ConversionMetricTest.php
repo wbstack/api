@@ -47,9 +47,31 @@ class ConversionMetricTest extends TestCase
         $response->assertSee('two.wikibase.cloud');
     }
 
-    private function createTestWiki( $name, $createdWeeksAgo, $firstEditedWeeksAgo, $lastEditedWeeksAgo, $active_users = 0) {
+    public function testDownloadJsonWithDuplicateLifecycleEvents() {
         $current_date = CarbonImmutable::now();
-        
+        $wiki = $this->createTestWiki('one.wikibase.cloud', 10, 9, 2);
+        $wiki->wikiLifecycleEvents()->create([
+            'last_edited' => $current_date->subWeeks(1),
+            'first_edited' => $current_date->subWeeks(9)
+        ]);
+        $wiki->save();
+        $response = $this->getJson($this->route);
+        $response->assertStatus(200);
+        $response->assertJsonFragment(
+            [
+                'domain' => 'one.wikibase.cloud',
+                'time_to_engage_days' => 7,
+                'time_before_wiki_abandoned_days' => null,
+                'number_of_active_editors' => 0,
+                'first_edited_time' => $current_date->subWeeks(9),
+                'last_edited_time' => $current_date->subWeeks(1)
+            ]
+        );
+    }
+
+    private function createTestWiki( $name, $createdWeeksAgo, $firstEditedWeeksAgo, $lastEditedWeeksAgo, $active_users = 0): Wiki {
+        $current_date = CarbonImmutable::now();
+
         $wiki = Wiki::factory()->create([
             'domain' => $name, 'sitename' => 'bsite'
         ]);
@@ -67,6 +89,7 @@ class ConversionMetricTest extends TestCase
         }
         $events->updateOrCreate($update);
         $wiki->save();
+        return $wiki;
     }
 
     public function testDownloadJson() {
