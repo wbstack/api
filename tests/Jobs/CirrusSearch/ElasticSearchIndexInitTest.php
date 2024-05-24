@@ -5,6 +5,7 @@ namespace Tests\Jobs\CirrusSearch;
 use App\Http\Curl\CurlRequest;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use RuntimeException;
 use Tests\TestCase;
 use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Http\Curl\HttpRequest;
@@ -141,10 +142,12 @@ class ElasticSearchIndexInitTest extends TestCase
 
     /**
 	 * @dataProvider failureProvider
-     * @expectedException RuntimeException
-	 */
-    public function testFailure( $request, string $expectedFailure, $mockResponse )
+     *
+     */
+    public function testFailure( string $expectedFailure, $mockResponse )
     {
+        $request = $this->createMock(HttpRequest::class);
+        $this->expectException(RuntimeException::class);
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())
                 ->method('fail');
@@ -161,11 +164,10 @@ class ElasticSearchIndexInitTest extends TestCase
         );
     }
 
-    public function failureProvider() {
+    public static function failureProvider() {
 
         $mockResponse = [];
         yield [
-            $this->createMock(HttpRequest::class),
             'wbstackElasticSearchInit call for <WIKI_ID>. No wbstackElasticSearchInit key in response: []',
             $mockResponse
         ];
@@ -179,22 +181,17 @@ class ElasticSearchIndexInitTest extends TestCase
         ];
 
         yield [
-            $this->createMock(HttpRequest::class),
             'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"return":0,"output":[]}}',
             $mockResponse
         ];
 
-        $curlError = $this->createMock(HttpRequest::class);
-        $curlError->method('error')->willReturn('Scary Error!');
         yield [
-            $curlError,
             'wbstackElasticSearchInit curl error for <WIKI_ID>: Scary Error!',
             $mockResponse
         ];
 
         $mockResponse['wbstackElasticSearchInit']['return'] = 1;
         yield [
-            $this->createMock(HttpRequest::class),
             'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"return":1,"output":[]}}',
             $mockResponse
         ];
