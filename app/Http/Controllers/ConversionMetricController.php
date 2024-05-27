@@ -20,15 +20,15 @@ class ConversionMetricController extends Controller
         $allWikis = Wiki::all();
         $current_date = CarbonImmutable::now();
         $output = [];
-        
+
 
         foreach ($allWikis as $wiki) {
-            $lifecycleEvents = $wiki->wikiLifecycleEvents()->first();
+            $lifecycleEvents = $wiki->wikiLifecycleEvents()->orderBy('id', 'desc')->first();
             $wikiLastEditedTime = null;
             $wikiFirstEditedTime = null;
             if (!empty($lifecycleEvents)  ) {
                 if ($lifecycleEvents['last_edited']) {
-                    $wikiLastEditedTime = CarbonImmutable::parse($lifecycleEvents['last_edited']);    
+                    $wikiLastEditedTime = CarbonImmutable::parse($lifecycleEvents['last_edited']);
                 }
                 if ($lifecycleEvents['first_edited']) {
                     $wikiFirstEditedTime = CarbonImmutable::parse($lifecycleEvents['first_edited']);
