@@ -1,5 +1,8 @@
 # api
 
+## 10x.8.2 - 27 May 2024
+- Fix conversion metrics with duplicate lifecyle events
+
 ## 10x.8.1 - 16 May 2024
 - Fix flipped namespace ids in PlatformSummaryStatsJob
 
