@@ -24,7 +24,7 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
     $router->apiResource('deletedWikiMetrics', 'DeletedWikiMetricsController')->only(['index'])
         ->middleware(AuthorisedUsersForDeletedWikiMetricsMiddleware::class);
 
-    $router->post('auth/login', ['uses' => 'Auth\LoginController@postLogin']);
+    $router->post('auth/login', ['uses' => 'Auth\LoginController@postLogin'])->name('login');
     // Authed
     $router->group(['middleware' => ['auth:api']], function () use ($router) {
         $router->get('auth/login', ['uses' => 'Auth\LoginController@getLogin']);

@@ -17,20 +17,26 @@ class DeletedWikiMetricsController extends Controller
      */
     public function index(Request $request)
     {
-        $allDeletedWikis = Wiki::OnlyTrashed()->get();
+        $allDeletedWikis = Wiki::onlyTrashed()->get();
         $output = [];
 
         foreach ($allDeletedWikis as $wiki) {
-            $userId = WikiManager::whereWikiId($wiki->id)->first()['user_id'];
+            $wikimanagers = $wiki->wikiManagers()->get();
+           // $wikiIds = DB::table('Wiki')->join('user', 'wiki.id', '=', 'user.wiki_id'
+            //$wikiIds = $wiki->wikiManagers()->whereIn('user_id')->pluck('wiki_id')->all();
+            //$userIds = WikiManager::whereWikiId($wiki->id)->pluck('user_id')->all();
+
+            //this will work only for the first manager as of now
+            $wikiIds = WikiManager::whereIn('user_id', $wikimanagers[0]->pivot->user_id)->pluck('wiki_id')->all();
 
             $output[] = [
                 'domain' => $wiki->domain,
                 'wiki_deletion_reason' => $wiki->wiki_deletion_reason,
-                'number_of_wikibases_for_user' => WikiManager::whereUserId($userId)->count(),
-                'number_of_wiki_edits_for_wiki'=> $wiki->wikiSiteStats()->first()['edits'],
+                'number_of_wikibases_owned_by_owners_of_this_wiki' => count(array_unique($wikiIds)),
+                'number_of_wiki_edits_for_wiki'=> $wiki->wikiSiteStats()->get('edits'),
                 'number_of_entities_for_wiki' => "No value available for now",
-                'number_of_wiki_pages_for_wiki' => $wiki->wikiSiteStats()->first()['pages'],
-                'number_of_users_for_wiki' => $wiki->wikiSiteStats()->first()['users'],
+                'number_of_wiki_pages_for_wiki' => $wiki->wikiSiteStats()->get('pages'),
+                'number_of_users_for_wiki' => $wiki->wikiSiteStats()->get('users'),
                 'wiki_creation_time' => $wiki->created_at,
                 'wiki_deletion_time' => $wiki->deleted_at,
             ];
@@ -50,7 +56,7 @@ class DeletedWikiMetricsController extends Controller
         fputcsv($handle, [
             'domain_name_for_wiki',
             'wiki_deletion_reason',
-            'number_of_wikibases_for_user',
+            'number_of_wikibases_owned_by_owners_of_this_wiki',
             'number_of_wiki_edits_for_wiki',
             'number_of_entities_for_wiki',
             'number_of_wiki_pages_for_wiki',
