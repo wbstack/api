@@ -21,33 +21,28 @@ class DeletedWikiMetricsController extends Controller
         $output = [];
 
         foreach ($allDeletedWikis as $wiki) {
-            $wikimanagers = $wiki->wikiManagers()->get();
-           // $wikiIds = DB::table('Wiki')->join('user', 'wiki.id', '=', 'user.wiki_id'
-            //$wikiIds = $wiki->wikiManagers()->whereIn('user_id')->pluck('wiki_id')->all();
-            //$userIds = WikiManager::whereWikiId($wiki->id)->pluck('user_id')->all();
-
-            //this will work only for the first manager as of now
-            $wikiIds = WikiManager::whereIn('user_id', $wikimanagers[0]->pivot->user_id)->pluck('wiki_id')->all();
+            $wikiManagers = $wiki->wikiManagers()->get();
+            $usersIds = [];
+            foreach($wikiManagers as $wikiManager) {
+                $usersIds[] = $wikiManager->pivot->user_id;
+            }
+            $allWikiIdsOwnedByAllOwners = WikiManager::whereIn('user_id', $usersIds)->pluck('wiki_id')->all();
 
             $output[] = [
-                'domain' => $wiki->domain,
+                'domain_name_for_wiki' => $wiki->domain,
                 'wiki_deletion_reason' => $wiki->wiki_deletion_reason,
-                'number_of_wikibases_owned_by_owners_of_this_wiki' => count(array_unique($wikiIds)),
-                'number_of_wiki_edits_for_wiki'=> $wiki->wikiSiteStats()->get('edits'),
+                'number_of_wikibases_owned_by_owners_of_this_wiki' => count(array_unique($allWikiIdsOwnedByAllOwners)),
                 'number_of_entities_for_wiki' => "No value available for now",
-                'number_of_wiki_pages_for_wiki' => $wiki->wikiSiteStats()->get('pages'),
-                'number_of_users_for_wiki' => $wiki->wikiSiteStats()->get('users'),
+                'number_of_wiki_pages_for_wiki' => $wiki->wikiSiteStats()->first('pages') ?? null,
+                'number_of_users_for_wiki' => $wiki->wikiSiteStats()->first('users') ?? null,
                 'wiki_creation_time' => $wiki->created_at,
-                'wiki_deletion_time' => $wiki->deleted_at,
+                'wiki_deletion_time' => $wiki->deleted_at
             ];
         }
-
         if ( $request->wantsJson() ) {
             return response()->json( $output );
         }
-
         return $this->returnCsv($output);
-
     }
 
     private function returnCsv( $output ) {
@@ -57,14 +52,15 @@ class DeletedWikiMetricsController extends Controller
             'domain_name_for_wiki',
             'wiki_deletion_reason',
             'number_of_wikibases_owned_by_owners_of_this_wiki',
-            'number_of_wiki_edits_for_wiki',
             'number_of_entities_for_wiki',
+            'number_of_wiki_edits_for_wiki',
             'number_of_wiki_pages_for_wiki',
             'number_of_users_for_wiki',
             'wiki_creation_time',
             'wiki_deletion_time',
             ]);
         foreach ($output as $deletedWikiMetrics) {
+            dd($deletedWikiMetrics);
             fputcsv($handle, array_values($deletedWikiMetrics));
         }
         $csv = ob_get_clean();
