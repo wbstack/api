@@ -18,30 +18,7 @@ class DeletedWikiMetricsController extends Controller
     public function index(Request $request)
     {
         $allDeletedWikis = Wiki::onlyTrashed()->get();
-        $output = [];
-
-        foreach ($allDeletedWikis as $wiki) {
-            $wikiManagers = $wiki->wikiManagers()->get();
-            $usersIds = [];
-            foreach($wikiManagers as $wikiManager) {
-                $usersIds[] = $wikiManager->pivot->user_id;
-            }
-            $allWikiIdsOwnedByAllOwners = WikiManager::whereIn('user_id', $usersIds)->pluck('wiki_id')->all();
-
-            $output[] = [
-                'domain_name_for_wiki' => $wiki->domain,
-                'wiki_deletion_reason' => $wiki->wiki_deletion_reason,
-                'number_of_wikibases_owned_by_owners_of_this_wiki' => count(array_unique($allWikiIdsOwnedByAllOwners)),
-                'number_of_entities_for_wiki' => "No value available for now",
-                'number_of_wiki_pages_for_wiki' => $wiki->wikiSiteStats()->first('pages') ?? null,
-                'number_of_users_for_wiki' => $wiki->wikiSiteStats()->first('users') ?? null,
-                'wiki_creation_time' => $wiki->created_at,
-                'wiki_deletion_time' => $wiki->deleted_at
-            ];
-        }
-        if ( $request->wantsJson() ) {
-            return response()->json( $output );
-        }
+        $output = $this->createOutput($allDeletedWikis);
         return $this->returnCsv($output);
     }
 
@@ -60,7 +37,6 @@ class DeletedWikiMetricsController extends Controller
             'wiki_deletion_time',
             ]);
         foreach ($output as $deletedWikiMetrics) {
-            dd($deletedWikiMetrics);
             fputcsv($handle, array_values($deletedWikiMetrics));
         }
         $csv = ob_get_clean();
@@ -68,5 +44,30 @@ class DeletedWikiMetricsController extends Controller
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment;filename='.CarbonImmutable::now()->toIso8601String().'-'.$this->fileName
         ]);
+    }
+
+    //This function should be private. It is right now public and only used for unit tests
+    public function createOutput($wikis): array
+    {
+        $output = [];
+        foreach ($wikis as $wiki) {
+            $wikiManagers = $wiki->wikiManagers()->get();
+            $usersIds = [];
+            foreach($wikiManagers as $wikiManager) {
+                $usersIds[] = $wikiManager->pivot->user_id;
+            }
+            $allWikiIdsOwnedByAllOwners = WikiManager::whereIn('user_id', $usersIds)->pluck('wiki_id')->all();
+            $output[] = [
+                'domain_name_for_wiki' => $wiki->domain,
+                'wiki_deletion_reason' => $wiki->wiki_deletion_reason,
+                'number_of_wikibases_owned_by_owners_of_this_wiki' => count(array_unique($allWikiIdsOwnedByAllOwners)),
+                'number_of_entities_for_wiki' => "No value available for now",
+                'number_of_wiki_pages_for_wiki' => $wiki->wikiSiteStats()->get()['pages'] ?? null,
+                'number_of_users_for_wiki' => $wiki->wikiSiteStats()->get()['úsers'] ?? null,
+                'wiki_creation_time' => $wiki->created_at,
+                'wiki_deletion_time' => $wiki->deleted_at
+            ];
+        }
+        return $output;
     }
 }

@@ -16,10 +16,9 @@ class AuthorisedUsersForDeletedWikiMetricsMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-        if(!is_null($user) && $user->is_admin) {
+        if(!is_null($user) && $user->is_admin === 1) {
             return $next($request);
         }
-        return $next($request);
-        //return redirect()->route('login');
+        return redirect()->route('login');
     }
 }
