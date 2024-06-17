@@ -32,8 +32,8 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
 
     private function updateLifecycleEvents (Wiki $wiki): void {
         $responses = Http::pool(fn (Pool $pool) => [
-            $pool->as('revisions')->withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1'
+            $pool->as('allrevisions')->withHeaders(['host' => $wiki->getAttribute('domain')])->get(
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer'
             ),
             $pool->as('recentchanges')->withHeaders(['host' => $wiki->getAttribute('domain')])->get(
                 getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json'
@@ -42,7 +42,15 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
 
         $update = [];
 
-        $firstEdited = data_get($responses['revisions']->json(), 'query.pages.0.revisions.0.timestamp');
+        $firstEdited = null;
+        $firstRevision = data_get($responses['allrevisions']->json(), 'query.allrevisions.0.revisions.0.revid');
+        if ($firstRevision) {
+            $res = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&rvprop=timestamp&revids='.$firstRevision
+            );
+            $firstEdited = data_get($res->json(), 'query.pages.0.revisions.0.timestamp');
+        }
+
         if ($firstEdited) {
             $update['first_edited'] = Carbon::parse($firstEdited);
         }
