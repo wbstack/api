@@ -31,31 +31,14 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
     }
 
     private function updateLifecycleEvents (Wiki $wiki): void {
-        $responses = Http::pool(fn (Pool $pool) => [
-            $pool->as('allrevisions')->withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer'
-            ),
-            $pool->as('recentchanges')->withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json'
-            ),
-        ]);
-
         $update = [];
 
-        $firstEdited = null;
-        $firstRevision = data_get($responses['allrevisions']->json(), 'query.allrevisions.0.revisions.0.revid');
-        if ($firstRevision) {
-            $res = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&rvprop=timestamp&revids='.$firstRevision
-            );
-            $firstEdited = data_get($res->json(), 'query.pages.0.revisions.0.timestamp');
-        }
-
+        $firstEdited = $this->getFirstEditedDate($wiki);
         if ($firstEdited) {
-            $update['first_edited'] = Carbon::parse($firstEdited);
+            $update['first_edited'] = $firstEdited;
         }
 
-        $lastEdited = data_get($responses['recentchanges']->json(), 'query.recentchanges.0.timestamp');
+        $lastEdited = $this->getLastEditedDate($wiki);
         if ($lastEdited) {
             $update['last_edited'] = Carbon::parse($lastEdited);
         }
@@ -86,5 +69,59 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         DB::transaction(function () use ($wiki, $update) {
             $wiki->wikiSiteStats()->lockForUpdate()->updateOrCreate(['wiki_id' => $wiki->id], $update);
         });
+    }
+
+    private function getFirstEditedDate (Wiki $wiki): ?\Carbon\CarbonInterface
+    {
+        $allRevisions = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php',
+            [
+                'action' => 'query',
+                'format' => 'json',
+                'list' => 'allrevisions',
+                'formatversion' => 2,
+                'arvlimit' => 1,
+                'arvprop' => 'ids',
+                'arvexcludeuser' => 'PlatformReservedUser',
+                'arvdir' => 'newer',
+            ],
+        );
+        $firstRevision = data_get($allRevisions->json(), 'query.allrevisions.0.revisions.0.revid');
+        if (!$firstRevision) {
+            return null;
+        }
+
+        $revisionInfo = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php',
+            [
+                'action' => 'query',
+                'format' => 'json',
+                'prop' => 'revisions',
+                'rvprop' => 'timestamp',
+                'revids' => $firstRevision,
+            ],
+        );
+        $result = data_get($revisionInfo->json(), 'query.pages.0.revisions.0.timestamp');
+        if (!$result) {
+            return null;
+        }
+        return Carbon::parse($result);
+    }
+
+    private function getLastEditedDate (Wiki $wiki): ?\Carbon\CarbonInterface
+    {
+        $recentChangesInfo = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php',
+            [
+                'action' => 'query',
+                'list' => 'recentchanges',
+                'format' => 'json',
+            ],
+        );
+        $result = data_get($recentChangesInfo->json(), 'query.recentchanges.0.timestamp');
+        if (!$result) {
+            return null;
+        }
+        return Carbon::parse($result);
     }
 }
