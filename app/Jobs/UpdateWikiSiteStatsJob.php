@@ -98,6 +98,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
                 'format' => 'json',
                 'prop' => 'revisions',
                 'rvprop' => 'timestamp',
+                'formatversion' => 2,
                 'revids' => $firstRevision,
             ],
         );
