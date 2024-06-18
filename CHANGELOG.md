@@ -1,5 +1,8 @@
 # api
 
+## 10x.8.3 - 18 June 2024
+- Fix calculation of first edited date in site stats
+
 ## 10x.8.2 - 27 May 2024
 - Fix conversion metrics with duplicate lifecyle events
 
