@@ -65,7 +65,35 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                         ]
                     ]])
                 ],
-                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1' => [
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer' => [
+                    'this.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'allrevisions' => [
+                                [
+                                    'revisions' => [
+                                        [
+                                            'revid' => 2
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                        ]),
+                        'that.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'allrevisions' => [
+                                [
+                                    'revisions' => [
+                                        [
+                                            'revid' => 2
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]),
+                ],
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&rvprop=timestamp&formatversion=2&revids=2' => [
                     'this.wikibase.cloud' => Http::response([
                         'query' => [
                             'pages' => [
@@ -222,7 +250,24 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                         ]
                     ]])
                 ],
-                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&formatversion=2&rvprop=timestamp&revids=1' => [
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer' => [
+                    'fail.wikibase.cloud' => Http::response([]),
+                    'incomplete.wikibase.cloud' => Http::response([
+                        'query' => [
+                            'allrevisions' => [
+                                [
+                                    'revisions' => [
+                                        [
+                                            'revid' => 1
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]),
+                    'that.wikibase.cloud' => Http::response([]),
+                ],
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&rvprop=timestamp&formatversion=2&revids=1' => [
                     'fail.wikibase.cloud' => Http::response([]),
                     'incomplete.wikibase.cloud' => Http::response([
                         'query' => [
