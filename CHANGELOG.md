@@ -1,5 +1,8 @@
 # api
 
+## 10x.8.5 - 19 June 2024
+- Consider deleted wikis when cleaning up lifecycle events table
+
 ## 10x.8.4 - 19 June 2024
 - Enforce per-wiki-uniqueness for WikiLifecycleEvents on database level
 
