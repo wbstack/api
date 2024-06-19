@@ -43,7 +43,9 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
             $update['last_edited'] = Carbon::parse($lastEdited);
         }
 
-        $wiki->wikiLifecycleEvents()->updateOrCreate($update);
+        DB::transaction(function () use ($wiki, $update) {
+            $wiki->wikiLifecycleEvents()->lockForUpdate()->updateOrCreate(['wiki_id' => $wiki->id], $update);
+        });
     }
 
     private function updateSiteStats (Wiki $wiki): void
