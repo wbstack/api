@@ -15,7 +15,7 @@ class EnforceLifecycleEventsConstraint extends Migration
      */
     public function up()
     {
-        $allWikis = Wiki::query()->get();
+        $allWikis = Wiki::withTrashed()->get();
         // Albeit `createOrUpdate` was used when creating lifecycle events
         // was used, multiple copies per wiki were created. To clean up before
         // enforcing a unique constraint on database level, this migration
