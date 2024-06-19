@@ -1,5 +1,8 @@
 # api
 
+## 10x.8.4 - 19 June 2024
+- Enforce per-wiki-uniqueness for WikiLifecycleEvents on database level
+
 ## 10x.8.3 - 18 June 2024
 - Fix calculation of first edited date in site stats
 
