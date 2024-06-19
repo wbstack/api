@@ -1,5 +1,8 @@
 # api
 
+## 10x.8.6 - 20 June 2024
+- Exclude PlatformReservedUser when looking up last edited date
+
 ## 10x.8.5 - 19 June 2024
 - Consider deleted wikis when cleaning up lifecycle events table
 
