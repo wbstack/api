@@ -119,6 +119,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
                 'action' => 'query',
                 'list' => 'recentchanges',
                 'format' => 'json',
+                'rcexcludeuser' => 'PlatformReservedUser',
             ],
         );
         $result = data_get($recentChangesInfo->json(), 'query.recentchanges.0.timestamp');

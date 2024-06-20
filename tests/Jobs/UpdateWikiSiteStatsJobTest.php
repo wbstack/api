@@ -121,7 +121,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                         ]
                     ]),
                 ],
-                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json' => [
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json&rcexcludeuser=PlatformReservedUser' => [
                     'this.wikibase.cloud' => Http::response([
                         'query' => [
                             'recentchanges' => [
@@ -284,7 +284,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                     ]),
                     'that.wikibase.cloud' => Http::response([]),
                 ],
-                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json' => [
+                getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=recentchanges&format=json&rcexcludeuser=PlatformReservedUser' => [
                     'fail.wikibase.cloud' => Http::response([]),
                     'incomplete.wikibase.cloud' => Http::response('haha whoops', 500),
                     'that.wikibase.cloud' => Http::response([]),
