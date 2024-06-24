@@ -102,6 +102,11 @@ class Wiki extends Model
         return $this->hasMany(WikiNotificationSentRecord::class);
     }
 
+    public function wikiEntityImports(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(WikiEntityImport::class);
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      *
