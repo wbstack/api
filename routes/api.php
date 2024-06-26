@@ -18,9 +18,6 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
     $router->post('user/resetPassword', ['uses' => 'Auth\ResetPasswordController@reset']);
     $router->post('contact/sendMessage', ['uses' => 'ContactController@sendMessage']);
 
-    $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
-    $router->apiResource('wikiConversionData', 'ConversionMetricController')->only(['index']);
-
     $router->post('auth/login', ['uses' => 'Auth\LoginController@postLogin']);
     // Authed
     $router->group(['middleware' => ['auth:api']], function () use ($router) {
@@ -46,8 +43,11 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
             $router->post('setting/{setting}/update', ['uses' => 'WikiSettingController@update']);
             // TODO should wiki managers really be here?
             $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
-            $router->get('entityImport', ['uses' => 'WikiEntityImportController@get']);
-            $router->post('entityImport', ['uses' => 'WikiEntityImportController@create']);
+            $router->get('entityImport', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiEntityImportController@get']);
+            $router->post('entityImport', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiEntityImportController@create']);
         });
     });
+
+    $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
+    $router->apiResource('wikiConversionData', 'ConversionMetricController')->only(['index']);
 });

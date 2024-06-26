@@ -15,8 +15,8 @@ $router->get(
 );
 
 $router->group(['prefix' => 'wiki'], function () use ($router) {
-    $router->get('getWikiForDomain', ['uses' => 'WikiController@getWikiForDomain']);
-    $router->patch('updateWikiEntityImport', ['uses' => 'WikiEntityImportController@update']);
+    $router->get('getWikiForDomain', ['uses' => '\App\Http\Controllers\WikiController@getWikiForDomain']);
+    $router->patch('updateWikiEntityImport', ['uses' => '\App\Http\Controllers\WikiEntityImportController@update']);
 });
 
 $router->group(['prefix' => 'event'], function () use ($router) {

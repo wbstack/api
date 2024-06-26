@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('wiki_entity_imports', function (Blueprint $table) {
+        Schema::create('wiki_entity_import', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
 
@@ -19,8 +19,8 @@ return new class extends Migration
             $table->foreign('wiki_id')->references('id')->on('wikis');
 
             $table->enum('status', ['pending', 'failed', 'success']);
-            $table->timestamp('started_at');
-            $table->timestamp('finished_at');
+            $table->timestamp('started_at')->nullable();
+            $table->timestamp('finished_at')->nullable();
         });
     }
 
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('wiki_entity_imports');
+        Schema::dropIfExists('wiki_entity_import');
     }
 };
