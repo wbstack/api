@@ -3,7 +3,6 @@
 namespace Tests\Routes\Wiki\Managers;
 
 use App\WikiEntityImportStatus;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use Tests\TestCase;
