@@ -61,4 +61,19 @@ class EntityImportBackendTest extends TestCase
             ->assertStatus(200)
             ->assertJsonPath('data.status', 'success');
     }
+
+    public function testUpdateWhenDone()
+    {
+        $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
+        $import = WikiEntityImport::factory()->create([
+            'status' => WikiEntityImportStatus::Failed,
+            'wiki_id' => $wiki->id,
+        ]);
+        $this->json('PATCH', $this->route."?wiki_entity_import=".$import->id, ['status' => 'success'])
+            ->assertStatus(400);
+        $this->assertEquals(
+            WikiEntityImportStatus::Failed,
+            WikiEntityImport::find($import->id)->status,
+        );
+    }
 }

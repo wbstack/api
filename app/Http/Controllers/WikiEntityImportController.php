@@ -73,6 +73,10 @@ class WikiEntityImportController extends Controller
             abort(400, 'Status '.$request->input('status').' is not allowed');
         }
 
+        if ($import->status !== WikiEntityImportStatus::Pending) {
+            abort(400, 'Import has to be pending if updated');
+        }
+
         $import->update([
             'status' => $request->input('status'),
             'finished_at' => Carbon::now(),
