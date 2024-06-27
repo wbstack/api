@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreign('wiki_id')->references('id')->on('wikis');
 
             $table->enum('status', ['pending', 'failed', 'success']);
-            $table->timestamp('started_at');
+            $table->timestamp('started_at')->nullable();
             $table->timestamp('finished_at')->nullable();
             $table->json('payload')->nullable();
         });
