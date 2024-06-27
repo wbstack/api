@@ -65,10 +65,19 @@ class WikiEntityImportController extends Controller
         // to be called from backend services that are implicitly allowed
         // access right.
         $import = WikiEntityImport::find($request->input('wiki_entity_import'));
+        if (!$import) {
+            abort(404, 'No such import');
+        }
+
+        if (!WikiEntityImportStatus::tryFrom($request->input('status'))) {
+            abort(400, 'Status '.$request->input('status').' is not allowed');
+        }
+
         $import->update([
             'status' => $request->input('status'),
             'finished_at' => Carbon::now(),
         ]);
+
         return response()->json(['data' => $import]);
     }
 }
