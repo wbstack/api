@@ -174,15 +174,16 @@ class WikiController extends Controller
             // The deletion was requested by a user that does not manage the wiki
             return response()->json('Unauthorized', 401);
         }
+        $wiki = Wiki::find($wikiId);
 
         //Save the wiki deletion reason
-        Wiki::find($wikiId)->update(['wiki_deletion_reason' => $wikiDeletionReason]);
+        $wiki->update(['wiki_deletion_reason' => $wikiDeletionReason]);
 
         // Delete the wiki
-        Wiki::find($wikiId)->delete();
+        $wiki->delete();
 
         // Return a success
-        return response()->json('Success', 200);
+        return response()->json($wiki->wiki_deletion_reason, 200);
     }
 
     // TODO should this just be get wiki?
