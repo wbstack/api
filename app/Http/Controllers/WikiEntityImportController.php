@@ -6,7 +6,7 @@ use App\WikiEntityImportStatus;
 use Illuminate\Http\Request;
 use App\Wiki;
 use App\WikiEntityImport;
-use App\Jobs\WikiEntityImportJob;
+use App\Jobs\WikiEntityImportDummyJob;
 use Carbon\Carbon;
 
 class WikiEntityImportController extends Controller
@@ -49,7 +49,7 @@ class WikiEntityImportController extends Controller
             'payload' => $request->all(),
         ]);
 
-        dispatch(new WikiEntityImportJob(
+        dispatch(new WikiEntityImportDummyJob(
             wikiId: $wiki->id,
             sourceWikiUrl: $request->input('source_wiki_url'),
             importId: $import->id,

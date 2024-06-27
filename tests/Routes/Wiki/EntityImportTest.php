@@ -13,7 +13,7 @@ use App\Wiki;
 use App\WikiEntityImport;
 use App\User;
 use App\WikiManager;
-use App\Jobs\WikiEntityImportJob;
+use App\Jobs\WikiEntityImportDummyJob;
 
 class EntityImportTest extends TestCase
 {
@@ -139,7 +139,7 @@ class EntityImportTest extends TestCase
             ->assertStatus(200);
 
         $this->assertEquals(1, WikiEntityImport::count());
-        Bus::assertDispatchedTimes(WikiEntityImportJob::class, 1);
+        Bus::assertDispatchedTimes(WikiEntityImportDummyJob::class, 1);
     }
     public function testCreateWhenFailed()
     {
@@ -159,6 +159,6 @@ class EntityImportTest extends TestCase
             ->assertStatus(200);
 
         $this->assertEquals(2, WikiEntityImport::count());
-        Bus::assertDispatchedTimes(WikiEntityImportJob::class, 1);
+        Bus::assertDispatchedTimes(WikiEntityImportDummyJob::class, 1);
     }
 }
