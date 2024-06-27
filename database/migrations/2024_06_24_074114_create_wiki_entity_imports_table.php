@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'failed', 'success']);
             $table->timestamp('started_at');
             $table->timestamp('finished_at')->nullable();
+            $table->json('payload')->nullable();
         });
     }
 

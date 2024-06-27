@@ -6,6 +6,7 @@ use App\WikiEntityImportStatus;
 use Illuminate\Http\Request;
 use App\Wiki;
 use App\WikiEntityImport;
+use App\Jobs\WikiEntityImportJob;
 use Carbon\Carbon;
 
 class WikiEntityImportController extends Controller
@@ -41,10 +42,20 @@ class WikiEntityImportController extends Controller
                     ->setStatusCode(400);
             }
         }
-        $wiki->wikiEntityImports()->create([
+
+        $import = $wiki->wikiEntityImports()->create([
             'status' => WikiEntityImportStatus::Pending,
             'started_at' => Carbon::now(),
+            'payload' => $request->post(),
         ]);
+
+        dispatch(new WikiEntityImportJob(
+            wikiId: $wiki->id,
+            sourceWikiUrl: $request->input('source_wiki_url'),
+            importId: $import->id,
+            entityIds: $request->input('entity_ids'),
+        ));
+
         return response()->json(['data' => $import]);
     }
 
