@@ -13,7 +13,10 @@ class WikiEntityImportController extends Controller
 {
     public function get(Request $request): \Illuminate\Http\JsonResponse
     {
-        $wiki = Wiki::find($request->input('wiki'));
+        $validatedInput = $request->validate([
+            'wiki' => ['required', 'integer'],
+        ]);
+        $wiki = Wiki::find($validatedInput['wiki']);
         if (!$wiki) {
             abort(404, 'No such wiki');
         }
@@ -24,7 +27,13 @@ class WikiEntityImportController extends Controller
 
     public function create(Request $request): \Illuminate\Http\JsonResponse
     {
-        $wiki = Wiki::find($request->input('wiki'));
+        $validatedInput = $request->validate([
+            'wiki' => ['required', 'integer'],
+            'source_wiki_url' => ['required', 'string'],
+            'entity_ids' => ['required', 'string'],
+        ]);
+
+        $wiki = Wiki::find($validatedInput['wiki']);
         if (!$wiki) {
             abort(404, 'No such wiki');
         }
@@ -51,9 +60,9 @@ class WikiEntityImportController extends Controller
 
         dispatch(new WikiEntityImportDummyJob(
             wikiId: $wiki->id,
-            sourceWikiUrl: $request->input('source_wiki_url'),
+            sourceWikiUrl: $validatedInput['source_wiki_url'],
             importId: $import->id,
-            entityIds: $request->input('entity_ids'),
+            entityIds: explode(',', $validatedInput['entity_ids']),
         ));
 
         return response()->json(['data' => $import]);
@@ -64,13 +73,18 @@ class WikiEntityImportController extends Controller
         // This route is not supposed have ACL middlewares in front as it is expected
         // to be called from backend services that are implicitly allowed
         // access right.
-        $import = WikiEntityImport::find($request->input('wiki_entity_import'));
+        $validatedInput = $request->validate([
+            'wiki_entity_import' => ['required', 'integer'],
+            'status' => ['required', 'string'],
+        ]);
+
+        $import = WikiEntityImport::find($validatedInput['wiki_entity_import']);
         if (!$import) {
             abort(404, 'No such import');
         }
 
-        if (!WikiEntityImportStatus::tryFrom($request->input('status'))) {
-            abort(400, 'Status '.$request->input('status').' is not allowed');
+        if (!WikiEntityImportStatus::tryFrom($validatedInput['status'])) {
+            abort(400, 'Status '.$validatedInput['status'].' is not allowed');
         }
 
         if ($import->status !== WikiEntityImportStatus::Pending) {
@@ -78,7 +92,7 @@ class WikiEntityImportController extends Controller
         }
 
         $import->update([
-            'status' => $request->input('status'),
+            'status' => $validatedInput['status'],
             'finished_at' => Carbon::now(),
         ]);
 
