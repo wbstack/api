@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\WikiEntityImportStatus;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Wiki;
 use App\WikiEntityImport;
 use App\Jobs\WikiEntityImportDummyJob;
@@ -75,16 +76,12 @@ class WikiEntityImportController extends Controller
         // access right.
         $validatedInput = $request->validate([
             'wiki_entity_import' => ['required', 'integer'],
-            'status' => ['required', 'string'],
+            'status' => ['required', Rule::enum(WikiEntityImportStatus::class)],
         ]);
 
         $import = WikiEntityImport::find($validatedInput['wiki_entity_import']);
         if (!$import) {
             abort(404, 'No such import');
-        }
-
-        if (!WikiEntityImportStatus::tryFrom($validatedInput['status'])) {
-            abort(400, 'Status '.$validatedInput['status'].' is not allowed');
         }
 
         if ($import->status !== WikiEntityImportStatus::Pending) {

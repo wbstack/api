@@ -46,7 +46,7 @@ class EntityImportBackendTest extends TestCase
             'wiki_id' => $wiki->id,
         ]);
         $this->json('PATCH', $this->route."?wiki_entity_import=".$import->id, ['status' => 'finished'])
-            ->assertStatus(400);
+            ->assertStatus(422);
     }
 
     public function testUpdate()
