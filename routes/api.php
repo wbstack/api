@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AuthorisedUsersForDeletedWikiMetricsMiddleware;
 use Illuminate\Support\Facades\Config;
 
 /**
