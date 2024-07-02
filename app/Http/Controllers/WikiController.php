@@ -44,7 +44,7 @@ class WikiController extends Controller
         }
 
         $user = $request->user();
-        
+
         $submittedDomain = strtolower($request->input('domain'));
         $submittedDomain = DomainHelper::encode($submittedDomain);
 
@@ -141,7 +141,7 @@ class WikiController extends Controller
                 dispatch(new ElasticSearchAliasInit($wiki->id));
             }
         }
-        
+
         // opportunistic dispatching of jobs to make sure storage pools are topped up
         dispatch(new ProvisionWikiDbJob(null, null, 10));
         dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
@@ -167,18 +167,24 @@ class WikiController extends Controller
 
         $wikiId = $request->input('wiki');
         $userId = $user->id;
+        $wikiDeletionReason = $request->input('deletionReason');
 
         // Check that the requesting user manages the wiki
         if (WikiManager::where('user_id', $userId)->where('wiki_id', $wikiId)->count() !== 1) {
             // The deletion was requested by a user that does not manage the wiki
             return response()->json('Unauthorized', 401);
         }
+        $wiki = Wiki::find($wikiId);
 
+        if(isset($wikiDeletionReason)){
+            //Save the wiki deletion reason
+            $wiki->update(['wiki_deletion_reason' => $wikiDeletionReason]);
+        }
         // Delete the wiki
-        Wiki::find($wikiId)->delete();
+        $wiki->delete();
 
         // Return a success
-        return response()->json('Success', 200);
+        return response()->json("Success", 200);
     }
 
     // TODO should this just be get wiki?
