@@ -27,6 +27,10 @@ class DeleteWikiTest extends TestCase
             );
         // check response is correct
         $response->assertStatus(200);
-        $this->assertSame('Some reason for deleting my wiki', $response->original);
+        
+        $this->assertSame(
+            'Some reason for deleting my wiki',
+            Wiki::withTrashed()->find($wiki->id)->wiki_deletion_reason
+        );
     }
 }

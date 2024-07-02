@@ -179,15 +179,12 @@ class WikiController extends Controller
         if(isset($wikiDeletionReason)){
             //Save the wiki deletion reason
             $wiki->update(['wiki_deletion_reason' => $wikiDeletionReason]);
-            $response = $wiki->wiki_deletion_reason;
-        }else{
-            $response = '';
         }
         // Delete the wiki
         $wiki->delete();
 
         // Return a success
-        return response()->json($response, 200);
+        return response()->json("Success", 200);
     }
 
     // TODO should this just be get wiki?
