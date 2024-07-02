@@ -44,7 +44,7 @@ class DeletedWikiMetricsControllerTest extends TestCase
     }
     public function testRedirectIfUserIsLoggedInAsNotAdmin()
     {
-        $user = $this->createUserWithPriviledges(0);
+        $user = $this->createUserWithPrivileges(0);
         $this->actingAs($user, 'api')->get('auth/login');
         $this->createAndDeleteTestWiki('one.wikibase.cloud', 0, '', 1, 2);
         $this->createAndDeleteTestWiki('two.wikibase.cloud', 10, 'Some Reason', 0, 3);
@@ -54,7 +54,7 @@ class DeletedWikiMetricsControllerTest extends TestCase
 
     public function testDownloadCsvIfUserIsLoggedInAsAdmin()
     {
-        $user = $this->createUserWithPriviledges(1);
+        $user = $this->createUserWithPrivileges(1);
         $this->actingAs($user, 'api')->get('auth/login');
         $this->createAndDeleteTestWiki('one.wikibase.cloud', 0, '', 1, 2);
         $this->createAndDeleteTestWiki('two.wikibase.cloud', 10, 'Some Reason', 0, 3);
@@ -80,14 +80,14 @@ class DeletedWikiMetricsControllerTest extends TestCase
         $this->assertSame(2, $output[0]['number_of_wikibases_owned_by_owners_of_this_wiki']);
     }
 
-    private function createUserWithPriviledges($userPriviledge)
+    private function createUserWithPrivileges($userPrivilege)
     {
         $password = 'apassword';
         return User::factory()->create([
             'verified' => true,
             'email' => 'atestmail@gmail.com',
             'password' => password_hash($password, PASSWORD_DEFAULT),
-            'is_admin' => $userPriviledge
+            'is_admin' => $userPrivilege
         ]);
     }
 
