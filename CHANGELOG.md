@@ -1,5 +1,10 @@
 # api
 
+## 10x.8.7 - 16 July 2024
+- Add user admin flag and deletion reasons to the DB
+- Save reason for deleting wikis
+- Created downloadable metric for deleted wikis
+
 ## 10x.8.6 - 20 June 2024
 - Exclude PlatformReservedUser when looking up last edited date
 
