@@ -38,6 +38,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'limit_wiki_access' => \App\Http\Middleware\LimitWikiAccess::class,
 
         // https://laravel-news.com/signed-routes
         //'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
