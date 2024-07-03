@@ -7,9 +7,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use App\Wiki;
+use App\WikiEntityImport;
+use Carbon\Carbon;
 
 class WikiEntityImportJob implements ShouldQueue
 {
@@ -24,15 +26,36 @@ class WikiEntityImportJob implements ShouldQueue
         public array $entityIds,
         public string $importId,
     )
-    {}
+    {
+        $this->import = WikiEntityImport::findOrFail($this->importId);
+    }
+
+
+    public WikiEntityImport $import;
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        $wiki = Wiki::findOrFail($this->wikiId);
-        $creds = $this->acquireCredentials($wiki->domain);
+        try {
+            $wiki = Wiki::findOrFail($this->wikiId);
+            $creds = $this->acquireCredentials($wiki->domain);
+
+            $job = new TransferBotJob($wiki, $creds);
+            $result = $job->run();
+
+            $this->import->update([
+                'status' => $result,
+                'finished_at' => Carbon::now(),
+            ]);
+        } catch (\Exception $ex) {
+            Log::error('Entity import job failed with error: '.$ex->getMessage());
+            $this->import->update([
+                'status' => WikiEntityImportStatus::Failed,
+                'finished_at' => Carbon::now()
+            ]);
+        }
     }
 
     private static function acquireCredentials(string $wikiDomain): OAuthCredentials
@@ -90,5 +113,18 @@ class OAuthCredentials
             $prefix.'_ACCESS_TOKEN' => $this->accessToken,
             $prefix.'_ACCESS_SECRET' => $this->accessSecret,
         ];
+    }
+}
+
+class TransferBotJob
+{
+    public function __construct(
+        public Wiki $wiki,
+        public OAuthCredentials $creds,
+    ){}
+
+    public function run(): WikiEntityImportStatus
+    {
+        return WikiEntityImportStatus::Success;
     }
 }
