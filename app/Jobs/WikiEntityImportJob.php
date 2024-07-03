@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\WikiEntityImportStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 use App\Wiki;
 use App\WikiEntityImport;
 use Carbon\Carbon;
+use Maclof\Kubernetes\Client;
+use Maclof\Kubernetes\Models\Job as KubernetesJob;
 
 class WikiEntityImportJob implements ShouldQueue
 {
@@ -21,40 +24,51 @@ class WikiEntityImportJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public string $wikiId,
+        public int $wikiId,
         public string $sourceWikiUrl,
         public array $entityIds,
-        public string $importId,
+        public int $importId,
     )
-    {
-        $this->import = WikiEntityImport::findOrFail($this->importId);
-    }
+    {}
 
-
-    public WikiEntityImport $import;
+    public string $targetWikiUrl;
 
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(Client $kubernetesClient): void
     {
+        $import = null;
         try {
             $wiki = Wiki::findOrFail($this->wikiId);
+            $import = WikiEntityImport::findOrFail($this->importId);
             $creds = $this->acquireCredentials($wiki->domain);
 
-            $job = new TransferBotJob($wiki, $creds);
-            $result = $job->run();
+            $this->targetWikiUrl = str_contains($wiki->domain, "localhost")
+                ? "http://".$wiki->domain
+                : "https://".$wiki->domain;
 
-            $this->import->update([
-                'status' => $result,
-                'finished_at' => Carbon::now(),
-            ]);
+            $kubernetesJob = new TransferBotKubernetesJob(
+                kubernetesClient: $kubernetesClient,
+                wiki: $wiki,
+                creds: $creds,
+                entityIds: $this->entityIds,
+                sourceWikiUrl: $this->sourceWikiUrl,
+                targetWikiUrl: $this->targetWikiUrl,
+            );
+            $jobName = $kubernetesJob->spawn();
+            Log::info(
+                'transferbot job for wiki "'.$wiki->domain.'" exists or was created with name "'.$jobName.'".'
+            );
         } catch (\Exception $ex) {
             Log::error('Entity import job failed with error: '.$ex->getMessage());
-            $this->import->update([
+            $import?->update([
                 'status' => WikiEntityImportStatus::Failed,
                 'finished_at' => Carbon::now()
             ]);
+            $this->fail(
+                new \Exception('Error spawning transferbot for wiki '.$wiki->domain.': '.$ex->getMessage()),
+            );
         }
     }
 
@@ -81,6 +95,69 @@ class WikiEntityImportJob implements ShouldQueue
         }
 
         return OAuthCredentials::unmarshalMediaWikiResponse($body);
+    }
+}
+
+class TransferBotKubernetesJob
+{
+    public function __construct(
+        public Client $kubernetesClient,
+        public Wiki $wiki,
+        public OAuthCredentials $creds,
+        public array $entityIds,
+        public string $sourceWikiUrl,
+        public string $targetWikiUrl,
+        public string $kubernetesNamespace = 'api-jobs',
+    ){}
+
+    public function spawn(): string
+    {
+        $spec = $this->constructSpec();
+        $jobSpec = new KubernetesJob($spec);
+
+        $jobObject = $this->kubernetesClient->jobs()->apply($jobSpec);
+        $jobName = data_get($jobObject, 'metadata.name');
+        if (data_get($jobObject, 'status') === 'Failure' || !$jobName) {
+            // The k8s client does not fail reliably on 4xx responses, so checking the name
+            // currently serves as poor man's error handling.
+            throw new \RuntimeException(
+                'transferbot creation for wiki "'.$this->wiki->domain.'" failed with message: '.data_get($jobObject, 'message', 'n/a')
+            );
+        }
+        return $jobName;
+    }
+
+    private function constructSpec(): array
+    {
+        return [
+            'metadata' => [
+                'name' => 'run-transferbot-'.hash('sha1', $this->wiki->id),
+                'namespace' => $this->kubernetesNamespace,
+                'labels' => [
+                    'app.kubernetes.io/instance' => $this->wiki->domain,
+                    'app.kubernetes.io/name' => 'run-transferbot',
+                ]
+            ],
+            'spec' => [
+                'ttlSecondsAfterFinished' => 24 * 60 * 60, // 1 day
+                'template' => [
+                    'metadata' => [
+                        'name' => 'run-transferbot'
+                    ],
+                    'spec' => [
+                        'containers' => [
+                            0 => [
+                                'name' => 'run-qs-updater',
+                                'image' => 'ghcr.io/wbstack/transferbot:latest',
+                                'env' => $this->creds->marshalEnv(),
+                                'command' => $this->sourceWikiUrl.' '.$this->targetWikiUrl.' '.implode(" ", $this->entityIds),
+                            ]
+                        ],
+                        'restartPolicy' => 'Never'
+                    ]
+                ]
+            ]
+        ];
     }
 }
 
@@ -113,18 +190,5 @@ class OAuthCredentials
             $prefix.'_ACCESS_TOKEN' => $this->accessToken,
             $prefix.'_ACCESS_SECRET' => $this->accessSecret,
         ];
-    }
-}
-
-class TransferBotJob
-{
-    public function __construct(
-        public Wiki $wiki,
-        public OAuthCredentials $creds,
-    ){}
-
-    public function run(): WikiEntityImportStatus
-    {
-        return WikiEntityImportStatus::Success;
     }
 }
