@@ -13,6 +13,7 @@ use App\Jobs\PollForMediaWikiJobsJob;
 use App\Jobs\UpdateWikiSiteStatsJob;
 use App\Jobs\SendEmptyWikiNotificationsJob;
 use App\Jobs\CreateQueryserviceBatchesJob;
+use App\Jobs\FailStalledEntityImportsJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -38,6 +39,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes();
         $schedule->job(new CreateQueryserviceBatchesJob)->everyMinute();
         $schedule->job(new RequeuePendingQsBatchesJob)->everyFifteenMinutes();
+        $schedule->job(new FailStalledEntityImportsJob)->hourly();
 
         // Sandbox
         // TODO this should maybe only be run when sandbox as a whole is loaded?
