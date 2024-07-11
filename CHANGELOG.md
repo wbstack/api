@@ -1,5 +1,9 @@
 # api
 
+## 10x.9.0 - 11 July 2024
+- Prepare saving wiki deletion reasons
+- Add is_admin flag to user table
+
 ## 10x.8.6 - 20 June 2024
 - Exclude PlatformReservedUser when looking up last edited date
 
