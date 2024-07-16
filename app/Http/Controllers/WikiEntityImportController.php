@@ -31,7 +31,14 @@ class WikiEntityImportController extends Controller
         $validatedInput = $request->validate([
             'wiki' => ['required', 'integer'],
             'source_wiki_url' => ['required', 'string'],
-            'entity_ids' => ['required', 'string'],
+            'entity_ids' => ['required', 'string', function (string $attr, mixed $value, \Closure $fail) {
+                $chunks = explode(',', $value);
+                foreach ($chunks as $chunk) {
+                    if (!preg_match("/^[A-Z]\d+$/", $chunk)) {
+                        $fail("Received unexpected input '{$chunk}' cannot continue.");
+                    }
+                }
+            }],
         ]);
 
         $wiki = Wiki::find($validatedInput['wiki']);
