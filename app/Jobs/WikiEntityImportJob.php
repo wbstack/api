@@ -115,6 +115,7 @@ class TransferBotKubernetesJob
         $spec = $this->constructSpec();
         $jobSpec = new KubernetesJob($spec);
 
+        $this->kubernetesClient->setNamespace($this->kubernetesNamespace);
         $jobObject = $this->kubernetesClient->jobs()->apply($jobSpec);
         $jobName = data_get($jobObject, 'metadata.name');
         if (data_get($jobObject, 'status') === 'Failure' || !$jobName) {
@@ -148,9 +149,19 @@ class TransferBotKubernetesJob
                         'containers' => [
                             0 => [
                                 'name' => 'run-qs-updater',
-                                'image' => 'ghcr.io/wbstack/transferbot:latest',
+                                'image' => 'ghcr.io/wbstack/transferbot:main',
                                 'env' => $this->creds->marshalEnv(),
-                                'command' => $this->sourceWikiUrl.' '.$this->targetWikiUrl.' '.implode(" ", $this->entityIds),
+                                'command' => ['transferbot', $this->sourceWikiUrl, $this->targetWikiUrl, ...$this->entityIds],
+                                'resources' => [
+                                    'requests' => [
+                                        'cpu' => '0.25',
+                                        'memory' => '250Mi',
+                                    ],
+                                    'limits' => [
+                                        'cpu' => '0.5',
+                                        'memory' => '500Mi',
+                                    ],
+                                ],
                             ]
                         ],
                         'restartPolicy' => 'Never'
@@ -182,13 +193,25 @@ class OAuthCredentials
         );
     }
 
-    public function marshalEnv(string $prefix = 'TARGET_WIKI'): array
+    public function marshalEnv(string $prefix = 'TARGET_WIKI_OAUTH'): array
     {
         return [
-            $prefix.'_CONSUMER_TOKEN' => $this->consumerToken,
-            $prefix.'_CONSUMER_SECRET' => $this->consumerSecret,
-            $prefix.'_ACCESS_TOKEN' => $this->accessToken,
-            $prefix.'_ACCESS_SECRET' => $this->accessSecret,
+            [
+                'name' => $prefix.'_CONSUMER_TOKEN',
+                'value' => $this->consumerToken,
+            ],
+            [
+                'name' => $prefix.'_CONSUMER_SECRET',
+                'value' => $this->consumerSecret,
+            ],
+            [
+                'name' => $prefix.'_ACCESS_TOKEN',
+                'value' => $this->accessToken,
+            ],
+            [
+                'name' => $prefix.'_ACCESS_SECRET',
+                'value' => $this->accessSecret,
+            ],
         ];
     }
 }
