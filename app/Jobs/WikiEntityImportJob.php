@@ -55,10 +55,11 @@ class WikiEntityImportJob implements ShouldQueue
                 entityIds: $this->entityIds,
                 sourceWikiUrl: $this->sourceWikiUrl,
                 targetWikiUrl: $this->targetWikiUrl,
+                importId: $this->importId,
             );
             $jobName = $kubernetesJob->spawn();
             Log::info(
-                'transferbot job for wiki "'.$wiki->domain.'" exists or was created with name "'.$jobName.'".'
+                'transferbot job for wiki "'.$wiki->domain.'" was created with name "'.$jobName.'".'
             );
         } catch (\Exception $ex) {
             Log::error('Entity import job failed with error: '.$ex->getMessage());
@@ -107,6 +108,7 @@ class TransferBotKubernetesJob
         public array $entityIds,
         public string $sourceWikiUrl,
         public string $targetWikiUrl,
+        public int $importId,
         public string $kubernetesNamespace = 'api-jobs',
     ){}
 
@@ -132,7 +134,7 @@ class TransferBotKubernetesJob
     {
         return [
             'metadata' => [
-                'name' => 'run-transferbot-'.hash('sha1', $this->wiki->id),
+                'generateName' => 'run-transferbot-',
                 'namespace' => $this->kubernetesNamespace,
                 'labels' => [
                     'app.kubernetes.io/instance' => $this->wiki->domain,
@@ -141,6 +143,7 @@ class TransferBotKubernetesJob
             ],
             'spec' => [
                 'ttlSecondsAfterFinished' => 24 * 60 * 60, // 1 day
+                'backoffLimit' => 0,
                 'template' => [
                     'metadata' => [
                         'name' => 'run-transferbot'
@@ -148,9 +151,20 @@ class TransferBotKubernetesJob
                     'spec' => [
                         'containers' => [
                             0 => [
+                                'hostNetwork' => true,
                                 'name' => 'run-qs-updater',
                                 'image' => 'ghcr.io/wbstack/transferbot:main',
-                                'env' => $this->creds->marshalEnv(),
+                                'env' => [
+                                    ...$this->creds->marshalEnv(),
+                                    [
+                                        'name' => 'CALLBACK_ON_FAILURE',
+                                        'value' => 'curl -H "Accept: application/json" -H "Content-Type: application/json" --data \'{"wiki_entity_import":'.$this->importId.',"status":"failed"}\' -XPATCH http://api-app-backend.default.svc.cluster.local/backend/wiki/updateEntityImport'
+                                    ],
+                                    [
+                                        'name' => 'CALLBACK_ON_SUCCESS',
+                                        'value' => 'curl -H "Accept: application/json" -H "Content-Type: application/json" --data \'{"wiki_entity_import":'.$this->importId.',"status":"success"}\' -XPATCH http://api-app-backend.default.svc.cluster.local/backend/wiki/updateEntityImport'
+                                    ],
+                                ],
                                 'command' => ['transferbot', $this->sourceWikiUrl, $this->targetWikiUrl, ...$this->entityIds],
                                 'resources' => [
                                     'requests' => [

@@ -83,7 +83,7 @@ class WikiEntityImportController extends Controller
         // access right.
         $validatedInput = $request->validate([
             'wiki_entity_import' => ['required', 'integer'],
-            'status' => ['required', Rule::enum(WikiEntityImportStatus::class)],
+            'status' => ['required', Rule::in([WikiEntityImportStatus::Failed->value, WikiEntityImportStatus::Success->value])],
         ]);
 
         $import = WikiEntityImport::find($validatedInput['wiki_entity_import']);

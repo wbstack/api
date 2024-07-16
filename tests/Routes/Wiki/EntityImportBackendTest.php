@@ -56,9 +56,9 @@ class EntityImportBackendTest extends TestCase
             'status' => WikiEntityImportStatus::Pending,
             'wiki_id' => $wiki->id,
         ]);
-        $this->json('PATCH', $this->route."?wiki_entity_import=".$import->id, ['status' => 'success'])
+        $this->json('PATCH', $this->route."?wiki_entity_import=".$import->id, ['status' => 'failed'])
             ->assertStatus(200)
-            ->assertJsonPath('data.status', 'success');
+            ->assertJsonPath('data.status', 'failed');
     }
 
     public function testUpdateWhenDone()
