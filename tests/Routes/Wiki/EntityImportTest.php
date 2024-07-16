@@ -141,6 +141,21 @@ class EntityImportTest extends TestCase
         $this->assertEquals(1, WikiEntityImport::count());
         Bus::assertDispatchedTimes(WikiEntityImportDummyJob::class, 1);
     }
+
+    public function testCreateValidation()
+    {
+        Bus::fake();
+        $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
+        $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+
+        $this->actingAs($user, 'api')
+            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'source.wikibase.cloud', 'entity_ids' => 'P1,P2; echo "P4Wn3D!!",Q42'])
+            ->assertStatus(422);
+
+        $this->assertEquals(0, WikiEntityImport::count());
+        Bus::assertDispatchedTimes(WikiEntityImportDummyJob::class, 0);
+    }
     public function testCreateWhenFailed()
     {
         Bus::fake();
