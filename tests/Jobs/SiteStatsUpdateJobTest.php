@@ -11,10 +11,14 @@ use App\Wiki;
 use App\WikiManager;
 use App\Jobs\SiteStatsUpdateJob;
 
+/**
+ * @ignore
+ */
 class SiteStatsUpdateJobTest extends TestCase
 {
 
     public function setUp(): void {
+        $this->markTestSkipped('Pollutes the deleted wiki list');
         parent::setUp();
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();

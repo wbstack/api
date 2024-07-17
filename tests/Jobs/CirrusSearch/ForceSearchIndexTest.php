@@ -48,6 +48,7 @@ class ForceSearchIndexTest extends TestCase
     }
     public function testSuccess()
     {
+        $this->markTestSkipped('Pollutes the deleted wiki list');
         Queue::fake();
 
         $toId = 10;

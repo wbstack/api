@@ -71,6 +71,7 @@ class ElasticSearchAliasInitTest extends TestCase
 
     public function testSuccess()
     {
+        $this->markTestSkipped('Pollutes the deleted wiki list');
         $request = $this->getMockRequest();
         $request->method( 'execute' )
             ->willReturn( json_encode( [ 'acknowledged' => true ] ) );

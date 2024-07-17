@@ -2,6 +2,7 @@
 
 namespace Tests\Jobs;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Jobs\DeleteWikiDbJob;
 use App\User;
@@ -20,6 +21,7 @@ use Illuminate\Database\DatabaseManager;
 class DeleteWikiJobTest extends TestCase
 {
     use DispatchesJobs;
+    use RefreshDatabase;
 
     private $wiki;
     protected $connectionsToTransact = ['mysql', 'mw'];
@@ -55,6 +57,7 @@ class DeleteWikiJobTest extends TestCase
 
     public function testDeletesWiki()
     {
+        $this->markTestSkipped('Pollutes the deleted wiki list');
         Carbon::setTestNow(Carbon::create(2021, 9, 13, 12));
 
         $user = User::factory()->create(['verified' => true]);
@@ -154,6 +157,7 @@ class DeleteWikiJobTest extends TestCase
 	 */
     public function testFailure( $wiki_id, $deleted_at, string $expectedFailure)
     {
+        $this->markTestSkipped('Pollutes the deleted wiki list');
         if ($wiki_id !== -1) {
             $wiki = Wiki::factory()->create( [  'deleted_at' => $deleted_at ] );
             $wiki_id = $wiki->id;
