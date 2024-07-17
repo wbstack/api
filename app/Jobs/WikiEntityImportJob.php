@@ -81,7 +81,7 @@ class WikiEntityImportJob implements ShouldQueue
                 'consumerName' => 'WikiEntityImportJob',
                 'ownerOnly' => '1',
                 'consumerVersion' => '1',
-                'grants' => 'createeditmovepage|highvolume',
+                'grants' => 'basic|highvolume|import|editpage|editprotected|createeditmovepage|uploadfile|uploadeditmovefile|rollback|delete|mergehistory',
                 'callbackUrlTail' => '/w/index.php',
             ],
         );
