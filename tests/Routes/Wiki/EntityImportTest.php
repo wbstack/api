@@ -120,7 +120,7 @@ class EntityImportTest extends TestCase
         ]);
 
         $this->actingAs($user, 'api')
-            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'source.wikibase.cloud', 'entity_ids' => 'P1'])
+            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1'])
             ->assertStatus(400);
 
         $this->assertEquals(1, WikiEntityImport::count());
@@ -135,7 +135,7 @@ class EntityImportTest extends TestCase
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
-            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'source.wikibase.cloud', 'entity_ids' => 'P1,P2'])
+            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1,P2'])
             ->assertStatus(200);
 
         $this->assertEquals(1, WikiEntityImport::count());
@@ -150,7 +150,7 @@ class EntityImportTest extends TestCase
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
-            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'source.wikibase.cloud', 'entity_ids' => 'P1,P2; echo "P4Wn3D!!",Q42'])
+            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1,P2; echo "P4Wn3D!!",Q42'])
             ->assertStatus(422);
 
         $this->assertEquals(0, WikiEntityImport::count());
@@ -170,7 +170,7 @@ class EntityImportTest extends TestCase
         ]);
 
         $this->actingAs($user, 'api')
-            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'source.wikibase.cloud', 'entity_ids' => 'P1,P2'])
+            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1,P2'])
             ->assertStatus(200);
 
         $this->assertEquals(2, WikiEntityImport::count());

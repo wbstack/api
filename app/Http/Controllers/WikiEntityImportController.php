@@ -30,7 +30,7 @@ class WikiEntityImportController extends Controller
     {
         $validatedInput = $request->validate([
             'wiki' => ['required', 'integer'],
-            'source_wiki_url' => ['required', 'string'],
+            'source_wiki_url' => ['required', 'url'],
             'entity_ids' => ['required', 'string', function (string $attr, mixed $value, \Closure $fail) {
                 $chunks = explode(',', $value);
                 foreach ($chunks as $chunk) {
