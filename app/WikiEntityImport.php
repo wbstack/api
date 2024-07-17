@@ -22,10 +22,3 @@ class WikiEntityImport extends Model
         'status' => WikiEntityImportStatus::class,
     ];
 }
-
-enum WikiEntityImportStatus: string
-{
-    case Pending = "pending";
-    case Success = "success";
-    case Failed = "failed";
-}
