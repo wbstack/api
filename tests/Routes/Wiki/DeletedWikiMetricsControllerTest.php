@@ -72,12 +72,17 @@ class DeletedWikiMetricsControllerTest extends TestCase
             $this->createAndDeleteTestWiki('two.wikibase.cloud', $user2->id, 'Some Reason', 0, 3),
             $this->createAndDeleteTestWiki('sameuser.wikibase.cloud', $user1->id, 'Some Reason', 0, 3),
         ];
-        $controller = new DeletedWikiMetricsController();
-        $output = $controller->createOutput($deletedWikis);
-        $this->assertSame('one.wikibase.cloud', $output[0]['domain_name_for_wiki']);
-        $this->assertSame('two.wikibase.cloud', $output[1]['domain_name_for_wiki']);
-        $this->assertSame('Some Reason',$output[1]['wiki_deletion_reason']);
-        $this->assertSame(2, $output[0]['number_of_wikibases_owned_by_owners_of_this_wiki']);
+        $user = $this->createUserWithPrivileges(1);
+        $this->actingAs($user, 'api')->get('auth/login');
+
+        $response = $this->get($this->route);
+
+        $rawCsv = $response->getContent();
+        $output = array_map('str_getcsv', explode("\n", $rawCsv));
+        $this->assertSame('one.wikibase.cloud', $output[1][0]);
+        $this->assertSame('two.wikibase.cloud', $output[2][0]);
+        $this->assertSame('Some Reason',$output[2][1]);
+        $this->assertSame(2, intval($output[1][2]));
     }
 
     private function createUserWithPrivileges($userPrivilege)
