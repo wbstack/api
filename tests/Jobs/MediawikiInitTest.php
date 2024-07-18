@@ -52,7 +52,6 @@ class MediawikiInitTest extends TestCase
 
     public function testSuccess()
     {
-        $this->markTestSkipped('Pollutes the deleted wiki list');
         $mockResponse = [
             'warnings' => [],
             'wbstackInit' => [

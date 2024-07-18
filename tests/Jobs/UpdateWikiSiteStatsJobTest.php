@@ -28,7 +28,6 @@ class UpdateWikiSiteStatsJobTest extends TestCase
 
     public function testSuccess()
     {
-        $this->markTestSkipped('Pollutes the deleted wiki list');
         Wiki::factory()->create([
             'domain' => 'this.wikibase.cloud'
         ]);

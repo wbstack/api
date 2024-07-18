@@ -46,7 +46,6 @@ class QueueSearchIndexBatchesTest extends TestCase
     }
     public function testSuccess()
     {
-        $this->markTestSkipped('Pollutes the deleted wiki list');
         Queue::fake();
         
         $mockResponse = [

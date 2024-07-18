@@ -2,6 +2,7 @@
 
 namespace Tests\Jobs;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Http\Curl\HttpRequest;
 use Illuminate\Contracts\Queue\Job;
@@ -16,9 +17,9 @@ use App\Jobs\SiteStatsUpdateJob;
  */
 class SiteStatsUpdateJobTest extends TestCase
 {
+    use RefreshDatabase;
 
     public function setUp(): void {
-        $this->markTestSkipped('Pollutes the deleted wiki list');
         parent::setUp();
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
