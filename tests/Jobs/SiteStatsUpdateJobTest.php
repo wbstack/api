@@ -12,9 +12,6 @@ use App\Wiki;
 use App\WikiManager;
 use App\Jobs\SiteStatsUpdateJob;
 
-/**
- * @ignore
- */
 class SiteStatsUpdateJobTest extends TestCase
 {
     use RefreshDatabase;
