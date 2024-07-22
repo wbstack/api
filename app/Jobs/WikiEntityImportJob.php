@@ -146,7 +146,7 @@ class TransferBotKubernetesJob
                 ]
             ],
             'spec' => [
-                'ttlSecondsAfterFinished' => 24 * 60 * 60, // 1 day
+                'ttlSecondsAfterFinished' => 0,
                 'backoffLimit' => 0,
                 'template' => [
                     'metadata' => [
