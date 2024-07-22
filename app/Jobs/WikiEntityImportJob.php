@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
 use App\Wiki;
 use App\WikiEntityImport;
 use Carbon\Carbon;
@@ -31,7 +32,7 @@ class WikiEntityImportJob implements ShouldQueue
     )
     {}
 
-    public string $targetWikiUrl;
+    private string $targetWikiUrl;
 
     /**
      * Execute the job.
@@ -65,10 +66,10 @@ class WikiEntityImportJob implements ShouldQueue
             Log::error('Entity import job failed with error: '.$ex->getMessage());
             $import?->update([
                 'status' => WikiEntityImportStatus::Failed,
-                'finished_at' => Carbon::now()
+                'finished_at' => Carbon::now(),
             ]);
             $this->fail(
-                new \Exception('Error spawning transferbot for wiki '.$wiki->domain.': '.$ex->getMessage()),
+                new \Exception('Error spawning transferbot for wiki '.$this->wikiId.': '.$ex->getMessage()),
             );
         }
     }
@@ -109,8 +110,11 @@ class TransferBotKubernetesJob
         public string $sourceWikiUrl,
         public string $targetWikiUrl,
         public int $importId,
-        public string $kubernetesNamespace = 'api-jobs',
-    ){}
+    ){
+        $this->kubernetesNamespace = Config::get('wbstack.api_job_namespace');
+    }
+
+    private string $kubernetesNamespace;
 
     public function spawn(): string
     {
@@ -165,7 +169,12 @@ class TransferBotKubernetesJob
                                         'value' => 'curl -H "Accept: application/json" -H "Content-Type: application/json" --data \'{"wiki_entity_import":'.$this->importId.',"status":"success"}\' -XPATCH http://api-app-backend.default.svc.cluster.local/backend/wiki/updateEntityImport'
                                     ],
                                 ],
-                                'command' => ['transferbot', $this->sourceWikiUrl, $this->targetWikiUrl, ...$this->entityIds],
+                                'command' => [
+                                    'transferbot',
+                                    $this->sourceWikiUrl,
+                                    $this->targetWikiUrl,
+                                    ...$this->entityIds,
+                                ],
                                 'resources' => [
                                     'requests' => [
                                         'cpu' => '0.25',
