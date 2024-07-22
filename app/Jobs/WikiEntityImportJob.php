@@ -157,7 +157,7 @@ class TransferBotKubernetesJob
                             0 => [
                                 'hostNetwork' => true,
                                 'name' => 'run-qs-updater',
-                                'image' => 'ghcr.io/wbstack/transferbot:main',
+                                'image' => 'ghcr.io/wbstack/transferbot:1.0.0',
                                 'env' => [
                                     ...$this->creds->marshalEnv(),
                                     [
