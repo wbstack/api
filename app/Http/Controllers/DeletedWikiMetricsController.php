@@ -45,8 +45,7 @@ class DeletedWikiMetricsController extends Controller
             'Content-Disposition' => 'attachment;filename='.CarbonImmutable::now()->toIso8601String().'-'.$this->fileName ]);
     }
 
-    // TODO: This function should be private. It is right now public and only used for unit tests
-    public function createOutput($wikis): array
+    private function createOutput($wikis): array
     {
         $output = [];
         foreach ($wikis as $wiki) {

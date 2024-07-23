@@ -6,15 +6,16 @@ use App\User;
 use App\Wiki;
 use App\WikiManager;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class DeleteWikiTest extends TestCase
 {
     use HasFactory;
+    use RefreshDatabase;
 
     public function testDelete()
     {
-
         $user = User::factory()->create(['verified' => true]);
         $wiki = Wiki::factory('nodb')->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
