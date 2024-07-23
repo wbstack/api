@@ -23,6 +23,7 @@ return [
         \LKDevelopment\HorizonPrometheusExporter\Exporter\RecentJobs::class,
         \App\Metrics\FailedQsBatches::class,
         \App\Metrics\PendingQsBatches::class,
+        \App\Metrics\WikiEntityImports::class,
     ],
 
     /**
