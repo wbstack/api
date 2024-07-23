@@ -45,9 +45,7 @@ class WikiEntityImportJob implements ShouldQueue
             $import = WikiEntityImport::findOrFail($this->importId);
             $creds = $this->acquireCredentials($wiki->domain);
 
-            $this->targetWikiUrl = str_contains($wiki->domain, "localhost")
-                ? "http://".$wiki->domain
-                : "https://".$wiki->domain;
+            $this->targetWikiUrl = $this->domainToOrigin($wiki->domain);
 
             $kubernetesJob = new TransferBotKubernetesJob(
                 kubernetesClient: $kubernetesClient,
@@ -72,6 +70,14 @@ class WikiEntityImportJob implements ShouldQueue
                 new \Exception('Error spawning transferbot for wiki '.$this->wikiId.': '.$ex->getMessage()),
             );
         }
+    }
+
+    private static function domainToOrigin(string $domain): string
+    {
+        $tld = last(explode('.', $domain));
+        return $tld === 'localhost'
+            ? "http://".$domain
+            : "https://".$domain;
     }
 
     private static function acquireCredentials(string $wikiDomain): OAuthCredentials
@@ -112,9 +118,13 @@ class TransferBotKubernetesJob
         public int $importId,
     ){
         $this->kubernetesNamespace = Config::get('wbstack.api_job_namespace');
+        $this->transferbotImageRepo = Config::get('wbstack.transferbot_image_repo');
+        $this->transferbotImageVersion = Config::get('wbstack.transferbot_image_version');
     }
 
     private string $kubernetesNamespace;
+    private string $transferbotImageRepo;
+    private string $transferbotImageVersion;
 
     public function spawn(): string
     {
@@ -150,14 +160,14 @@ class TransferBotKubernetesJob
                 'backoffLimit' => 0,
                 'template' => [
                     'metadata' => [
-                        'name' => 'run-transferbot'
+                        'name' => 'run-entity-import'
                     ],
                     'spec' => [
                         'containers' => [
                             0 => [
                                 'hostNetwork' => true,
-                                'name' => 'run-qs-updater',
-                                'image' => 'ghcr.io/wbstack/transferbot:1.0.0',
+                                'name' => 'run-entity-import',
+                                'image' => $this->transferbotImageRepo.':'.$this->transferbotImageVersion,
                                 'env' => [
                                     ...$this->creds->marshalEnv(),
                                     [
