@@ -1,5 +1,10 @@
 # api
 
+## 10x.9.0 - 23 July 2024
+-  Created downloadable metric for deleted wikis, which can only be accessed by users with admin privileges
+- Test the csv output of DeletedWikiMetricsController
+- Add RefreshDatabase or Skip offending tests where these pollute the deleted wiki list
+
 ## 10x.9.0 - 11 July 2024
 - Prepare saving wiki deletion reasons
 - Add is_admin flag to user table
