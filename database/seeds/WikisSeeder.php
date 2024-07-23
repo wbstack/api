@@ -20,7 +20,7 @@ class WikisSeeder extends Seeder
      * @param string $name
      * @param array $stats
      */
-    public function createWiki($user, $name, $stats)
+    private function createWiki($user, $name, $stats)
     {
         $domain = $name . '.nodomain.example';
 
