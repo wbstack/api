@@ -1,44 +1,89 @@
 <?php
 
+use App\QueryserviceNamespace;
+use App\User;
 use App\Wiki;
+use App\WikiDb;
 use App\WikiDomain;
 use App\WikiManager;
 use App\WikiSetting;
+use App\WikiSiteStats;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class WikisSeeder extends Seeder
 {
-    public function run()
+    /**
+     * @param \App\User $user
+     * @param string $name
+     * @param array $stats
+     */
+    private function createWiki($user, $name, $stats)
     {
-        // Just create one for now
-        // TODO this is all done in the WikiController but should probably be factored out so it can be reused...
+        $domain = $name . '.nodomain.example';
+
         $wiki = Wiki::create([
-            'sitename' => 'seededSite',
-            'domain' => 'seededsite.nodomain.dev',
+            'sitename' => $name,
+            'domain' => $domain
         ]);
+
         WikiDomain::create([
-            'domain' => 'seededsite.nodomain.dev',
-            'wiki_id' => $wiki->id,
+            'domain' => $domain,
+            'wiki_id' => $wiki->id
         ]);
-        DB::table('wiki_dbs')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
-        DB::table('queryservice_namespaces')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
-        WikiSetting::create([
-            'wiki_id' => $wiki->id,
-            'name' => 'wgSecretKey',
-            'value' => Str::random(64),
+
+        $index = substr(bin2hex(random_bytes(48)), 0, 10);
+
+        WikiDb::create([
+            'name' => 'mwdb_' . $index,
+            'user' => 'mwu_' . $index,
+            'password' => $index,
+            'version' => Config::get('wbstack.wiki_db_use_version'),
+            'prefix' => 'mwt_' . $index,
+            'wiki_id' => $wiki->id
+        ]);
+
+        QueryserviceNamespace::create([
+            'namespace' => 'qsns_' . $index,
+            'backend' => 'someQueryserviceBackend',
+            'wiki_id' => $wiki->id
         ]);
 
         WikiSetting::create([
-            'wiki_id' => $wiki->id,
+            'name' => 'wgSecretKey',
+            'value' => Str::random(64),
+            'wiki_id' => $wiki->id
+        ]);
+
+        WikiSetting::create([
             'name' => WikiSetting::wwExtEnableElasticSearch,
             'value' => true,
+            'wiki_id' => $wiki->id
         ]);
 
         WikiManager::create([
-            'user_id' => DB::table('users')->where(['email'=>'adamshorland@gmail.com'])->limit(1)->get()->pop()->id,
-            'wiki_id' => $wiki->id,
+            'user_id' => $user->id,
+            'wiki_id' => $wiki->id
         ]);
+
+        WikiSiteStats::create(
+            array_merge($stats, [ 'wiki_id' => $wiki->id ])
+        );
+    }
+
+    public function run()
+    {
+        $email = 'seeder@email.example';
+        $user = User::create([
+            'email' => $email,
+            'password' => Hash::make($email),
+            'verified' => true
+        ]);
+
+        for ($id = 0; $id < 50; $id++) {
+            $this->createWiki($user, 'seededsite-' . $id, [ 'pages' => $id ]);
+        }
     }
 }
