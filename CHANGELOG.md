@@ -1,5 +1,8 @@
 # api
 
+## 10.10.0 - 30 July 2024
+- Add Backend for Entity Import Feature T360031
+
 ## 10x.9.1 - 23 July 2024
 -  Created downloadable metric for deleted wikis, which can only be accessed by users with admin privileges
 - Test the csv output of DeletedWikiMetricsController
