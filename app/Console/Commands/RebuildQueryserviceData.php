@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Constants\MediawikiNamespace;
 use App\Traits;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
@@ -15,10 +16,6 @@ use App\Jobs\SpawnQueryserviceUpdaterJob;
 class RebuildQueryserviceData extends Command
 {
     use Traits\PageFetcher;
-
-    private const NAMESPACE_ITEM = 120;
-    private const NAMESPACE_PROPERTY = 122;
-    private const NAMESPACE_LEXEME = 146;
 
     protected $signature = 'wbs-qs:rebuild {--domain=*} {--chunkSize=50} {--queueName=manual-intervention} {--sparqlUrlFormat=http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql}';
 
@@ -80,8 +77,8 @@ class RebuildQueryserviceData extends Command
 
     private function getEntitiesForWiki (Wiki $wiki): array
     {
-        $items = $this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_ITEM);
-        $properties = $this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_PROPERTY);
+        $items = $this->fetchPagesInNamespace($wiki->domain, MediawikiNamespace::item);
+        $properties = $this->fetchPagesInNamespace($wiki->domain, MediawikiNamespace::property);
 
         $lexemesSetting = WikiSetting::where(
             [
@@ -91,7 +88,7 @@ class RebuildQueryserviceData extends Command
         )->first();
         $hasLexemesEnabled = $lexemesSetting !== null && $lexemesSetting->value === '1';
         $lexemes = $hasLexemesEnabled
-            ? $this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_LEXEME)
+            ? $this->fetchPagesInNamespace($wiki->domain, MediawikiNamespace::lexeme)
             : [];
 
         $merged = array_merge($items, $properties, $lexemes);
