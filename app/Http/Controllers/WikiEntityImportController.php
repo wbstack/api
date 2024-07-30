@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Wiki;
 use App\WikiEntityImport;
-use App\Jobs\WikiEntityImportDummyJob;
+use App\Jobs\WikiEntityImportJob;
 use Carbon\Carbon;
 
 class WikiEntityImportController extends Controller
@@ -30,7 +30,7 @@ class WikiEntityImportController extends Controller
     {
         $validatedInput = $request->validate([
             'wiki' => ['required', 'integer'],
-            'source_wiki_url' => ['required', 'string'],
+            'source_wiki_url' => ['required', 'url'],
             'entity_ids' => ['required', 'string', function (string $attr, mixed $value, \Closure $fail) {
                 $chunks = explode(',', $value);
                 foreach ($chunks as $chunk) {
@@ -66,7 +66,7 @@ class WikiEntityImportController extends Controller
             'payload' => $request->all(),
         ]);
 
-        dispatch(new WikiEntityImportDummyJob(
+        dispatch(new WikiEntityImportJob(
             wikiId: $wiki->id,
             sourceWikiUrl: $validatedInput['source_wiki_url'],
             importId: $import->id,
@@ -83,7 +83,7 @@ class WikiEntityImportController extends Controller
         // access right.
         $validatedInput = $request->validate([
             'wiki_entity_import' => ['required', 'integer'],
-            'status' => ['required', Rule::enum(WikiEntityImportStatus::class)],
+            'status' => ['required', Rule::in([WikiEntityImportStatus::Failed->value, WikiEntityImportStatus::Success->value])],
         ]);
 
         $import = WikiEntityImport::find($validatedInput['wiki_entity_import']);

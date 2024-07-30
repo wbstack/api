@@ -34,4 +34,7 @@ return [
 
     'api_job_namespace' => env('API_JOB_NAMESPACE', env('WBSTACK_API_JOB_NAMESPACE', 'api-jobs')),
     'qs_job_namespace' => env('WBSTACK_QS_JOB_NAMESPACE', 'qs-jobs'),
+
+    'transferbot_image_repo' => env('WBSTACK_TRANSFERBOT_IMAGE_REPO', 'ghcr.io/wbstack/transferbot'),
+    'transferbot_image_version' => env('WBSTACK_TRANSFERBOT_IMAGE_VERSION', '1.0.1'),
 ];
