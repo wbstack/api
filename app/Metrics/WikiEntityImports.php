@@ -21,12 +21,12 @@ class WikiEntityImports implements Exporter
             'wiki_entity_imports_pending',
             'The number of pending Entity imports currently being processed.',
         );
-        $this->successful = $collectorRegistry->getOrRegisterGauge(
+        $this->successful = $collectorRegistry->getOrRegisterCounter(
             config('horizon-exporter.namespace'),
             'wiki_entity_imports_successful',
             'The number of successful Entity import records.',
         );
-        $this->failed = $collectorRegistry->getOrRegisterGauge(
+        $this->failed = $collectorRegistry->getOrRegisterCounter(
             config('horizon-exporter.namespace'),
             'wiki_entity_imports_failed',
             'The number of failed Entity import records.',
@@ -36,14 +36,9 @@ class WikiEntityImports implements Exporter
 
     public function collect()
     {
+        // counters for failed / success are incremented in the HTTP controller
         $this->pending->set(
             WikiEntityImport::where(['status' => WikiEntityImportStatus::Pending])->count()
-        );
-        $this->failed->set(
-            WikiEntityImport::where(['status' => WikiEntityImportStatus::Failed])->count()
-        );
-        $this->successful->set(
-            WikiEntityImport::where(['status' => WikiEntityImportStatus::Success])->count()
         );
     }
 }

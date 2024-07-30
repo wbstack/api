@@ -9,9 +9,26 @@ use App\Wiki;
 use App\WikiEntityImport;
 use App\Jobs\WikiEntityImportJob;
 use Carbon\Carbon;
+use LKDevelopment\HorizonPrometheusExporter\Repository\ExporterRepository;
+use Prometheus\Counter;
 
 class WikiEntityImportController extends Controller
 {
+    private Counter $successfulCounter;
+    private Counter $failedCounter;
+
+    public function __construct()
+    {
+        ExporterRepository::load();
+        $this->successfulCounter = ExporterRepository::getRegistry()->getCounter(
+            config('horizon-exporter.namespace'),
+            'wiki_entity_imports_successful',
+        );
+        $this->failedCounter = ExporterRepository::getRegistry()->getCounter(
+            config('horizon-exporter.namespace'),
+            'wiki_entity_imports_failed',
+        );
+    }
     public function get(Request $request): \Illuminate\Http\JsonResponse
     {
         $validatedInput = $request->validate([
@@ -93,6 +110,13 @@ class WikiEntityImportController extends Controller
 
         if ($import->status !== WikiEntityImportStatus::Pending) {
             abort(400, 'Import has to be pending if updated');
+        }
+
+        if ($validatedInput['status'] === WikiEntityImportStatus::Failed->value) {
+            $this->failedCounter->inc();
+        }
+        if ($validatedInput['status'] === WikiEntityImportStatus::Success->value) {
+            $this->successfulCounter->inc();
         }
 
         $import->update([
