@@ -34,7 +34,6 @@ class Kernel extends HttpKernel
     protected $middlewareAliases = [
         // Came with Laravel
         'auth' => \App\Http\Middleware\Authenticate::class,
-        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
@@ -45,7 +44,7 @@ class Kernel extends HttpKernel
 
         'backend.auth' => \App\Http\Middleware\BackendAuth::class,
         'throttle.signup' => \App\Http\Middleware\ThrottleSignup::class,
-        //'throttle' => App\Http\Middleware\ThrottleRequests::class,
+        'throttle' => \App\Http\Middleware\Throttle::class,
         //'auth' => App\Http\Middleware\Authenticate::class,
     ];
 
