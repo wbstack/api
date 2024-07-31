@@ -36,5 +36,5 @@ return [
     'qs_job_namespace' => env('WBSTACK_QS_JOB_NAMESPACE', 'qs-jobs'),
 
     'transferbot_image_repo' => env('WBSTACK_TRANSFERBOT_IMAGE_REPO', 'ghcr.io/wbstack/transferbot'),
-    'transferbot_image_version' => env('WBSTACK_TRANSFERBOT_IMAGE_VERSION', '1.0.1'),
+    'transferbot_image_version' => env('WBSTACK_TRANSFERBOT_IMAGE_VERSION', '1.1.0'),
 ];

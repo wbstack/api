@@ -1,5 +1,8 @@
 # api
 
+## 10.11.0 - 31 July 2024
+- Bump transferbot image, allow revisioned entity ids in validation
+
 ## 10.10.0 - 30 July 2024
 - Add Backend for Entity Import Feature T360031
 
