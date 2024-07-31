@@ -135,7 +135,7 @@ class EntityImportTest extends TestCase
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
-            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1,P2'])
+            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1,P2,Q1@123'])
             ->assertStatus(200);
 
         $this->assertEquals(1, WikiEntityImport::count());
@@ -154,7 +154,7 @@ class EntityImportTest extends TestCase
             ->assertStatus(422);
 
         $this->assertEquals(0, WikiEntityImport::count());
-        Bus::assertDispatchedTimes(WikiEntityImportDummyJob::class, 0);
+        Bus::assertDispatchedTimes(WikiEntityImportJob::class, 0);
     }
     public function testCreateWhenFailed()
     {

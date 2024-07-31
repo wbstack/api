@@ -34,7 +34,7 @@ class WikiEntityImportController extends Controller
             'entity_ids' => ['required', 'string', function (string $attr, mixed $value, \Closure $fail) {
                 $chunks = explode(',', $value);
                 foreach ($chunks as $chunk) {
-                    if (!preg_match("/^[A-Z]\d+$/", $chunk)) {
+                    if (!preg_match("/^[A-Z]\d+(@\d+)?$/", $chunk)) {
                         $fail("Received unexpected input '{$chunk}' cannot continue.");
                     }
                 }
