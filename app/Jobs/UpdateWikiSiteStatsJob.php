@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Wiki;
 use App\WikiSiteStats;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -73,7 +74,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         });
     }
 
-    private function getFirstEditedDate (Wiki $wiki): ?\Carbon\CarbonInterface
+    private function getFirstEditedDate (Wiki $wiki): ?CarbonInterface
     {
         $allRevisions = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
             getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php',
@@ -111,18 +112,38 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         return Carbon::parse($result);
     }
 
-    private function getLastEditedDate (Wiki $wiki): ?\Carbon\CarbonInterface
+    private function getLastEditedDate (Wiki $wiki): ?CarbonInterface
     {
-        $recentChangesInfo = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
+        $allRevisions = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
             getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php',
             [
                 'action' => 'query',
-                'list' => 'recentchanges',
                 'format' => 'json',
-                'rcexcludeuser' => 'PlatformReservedUser',
+                'list' => 'allrevisions',
+                'formatversion' => 2,
+                'arvlimit' => 1,
+                'arvprop' => 'ids',
+                'arvexcludeuser' => 'PlatformReservedUser',
+                'arvdir' => 'older',
             ],
         );
-        $result = data_get($recentChangesInfo->json(), 'query.recentchanges.0.timestamp');
+        $lastRevision = data_get($allRevisions->json(), 'query.allrevisions.0.revisions.0.revid');
+        if (!$lastRevision) {
+            return null;
+        }
+
+        $revisionInfo = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
+            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php',
+            [
+                'action' => 'query',
+                'format' => 'json',
+                'prop' => 'revisions',
+                'rvprop' => 'timestamp',
+                'formatversion' => 2,
+                'revids' => $lastRevision,
+            ],
+        );
+        $result = data_get($revisionInfo->json(), 'query.pages.0.revisions.0.timestamp');
         if (!$result) {
             return null;
         }
