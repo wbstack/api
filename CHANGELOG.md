@@ -1,9 +1,12 @@
 # api
 
-## 10.11.0 - 31 July 2024
+## 10x.11.1 - 1 August 2024
+- Fix null `payload` field in WikiEntityImport records
+
+## 10x.11.0 - 31 July 2024
 - Bump transferbot image, allow revisioned entity ids in validation
 
-## 10.10.0 - 30 July 2024
+## 10x.10.0 - 30 July 2024
 - Add Backend for Entity Import Feature T360031
 
 ## 10x.9.1 - 23 July 2024
