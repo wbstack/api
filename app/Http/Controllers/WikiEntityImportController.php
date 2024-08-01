@@ -63,7 +63,7 @@ class WikiEntityImportController extends Controller
         $import = $wiki->wikiEntityImports()->create([
             'status' => WikiEntityImportStatus::Pending,
             'started_at' => Carbon::now(),
-            'payload' => $request->all(),
+            'payload' => $validatedInput,
         ]);
 
         dispatch(new WikiEntityImportJob(
