@@ -52,6 +52,21 @@ class UpdateWikiSiteStatsJobTest extends TestCase
         ]);
     }
 
+    private function addFakeEmptyRevisionList($site) {
+        $firstRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer';
+        $this->fakeResponses[$firstRevisionIdUrl][$site] = Http::response([
+            'query' => [
+                'allrevisions' => []
+            ]
+        ]);
+        $lastRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=older';
+        $this->fakeResponses[$lastRevisionIdUrl][$site] = Http::response([
+            'query' => [
+                'allrevisions' => []
+            ]
+        ]);
+    }
+
     private function addFakeFirstRevisionId($site, $id) {
         $firstRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer';
         $this->fakeResponses[$firstRevisionIdUrl][$site] = Http::response([
@@ -263,6 +278,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
+        $mockJob->expects($this->never())->method('markAsFailed');
         $job->handle();
 
         $stats2 = Wiki::with('wikiSiteStats')->where(['domain' => 'incomplete.wikibase.cloud'])->first()->wikiSiteStats()->first();
@@ -271,62 +287,26 @@ class UpdateWikiSiteStatsJobTest extends TestCase
     }
 
     public function testNeverEditedWikiCreatesEmptyLifecycleEvents() {
-
-    }
-
-    public function testWikiWithOnlyFirstEditedTimeIsMarkedAsFailed() {}
-    public function testWikiWithOnlyLastEditedTimeIsMarkedAsFailed() {}
-
-    public function testFailure()
-    {
-        
         Wiki::factory()->create([
-            'domain' => 'that.wikibase.cloud'
-        ]);
-        Wiki::factory()->create([
-            'domain' => 'incomplete.wikibase.cloud'
+            'domain' => 'this.wikibase.cloud'
         ]);
 
-        
-        $this->addFakeSiteStatsResponse(
-            'incomplete.wikibase.cloud',
-            Http::response()
-        );
-
-        $this->addFakeSiteStatsResponse('that.wikibase.cloud', Http::response(['query' => [
-            'statistics' => [
-                'pages' => 1,
-                'articles' => 2,
-                'edits' => 3,
-                'images' => 4,
-                'users' => 5,
-                'activeusers' => 6,
-                'admins' => 7,
-                'jobs' => 8,
-                'cirrussearch-article-words' => 9
-            ]
-        ]]));
-
-        $this->addFakeFirstRevisionId('incomplete.wikibase.cloud', 1);
-        $this->addFakeRevisionTimestamp( 'incomplete.wikibase.cloud', 1, '2023-05-07T21:31:47Z' );
-
+        $this->addFakeSiteStatsResponse('this.wikibase.cloud', Http::response());
+        $this->addFakeEmptyRevisionList('this.wikibase.cloud');
         $this->fakeResponse();
+
 
         $mockJob = $this->createMock(Job::class);
         $job = new UpdateWikiSiteStatsJob();
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
+        $mockJob->expects($this->never())->method('markAsFailed');
         $job->handle();
-
-        $stats1 = Wiki::with('wikiSiteStats')->where(['domain' => 'that.wikibase.cloud'])->first()->wikiSiteStats()->first();
-        $this->assertEquals($stats1['admins'], 7);
-
-        $stats2 = Wiki::with('wikiSiteStats')->where(['domain' => 'incomplete.wikibase.cloud'])->first()->wikiSiteStats()->first();
-        $this->assertEquals($stats2['articles'], 99);
-        $this->assertEquals($stats2['images'], 0);
-        $events2 = Wiki::with('wikiLifecycleEvents')->where(['domain' => 'incomplete.wikibase.cloud'])->first()->wikiLifecycleEvents()->first();
-        $this->assertEquals($events2['first_edited']->toIso8601String(), '2023-05-07T21:31:47+00:00');
-        $this->assertEquals($events2['last_edited'], null);
+        
+        $events = Wiki::with('wikiLifecycleEvents')->where(['domain' => 'this.wikibase.cloud'])->first()->wikiLifecycleEvents()->first();
+        $this->assertNull($events['first_edited']);
+        $this->assertNull($events['last_edited']);
     }
+
 }
