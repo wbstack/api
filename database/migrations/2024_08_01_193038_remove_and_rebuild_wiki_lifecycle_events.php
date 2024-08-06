@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        WikiLifecycleEvents::all()->map->delete();
+        WikiLifecycleEvents::query()->delete();
         (new UpdateWikiSiteStatsJob())->handle();
     }
 
