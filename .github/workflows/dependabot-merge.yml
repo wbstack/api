@@ -1,0 +1,19 @@
+on:
+    pull_request:
+      types: [closed]
+  
+jobs:
+    notify:
+        runs-on: ubuntu-latest
+        if: ${{ github.actor == 'dependabot[bot]' && github.event.pull_request.merged == true }}
+        steps:
+            - name: Create the Mattermost Message
+              env:
+                TITLE: ${{ github.event.pull_request.title }}
+                HTML_LINK: ${{ github.event.pull_request.html_url }}
+              run: |
+                jq -n --arg t "Dependabot merged a pull request: [$TITLE]($HTML_LINK)" '{text: $t}' > mattermost.json
+            - name: Send the Mattermost Message
+              uses: mattermost/action-mattermost-notify@1.1.0
+              env:
+                MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
