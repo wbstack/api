@@ -11,9 +11,6 @@ use App\WikiEntityImportStatus;
 class WikiEntityImports implements Exporter
 {
     protected $pending;
-    protected $successful;
-    protected $failed;
-
     public function metrics(CollectorRegistry $collectorRegistry)
     {
         $this->pending = $collectorRegistry->getOrRegisterGauge(

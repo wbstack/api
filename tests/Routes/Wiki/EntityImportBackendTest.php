@@ -9,8 +9,6 @@ use Tests\TestCase;
 use App\Wiki;
 use App\WikiEntityImport;
 use App\WikiManager;
-use Mockery\MockInterface;
-use Prometheus\CollectorRegistry;
 
 class EntityImportBackendTest extends TestCase
 {
