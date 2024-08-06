@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Wiki;
 use App\WikiSiteStats;
 use Carbon\CarbonInterface;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,7 @@ use Carbon\Carbon;
 
 class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
 {
+    use Dispatchable;
     public $timeout = 3600;
     public function handle (): void
     {

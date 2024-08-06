@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         WikiLifecycleEvents::query()->delete();
-        (new UpdateWikiSiteStatsJob())->handle();
+        UpdateWikiSiteStatsJob::dispatch();
     }
 
     /**
