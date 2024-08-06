@@ -21,16 +21,6 @@ class WikiEntityImports implements Exporter
             'wiki_entity_imports_pending',
             'The number of pending Entity imports currently being processed.',
         );
-        $this->successful = $collectorRegistry->getOrRegisterCounter(
-            config('horizon-exporter.namespace'),
-            'wiki_entity_imports_successful',
-            'The number of successful Entity import records.',
-        );
-        $this->failed = $collectorRegistry->getOrRegisterCounter(
-            config('horizon-exporter.namespace'),
-            'wiki_entity_imports_failed',
-            'The number of failed Entity import records.',
-        );
     }
 
 
