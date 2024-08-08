@@ -24,11 +24,11 @@ class DeleteWikiTest extends TestCase
             ->actingAs($user, 'api')
             ->post(
                 'wiki/delete',
-                ['wiki' => $wiki->id, 'deletionReason' => 'Some reason for deleting my wiki']
+                ['wiki' => $wiki->id, 'deletionReasons' => 'Some reason for deleting my wiki']
             );
         // check response is correct
         $response->assertStatus(200);
-        
+
         $this->assertSame(
             'Some reason for deleting my wiki',
             Wiki::withTrashed()->find($wiki->id)->wiki_deletion_reason

@@ -1,5 +1,8 @@
 # api
 
+## 10x.13.0 - 08 august 2024
+- Fix typo in WikiController and test
+
 ## 10x.12.0 - 8 August 2024
 - Normalise WikiLifecycleEvents
 
@@ -13,7 +16,7 @@
 - Add Backend for Entity Import Feature T360031
 
 ## 10x.9.1 - 23 July 2024
--  Created downloadable metric for deleted wikis, which can only be accessed by users with admin privileges
+- Created downloadable metric for deleted wikis, which can only be accessed by users with admin privileges
 - Test the csv output of DeletedWikiMetricsController
 - Add RefreshDatabase or Skip offending tests where these pollute the deleted wiki list
 

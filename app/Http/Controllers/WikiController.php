@@ -167,7 +167,7 @@ class WikiController extends Controller
 
         $wikiId = $request->input('wiki');
         $userId = $user->id;
-        $wikiDeletionReason = $request->input('deletionReason');
+        $wikiDeletionReason = $request->input('deletionReasons');
 
         // Check that the requesting user manages the wiki
         if (WikiManager::where('user_id', $userId)->where('wiki_id', $wikiId)->count() !== 1) {
