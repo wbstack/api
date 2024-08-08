@@ -17,8 +17,9 @@ FROM php:8.2-apache
 RUN apt-get update \
 	# Needed for the imagick php extension install
 	&& apt-get install -y --no-install-recommends libmagickwand-dev libpq-dev \
-	&& echo "" | pecl install imagick \
+	&& echo "" | pecl install imagick redis \
 	&& docker-php-ext-enable imagick \
+	&& docker-php-ext-enable redis \
 	&& docker-php-ext-configure pcntl --enable-pcntl \
 	&& docker-php-ext-install pcntl \
 	&& docker-php-ext-enable pcntl \

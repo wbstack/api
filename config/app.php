@@ -179,6 +179,7 @@ return [
         App\Providers\KubernetesClientServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\ReCaptchaServiceProvider::class,
+        App\Providers\CollectorRegistryProvider::class,
 
         /*
          * Imported from LUMEN
