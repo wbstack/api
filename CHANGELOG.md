@@ -1,5 +1,8 @@
 # api
 
+## 10x.12.0 - 8 August 2024
+- Normalise WikiLifecycleEvents
+
 ## 10x.11.1 - 1 August 2024
 - Fix null `payload` field in WikiEntityImport records
 
