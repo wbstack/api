@@ -1,5 +1,8 @@
 # api
 
+## 10x.14.0 - 12 August 2024
+- Add Prometheus metrics regarding Entity Import feature
+
 ## 10x.13.0 - 08 august 2024
 - Fix typo in WikiController and test
 
