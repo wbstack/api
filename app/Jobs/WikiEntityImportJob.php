@@ -172,11 +172,11 @@ class TransferBotKubernetesJob
                                     ...$this->creds->marshalEnv(),
                                     [
                                         'name' => 'CALLBACK_ON_FAILURE',
-                                        'value' => 'curl -H "Accept: application/json" -H "Content-Type: application/json" --data \'{"wiki_entity_import":'.$this->importId.',"status":"failed"}\' -XPATCH http://api-app-backend.default.svc.cluster.local/backend/wiki/updateEntityImport'
+                                        'value' => 'curl -sS -H "Accept: application/json" -H "Content-Type: application/json" --data \'{"wiki_entity_import":'.$this->importId.',"status":"failed"}\' -XPATCH http://api-app-backend.default.svc.cluster.local/backend/wiki/updateEntityImport'
                                     ],
                                     [
                                         'name' => 'CALLBACK_ON_SUCCESS',
-                                        'value' => 'curl -H "Accept: application/json" -H "Content-Type: application/json" --data \'{"wiki_entity_import":'.$this->importId.',"status":"success"}\' -XPATCH http://api-app-backend.default.svc.cluster.local/backend/wiki/updateEntityImport'
+                                        'value' => 'curl -sS -H "Accept: application/json" -H "Content-Type: application/json" --data \'{"wiki_entity_import":'.$this->importId.',"status":"success"}\' -XPATCH http://api-app-backend.default.svc.cluster.local/backend/wiki/updateEntityImport'
                                     ],
                                 ],
                                 'command' => [
