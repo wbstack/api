@@ -1,7 +1,8 @@
 # api
 
-## 10x.14.1 - 13 August 2024
+## 10x.14.1 - 14 August 2024
 - Silence curl output for entity import callbacks
+- Make payload field in entity import fillable
 
 ## 10x.14.0 - 12 August 2024
 - Add Prometheus metrics regarding Entity Import feature
