@@ -12,6 +12,7 @@ class WikiEntityImport extends Model
         'status',
         'started_at',
         'finished_at',
+        'payload',
     ];
 
     protected $fillable = self::FIELDS;
@@ -20,5 +21,6 @@ class WikiEntityImport extends Model
 
     protected $casts = [
         'status' => WikiEntityImportStatus::class,
+        'payload' => 'array',
     ];
 }
