@@ -47,10 +47,10 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
             $router->get('entityImport', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiEntityImportController@get']);
             $router->post('entityImport', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiEntityImportController@create']);
         });
+        $router->apiResource('deletedWikiMetrics', 'DeletedWikiMetricsController')->only(['index'])
+            ->middleware(AuthorisedUsersForDeletedWikiMetricsMiddleware::class);
     });
 
     $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
     $router->apiResource('wikiConversionData', 'ConversionMetricController')->only(['index']);
-    $router->apiResource('deletedWikiMetrics', 'DeletedWikiMetricsController')->only(['index'])
-        ->middleware(AuthorisedUsersForDeletedWikiMetricsMiddleware::class);
 });
