@@ -35,12 +35,12 @@ class DeletedWikiMetricsControllerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testRedirectIfUserNotLoggedIn()
+    public function testUnauthorisedStatusIfUserNotLoggedIn()
     {
         $this->createAndDeleteTestWiki('one.wikibase.cloud', 0, '', 1, 2);
         $this->createAndDeleteTestWiki('two.wikibase.cloud', 10, 'Some Reason', 0, 3);
         $response = $this->get($this->route);
-        $response->assertStatus(302);
+        $response->assertStatus(401);
     }
     public function testRedirectIfUserIsLoggedInAsNotAdmin()
     {

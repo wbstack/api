@@ -1,5 +1,8 @@
 # api
 
+## 10x.15.0 - 15 August 2024
+- Fix deleted wiki metrics download
+
 ## 10x.14.1 - 14 August 2024
 - Silence curl output for entity import callbacks
 - Make payload field in entity import fillable
