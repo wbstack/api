@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Wiki;
-use App\WikiManager;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 
@@ -28,8 +27,6 @@ class DeletedWikiMetricsController extends Controller
         fputcsv($handle, [
             'domain_name_for_wiki',
             'wiki_deletion_reason',
-            'number_of_wikibases_owned_by_owners_of_this_wiki',
-            'number_of_entities_for_wiki',
             'number_of_wiki_edits_for_wiki',
             'number_of_wiki_pages_for_wiki',
             'number_of_users_for_wiki',
@@ -49,19 +46,12 @@ class DeletedWikiMetricsController extends Controller
     {
         $output = [];
         foreach ($wikis as $wiki) {
-            $wikiManagers = $wiki->wikiManagers()->get();
-            $usersIds = [];
-            foreach($wikiManagers as $wikiManager) {
-                $usersIds[] = $wikiManager->pivot->user_id;
-            }
-            $allWikiIdsOwnedByAllOwners = WikiManager::whereIn('user_id', $usersIds)->pluck('wiki_id')->all();
             $output[] = [
                 'domain_name_for_wiki' => $wiki->domain,
                 'wiki_deletion_reason' => $wiki->wiki_deletion_reason,
-                'number_of_wikibases_owned_by_owners_of_this_wiki' => count(array_unique($allWikiIdsOwnedByAllOwners)),
-                'number_of_entities_for_wiki' => "No value available for now",
-                'number_of_wiki_pages_for_wiki' => $wiki->wikiSiteStats()->get()['pages'] ?? null,
-                'number_of_users_for_wiki' => $wiki->wikiSiteStats()->get()['úsers'] ?? null,
+                'number_of_wiki_edits_for_wiki' => $wiki->wikiSiteStats()->first()->edits ?? null,
+                'number_of_wiki_pages_for_wiki' => $wiki->wikiSiteStats()->first()->pages ?? null,
+                'number_of_users_for_wiki' => $wiki->wikiSiteStats()->first()->users ?? null,
                 'wiki_creation_time' => $wiki->created_at,
                 'wiki_deletion_time' => $wiki->deleted_at
             ];
