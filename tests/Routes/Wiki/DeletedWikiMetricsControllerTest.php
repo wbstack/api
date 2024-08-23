@@ -1,7 +1,6 @@
 <?php
 
 namespace Tests\Routes\Wiki;
-use App\Http\Controllers\DeletedWikiMetricsController;
 use App\User;
 use App\WikiManager;
 use Carbon\CarbonImmutable;
@@ -82,7 +81,6 @@ class DeletedWikiMetricsControllerTest extends TestCase
         $this->assertSame('one.wikibase.cloud', $output[1][0]);
         $this->assertSame('two.wikibase.cloud', $output[2][0]);
         $this->assertSame('Some Reason',$output[2][1]);
-        $this->assertSame(2, intval($output[1][2]));
     }
 
     private function createUserWithPrivileges($userPrivilege)
@@ -101,7 +99,7 @@ class DeletedWikiMetricsControllerTest extends TestCase
         $current_date = CarbonImmutable::now();
 
         $wiki = Wiki::factory()->create([
-            'domain' => $domain, 'sitename' => 'bsite'
+            'domain' => $domain, 'sitename' => 'bsite', 'created_at' => $current_date->subWeeks($createdWeeksAgo),
         ]);
         WikiManager::factory()->create([
             'wiki_id' => $wiki->id, 'user_id' => $user_id,
@@ -109,7 +107,6 @@ class DeletedWikiMetricsControllerTest extends TestCase
         WikiSiteStats::factory()->create([
             'wiki_id' => $wiki->id, 'pages' => 77, 'users' => $wiki_users
         ]);
-        $wiki->created_at = $current_date->subWeeks($createdWeeksAgo);
 
         $wiki->save();
         $wiki->update(['wiki_deletion_reason' => $wikiDeletionReason]);

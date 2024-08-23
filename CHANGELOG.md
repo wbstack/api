@@ -1,5 +1,8 @@
 # api
 
+## 10x.15.1 - 23 August 2024
+- Fix output in csv file for deleted wiki metrics
+
 ## 10x.15.0 - 15 August 2024
 - Fix deleted wiki metrics download
 
