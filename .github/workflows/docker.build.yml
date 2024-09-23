@@ -12,39 +12,32 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v4
-      -
-        name: Docker meta
+      - name: Docker meta
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v5.5.1
         with:
           images: ghcr.io/${{ github.repository }}
-      -
-        name: Set up QEMU
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-      -
-        name: Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.3.0
-      -
-        name: Cache Docker layers
+      - name: Cache Docker layers
         uses: actions/cache@v4.0.2
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-      -
-        name: Login to GitHub Container Registry
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3.1.0
         if: github.event_name != 'pull_request'
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Build and push
+      - name: Build and push
         uses: docker/build-push-action@v5.3.0
         with:
           context: .
@@ -56,30 +49,26 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
 
-      -
-        name: Check whether wbaas-deploy should be updated
+      - name: Check whether wbaas-deploy should be updated
         id: update-check
         run: |
           if [[ "$GITHUB_REF" =~ ^refs/tags/.+$ ]]; then
               echo "This is a tagged release, will try to create an update in wbaas-deploy."
               echo "match=true" >> $GITHUB_OUTPUT
           fi
-      -
-        name: Check out `wmde/wbaas-deploy` repository in staging child directory
+      - name: Check out `wmde/wbaas-deploy` repository in staging child directory
         if: steps.update-check.outputs.match == 'true'
         uses: actions/checkout@v4
         with:
           repository: wmde/wbaas-deploy
           path: ./repos/wbaas-deploy-staging
-      -
-        name: Check out `wmde/wbaas-deploy` repository in production child directory
+      - name: Check out `wmde/wbaas-deploy` repository in production child directory
         if: steps.update-check.outputs.match == 'true'
         uses: actions/checkout@v4
         with:
           repository: wmde/wbaas-deploy
           path: ./repos/wbaas-deploy-production
-      -
-        name: Update values for local, staging and production
+      - name: Update values for local, staging and production
         if: steps.update-check.outputs.match == 'true'
         id: update-values
         run: |
@@ -88,14 +77,25 @@ jobs:
           sed -i "/image:/{n;s/tag:.*/tag: $TAG/;}" ./repos/wbaas-deploy-staging/k8s/helmfile/env/local/api.values.yaml.gotmpl
           sed -i "/image:/{n;s/tag:.*/tag: $TAG/;}" ./repos/wbaas-deploy-staging/k8s/helmfile/env/staging/api.values.yaml.gotmpl
           sed -i "/image:/{n;s/tag:.*/tag: $TAG/;}" ./repos/wbaas-deploy-production/k8s/helmfile/env/production/api.values.yaml.gotmpl
-      -
-        name: Truncate commit message
+      - name: Update argo values for local, staging and production
+        if: github.event_name != 'pull_request'
+        id: update-argo-values
+        run: |
+          cd ./repos/wbaas-deploy-staging
+          # run generate values script for local from staging folder
+          ./bin/generate-values local api
+          # run generate values script for staging from staging folder
+          ./bin/generate-values staging api
+          # run generate values script for prod from prod folder
+          cd ../wbaas-deploy-production
+          ./bin/generate-values production api
+      - name: Truncate commit message
         if: steps.update-check.outputs.match == 'true'
         id: truncate-commit-message
         run: |
           MSG=$(echo "${{ github.event.head_commit.message }}" | head -n 1)
           echo "msg=$MSG" >> $GITHUB_OUTPUT
-      -
+      - name: Create Staging+Local Pull Request
         uses: peter-evans/create-pull-request@v6
         if: steps.update-check.outputs.match == 'true'
         with:
@@ -111,7 +111,7 @@ jobs:
             This is an automated update for the `api` image in staging and local, using `${{ steps.update-values.outputs.tag }}`.
 
             **Changes**: [${{ steps.truncate-commit-message.outputs.msg }}](https://github.com/wbstack/api/commit/${{ github.sha }})
-      -
+      - name: Create Production Pull Request
         uses: peter-evans/create-pull-request@v6
         if: steps.update-check.outputs.match == 'true'
         with:
