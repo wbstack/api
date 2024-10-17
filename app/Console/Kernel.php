@@ -14,6 +14,7 @@ use App\Jobs\UpdateWikiSiteStatsJob;
 use App\Jobs\SendEmptyWikiNotificationsJob;
 use App\Jobs\CreateQueryserviceBatchesJob;
 use App\Jobs\FailStalledEntityImportsJob;
+use App\Jobs\UpdateQueryserviceAllowList;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -57,6 +58,8 @@ class Kernel extends ConsoleKernel
         $schedule->job(new UpdateWikiSiteStatsJob)->dailyAt('19:00');
 
         $schedule->job(new SendEmptyWikiNotificationsJob)->dailyAt('21:00');
+
+        $schedule->job(new UpdateQueryserviceAllowList)->weeklyOn(Schedule::MONDAY, '01:00');
     }
 
     /**
