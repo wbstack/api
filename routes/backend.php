@@ -14,6 +14,11 @@ $router->get(
     }
 );
 
+$router->group(['prefix' => 'ingress'], function () use ($router) {
+    // GET
+    $router->get('getWikiVersionForDomain', ['uses' => 'IngressController@getWikiVersionForDomain']);
+});
+
 $router->group(['prefix' => 'wiki'], function () use ($router) {
     $router->get('getWikiForDomain', ['uses' => 'WikiController@getWikiForDomain']);
     $router->patch('updateEntityImport', ['uses' => '\App\Http\Controllers\WikiEntityImportController@update']);
