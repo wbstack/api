@@ -1,5 +1,8 @@
 # api
 
+## 10x.16.0 - 28 October 2024
+- Add job for updating Queryservice allowlist
+
 ## 10x.15.1 - 23 August 2024
 - Fix output in csv file for deleted wiki metrics
 
