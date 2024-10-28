@@ -78,7 +78,7 @@ jobs:
           sed -i "/image:/{n;s/tag:.*/tag: $TAG/;}" ./repos/wbaas-deploy-staging/k8s/helmfile/env/staging/api.values.yaml.gotmpl
           sed -i "/image:/{n;s/tag:.*/tag: $TAG/;}" ./repos/wbaas-deploy-production/k8s/helmfile/env/production/api.values.yaml.gotmpl
       - name: Update argo values for local, staging and production
-        if: github.event_name != 'pull_request'
+        if: steps.update-check.outputs.match == 'true'
         id: update-argo-values
         run: |
           cd ./repos/wbaas-deploy-staging
