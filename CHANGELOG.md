@@ -1,5 +1,9 @@
 # api
 
+## 10x.17.0 - 30 October 2024
+- Remove WBStack migration code
+- Introduce namespace enum for mediawiki namespaces
+
 ## 10x.16.0 - 28 October 2024
 - Add job for updating Queryservice allowlist
 
