@@ -2,6 +2,7 @@
 
 namespace Tests\Jobs;
 
+use App\Constants\MediawikiNamespace;
 use App\Helper\MWTimestampHelper;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -111,9 +112,9 @@ class PlatformStatsSummaryJobTest extends TestCase
                 getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                     'query' => [
                         'allpages' => [
-                            ['title' => 'Property:P1', 'namespace' => 122],
-                            ['title' => 'Property:P9', 'namespace' => 122],
-                            ['title' => 'Property:P11', 'namespace' => 122],
+                            ['title' => 'Property:P1', 'namespace' => MediawikiNamespace::property],
+                            ['title' => 'Property:P9', 'namespace' => MediawikiNamespace::property],
+                            ['title' => 'Property:P11', 'namespace' => MediawikiNamespace::property],
                         ],
                     ],
                 ], 200),
@@ -123,21 +124,21 @@ class PlatformStatsSummaryJobTest extends TestCase
                     ],
                     'query' => [
                         'allpages' => [
-                            ['title' => 'Item:Q1', 'namespace' => 120],
-                            ['title' => 'Item:Q2', 'namespace' => 120],
-                            ['title' => 'Item:Q3', 'namespace' => 120],
-                            ['title' => 'Item:Q4', 'namespace' => 120],
-                            ['title' => 'Item:Q5', 'namespace' => 120],
+                            ['title' => 'Item:Q1', 'namespace' => MediawikiNamespace::item],
+                            ['title' => 'Item:Q2', 'namespace' => MediawikiNamespace::item],
+                            ['title' => 'Item:Q3', 'namespace' => MediawikiNamespace::item],
+                            ['title' => 'Item:Q4', 'namespace' => MediawikiNamespace::item],
+                            ['title' => 'Item:Q5', 'namespace' => MediawikiNamespace::item],
                         ],
                     ],
                 ], 200),
                 getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=Q6&aplimit=max&format=json' => Http::response([
                     'query' => [
                         'allpages' => [
-                            ['title' => 'Item:Q6', 'namespace' => 120],
-                            ['title' => 'Item:Q7', 'namespace' => 120],
-                            ['title' => 'Item:Q8', 'namespace' => 120],
-                            ['title' => 'Item:Q9', 'namespace' => 120],
+                            ['title' => 'Item:Q6', 'namespace' => MediawikiNamespace::item],
+                            ['title' => 'Item:Q7', 'namespace' => MediawikiNamespace::item],
+                            ['title' => 'Item:Q8', 'namespace' => MediawikiNamespace::item],
+                            ['title' => 'Item:Q9', 'namespace' => MediawikiNamespace::item],
                         ],
                     ]
                 ], 200)

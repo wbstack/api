@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Constants\MediawikiNamespace;
 use App\Traits;
 use App\Helper\MWTimestampHelper;
 use App\Wiki;
@@ -37,9 +38,6 @@ class PlatformStatsSummaryJob extends Job
     private $creationRateRanges;
 
     private $platformSummaryStatsVersion = "v1";
-
-    private const NAMESPACE_ITEM = 120;
-    private const NAMESPACE_PROPERTY = 122;
 
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
@@ -86,13 +84,13 @@ class PlatformStatsSummaryJob extends Job
 
             //add items and properties counts of the wiki to the corresponded arrays
             try {
-                $nextItemCount = count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_ITEM));
+                $nextItemCount = count($this->fetchPagesInNamespace($wiki->domain, MediawikiNamespace::item));
                 array_push($itemsCount, $nextItemCount);
             } catch (\Exception $ex) {
                 Log::warning("Failed to fetch item count for wiki ".$wiki->domain.", will use 0 instead.");
             }
             try {
-                $nextPropertyCount = count($this->fetchPagesInNamespace($wiki->domain, self::NAMESPACE_PROPERTY));
+                $nextPropertyCount = count($this->fetchPagesInNamespace($wiki->domain, MediawikiNamespace::property));
                 array_push($propertiesCount, $nextPropertyCount);
             } catch (\Exception $ex) {
                 Log::warning("Failed to fetch property count for wiki ".$wiki->domain.", will use 0 instead.");
