@@ -1,5 +1,8 @@
 # api
 
+## 10x.18.0 - 20 November 2024
+- Update email template
+
 ## 10x.17.0 - 30 October 2024
 - Remove WBStack migration code
 - Introduce namespace enum for mediawiki namespaces
