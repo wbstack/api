@@ -58,7 +58,7 @@ class EmptyWikiNotification extends Notification
             ->line(Lang::get('If you’re still planning to use Wikibase for your project but just haven’t gotten around to doing so, no worries -- feel free to ignore this email.'))
             ->line(Lang::get('Are you having trouble getting started? We have some resources that might help:'))
             ->line(new HtmlString('<ul>'))
-            ->line(new HtmlString(Lang::get('<li><a href="https://www.mediawiki.org/wiki/Wikibase/Wikibase.cloud/Initial_setup">Getting started</a></li>')))
+            ->line(new HtmlString(Lang::get('<li><a href="https://www.mediawiki.org/wiki/Wikibase/Wikibase.cloud/First_steps">Getting started</a></li>')))
             ->line(new HtmlString(Lang::get('<li><a href="https://www.mediawiki.org/wiki/Wikibase/Introduction_to_modeling_data">Data modeling</a></li>')))
             ->line(new HtmlString(Lang::get('<li><a href="https://www.wikibase.cloud/discovery">Learn by example</a></li>')))
             ->line(new HtmlString(Lang::get('<li>Get your questions answered: check the <a href="https://www.mediawiki.org/wiki/Wikibase/FAQ">FAQ</a>, <a href="https://www.wikibase.cloud/contact">ask us</a> or ask the community, either on <a href="https://t.me/joinchat/FgqAnxNQYOeAKmyZTIId9g">Telegram</a> or the <a href="https://lists.wikimedia.org/postorius/lists/wikibase-cloud.lists.wikimedia.org/">mailing list</a></li>')))
