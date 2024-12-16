@@ -61,7 +61,7 @@ class EmptyWikiNotification extends Notification
             ->line(new HtmlString(Lang::get('<li><a href="https://www.mediawiki.org/wiki/Wikibase/Wikibase.cloud/First_steps">Getting started</a></li>')))
             ->line(new HtmlString(Lang::get('<li><a href="https://www.mediawiki.org/wiki/Wikibase/Introduction_to_modeling_data">Data modeling</a></li>')))
             ->line(new HtmlString(Lang::get('<li><a href="https://www.wikibase.cloud/discovery">Learn by example</a></li>')))
-            ->line(new HtmlString(Lang::get('<li>Get your questions answered: check the <a href="https://www.mediawiki.org/wiki/Wikibase/FAQ">FAQ</a>, <a href="https://www.wikibase.cloud/contact">ask us</a> or ask the community, either on <a href="https://t.me/joinchat/FgqAnxNQYOeAKmyZTIId9g">Telegram</a> or the <a href="https://lists.wikimedia.org/postorius/lists/wikibase-cloud.lists.wikimedia.org/">mailing list</a></li>')))
+            ->line(new HtmlString(Lang::get('<li>Get your questions answered: check the <a href="https://www.mediawiki.org/wiki/Wikibase/Wikibase.cloud/FAQ">FAQ</a>, <a href="https://www.wikibase.cloud/contact">ask us</a> or ask the community, either on <a href="https://t.me/joinchat/FgqAnxNQYOeAKmyZTIId9g">Telegram</a> or the <a href="https://lists.wikimedia.org/postorius/lists/wikibase-cloud.lists.wikimedia.org/">mailing list</a></li>')))
             ->line(new HtmlString('</ul>'))
             ->line(new HtmlString(Lang::get('Have you reconsidered using Wikibase for this project? We’d love it if you’d <a href="https://www.wikibase.cloud/contact">tell us why</a>. (You can delete your empty Wikibase(s) from your <a href="https://www.wikibase.cloud/dashboard">dashboard</a>.)')))
             ->line(Lang::get('Thanks for using Wikibase Cloud!'));
