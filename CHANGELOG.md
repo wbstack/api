@@ -1,5 +1,8 @@
 # api
 
+## 10x.18.2 - 16 December 2024
+- Update FAQ link in empty wiki notification email
+
 ## 10x.18.1 - 20 November 2024
 - Update Getting Started url in empty wiki notification email
 
