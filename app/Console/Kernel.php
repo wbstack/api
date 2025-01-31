@@ -10,11 +10,13 @@ use App\Jobs\PruneQueryserviceBatchesTable;
 use App\Jobs\RequeuePendingQsBatchesJob;
 use App\Jobs\SandboxCleanupJob;
 use App\Jobs\PollForMediaWikiJobsJob;
+use App\Jobs\UpdateWikiMetricDailyJob;
 use App\Jobs\UpdateWikiSiteStatsJob;
 use App\Jobs\SendEmptyWikiNotificationsJob;
 use App\Jobs\CreateQueryserviceBatchesJob;
 use App\Jobs\FailStalledEntityImportsJob;
 use App\Jobs\UpdateQueryserviceAllowList;
+use App\Wiki;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -60,6 +62,14 @@ class Kernel extends ConsoleKernel
         $schedule->job(new SendEmptyWikiNotificationsJob)->dailyAt('21:00');
 
         $schedule->job(new UpdateQueryserviceAllowList)->weeklyOn(Schedule::MONDAY, '01:00');
+
+        $schedule->call(function () {
+            $wikis = Wiki::all();
+
+            foreach ($wikis as $wiki) {
+                dispatch(new UpdateWikiMetricDailyJob($wiki));
+            }
+        })->dailyAt('23:00');
     }
 
     /**
