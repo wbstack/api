@@ -2,7 +2,10 @@
 
 namespace Jobs;
 
+use App\Jobs\UpdateWikiMetricDailyJob;
 use App\Wiki;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class UpdateWikiMetricDailyJobTest extends TestCase
