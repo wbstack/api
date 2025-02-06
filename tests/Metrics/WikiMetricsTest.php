@@ -1,6 +1,6 @@
 <?php
 
-namespace Metrics;
+namespace Tests\Metrics;
 
 use App\Metrics\App\WikiMetrics;
 use App\Wiki;
@@ -13,6 +13,7 @@ class WikiMetricsTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** @test */
     public function successfullyAddRecords()
     {
         $wiki = Wiki::factory()->create([
