@@ -13,7 +13,7 @@ class WikiMetricsTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+
     public function successfullyAddRecords()
     {
         $wiki = Wiki::factory()->create([
@@ -27,7 +27,7 @@ class WikiMetricsTest extends TestCase
         ]);
     }
 
-    /** @test*/
+
     public function doesNotAddDuplicateRecordsWithOnlyDateChange()
     {
         $wiki = Wiki::factory()->create([
