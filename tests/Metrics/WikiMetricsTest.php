@@ -14,7 +14,7 @@ class WikiMetricsTest extends TestCase
     use RefreshDatabase;
 
 
-    public function successfullyAddRecords()
+    public function testSuccessfullyAddRecords()
     {
         $wiki = Wiki::factory()->create([
             'domain' => 'thisfake.wikibase.cloud'
@@ -28,7 +28,7 @@ class WikiMetricsTest extends TestCase
     }
 
 
-    public function doesNotAddDuplicateRecordsWithOnlyDateChange()
+    public function testDoesNotAddDuplicateRecordsWithOnlyDateChange()
     {
         $wiki = Wiki::factory()->create([
             'domain' => 'thisfake.wikibase.cloud'

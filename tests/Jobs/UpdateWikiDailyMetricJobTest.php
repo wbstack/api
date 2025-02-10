@@ -15,7 +15,7 @@ class UpdateWikiDailyMetricJobTest extends TestCase
     use RefreshDatabase;
 
 
-    public function dispatchJob()
+    public function testDispatchJob()
     {
         Queue::fake();
 
@@ -25,7 +25,7 @@ class UpdateWikiDailyMetricJobTest extends TestCase
     }
 
 
-    public function runJobForAllWikisIncludingDeletedWikis()
+    public function testRunJobForAllWikisIncludingDeletedWikis()
     {
         $activeWiki = Wiki::factory()->create([
             'domain' => 'example.wikibase.cloud',
