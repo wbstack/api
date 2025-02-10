@@ -1,5 +1,11 @@
 # api
 
+
+## 10x.18.3 - 10 February 2024
+- Added new table wiki_daily_metrics
+- Added a new Wiki.php class in the metric folder for wiki related metrics
+- Added a Job scheduled to run daily and update metrics in the wiki_daily_metric table.
+
 ## 10x.18.2 - 16 December 2024
 - Update FAQ link in empty wiki notification email
 
