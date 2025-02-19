@@ -1,7 +1,8 @@
 # api
 
-## 10x.18.4 - 18 February 2025
+## 10x.18.4 - 19 February 2025
 - Fix job definition in UpdateWikiDailyMetricJob class
+- Update actions/cache in github workflow to version 4 to pass CI
 
 ## 10x.18.3 - 10 February 2025
 - Added new table wiki_daily_metrics
