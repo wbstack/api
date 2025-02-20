@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   mediawiki:
-    image: ghcr.io/wbstack/mediawiki:1.39-7.4-20230328-0
+    image: local-wbaas-mediawiki
     volumes:
       - ./maintWikWiki.json:/var/www/html/w/maintWikWiki.json
       - ./new:/var/www/html/w/maintenance/wbaas-api/new
