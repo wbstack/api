@@ -2,9 +2,9 @@
 
 namespace Tests\Jobs\CirrusSearch;
 
+use App\Http\Curl\CurlRequest;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use RuntimeException;
 use Tests\TestCase;
 use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Http\Curl\HttpRequest;
@@ -49,7 +49,7 @@ class ElasticSearchIndexInitTest extends TestCase
         $job->setJob($mockJob);
         $mockJob->expects($this->once())
             ->method('fail');
-        $this->dispatchNow($job);
+        $job->handle(new CurlRequest);
     }
 
     public function testSuccess()
@@ -71,7 +71,7 @@ class ElasticSearchIndexInitTest extends TestCase
         $request->expects($this->once())
             ->method('setOptions')
             ->with([
-                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json',
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json&cluster=all',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 1234,
@@ -145,7 +145,6 @@ class ElasticSearchIndexInitTest extends TestCase
 	 */
     public function testFailure( $request, string $expectedFailure, $mockResponse )
     {
-
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())
                 ->method('fail');

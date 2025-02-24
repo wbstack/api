@@ -12,7 +12,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
  * 
  * Example:
  * 
- * php artisan job:dispatchNow CirrusSearch\\QueueSearchIndexBatches 1
+ * php artisan job:dispatch CirrusSearch\\QueueSearchIndexBatches 1
  */
 class QueueSearchIndexBatches extends CirrusSearchJob
 {
@@ -84,7 +84,7 @@ class QueueSearchIndexBatches extends CirrusSearchJob
         if ( !empty($batches) ) {
             // todo rewrite as batch
             foreach ($batches as $job) {
-                $this->dispatch($job);
+                dispatch($job);
             }
 
         } else {

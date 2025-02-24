@@ -4,21 +4,25 @@ COPY ./composer.json /tmp/src1/composer.json
 COPY ./composer.lock /tmp/src1/composer.lock
 
 WORKDIR /tmp/src1
-RUN composer install --no-dev --no-progress --no-autoloader
+RUN composer install --no-dev --no-progress --no-autoloader --ignore-platform-req=ext-pcntl
 
 COPY ./ /tmp/src2
 RUN cp -r /tmp/src1/vendor /tmp/src2/vendor
 WORKDIR /tmp/src2
-RUN composer install --no-dev --no-progress --optimize-autoloader
+RUN composer install --no-dev --no-progress --optimize-autoloader --ignore-platform-req=ext-pcntl
 
 
-FROM php:7.4-apache
+FROM php:8.2-apache
 
 RUN apt-get update \
 	# Needed for the imagick php extension install
-	&& apt-get install -y --no-install-recommends libmagickwand-dev \
-	&& echo "" | pecl install imagick \
+	&& apt-get install -y --no-install-recommends libmagickwand-dev libpq-dev \
+	&& echo "" | pecl install imagick redis \
 	&& docker-php-ext-enable imagick \
+	&& docker-php-ext-enable redis \
+	&& docker-php-ext-configure pcntl --enable-pcntl \
+	&& docker-php-ext-install pcntl \
+	&& docker-php-ext-enable pcntl \
 	# Obviously needed for mysql connection
 	&& docker-php-ext-install pdo pdo_mysql \
 	# For rewrite rules

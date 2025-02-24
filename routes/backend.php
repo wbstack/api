@@ -3,7 +3,7 @@
 /**
  * This route file is loaded in the RouteServiceProvider optionally when an env var is set.
  * You'll find that service in the Providers directory.
- * @var \Laravel\Lumen\Routing\Router $router
+ * @var Illuminate\Routing\Router $router
  */
 
 // GET
@@ -20,8 +20,8 @@ $router->group(['prefix' => 'ingress'], function () use ($router) {
 });
 
 $router->group(['prefix' => 'wiki'], function () use ($router) {
-    // GET
     $router->get('getWikiForDomain', ['uses' => 'WikiController@getWikiForDomain']);
+    $router->patch('updateEntityImport', ['uses' => '\App\Http\Controllers\WikiEntityImportController@update']);
 });
 
 $router->group(['prefix' => 'event'], function () use ($router) {
@@ -35,5 +35,5 @@ $router->group(['prefix' => 'qs'], function () use ($router) {
     $router->get('getBatches', ['uses' => 'QsController@getBatches']);
     // POST
     $router->post('markDone', ['uses' => 'QsController@markBatchesDone']);
-    $router->post('markFailed', ['uses' => 'QsController@markBatchesFailed']);
+    $router->post('markNotDone', ['uses' => 'QsController@markBatchesNotDone']);
 });

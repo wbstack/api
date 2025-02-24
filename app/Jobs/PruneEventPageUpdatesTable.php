@@ -10,10 +10,10 @@ class PruneEventPageUpdatesTable extends Job
     public function handle(): void
     {
         // Assume that we only need the latest 100k page update events
-        // and delete 100 if there are too many
+        // and delete 500 if there are too many
         EventPageUpdate::where('id', '<', DB::table('event_page_updates')->max('id') - 100000)
             ->orderBy('id', 'ASC')
-            ->take(100)
+            ->take(500)
             ->delete();
     }
 }

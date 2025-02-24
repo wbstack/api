@@ -1,5 +1,339 @@
 # api
 
+
+## 10x.18.3 - 10 February 2025
+- Added new table wiki_daily_metrics
+- Added a new Wiki.php class in the metric folder for wiki related metrics
+- Added a Job scheduled to run daily and update metrics in the wiki_daily_metric table.
+
+## 10x.18.2 - 16 December 2024
+- Update FAQ link in empty wiki notification email
+
+## 10x.18.1 - 20 November 2024
+- Update Getting Started url in empty wiki notification email
+
+## 10x.18.0 - 20 November 2024
+- Update email template
+
+## 10x.17.0 - 30 October 2024
+- Remove WBStack migration code
+- Introduce namespace enum for mediawiki namespaces
+
+## 10x.16.0 - 28 October 2024
+- Add job for updating Queryservice allowlist
+
+## 10x.15.1 - 23 August 2024
+- Fix output in csv file for deleted wiki metrics
+
+## 10x.15.0 - 15 August 2024
+- Fix deleted wiki metrics download
+
+## 10x.14.1 - 14 August 2024
+- Silence curl output for entity import callbacks
+- Make payload field in entity import fillable
+
+## 10x.14.0 - 12 August 2024
+- Add Prometheus metrics regarding Entity Import feature
+
+## 10x.13.0 - 08 august 2024
+- Fix typo in WikiController and test
+
+## 10x.12.0 - 8 August 2024
+- Normalise WikiLifecycleEvents
+
+## 10x.11.1 - 1 August 2024
+- Fix null `payload` field in WikiEntityImport records
+
+## 10x.11.0 - 31 July 2024
+- Bump transferbot image, allow revisioned entity ids in validation
+
+## 10x.10.0 - 30 July 2024
+- Add Backend for Entity Import Feature T360031
+
+## 10x.9.1 - 23 July 2024
+- Created downloadable metric for deleted wikis, which can only be accessed by users with admin privileges
+- Test the csv output of DeletedWikiMetricsController
+- Add RefreshDatabase or Skip offending tests where these pollute the deleted wiki list
+
+## 10x.9.0 - 11 July 2024
+- Prepare saving wiki deletion reasons
+- Add is_admin flag to user table
+
+## 10x.8.6 - 20 June 2024
+- Exclude PlatformReservedUser when looking up last edited date
+
+## 10x.8.5 - 19 June 2024
+- Consider deleted wikis when cleaning up lifecycle events table
+
+## 10x.8.4 - 19 June 2024
+- Enforce per-wiki-uniqueness for WikiLifecycleEvents on database level
+
+## 10x.8.3 - 18 June 2024
+- Fix calculation of first edited date in site stats
+
+## 10x.8.2 - 27 May 2024
+- Fix conversion metrics with duplicate lifecyle events
+
+## 10x.8.1 - 16 May 2024
+- Fix flipped namespace ids in PlatformSummaryStatsJob
+
+## 10x.8.0 - 15 May 2024
+- PlatformSummaryStatsJob adjust metric names
+
+## 10x.7.0 - 14 May 2024
+- Add wiki entities counts to PlatformSummaryJob
+- 
+## 10x.6.0 - 13 May 2024
+- Fix PlatformSummaryStatsJob for inactive wikis again
+
+## 10x.5.0 - 8 May 2024
+- Fix PlatformSummaryStatsJob for inactive wikis
+
+## 10x.4.0 - 6 May 2024
+- Allow cookie based authentication
+
+## 10x.3.0 - 23 April 2024
+- Add job for creating aliases in Elasticsearch
+
+## 10x.2.1 - 17 April 2024
+- Prevent duplicate entries per wiki in wiki_site_stats table
+
+## 10x.2.0 - 8 April 2024
+- Add Prometheus metrics for failed and pending QsBatches
+
+## 10x.1.3 - 2 April 2024
+- Disregard QsBatches without associated wikis in Controller
+
+## 10x.1.2 - 25 March 2024
+- Define default job timeout at class level
+
+## 10x.1.1 - 14 March 2024
+- Declare Horizon configuration stubs for all known environments
+
+## 10x.1.0 - 14 March 2024
+- Use Laravel Horizon to supervise queue workers if enabled T342866
+
+## 10x.0.0 - 26 February 2024
+- Update Laravel to v10.10 - T341797
+  - schedule redis stale tag pruning
+  - refactor: `dispatchNow` was removed
+- Update to PHPUnit v10.5
+- fix: Implemented ForceSearchIndex::uniqueId T358106
+
+## 9x.1.0 - 16 Februrary 2024
+- Switching to PHP 8.2
+
+## 9x.0.3 - 08 February 2024
+- Replace stackdriver package (#731)
+- Update GitHub Actions (#683 #723 #732 #733 #734)
+
+## 9x.0.2 - 07 February 2024
+- Retry DB transactions that lock
+
+## 9x.0.1 - 23 January 2024
+- Fix typo when setting visibility on raw assets
+
+## 9x.0.0 - 23 January 2024
+- Update Laravel to version 9
+
+## 8x.35.1 - 22 January 2024
+- Use S3 driver for accessing static files in GCP buckets, using proper ACLs
+
+## 8x.35.0 - 19 January 2024
+- Use pessimistic DB locks during Query Service Batch transactions
+
+## 8x.34.1 - 18 January 2024
+- Add missing QuestyCaptcha settings to wiki details response
+- Revert "Use S3 driver for accessing static files in GCP buckets"
+
+## 8x.34.0 - 17 January
+- Use S3 driver for accessing static files in GCP buckets
+
+## 8x.33.0 - 03 January 2024
+- Add QuestyCaptcha Setting
+
+## 8x.32.0 - 21 December 2023
+- Update to PHP 8.1
+
+## 8x.31.1 - 18 December 2023
+- Fix namespace lookup for api-jobs
+
+## 8x.31.0 - 14 December 2023
+- Dispatch jobs for rebuilding Queryservice data to non-default queue
+
+## 8x.30.0 - 14 December 2023
+- Allow passing a queue name to the worker
+
+## 8x.29.1 - 13 December 2023
+- Try to fix memory exhaustion issue when running wbs-qs:rebuild command
+
+## 8x.29.0 - 13 December 2023
+- Add command for rebuilding Queryservice data
+
+## 8x.28.11 - 12 December 2023
+- Batches that are done shall never be marked failed
+
+## 8x.28.10 - 29 November 2023
+- Requeueing should not select failed batches
+
+## 8x.28.9 - 28 November 2023
+- Fix error reporting on detecting failed Qs Batches
+
+## 8x.28.8 - 28 November 2023
+- Chunk query for all page update events in QsBatches job
+- Reenable QsBatches job
+
+## 8x.28.7 - 28 November 2023
+- Stub QsBatches job so queued job will proceed
+
+## 8x.28.6 - 28 November 2023
+- Disable QsBatches job as it fails queue
+
+## 8x.28.5 - 28 November 2023
+- Hard increase memory_limit for QsBatches job
+
+## 8x.28.4 - 28 November 2023
+- Increase timeout for QsBatches job
+
+## 8x.28.3 - 28 November 2023
+- Reenable job for creating QsBatches
+
+## 8x.28.2 - 28 November 2023
+- Temporarily disable job for creating QsBatches
+
+## 8x.28.1 - 27 November 2023
+- Do not create QsBatches for deleted wikis, deduplicate IDs (T348256)
+
+## 8x.28.0 - 27 November 2023
+- Limit QsBatch sizes, run batch creation in dedicated job (T348256)
+
+## 8x.27.1 - 20 November 2023
+- Hotfix for functionality added in 8x.27.0 (#686)
+
+## 8x.27.0 - 14 November 2023
+- Add daily execution of empty wiki notifications (T344689)
+
+## 8x.26.0 - 13 November 2023
+- Introduce pending state for QueryService Batches
+
+## 8x.25.7 - 8 November 2023
+- Title column for event_page_update data is now a `text` field
+
+## 8x.25.6 - 25 October 2023
+- Add additional raw info to Conversion Metrics
+
+## 8x.25.5 - 25 October 2023
+- Add Conversion Metrics endpoint
+
+## 8x.25.4 - 25 October 2023
+- Fix response shape in QueryService controller
+
+## 8x.25.3 - 25 October 2023
+- Add support for non-ascii domains
+- Adjust QueryService updater batch order
+
+## 8x.25.2 - 19 October 2023
+- Bump Various Github Actions packages
+  - Should be no-op for container images
+
+## 8x.25.1 - 12 October 2023
+- Do not purge DB connections in Platform Summary Job
+
+## 8x.25.0 - 21 September 2023
+- Collect timestamps for Wikis' Lifecycle
+
+## 8x.24.0 - 19 September 2023
+- Fix local app env #648
+  - Remove MattAllan\LaravelCodeStyle from local_providers
+  - Remove obsolete local check for jobs
+  - Remove unused IdeHelperServiceProvider  
+- Increase EventPageUpdate pruning rate to 250 (from 50) #646
+- Increase QsBatch prune rate to 500 (from 100) #647
+
+## 8x.23.0 - 13 September 2023
+- Remove sign up code requirement when creating account
+
+## 8x.22.2 - 13 September 2023
+- Prevent Laravel IDE helper from being loaded in staging
+
+## 8x.22.1 - 13 September 2023
+- Prevent multiple job invocations from reusing the same K8s client instance
+- fix for using the correct recaptcha config key
+
+## 8x.22.0 - 05 September 2023
+- Remove `albertcht/invisible-recaptcha` package
+- Add validation class App\Rules\RecaptchaValidation for using `google/recaptcha` package
+  - Use it for Register & Contact Controllers via Service Provider
+  - replace application path change for testing with mocking ReCaptcha object
+- Use env var `LOG_LEVEL` to configure stderr log channel (defaults to `info`)
+
+## 8x.21.3 - 30 August 2023
+- Add migration for creating batches table
+- Make batched job batchable
+
+## 8x.21.2 - 29 August 2023
+- Also run PlatformStatsSummaryJob if preceding jobs failed
+
+## 8x.21.1 - 29 August 2023
+- Continue collecting platform stats when single job failed
+
+## 8x.21.0 - 24 August 2023
+- Allow for trusted proxies to be configured
+
+## 8x.20.0 - 23 August 2023
+- Add public /wiki endpoint
+
+## 8x.19.0 - 23 August 2023
+- Add daily job for updating MediaWiki stats on wikis
+
+## 8x.18.0 - 22 August 2023
+- Add WikiSiteStats model for persisting MediaWiki stats for a wiki
+
+## 8x.17.3 - 15 August 2023
+- Respond with proper HTTP status code on backend wiki lookup
+
+## 8x.17.2 - 11 August 2023
+- Update CHANGELOG.md file
+
+## 8x.17.1 - 11 August 2023
+- Reschedule stats collection job to 7AM
+
+## 8x.17.0 - 01 August 2023
+- Support arbitrary number of ElasticSearch clusters
+
+## 8x.16.0 - 27 July 2023
+- Added calling `report()` on for failed jobs to be able to gather them in Stackdriver (#622)
+- Removed `fail()` calls for `MediawikiInit` Job, so it gets retried by the queue (#623)
+- Added configurable backoff setting for failed jobs (#621) 
+
+## 8x.15.1 - 24 July 2023
+- Report Exception instead of logging when throttling account creation
+
+## 8x.15.0 - 13 July 2023
+- Throttle user signup
+
+## 8x.14.0 - 04 July 2023
+- Collect signup and wiki creation rate metrics with platform summary job
+
+## 8x.13.0 - 22 June 2023
+- Force lowercase domain names on wiki creation
+
+## 8x.12.4 - 19 June 2023
+- Reenable work done in polling job
+
+## 8x.12.3 - 19 June 2023
+- Temporary fix: make polling job a no-op so the queue can empty
+- Run polling job less often
+
+## 8x.12.2 - 13 June 2023
+- Make sure job for polling wikis does queue properly
+
+## 8x.12.1 - 12 June 2023
+- Raise timeout values for polling wikis for pending jobs
+
+## 8x.12.0 - 01 June 2023
+- Poll wikis for pending MediaWiki jobs and create Kubernetes jobs to process them if needed
+
 ## 8x.11.1 - 18 April 2023
 - Do not disable elastic search on wikis after a failure
 
@@ -30,7 +364,7 @@
 - Refactor /mine endpoint to include limit, count and wikis
 
 ## 8x.9.6 - 18 August 2022
-- Disable Elasticsearch on wiki creation by default. Make it configurable. 
+- Disable Elasticsearch on wiki creation by default. Make it configurable.
 
 ## 8x.9.5 - 15 August 2022
 - Add active users to PlatformStatsSummaryJob
@@ -73,7 +407,7 @@
 
 ## 8x.8.14 - 17 June 2022
 
-- Bump laravel/framework from 8.80.0 to 8.83.16 
+- Bump laravel/framework from 8.80.0 to 8.83.16
 
 ## 8x.8.13 - 17 June 2022
 
@@ -91,7 +425,7 @@
 
 - Bump `phpunit/phpunit` from 9.5.13 to 9.5.20
 
-## 8x.8.9 - 13 June 
+## 8x.8.9 - 13 June
 
 - Bump `fakerphp/faker` from 1.18.0 to 1.19.0
 

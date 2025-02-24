@@ -10,22 +10,27 @@ class WikiController extends Controller
 {
     private static $with = ['wikiDb', 'wikiQueryserviceNamespace', 'settings'];
 
-    public function getWikiForDomain(Request $request): \Illuminate\Http\Response
+    public function getWikiForDomain(Request $request): \Illuminate\Http\JsonResponse
     {
         $domain = $request->input('domain');
 
         // XXX: this same logic is in quickstatements.php and platform api WikiController backend
-
-        if ($domain === 'localhost' || $domain === 'mediawiki') {
-            // If just using localhost then just get the first undeleted wiki
-            $result = Wiki::with(self::$with)->first();
-        } else {
-            // TODO don't select the timestamps and redundant info for the settings?
-            $result = Wiki::where('domain', $domain)->with(self::$with)->first();
+        try {
+            if ($domain === 'localhost' || $domain === 'mediawiki') {
+                // If just using localhost then just get the first undeleted wiki
+                $result = Wiki::with(self::$with)->first();
+            } else {
+                // TODO don't select the timestamps and redundant info for the settings?
+                $result = Wiki::where('domain', $domain)->with(self::$with)->first();
+            }
+        } catch (\Exception $ex) {
+            return response()->json($ex->getMessage(), 500);
         }
 
-        $res['data'] = $result;
+        if (!$result) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
 
-        return response($res);
+        return response()->json(['data' => $result], 200);
     }
 }

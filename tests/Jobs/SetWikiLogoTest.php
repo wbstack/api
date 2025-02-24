@@ -14,7 +14,6 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Tests\TestCase;
-use Psalm\Type\Union;
 
 class SetWikiLogoTest extends TestCase
 {
@@ -28,7 +27,7 @@ class SetWikiLogoTest extends TestCase
         $job->setJob($mockJob);
         $mockJob->expects($this->once())
             ->method('fail');
-        $this->dispatchNow($job);
+        $job->handle();
     }
 
     private function assertJobSucceeds(string $wikiKey, string $wikiValue, string $logoPath)
@@ -38,7 +37,7 @@ class SetWikiLogoTest extends TestCase
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
-        $this->dispatchNow($job);
+        $job->handle();
     }
 
     /**
@@ -46,7 +45,7 @@ class SetWikiLogoTest extends TestCase
      */
     public function testSetLogoFails($wikiKey, $wikiValue, $logoPath)
     {
-        $storage = Storage::fake('gcs-public-static');
+        $storage = Storage::fake('static-assets');
         $this->assertJobFails($wikiKey, $wikiValue, $logoPath);
 
         if ($wikiKey === 'id') {
@@ -66,7 +65,7 @@ class SetWikiLogoTest extends TestCase
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         // $wiki = Wiki::firstWhere($wikiKey, $wikiValue);
-        $storage = Storage::fake('gcs-public-static');
+        $storage = Storage::fake('static-assets');
         $logoDir = Wiki::getLogosDirectory($wiki->id);
 
         // get the previous logo and favicon settings
@@ -108,14 +107,14 @@ class SetWikiLogoTest extends TestCase
         $this->assertStringEndsWith($logoDir . '/64.ico', $currentFaviconSettingURL['path']);
     }
 
-    public function validProvider()
+    static public function validProvider()
     {
         # $wikiKey, $wikiValue, $logoPath
         yield ['id', 42, __DIR__ . "/../data/logo_200x200.png"];
         yield ['domain', 'example.test.dev', __DIR__ . "/../data/logo_200x200.png"];
     }
 
-    public function invalidProvider()
+    static public function invalidProvider()
     {
         # $wikiKey, $wikiValue, $logoPath
         yield "id doesn't exist" => ['id', 999, __DIR__ . "/../data/logo_200x200.png"];

@@ -7,6 +7,7 @@ use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
+use App\Jobs\ElasticSearchAliasInit;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
 use App\Helper\DomainValidator;
+use App\Helper\DomainHelper;
 
 class WikiController extends Controller
 {
@@ -31,9 +33,21 @@ class WikiController extends Controller
 
     public function create(Request $request): \Illuminate\Http\Response
     {
+        $clusterWithoutSharedIndex = Config::get('wbstack.elasticsearch_cluster_without_shared_index');
+        $sharedIndexHost = Config::get('wbstack.elasticsearch_shared_index_host');
+        $sharedIndexPrefix = Config::get('wbstack.elasticsearch_shared_index_prefix');
+
+        if (Config::get('wbstack.elasticsearch_enabled_by_default')) {
+            if (!$clusterWithoutSharedIndex && !($sharedIndexHost && $sharedIndexPrefix)) {
+                abort(503, 'Search enabled, but its configuration is invalid');
+            }
+        }
+
         $user = $request->user();
-        $submittedDomain = $request->input('domain');
-        
+
+        $submittedDomain = strtolower($request->input('domain'));
+        $submittedDomain = DomainHelper::encode($submittedDomain);
+
         $validator = $this->domainValidator->validate( $submittedDomain );
         $isSubdomain = $this->isSubDomain($submittedDomain);
 
@@ -49,7 +63,7 @@ class WikiController extends Controller
         $dbAssignment = null;
 
         // TODO create with some sort of owner etc?
-        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain) {
+        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain, $submittedDomain) {
             $dbVersion = Config::get('wbstack.wiki_db_use_version');
             $wikiDbCondition = ['wiki_id'=>null, 'version'=>$dbVersion];
 
@@ -65,12 +79,12 @@ class WikiController extends Controller
             $maxWikis = config('wbstack.wiki_max_per_user');
 
             if ( config('wbstack.wiki_max_per_user') !== false && $numWikis > config('wbstack.wiki_max_per_user')) {
-                abort(403, "Too many wikis. Your new total of {$numWikis} would exceed the limit of ${maxWikis} per user.");
+                abort(403, "Too many wikis. Your new total of {$numWikis} would exceed the limit of {$maxWikis} per user.");
             }
 
             $wiki = Wiki::create([
                 'sitename' => $request->input('sitename'),
-                'domain' => strtolower($request->input('domain')),
+                'domain'   => $submittedDomain,
             ]);
 
             // Assign storage
@@ -110,29 +124,27 @@ class WikiController extends Controller
               'wiki_id' => $wiki->id,
             ]);
 
-            // If we are local, the dev environment wont be able to run these jobs yet, so end this closure early.
-            // TODO maybe send different jobs instead? or do this in the jobs?
-            if (App::environment() === 'local') {
-                return;
-            }
-
             // TODO maybe always make these run in a certain order..?
-            $this->dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
+            dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
             // Only dispatch a job to add a k8s ingress IF we are using a custom domain...
             if (! $isSubdomain) {
-                $this->dispatch(new KubernetesIngressCreate($wiki->id, $wiki->domain));
+                dispatch(new KubernetesIngressCreate($wiki->id, $wiki->domain));
             }
         });
 
-
         // dispatch elasticsearch init job to enable the feature
-        if ( Config::get('wbstack.elasticsearch_enabled_by_default') ) {
-            $this->dispatch(new ElasticSearchIndexInit($wiki->id));
+        if (Config::get('wbstack.elasticsearch_enabled_by_default')) {
+            if ($clusterWithoutSharedIndex) {
+                dispatch(new ElasticSearchIndexInit($wiki->id, $clusterWithoutSharedIndex));
+            }
+            if ($sharedIndexHost && $sharedIndexPrefix) {
+                dispatch(new ElasticSearchAliasInit($wiki->id));
+            }
         }
-        
+
         // opportunistic dispatching of jobs to make sure storage pools are topped up
-        $this->dispatch(new ProvisionWikiDbJob(null, null, 10));
-        $this->dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
+        dispatch(new ProvisionWikiDbJob(null, null, 10));
+        dispatch(new ProvisionQueryserviceNamespaceJob(null, 10));
 
         $res['success'] = true;
         $res['message'] = 'Success!';
@@ -155,18 +167,24 @@ class WikiController extends Controller
 
         $wikiId = $request->input('wiki');
         $userId = $user->id;
+        $wikiDeletionReason = $request->input('deletionReasons');
 
         // Check that the requesting user manages the wiki
         if (WikiManager::where('user_id', $userId)->where('wiki_id', $wikiId)->count() !== 1) {
             // The deletion was requested by a user that does not manage the wiki
             return response()->json('Unauthorized', 401);
         }
+        $wiki = Wiki::find($wikiId);
 
+        if(isset($wikiDeletionReason)){
+            //Save the wiki deletion reason
+            $wiki->update(['wiki_deletion_reason' => $wikiDeletionReason]);
+        }
         // Delete the wiki
-        Wiki::find($wikiId)->delete();
+        $wiki->delete();
 
         // Return a success
-        return response()->json('Success', 200);
+        return response()->json("Success", 200);
     }
 
     // TODO should this just be get wiki?
@@ -191,8 +209,10 @@ class WikiController extends Controller
       ->with('wikiDbVersion')
       ->with('publicSettings')->first();
 
-        $res['success'] = true;
-        $res['data'] = $wiki;
+        $res = [
+            'success' => true,
+            'data'    => $wiki,
+        ];
 
         return response($res);
     }

@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Helper\DomainHelper;
 
 /**
  * App\Wiki.
@@ -49,10 +50,22 @@ class Wiki extends Model
     protected $fillable = [
         'sitename',
         'domain',
+        'description',
+        'is_featured',
+        'wiki_deletion_reason',
     ];
 
-    protected $dates = [
-        'deleted_at',
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'domain_decoded',
+    ];
+
+    protected $casts = [
+        'deleted_at' => 'datetime',
     ];
 
     public function wikiDbVersion()
@@ -73,6 +86,26 @@ class Wiki extends Model
     public function wikiDb(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(WikiDb::class);
+    }
+
+    public function wikiSiteStats(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(WikiSiteStats::class);
+    }
+
+    public function wikiLifecycleEvents(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(WikiLifecycleEvents::class);
+    }
+
+    public function wikiNotificationSentRecords(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(WikiNotificationSentRecord::class);
+    }
+
+    public function wikiEntityImports(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(WikiEntityImport::class);
     }
 
     /**
@@ -111,6 +144,8 @@ class Wiki extends Model
             'wwWikibaseStringLengthMultilang',
             'wikibaseFedPropsEnable',
             'wikibaseManifestEquivEntities',
+            'wwUseQuestyCaptcha',
+            'wwCaptchaQuestions',
         ]
     );
     }
@@ -137,5 +172,14 @@ class Wiki extends Model
     public static function getSiteDirectory( int $wiki_id ): string {
         $siteDir = md5($wiki_id.md5($wiki_id));
         return 'sites/'.$siteDir;
+    }
+
+    /**
+     * Convert the IDN formatted domain name to it's Unicode representation.
+     *
+     * @return string
+     */
+    public function getDomainDecodedAttribute(): string {
+        return DomainHelper::decode($this->domain);
     }
 }

@@ -52,7 +52,7 @@ class SettingUpdateTest extends TestCase
           ->assertStatus(401);
     }
 
-    public function provideValidSettings()
+    static public function provideValidSettings()
     {
         yield ['wgDefaultSkin', 'vector', 'vector'];
         yield ['wwExtEnableConfirmAccount', '1', '1'];
@@ -71,6 +71,15 @@ class SettingUpdateTest extends TestCase
 
         $validProps = json_encode(['properties' => ['P31' => 'P1'], 'items' => ['Q1' => 'Q1']]);
         yield ['wikibaseManifestEquivEntities', $validProps, $validProps];
+
+        yield ['wwUseQuestyCaptcha', '1', '1'];
+        yield ['wwUseQuestyCaptcha', '0', '0'];
+        $validCaptchaQuestions = json_encode([
+            "How many vowels are in this question?" => ['12', 'twelve'],
+            "What is the chemical formula of water" => ['H2O'],
+            "2 + 4 = ?" => ['6', 'six']
+        ]);
+        yield ['wwCaptchaQuestions', $validCaptchaQuestions, $validCaptchaQuestions ];
     }
 
     /**
@@ -96,7 +105,7 @@ class SettingUpdateTest extends TestCase
           );
     }
 
-    public function provideValidSettingsBadValues()
+    static public function provideValidSettingsBadValues()
     {
         yield ['wgDefaultSkin', 'foo'];
         yield ['wwExtEnableConfirmAccount', 'foo'];
@@ -118,6 +127,26 @@ class SettingUpdateTest extends TestCase
         yield ['wikibaseManifestEquivEntities', json_encode(['properties' => ['P1' => 'P2'], 'items' => ['P10' => 'Q2']])];
         // all entities should be of the same type
         yield ['wikibaseManifestEquivEntities', json_encode(['properties' => ['P1' => 'P2'], 'items' => ['Q2' => 'Q2', 'P2' => 'P2']])];
+        // no answers
+        yield ['wwCaptchaQuestions', json_encode([
+            "How many vowels are in this question?" => []
+        ])];
+        // Question too long
+        yield ['wwCaptchaQuestions', json_encode([
+            "How many vowels are in this question?How many vowels are in this question?
+            How many vowels are in this question?How many vowels are in this question?
+            How many vowels are in this question?How many vowels are in this question?
+            How many vowels are in this question?How many vowels are in this question?" => ['12', 'twelve']
+        ])];
+        // Answer too long
+        yield ['wwCaptchaQuestions', json_encode([
+            "Is this too long?" => [
+                "LongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswer
+                LongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswer
+                LongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswer
+                LongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswer"
+            ]
+        ])];
     }
 
     /**

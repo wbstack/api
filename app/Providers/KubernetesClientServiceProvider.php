@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Maclof\Kubernetes\Client;
-use Http\Adapter\Guzzle6\Client as Guzzle6Client;
+use Http\Adapter\Guzzle7\Client as GuzzleClient;
 
 class KubernetesClientServiceProvider extends ServiceProvider
 {
@@ -15,8 +15,8 @@ class KubernetesClientServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(Client::class , function ($app) {
-            $httpClient = Guzzle6Client::createWithConfig([
+        $this->app->bind(Client::class , function ($app) {
+            $httpClient = GuzzleClient::createWithConfig([
                 'verify' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
             ]);
 

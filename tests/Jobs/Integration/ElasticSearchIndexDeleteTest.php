@@ -16,13 +16,13 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Facades\Config;
 
 /**
- * This is only meant to run when services is started with 
+ * This is only meant to run when services is started with
  * additional services from docker-compose.integration.yml
- * 
+ *
  * Delete all local indices:
- * 
+ *
  * curl -X DELETE "localhost:9200/*?pretty"
- * 
+ *
  * Example: docker-compose exec -e RUN_PHPUNIT_INTEGRATION_TEST=1 -e ELASTICSEARCH_HOST=elasticsearch.svc:9200 -T api vendor/bin/phpunit tests/Jobs/Integration/ElasticSearchIndexDeleteTest.php
  */
 class ElasticSearchIndexDeleteTest extends TestCase
@@ -36,7 +36,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
     public function makeRequest( $url, $method = 'GET' ) {
         // create some dummy index
         $curlRequest = new CurlRequest();
-        $curlRequest->setOptions( 
+        $curlRequest->setOptions(
             [
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
@@ -54,7 +54,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
             var_dump($err);
         }
         $curlRequest->close();
-        
+
         return json_decode($response, true);
     }
 
@@ -64,10 +64,10 @@ class ElasticSearchIndexDeleteTest extends TestCase
             $this->markTestSkipped('No blazegraph instance to connect to');
         }
 
-        $ELASTICSEARCH_HOST=Config::get('wbstack.elasticsearch_host');
+        $ELASTICSEARCH_HOST = data_get(Config::get('wbstack.elasticsearch_hosts'), 0);
 
         if ( !$ELASTICSEARCH_HOST ) {
-            throw new \Exception('ELASTICSEARCH_HOST / wbstack.elasticsearch_host not set');
+            throw new \Exception('ELASTICSEARCH_HOST / wbstack.elasticsearch_hosts not set');
         }
 
 
@@ -101,7 +101,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
         $mockJob->expects($this->never())->method('fail');
         $job = new ElasticSearchIndexDelete( $this->wiki->id);
         $job->setJob($mockJob);
-        $this->dispatchNow($job);
+        $this->dispatchSync($job);
 
         // feature should get disabled
         $this->assertNull( WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->first());

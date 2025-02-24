@@ -7,6 +7,7 @@ use App\Http\Curl\HttpRequest;
 use App\Wiki;
 use App\Helper\ElasticSearchHelper;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 
 class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
 {
@@ -59,63 +60,66 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique
             $setting->update( [  'value' => false  ] );
             return;
         }
-        
+
         $elasticSearchBaseName = $wikiDB->name;
-        $elasticSearchHost = Config::get('wbstack.elasticsearch_host');
-        
-        if( !$elasticSearchHost ) {
-            $this->fail( new \RuntimeException('wbstack.elasticsearch_host not configured') );
+        $elasticSearchHosts = Config::get('wbstack.elasticsearch_hosts');
+
+        if (empty($elasticSearchHosts)) {
+            $this->fail( new \RuntimeException('No ElasticSearch hosts were configured, cannot continue.') );
             return;
         }
-        try{
-            $elasticSearchHelper = new ElasticSearchHelper($elasticSearchHost, $elasticSearchBaseName);
 
-            // Not having any indices to remove should not fail the job
-            if( !$elasticSearchHelper->hasIndices($request) ) {
-                $setting->update( [  'value' => false  ] );
-                return;
+        foreach ($elasticSearchHosts as $elasticSearchHost) {
+            try {
+                $elasticSearchHelper = new ElasticSearchHelper($elasticSearchHost, $elasticSearchBaseName);
+
+                // Not having any indices to remove should not fail the job
+                if( !$elasticSearchHelper->hasIndices($request) ) {
+                    $setting->update( [  'value' => false  ] );
+                    continue;
+                }
+            } catch (\RuntimeException $exception) {
+                $this->fail($exception);
+                continue;
             }
-        } catch(\RuntimeException $exception) {
-            $this->fail($exception);
-            return;
+
+
+            // So there are some indices to delete for the wiki
+            //
+            // make a request to the elasticsearch cluster using DELETE
+            // use cirrusSearch baseName to delete indices
+            $url = $elasticSearchHost."/{$elasticSearchBaseName}*";
+
+            $request->reset();
+
+            $request->setOptions(
+                [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_TIMEOUT => getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_DELETE_DELETE') ?: 60,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'DELETE',
+                ]
+            );
+
+            $rawResponse = $request->execute();
+            $err = $request->error();
+            $request->close();
+
+            if ($err) {
+                $this->fail( new \RuntimeException('curl error for '.$this->wikiId.': '.$err) );
+                continue;
+            }
+
+            $response = json_decode($rawResponse, true);
+
+            if ( !is_array($response) || !array_key_exists('acknowledged', $response) || $response['acknowledged'] !== true) {
+                $this->fail( new \RuntimeException('ElasticSearchIndexDelete job for '.$this->wikiId.' was not successful: '.$rawResponse) );
+                continue;
+            }
+
+            $setting->update( [  'value' => false ] );
         }
-
-
-        // So there are some indices to delete for the wiki
-        //
-        // make a request to the elasticsearch cluster using DELETE
-        // use cirrusSearch baseName to delete indices
-        $url = $elasticSearchHost."/{$elasticSearchBaseName}*";
-
-        $request->reset();
-
-        $request->setOptions( 
-            [
-                CURLOPT_URL => $url,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_TIMEOUT => getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_DELETE_DELETE') ?: 60,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'DELETE',
-            ]
-        );
-
-        $rawResponse = $request->execute();
-        $err = $request->error();
-        $request->close();
-
-        if ($err ) {
-            $this->fail( new \RuntimeException('curl error for '.$this->wikiId.': '.$err) );
-            return;
-        }
-
-        $response = json_decode($rawResponse, true);
-
-        if ( !is_array($response) || !array_key_exists('acknowledged', $response) || $response['acknowledged'] !== true) {
-            $this->fail( new \RuntimeException('ElasticSearchIndexDelete job for '.$this->wikiId.' was not successful: '.$rawResponse) );
-            return;
-        }
-
-        $setting->update( [  'value' => false ] );
     }
 }

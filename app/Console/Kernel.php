@@ -7,12 +7,18 @@ use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\PruneEventPageUpdatesTable;
 use App\Jobs\PruneQueryserviceBatchesTable;
+use App\Jobs\RequeuePendingQsBatchesJob;
 use App\Jobs\SandboxCleanupJob;
+use App\Jobs\PollForMediaWikiJobsJob;
+use App\Jobs\UpdateWikiDailyMetricJob;
+use App\Jobs\UpdateWikiSiteStatsJob;
+use App\Jobs\SendEmptyWikiNotificationsJob;
+use App\Jobs\CreateQueryserviceBatchesJob;
+use App\Jobs\FailStalledEntityImportsJob;
+use App\Jobs\UpdateQueryserviceAllowList;
+use App\Wiki;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use App\Jobs\PlatformStatsSummaryJob;
-use App\Wiki;
-use App\Jobs\SiteStatsUpdateJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -20,9 +26,8 @@ class Kernel extends ConsoleKernel
      * Define the application's command schedule.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
      */
-    protected function schedule(Schedule $schedule)
+    protected function schedule(Schedule $schedule): void
     {
         // Make sure that the DB and QS pools are always populated somewhat.
         // This will create at most 1 new entry for each per minute...
@@ -35,6 +40,9 @@ class Kernel extends ConsoleKernel
         $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
         $schedule->job(new PruneEventPageUpdatesTable)->everyFifteenMinutes();
         $schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes();
+        $schedule->job(new CreateQueryserviceBatchesJob)->everyMinute();
+        $schedule->job(new RequeuePendingQsBatchesJob)->everyFifteenMinutes();
+        $schedule->job(new FailStalledEntityImportsJob)->hourly();
 
         // Sandbox
         // TODO this should maybe only be run when sandbox as a whole is loaded?
@@ -42,15 +50,27 @@ class Kernel extends ConsoleKernel
         $schedule->job(new SandboxCleanupJob)->everyFifteenMinutes();
 
         // Schedule site stat updates for each wiki and platform-summary
-        $schedule->command('schedule:stats')->daily();
+        $schedule->command('schedule:stats')->dailyAt('7:00');
+
+        // https://laravel.com/docs/10.x/upgrade#redis-cache-tags
+        $schedule->command('cache:prune-stale-tags')->hourly();
+
+        $schedule->job(new PollForMediaWikiJobsJob)->everyFifteenMinutes();
+
+        $schedule->job(new UpdateWikiSiteStatsJob)->dailyAt('19:00');
+
+        $schedule->job(new SendEmptyWikiNotificationsJob)->dailyAt('21:00');
+
+        $schedule->job(new UpdateWikiDailyMetricJob)->dailyAt('23:00');
+
+        $schedule->job(new UpdateQueryserviceAllowList)->weeklyOn(Schedule::MONDAY, '01:00');
+
     }
 
     /**
      * Register the commands for the application.
-     *
-     * @return void
      */
-    protected function commands()
+    protected function commands(): void
     {
         $this->load(__DIR__.'/Commands');
         $this->load(__DIR__.'/Commands/User');

@@ -6,6 +6,17 @@ use Illuminate\Support\Facades\Log;
 
 class ElasticSearchIndexInit extends CirrusSearchJob
 {
+    private $cluster;
+
+    public function __construct( int $wikiId, string $cluster = 'all' ) {
+        $this->cluster = $cluster;
+        parent::__construct( $wikiId );
+    }
+
+    public function cluster(): string {
+        return $this->cluster;
+    }
+
     function apiModule(): string {
         return 'wbstackElasticSearchInit';
     }
@@ -45,5 +56,9 @@ class ElasticSearchIndexInit extends CirrusSearchJob
     protected function getRequestTimeout(): int {
         return getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT') !== false
             ? intval(getenv('CURLOPT_TIMEOUT_ELASTICSEARCH_INIT')) : parent::getRequestTimeout();
+    }
+
+    protected function getQueryParams() {
+        return parent::getQueryParams() . '&cluster=' . $this->cluster;
     }
 }

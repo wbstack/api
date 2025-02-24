@@ -12,8 +12,8 @@ use Illuminate\Filesystem\FilesystemAdapter;
 
 /**
  * This can be run with the artisan job command, for example:
- * php artisan job:dispatchNow SetWikiLogo domain wiki.addshore.com /path/to/logo.png
- * php artisan job:dispatchNow SetWikiLogo id 1234 /path/to/logo.png
+ * php artisan job:dispatch SetWikiLogo domain wiki.addshore.com /path/to/logo.png
+ * php artisan job:dispatch SetWikiLogo id 1234 /path/to/logo.png
  *
  * NOTE: This job needs to be run as the correct user if run via artisan (instead of via the UI)
  */
@@ -55,7 +55,7 @@ class SetWikiLogo extends Job
         $wiki = $wikis->first();
 
         // Get the cloud disk we use to store logos
-        $storage = Storage::disk('gcs-public-static');
+        $storage = Storage::disk('static-assets');
         if (!$storage instanceof FilesystemAdapter) {
             # TODO: Use a more specific exception?
             $this->fail(new \RuntimeException("Invalid storage (not cloud)"));
@@ -66,7 +66,7 @@ class SetWikiLogo extends Job
         $logosDir = Wiki::getLogosDirectory($wiki->id);
 
         // Upload the local image to the cloud storage
-        $storage->putFileAs($logosDir, new File($this->logoPath), "raw.png");
+        $storage->putFileAs($logosDir, new File($this->logoPath), "raw.png", ['visibility' => 'public']);
 
         // Store a conversion for the actual site logo
         $reducedPath = $logosDir . '/135.png';
@@ -75,7 +75,8 @@ class SetWikiLogo extends Job
         }
         $storage->writeStream(
             $reducedPath,
-            Image::make($this->logoPath)->resize(135, 135)->stream()->detach()
+            Image::make($this->logoPath)->resize(135, 135)->stream()->detach(),
+            ['visibility' => 'public'],
         );
 
         // Store a conversion for the favicon
@@ -85,7 +86,8 @@ class SetWikiLogo extends Job
         }
         $storage->writeStream(
             $faviconPath,
-            Image::make($this->logoPath)->resize(64, 64)->stream()->detach()
+            Image::make($this->logoPath)->resize(64, 64)->stream()->detach(),
+            ['visibility' => 'public'],
         );
 
         // Get the urls

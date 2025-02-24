@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\InvitationDeleteJob;
 use App\Jobs\UserCreateJob;
 use App\Jobs\UserVerificationCreateTokenAndSendJob;
-use App\User;
+use App\Rules\ReCaptchaValidation;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +15,15 @@ use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
+    /**
+     * @var \App\Rules\ReCaptchaValidation
+     */
+    protected $recaptchaValidation;
+
+    public function __construct(ReCaptchaValidation $recaptchaValidation) {
+        $this->recaptchaValidation = $recaptchaValidation;
+    }
+
     /**
      * Handle a registration request for the application.
      *
@@ -31,9 +40,6 @@ class RegisterController extends Controller
             $request->input('email'),
             $request->input('password')
           ))->handle();
-            if ($request->input('invite')) {
-                ( new InvitationDeleteJob($request->input('invite')) )->handle();
-            }
             (UserVerificationCreateTokenAndSendJob::newForAccountCreation($user))->handle();
         });
 
@@ -44,6 +50,9 @@ class RegisterController extends Controller
 
         event(new Registered($user));
 
+        /**
+         * @psalm-suppress UndefinedInterfaceMethod
+         */
         Auth::guard()->login($user);
 
         // HTTP Response
@@ -63,31 +72,10 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         $validation = [
-          'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            // Not confirmed for password as we do that ourselves? No, we do it in the UI..
-          'password' => ['required', 'string', 'min:8'/*, 'confirmed'*/],
-          'recaptcha' => 'required|captcha',
-      ];
-
-        // XXX: for phpunit dont validate captcha when requested....
-        // TODO this should be mocked in the test instead
-        if (getenv('PHPUNIT_RECAPTCHA_CHECK') == '0') {
-            unset($validation['recaptcha']);
-        }
-
-        // If this is the first user then do not require an invitation or captcha
-        if (User::count() === 0) {
-            $inviteRequired = false;
-            unset($validation['recaptcha']);
-        } else {
-            $inviteRequired = true;
-            $validation['invite'] = 'required|exists:invitations,code';
-        }
-        // For testing, allow 5 char emails ot skip captcha...
-        if (array_key_exists('email', $data) && strlen($data['email']) == 5) {
-            unset($validation['recaptcha']);
-        }
-
+            'recaptcha' => ['required', 'string', 'bail', $this->recaptchaValidation],
+            'email'     => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password'  => ['required', 'string', 'min:8'],
+        ];
         return Validator::make($data, $validation);
     }
 }

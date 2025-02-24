@@ -1,28 +1,32 @@
 <?php
 
+use App\Http\Middleware\AuthorisedUsersForDeletedWikiMetricsMiddleware;
+use Illuminate\Support\Facades\Config;
+
 /**
  * This route file is loaded in the RouteServiceProvider optionally when an env var is set.
  * You'll find that service in the Providers directory.
- * @var \Laravel\Lumen\Routing\Router $router
+ * @var Illuminate\Routing\Router $router
  */
 $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
-
-    // POST
-    $router->post('auth/login', ['uses' => 'Auth\LoginController@login']);
     // TODO actually use logout route in VUE app..
-    $router->post('auth/logout', ['uses' => 'Auth\LoginController@logout']);
-    $router->post('user/register', ['uses' => 'Auth\RegisterController@register']);
+    $router->post('user/register', [
+        'middleware' => ['throttle.signup:'.Config::get('wbstack.signup_throttling_limit').','.Config::get('wbstack.signup_throttling_range')],
+        'uses' => 'Auth\RegisterController@register'
+    ]);
     $router->post('user/verifyEmail', ['uses' => 'UserVerificationTokenController@verify']);
     $router->post('user/forgotPassword', ['uses' => 'Auth\ForgotPasswordController@sendResetLinkEmail']);
     $router->post('user/resetPassword', ['uses' => 'Auth\ResetPasswordController@reset']);
     $router->post('contact/sendMessage', ['uses' => 'ContactController@sendMessage']);
 
+    $router->post('auth/login', ['uses' => 'Auth\LoginController@postLogin'])->name('login');
     // Authed
     $router->group(['middleware' => ['auth:api']], function () use ($router) {
+        $router->get('auth/login', ['uses' => 'Auth\LoginController@getLogin']);
+        $router->delete('auth/login', ['uses' => 'Auth\LoginController@deleteLogin']);
 
         // user
         $router->group(['prefix' => 'user'], function () use ($router) {
-            $router->post('self', ['uses' => 'UserController@getSelf']);
             $router->post('sendVerifyEmail', ['uses' => 'UserVerificationTokenController@createAndSendForUser']);
         });
 
@@ -40,6 +44,13 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
             $router->post('setting/{setting}/update', ['uses' => 'WikiSettingController@update']);
             // TODO should wiki managers really be here?
             $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
+            $router->get('entityImport', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiEntityImportController@get']);
+            $router->post('entityImport', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiEntityImportController@create']);
         });
+        $router->apiResource('deletedWikiMetrics', 'DeletedWikiMetricsController')->only(['index'])
+            ->middleware(AuthorisedUsersForDeletedWikiMetricsMiddleware::class);
     });
+
+    $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
+    $router->apiResource('wikiConversionData', 'ConversionMetricController')->only(['index']);
 });

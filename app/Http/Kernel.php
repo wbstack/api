@@ -14,7 +14,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
-        \Fruitcake\Cors\HandleCors::class,
+        \Illuminate\Http\Middleware\TrustProxies::class,
     ];
 
     /**
@@ -31,21 +31,21 @@ class Kernel extends HttpKernel
      *
      * @var array
      */
-    protected $routeMiddleware = [
+    protected $middlewareAliases = [
         // Came with Laravel
         'auth' => \App\Http\Middleware\Authenticate::class,
-        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'limit_wiki_access' => \App\Http\Middleware\LimitWikiAccess::class,
 
         // https://laravel-news.com/signed-routes
         //'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
 
         'backend.auth' => \App\Http\Middleware\BackendAuth::class,
-        //'throttle' => App\Http\Middleware\ThrottleRequests::class,
+        'throttle.signup' => \App\Http\Middleware\ThrottleSignup::class,
+        'throttle' => \App\Http\Middleware\Throttle::class,
         //'auth' => App\Http\Middleware\Authenticate::class,
-        'cors' => \Fruitcake\Cors\HandleCors::class,
     ];
 
     /**

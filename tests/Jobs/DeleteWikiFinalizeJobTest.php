@@ -12,7 +12,6 @@ use Carbon\Carbon;
 use App\Jobs\DeleteWikiFinalizeJob;
 use App\WikiDb;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\WikiLogoController;
 use App\Http\Curl\HttpRequest;
 use Illuminate\Contracts\Queue\Job;
 
@@ -22,7 +21,7 @@ class DeleteWikiFinalizeJobTest extends TestCase
 
     public function setUp(): void {
         parent::setUp();
-        Storage::fake('gcs-public-static');
+        Storage::fake('static-assets');
     }
 
     public function testDeleteWiki()
@@ -67,7 +66,7 @@ class DeleteWikiFinalizeJobTest extends TestCase
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())->method('fail')->with(
-            new \RuntimeException("Elasticsearch indices with basename {$wikiDbName} still exists")
+            new \RuntimeException("Elasticsearch indices with basename {$wikiDbName} still exists in http://localhost:9200")
         );
 
         $job = new DeleteWikiFinalizeJob( $wiki->id );
@@ -113,10 +112,10 @@ class DeleteWikiFinalizeJobTest extends TestCase
 
         $siteDir = Wiki::getSiteDirectory($wiki->id);
 
-        Storage::disk('gcs-public-static')
+        Storage::disk('static-assets')
             ->makeDirectory($siteDir);
 
-        Storage::disk('gcs-public-static')->assertExists($siteDir);
+        Storage::disk('static-assets')->assertExists($siteDir);
 
         $request = $this->createMock(HttpRequest::class);
         $request->expects($this->never())->method('execute');
@@ -130,6 +129,6 @@ class DeleteWikiFinalizeJobTest extends TestCase
         $this->assertNull( WikiSetting::whereId($setting->id)->first() );
 
         // site dir gone
-        Storage::disk('gcs-public-static')->assertMissing($siteDir);
+        Storage::disk('static-assets')->assertMissing($siteDir);
     }
 }

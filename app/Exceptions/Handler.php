@@ -2,21 +2,13 @@
 
 namespace App\Exceptions;
 
-use GlueDev\Laravel\Stackdriver\StackdriverExceptionHandler;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
 class Handler extends ExceptionHandler
 {
     /**
-     * A list of the exception types that are not reported.
-     *
-     * @var array
-     */
-    protected $dontReport = [];
-
-    /**
-     * A list of the inputs that are never flashed for validation exceptions.
+     * The list of the inputs that are never flashed to the session on validation exceptions.
      *
      * @var array
      */
@@ -26,14 +18,13 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * Report or log an exception.
-     *
-     * @param  \Throwable  $e
-     * @return void
+     * Register the exception handling callbacks for the application.
      */
-    public function report(Throwable $e)
+    public function register(): void
     {
-        StackdriverExceptionHandler::report($e);
-        parent::report($e);
+        $this->reportable(function (Throwable $e) {
+            (new \Absszero\ErrorReporting)->report($e);
+        });
     }
 }
+

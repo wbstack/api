@@ -9,11 +9,14 @@ class PruneQueryserviceBatchesTable extends Job
 {
     public function handle(): void
     {
-        // TODO possibly have some sort of user output...
-        QsBatch::where('done', 1)
-            ->where('updated_at', '<', Carbon::now()->subMonths(1))
+        QsBatch::where([
+            ['done', '=', 1],
+            ['pending_since', '=', null],
+            ['updated_at', '<', Carbon::now()->subMonths(1)],
+        ])
+            ->union(QsBatch::doesntHave('wiki'))
             ->orderBy('id', 'ASC')
-            ->take(50)
+            ->take(250)
             ->delete();
     }
 }
