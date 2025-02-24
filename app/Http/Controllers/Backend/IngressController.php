@@ -20,6 +20,6 @@ class IngressController extends Controller
         if (is_null($version)) {
             abort(401);
         }
-        return response(1)->header('x-version', $version);
+        return response('1')->header('x-version', $version);
     }
 }
