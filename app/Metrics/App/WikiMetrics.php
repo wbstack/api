@@ -16,12 +16,14 @@ class WikiMetrics
         $isDeleted = (bool)$wiki->deleted_at;
         if ($oldRecord) {
             if ($oldRecord->is_deleted) {
-                \Log::info("WikiMetrics is deleted, no new record for WikiMetrics ID {$wiki->id}.");
+                \Log::info("Wiki is deleted, no new record for WikiMetrics ID {$wiki->id}.");
                 return;
             }
-            if ($oldRecord->pages === $todayPageCount) {
-                \Log::info("Page count unchanged for WikiMetrics ID {$wiki->id}, no new record added.");
-                return;
+            if (!$isDeleted) {
+                if ($oldRecord->pages === $todayPageCount) {
+                    \Log::info("Page count unchanged for WikiMetrics ID {$wiki->id}, no new record added.");
+                    return;
+                }
             }
         }
         WikiDailyMetrics::create([
