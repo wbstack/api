@@ -61,7 +61,7 @@ class WikiMetricsTest extends TestCase
             'wiki_id' => $wiki->id,
             'date' => Carbon::yesterday()->toDateString(),
             'pages' => 0,
-            'is_deleted' => 0
+            'is_deleted' => 1
         ]);
         //delete the wiki
         $wiki->delete();
@@ -70,7 +70,7 @@ class WikiMetricsTest extends TestCase
         (new WikiMetrics())->saveMetrics($wiki);
 
         //Assert No new record was created for today
-        $this->assertDatabaseHas('wiki_daily_metrics', [
+        $this->assertDatabaseMissing('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
             'is_deleted' => 1,
             'date' => now()->toDateString()
