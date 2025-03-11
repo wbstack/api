@@ -49,5 +49,32 @@ class WikiMetricsTest extends TestCase
             'date' => Carbon::today()->toDateString()
         ]);
     }
+
+    public function testAddRecordsWikiIsDeleted()
+    {
+        $wiki = Wiki::factory()->create([
+            'domain' => 'thisfake.wikibase.cloud'
+        ]);
+        //Insert an old metric value for a wiki
+        WikiDailyMetrics::create([
+            'id' => $wiki->id. '_'. Carbon::yesterday()->toDateString(),
+            'wiki_id' => $wiki->id,
+            'date' => Carbon::yesterday()->toDateString(),
+            'pages' => 0,
+            'is_deleted' => 1
+        ]);
+        //delete the wiki
+        $wiki->delete();
+        $wiki->save();
+
+        (new WikiMetrics())->saveMetrics($wiki);
+
+        //Assert No new record was created for today
+        $this->assertDatabaseMissing('wiki_daily_metrics', [
+            'wiki_id' => $wiki->id,
+            'is_deleted' => 1,
+            'date' => now()->toDateString()
+        ]);
+    }
 }
 
