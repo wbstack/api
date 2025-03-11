@@ -1,5 +1,8 @@
 # api
 
+## 10x.18.6 - 11 March 2025
+- Map domain to database version using backend route
+
 ## 10x.18.5 - 28 February 2025
 - Fix bug on wiki metrics recoding
 
