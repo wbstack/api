@@ -22,11 +22,22 @@ class CreateTest extends TestCase
 {
     protected $route = 'wiki/create';
 
+    const defaultData = [
+        'domain' => 'dErP.com',
+        'sitename' => 'merp',
+        'username' => 'AdminBoss',
+        'profile' => '{
+                        "audience": "narrow",
+                        "temporality": "permanent",
+                        "purpose": "data_hub"
+                      }'
+    ];
+
     use OptionsRequestAllowed;
     use DatabaseTransactions;
 
     /**
-	 * @dataProvider createProvider
+	 * @dataProvider createDispatchesSomeJobsProvider
 	 */
     public function testWikiCreateDispatchesSomeJobs( $elasticSearchConfig )
     {
@@ -62,7 +73,12 @@ class CreateTest extends TestCase
             [
                 'domain' => 'dErP.com',
                 'sitename' => 'merp',
-                'username' => 'AdminBoss'
+                'username' => 'AdminBoss',
+                'profile' => '{
+                                "audience": "narrow",
+                                "temporality": "permanent",
+                                "purpose": "data_hub"
+                              }'
             ]
         );
 
@@ -109,7 +125,7 @@ class CreateTest extends TestCase
         }
     }
 
-    static public function createProvider() {
+    static public function createDispatchesSomeJobsProvider() {
         yield [ [
             'enabledForNewWikis' => true,
             'clusterWithoutSharedIndex' => 'all',
@@ -219,4 +235,38 @@ class CreateTest extends TestCase
             ->assertJsonPath('data.domain', 'mywikidomain-2.com')
             ->assertJsonPath('success', true );
     }
+
+    /**
+     * @dataProvider createWikiHandlesRangeOfPostValuesProvider
+     */
+    public function testCreateWikiHandlesRangeOfPostValues($data, $expectedStatus): void {
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $response = $this->actingAs($user, 'api')
+        ->json(
+            'POST',
+            $this->route,
+            $data
+        );
+        $response->assertStatus( $expectedStatus );
+    }
+
+    static public function createWikiHandlesRangeOfPostValuesProvider(): array {
+        $noDomain = self::defaultData;
+        unset($noDomain['domain']);
+        $noSitename = self::defaultData;
+        unset($noSitename['sitename']);
+        $noUsername = self::defaultData;
+        unset($noUsername['username']);
+        $noprofile = self::defaultData;
+        unset($noprofile['profile']);
+        return [
+            'all params present' => [self::defaultData , 200],
+            'missing domain' => [$noDomain, 422],
+            'missing sitename' => [$noSitename, 422],
+            'missing username' => [$noUsername, 422],
+            'missing profile' => [$noprofile, 200]
+        ];
+    }
+
 }
