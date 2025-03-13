@@ -51,15 +51,7 @@ class CreateTest extends TestCase
         Config::set( 'wbstack.elasticsearch_shared_index_host', $sharedIndexHost );
         Config::set( 'wbstack.elasticsearch_shared_index_prefix', $sharedIndexPrefix );
 
-        // seed up ready db
-        $manager = $this->app->make('db');
-        $job = new ProvisionWikiDbJob();
-        $job->handle($manager);
-
-        $dbRow = QueryserviceNamespace::create([
-            'namespace' => "derp",
-            'backend' => "wdqs.svc",
-        ]);
+        $this->createSQLandQSDBs();
 
         Queue::fake();
 
@@ -236,10 +228,22 @@ class CreateTest extends TestCase
             ->assertJsonPath('success', true );
     }
 
+    private function createSQLandQSDBs(): void {
+        $manager = $this->app->make('db');
+        $job = new ProvisionWikiDbJob();
+        $job->handle($manager);
+
+        QueryserviceNamespace::create([
+            'namespace' => "derp",
+            'backend' => "wdqs.svc",
+        ]);
+    }
+
     /**
      * @dataProvider createWikiHandlesRangeOfPostValuesProvider
      */
     public function testCreateWikiHandlesRangeOfPostValues($data, $expectedStatus): void {
+        $this->createSQLandQSDBs();
         Queue::fake();
         $user = User::factory()->create(['verified' => true]);
         $response = $this->actingAs($user, 'api')
