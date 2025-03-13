@@ -22,11 +22,22 @@ class CreateTest extends TestCase
 {
     protected $route = 'wiki/create';
 
+    const defaultData = [
+        'domain' => 'dErP.com',
+        'sitename' => 'merp',
+        'username' => 'AdminBoss',
+        'profile' => '{
+                        "audience": "narrow",
+                        "temporality": "permanent",
+                        "purpose": "data_hub"
+                      }'
+    ];
+
     use OptionsRequestAllowed;
     use DatabaseTransactions;
 
     /**
-	 * @dataProvider createProvider
+	 * @dataProvider createDispatchesSomeJobsProvider
 	 */
     public function testWikiCreateDispatchesSomeJobs( $elasticSearchConfig )
     {
@@ -40,15 +51,7 @@ class CreateTest extends TestCase
         Config::set( 'wbstack.elasticsearch_shared_index_host', $sharedIndexHost );
         Config::set( 'wbstack.elasticsearch_shared_index_prefix', $sharedIndexPrefix );
 
-        // seed up ready db
-        $manager = $this->app->make('db');
-        $job = new ProvisionWikiDbJob();
-        $job->handle($manager);
-
-        $dbRow = QueryserviceNamespace::create([
-            'namespace' => "derp",
-            'backend' => "wdqs.svc",
-        ]);
+        $this->createSQLandQSDBs();
 
         Queue::fake();
 
@@ -62,7 +65,12 @@ class CreateTest extends TestCase
             [
                 'domain' => 'dErP.com',
                 'sitename' => 'merp',
-                'username' => 'AdminBoss'
+                'username' => 'AdminBoss',
+                'profile' => '{
+                                "audience": "narrow",
+                                "temporality": "permanent",
+                                "purpose": "data_hub"
+                              }'
             ]
         );
 
@@ -109,7 +117,7 @@ class CreateTest extends TestCase
         }
     }
 
-    static public function createProvider() {
+    static public function createDispatchesSomeJobsProvider() {
         yield [ [
             'enabledForNewWikis' => true,
             'clusterWithoutSharedIndex' => 'all',
@@ -219,4 +227,50 @@ class CreateTest extends TestCase
             ->assertJsonPath('data.domain', 'mywikidomain-2.com')
             ->assertJsonPath('success', true );
     }
+
+    private function createSQLandQSDBs(): void {
+        $manager = $this->app->make('db');
+        $job = new ProvisionWikiDbJob();
+        $job->handle($manager);
+
+        QueryserviceNamespace::create([
+            'namespace' => "derp",
+            'backend' => "wdqs.svc",
+        ]);
+    }
+
+    /**
+     * @dataProvider createWikiHandlesRangeOfPostValuesProvider
+     */
+    public function testCreateWikiHandlesRangeOfPostValues($data, $expectedStatus): void {
+        $this->createSQLandQSDBs();
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $response = $this->actingAs($user, 'api')
+        ->json(
+            'POST',
+            $this->route,
+            $data
+        );
+        $response->assertStatus( $expectedStatus );
+    }
+
+    static public function createWikiHandlesRangeOfPostValuesProvider(): array {
+        $noDomain = self::defaultData;
+        unset($noDomain['domain']);
+        $noSitename = self::defaultData;
+        unset($noSitename['sitename']);
+        $noUsername = self::defaultData;
+        unset($noUsername['username']);
+        $noprofile = self::defaultData;
+        unset($noprofile['profile']);
+        return [
+            'all params present' => [self::defaultData , 200],
+            'missing domain' => [$noDomain, 422],
+            'missing sitename' => [$noSitename, 422],
+            'missing username' => [$noUsername, 422],
+            'missing profile' => [$noprofile, 200]
+        ];
+    }
+
 }
