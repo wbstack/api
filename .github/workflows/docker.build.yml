@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Docker meta
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v5.5.1
+        uses: crazy-max/ghaction-docker-meta@v5.7.0
         with:
           images: ghcr.io/${{ github.repository }}
       - name: Set up QEMU
