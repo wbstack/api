@@ -1,4 +1,3 @@
-version: '2'
 services:
   wdqs:
     image: ghcr.io/wbstack/queryservice:0.3.6_0.6
