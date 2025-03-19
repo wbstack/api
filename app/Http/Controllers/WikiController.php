@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\ProfileValidator;
 use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
@@ -13,10 +14,12 @@ use App\Wiki;
 use App\WikiDb;
 use App\WikiDomain;
 use App\WikiManager;
+use App\WikiProfile;
 use App\WikiSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
 use App\Helper\DomainValidator;
@@ -25,9 +28,11 @@ use App\Helper\DomainHelper;
 class WikiController extends Controller
 {
     private $domainValidator;
+    private $profileValidator;
 
-    public function __construct( DomainValidator $domainValidator )
+    public function __construct( DomainValidator $domainValidator, ProfileValidator $profileValidator )
     {
+        $this->profileValidator = $profileValidator;
         $this->domainValidator = $domainValidator;
     }
 
@@ -42,28 +47,35 @@ class WikiController extends Controller
                 abort(503, 'Search enabled, but its configuration is invalid');
             }
         }
-
         $user = $request->user();
 
         $submittedDomain = strtolower($request->input('domain'));
         $submittedDomain = DomainHelper::encode($submittedDomain);
 
-        $validator = $this->domainValidator->validate( $submittedDomain );
+        $domainValidator = $this->domainValidator->validate( $submittedDomain );
         $isSubdomain = $this->isSubDomain($submittedDomain);
 
-        $validator->validateWithBag('post');
+        $domainValidator->validateWithBag('post');
 
         // TODO extra validation that username is correct?
         $request->validate([
             'sitename' => 'required|min:3',
             'username' => 'required',
+            'profile' => 'nullable|json',
         ]);
-
+        
+        $rawProfile = false;
+        if ($request->filled('profile') ) {
+            $rawProfile = json_decode($request->input('profile'), true);
+            $profileValidator = $this->profileValidator->validate($rawProfile);
+            $profileValidator->validateWithBag('post');
+        }
+        
         $wiki = null;
         $dbAssignment = null;
 
         // TODO create with some sort of owner etc?
-        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain, $submittedDomain) {
+        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain, $submittedDomain, $rawProfile) {
             $dbVersion = Config::get('wbstack.wiki_db_use_version');
             $wikiDbCondition = ['wiki_id'=>null, 'version'=>$dbVersion];
 
@@ -123,6 +135,12 @@ class WikiController extends Controller
               'user_id' => $user->id,
               'wiki_id' => $wiki->id,
             ]);
+            
+            // Create WikiProfile
+            if ($rawProfile) {
+                WikiProfile::create([ 'wiki_id' => $wiki->id, ...$rawProfile ] );
+            }
+            
 
             // TODO maybe always make these run in a certain order..?
             dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
