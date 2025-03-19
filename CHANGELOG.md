@@ -1,5 +1,8 @@
 # api
 
+## 10x.18.7
+- Include WikiProfile model and migration
+
 ## 10x.18.6 - 11 March 2025
 - Map domain to database version using backend route
 
