@@ -2,6 +2,7 @@
 
 namespace Tests\Routes\Wiki\Managers;
 
+use App\WikiProfile;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -264,13 +265,51 @@ class CreateTest extends TestCase
         unset($noUsername['username']);
         $noprofile = self::defaultData;
         unset($noprofile['profile']);
+        $profileWithOther = self::defaultData;
+        $profileWithOther['profile'] = '{
+                        "audience": "other",
+                        "audience_other": "just my cat",
+                        "temporality": "permanent",
+                        "purpose": "data_hub"
+                      }';
+        $profileWithOtherStringMissing = self::defaultData;
+        $profileWithOtherStringMissing['profile'] = '{
+            "audience": "other",
+            "temporality": "permanent",
+            "purpose": "data_hub"
+          }';
+        $profileWithExtraneousOther =  self::defaultData;
+        $profileWithExtraneousOther['profile'] = '{
+                        "audience_other": "just my cat",
+                        "temporality": "permanent",
+                        "purpose": "data_hub"
+                      }';
         return [
             'all params present' => [self::defaultData , 200],
             'missing domain' => [$noDomain, 422],
             'missing sitename' => [$noSitename, 422],
             'missing username' => [$noUsername, 422],
-            'missing profile' => [$noprofile, 200]
+            'missing profile' => [$noprofile, 200],
+            'profile with other' => [$profileWithOther, 200],
+            'profile with other string missing' => [$profileWithOtherStringMissing, 422],
+            'profile with extraneous other' => [$profileWithExtraneousOther, 422]
         ];
+    }
+
+    public function testCreateWithProfileCreatesProfiles(): void {
+        $this->createSQLandQSDBs();
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $response = $this->actingAs($user, 'api')
+        ->json(
+            'POST',
+            $this->route,
+            self::defaultData
+        );
+        $id = $response->decodeResponseJson()['data']['id'];
+        $this->assertEquals( 1,
+            WikiProfile::where( [ 'wiki_id' => $id ] )->count()
+        );
     }
 
 }
