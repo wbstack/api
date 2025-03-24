@@ -32,8 +32,7 @@ class ProfileValidatorTest extends TestCase {
                 'temporality' => 'permanent',
             ] ],
             [ 'with other values' => [
-                'purpose' => 'other',
-                'purpose_other' => 'for fun',
+                'purpose' => 'data_hub',
                 'audience' => 'other',
                 'audience_other' => 'my cat',
                 'temporality' => 'other',
@@ -46,7 +45,12 @@ class ProfileValidatorTest extends TestCase {
     private function invalidProfileProvider() {
         return [
             [ 'missing other keys' => [
-                'purpose' => 'other',
+                'purpose' => 'data_hub',
+                'audience' => 'narrow',
+                'temporality' => 'other',
+            ] ],
+            [ 'audience key present when purpose not data_hub' => [
+                'purpose' => 'data_lab',
                 'audience' => 'narrow',
                 'temporality' => 'permanent',
             ] ],
