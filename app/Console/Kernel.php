@@ -11,11 +11,14 @@ use App\Jobs\RequeuePendingQsBatchesJob;
 use App\Jobs\SandboxCleanupJob;
 use App\Jobs\PollForMediaWikiJobsJob;
 use App\Jobs\UpdateWikiDailyMetricJob;
+use App\Jobs\UpdateWikiMonthlyMetricJob;
+use App\Jobs\UpdateWikiQuarterlyMetricJob;
 use App\Jobs\UpdateWikiSiteStatsJob;
 use App\Jobs\SendEmptyWikiNotificationsJob;
 use App\Jobs\CreateQueryserviceBatchesJob;
 use App\Jobs\FailStalledEntityImportsJob;
 use App\Jobs\UpdateQueryserviceAllowList;
+use App\Jobs\UpdateWikiWeeklyMetricJob;
 use App\Wiki;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -61,7 +64,10 @@ class Kernel extends ConsoleKernel
 
         $schedule->job(new SendEmptyWikiNotificationsJob)->dailyAt('21:00');
 
-        $schedule->job(new UpdateWikiDailyMetricJob)->dailyAt('23:00');
+        $schedule->job(new UpdateWikiDailyMetricJob)->dailyAt('22:00');
+        $schedule->job(new UpdateWikiWeeklyMetricJob())->weeklyOn('Sunday')->at('23:00');
+        $schedule->job(new UpdateWikiMonthlyMetricJob())->monthlyOn('Monday')->at('23:00');
+        $schedule->job(new UpdateWikiQuarterlyMetricJob())->quarterlyOn('Tuesday')->at('23:00');
 
         $schedule->job(new UpdateQueryserviceAllowList)->weeklyOn(Schedule::MONDAY, '01:00');
 
