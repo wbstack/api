@@ -284,6 +284,12 @@ class CreateTest extends TestCase
                         "temporality": "permanent",
                         "purpose": "data_hub"
                       }';
+        $profileWithAudienceBlank =  self::defaultData;
+        $profileWithAudienceBlank['profile'] = '{
+                        "audience": "",
+                        "temporality": "permanent",
+                        "purpose": "data_hub"
+                    }';
         return [
             'all params present' => [self::defaultData , 200],
             'missing domain' => [$noDomain, 422],
@@ -292,7 +298,8 @@ class CreateTest extends TestCase
             'missing profile' => [$noprofile, 200],
             'profile with other' => [$profileWithOther, 200],
             'profile with other string missing' => [$profileWithOtherStringMissing, 422],
-            'profile with extraneous other' => [$profileWithExtraneousOther, 422]
+            'profile with extraneous other' => [$profileWithExtraneousOther, 422],
+            'profile with audience blank string' => [$profileWithAudienceBlank, 422]
         ];
     }
 

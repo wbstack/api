@@ -1,5 +1,8 @@
 # api
 
+## 10x.18.8
+ - Fix WikiProfile Validation
+
 ## 10x.18.7
 - Include WikiProfile model and migration
 
