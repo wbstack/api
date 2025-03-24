@@ -2,14 +2,16 @@
 
 namespace App\Jobs;
 
+use App\Metrics\App\WikiMetrics;
 use App\Wiki;
-use \App\Metrics\App\WikiMetrics;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
-//This job is for the daily measurements of metrics per wikibases.
-//This is to help in understanding the purpose of active wikis.
-class UpdateWikiDailyMetricJob extends Job implements ShouldBeUnique
+class UpdateWikiQuarterlyMetricJob extends Job implements ShouldBeUnique
 {
     use Dispatchable;
     public $timeout = 3600;
@@ -21,7 +23,7 @@ class UpdateWikiDailyMetricJob extends Job implements ShouldBeUnique
     {
         $wikis= Wiki::withTrashed()->get();
         foreach ( $wikis as $wiki ) {
-            (new WikiMetrics())->saveDailySnapshot($wiki);
+            (new WikiMetrics())->saveQuarterlySnapshot($wiki);
         }
     }
 }
