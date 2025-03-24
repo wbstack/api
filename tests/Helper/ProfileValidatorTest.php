@@ -49,6 +49,11 @@ class ProfileValidatorTest extends TestCase {
                 'audience' => 'narrow',
                 'temporality' => 'other',
             ] ],
+            [ 'audience is empty string' => [
+                'purpose' => 'data_hub',
+                'audience' => '',
+                'temporality' => 'other',
+            ] ],
             [ 'audience key present when purpose not data_hub' => [
                 'purpose' => 'data_lab',
                 'audience' => 'narrow',
