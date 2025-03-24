@@ -66,8 +66,8 @@ class Kernel extends ConsoleKernel
 
         $schedule->job(new UpdateWikiDailyMetricJob)->dailyAt('22:00');
         $schedule->job(new UpdateWikiWeeklyMetricJob())->weeklyOn('Sunday')->at('23:00');
-        $schedule->job(new UpdateWikiMonthlyMetricJob())->monthlyOn('Monday')->at('23:00');
-        $schedule->job(new UpdateWikiQuarterlyMetricJob())->quarterlyOn('Tuesday')->at('23:00');
+        $schedule->job(new UpdateWikiMonthlyMetricJob())->monthlyOn(28)->at('23:00');
+        $schedule->job(new UpdateWikiQuarterlyMetricJob())->quarterlyOn(85)->at('23:00');
 
         $schedule->job(new UpdateQueryserviceAllowList)->weeklyOn(Schedule::MONDAY, '01:00');
 
