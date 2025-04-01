@@ -2,10 +2,13 @@
 
 namespace Tests\Jobs;
 
+use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\UpdateWikiDailyMetricJob;
 use App\Wiki;
+use App\WikiDb;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
@@ -33,9 +36,19 @@ class UpdateWikiDailyMetricJobTest extends TestCase
         $deletedWiki = Wiki::factory()->create([
             'domain' => 'deletedwiki.wikibase.cloud',
         ]);
+        $manager = $this->app->make('db');
+        $job = new ProvisionWikiDbJob(null, 'deletedwikidb', 1);
+        $job2 = new ProvisionWikiDbJob(null, 'activewikidb', 1);
+        $job->handle($manager);
+        $job2->handle($manager);
+        DB::table('wiki_dbs')->where(["wiki_id" => null])->limit(1)->value('name');
+        DB::table('wiki_dbs')->where(["wiki_id" => null])->update(['wiki_id' => $activeWiki->id]);
+        DB::table('wiki_dbs')->where(["wiki_id" => null])->limit(1)->value('name');
+        DB::table('wiki_dbs')->where(["wiki_id" => null])->update(['wiki_id' => $deletedWiki->id]);
+
         $deletedWiki->delete();
 
-        (new UpdateWikiDailyMetricJob())->handle();
+        (new UpdateWikiDailyMetricJob())->handle($manager);
 
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $activeWiki->id,

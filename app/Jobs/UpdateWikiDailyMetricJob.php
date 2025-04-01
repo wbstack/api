@@ -6,6 +6,7 @@ use App\Wiki;
 use \App\Metrics\App\WikiMetrics;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Foundation\Bus\Dispatchable;
 
 //This job is for the daily measurements of metrics per wikibases.
@@ -18,11 +19,11 @@ class UpdateWikiDailyMetricJob extends Job implements ShouldBeUnique
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(DatabaseManager $manager): void
     {
         $wikis= Wiki::withTrashed()->get();
         foreach ( $wikis as $wiki ) {
-            (new WikiMetrics())->saveMetrics($wiki);
+            (new WikiMetrics())->saveMetrics($wiki, $manager);
         }
     }
 }
