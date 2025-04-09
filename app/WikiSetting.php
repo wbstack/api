@@ -36,6 +36,8 @@ class WikiSetting extends Model
     public const wgSecretKey = 'wgSecretKey';
     public const wgLogo = 'wgLogo';
     public const wgFavicon = 'wgFavicon';
+    public const wgOAuth2PrivateKey = 'wgOAuth2PrivateKey';
+    public const wgOAuth2PublicKey = '$wgOAuth2PublicKey';
 
     /**
      * The attributes that are mass assignable.

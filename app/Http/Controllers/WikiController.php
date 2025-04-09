@@ -109,12 +109,37 @@ class WikiController extends Controller
                 abort(503, 'QS Namespace ready, but failed to assign');
             }
 
+            // Create keys for OAuth2
+            // T336937
+            $keyPair = openssl_pkey_new([
+                'private_key_bits' => 2048,
+                'private_key_type' => OPENSSL_KEYTYPE_RSA,
+            ]);
+            // Extract private key
+            openssl_pkey_export($keyPair, $wgOAuth2PrivateKey);
+            // Extract pub key
+            $keyDetails = openssl_pkey_get_details($keyPair);
+            $wgOAuth2PublicKey = $keyDetails['key'];
+
+            WikiSetting::create([
+                'wiki_id' => $wiki->id,
+                'name' => WikiSetting::wgOAuth2PrivateKey,
+                'value' => $wgOAuth2PrivateKey,
+            ]);
+
+            WikiSetting::create([
+                'wiki_id' => $wiki->id,
+                'name' => WikiSetting::wgOAuth2PublicKey,
+                'value' => $wgOAuth2PublicKey,
+            ]);
+
             // Create initial needed non default settings
             // Docs: https://www.mediawiki.org/wiki/Manual:$wgSecretKey
             WikiSetting::create([
                 'wiki_id' => $wiki->id,
                 'name' => WikiSetting::wgSecretKey,
                 'value' => Str::random(64),
+
             ]);
 
             // Create the elasticsearch setting
