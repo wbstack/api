@@ -1,5 +1,8 @@
 # api
 
+## 10x.18.10
+- Generate OAuth2 keys dynamically within PHP
+
 ## 10x.18.9
  - Migration to fix WikiProfile table
 
