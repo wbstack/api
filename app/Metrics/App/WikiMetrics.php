@@ -16,7 +16,7 @@ class WikiMetrics
 
     const QUERY_NUMBER_OF_ACTIONS = <<<EOF
 SELECT
-    SUM(rc_timestamp >= DATE_FORMAT(DATE_SUB(NOW(), ?), '%Y%m%d%H%i%S')) AS sum_actions,
+    SUM(rc_timestamp >= DATE_FORMAT(DATE_SUB(NOW(), ?), '%Y%m%d%H%i%S')) AS sum_actions
 FROM
     ? AS rc
 INNER JOIN ? AS a ON rc.rc_actor = a.actor_id
