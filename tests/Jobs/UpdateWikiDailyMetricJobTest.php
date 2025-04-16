@@ -39,12 +39,20 @@ class UpdateWikiDailyMetricJobTest extends TestCase
 
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $activeWiki->id,
-            'date' => Carbon::today()->toDateString()
+            'date' => Carbon::today()->toDateString(),
+            'daily_actions' => null,
+            'weekly_actions' => null,
+            'monthly_actions' => null,
+            'quarterly_actions' => null,
         ]);
 
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $deletedWiki->id,
-            'date' => Carbon::today()->toDateString()
+            'date' => Carbon::today()->toDateString(),
+            'daily_actions' => null,
+            'weekly_actions' => null,
+            'monthly_actions' => null,
+            'quarterly_actions' => null,
         ]);
     }
 
