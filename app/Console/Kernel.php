@@ -29,6 +29,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
+        // do not schedule anything if this container is not "the scheduler"
+        if (env('CONTAINER_ROLE') !== 'scheduler') { return; }
+
         // Make sure that the DB and QS pools are always populated somewhat.
         // This will create at most 1 new entry for each per minute...
         // There are also jobs currently scheduled in Controllers that use up resources from these pools
