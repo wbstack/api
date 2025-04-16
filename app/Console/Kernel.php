@@ -33,29 +33,29 @@ class Kernel extends ConsoleKernel
         // This will create at most 1 new entry for each per minute...
         // There are also jobs currently scheduled in Controllers that use up resources from these pools
         // for more opportunistic storage repopulation
-        $schedule->job(new ProvisionWikiDbJob(null, null, 10))->everyMinute();
-        $schedule->job(new ProvisionQueryserviceNamespaceJob(null, 10))->everyMinute();
+        $schedule->job(new ProvisionWikiDbJob(null, null, 10))->everyMinute()->withoutOverlapping();
+        $schedule->job(new ProvisionQueryserviceNamespaceJob(null, 10))->everyMinute()->withoutOverlapping();
 
         // Slowly cleanup some tables
-        $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly();
-        $schedule->job(new PruneEventPageUpdatesTable)->everyFifteenMinutes();
-        $schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes();
-        $schedule->job(new CreateQueryserviceBatchesJob)->everyMinute();
-        $schedule->job(new RequeuePendingQsBatchesJob)->everyFifteenMinutes();
+        $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly()->withoutOverlapping();
+        $schedule->job(new PruneEventPageUpdatesTable)->everyFifteenMinutes()->withoutOverlapping();
+        $schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes()->withoutOverlapping();
+        $schedule->job(new CreateQueryserviceBatchesJob)->everyMinute()->withoutOverlapping();
+        $schedule->job(new RequeuePendingQsBatchesJob)->everyFifteenMinutes()->withoutOverlapping();
         $schedule->job(new FailStalledEntityImportsJob)->hourly();
 
         // Sandbox
         // TODO this should maybe only be run when sandbox as a whole is loaded?
         // TODO instead of using LOAD ROUTES, we should just have different modes?
-        $schedule->job(new SandboxCleanupJob)->everyFifteenMinutes();
+        $schedule->job(new SandboxCleanupJob)->everyFifteenMinutes()->withoutOverlapping();
 
         // Schedule site stat updates for each wiki and platform-summary
         $schedule->command('schedule:stats')->dailyAt('7:00');
 
         // https://laravel.com/docs/10.x/upgrade#redis-cache-tags
-        $schedule->command('cache:prune-stale-tags')->hourly();
+        $schedule->command('cache:prune-stale-tags')->hourly()->withoutOverlapping();
 
-        $schedule->job(new PollForMediaWikiJobsJob)->everyFifteenMinutes();
+        $schedule->job(new PollForMediaWikiJobsJob)->everyFifteenMinutes()->withoutOverlapping();
 
         $schedule->job(new UpdateWikiSiteStatsJob)->dailyAt('19:00');
 
