@@ -106,25 +106,8 @@ EOF;
             $tableActor,
         ]);
 
-        dd($result);
+        $actions = $result->sum_actions;
 
         return $actions;
     }
 }
-
-/*
-
-SELECT
-    SUM(rc_timestamp >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 DAY), '%Y%m%d%H%i%S')) AS daily_actions,
-    SUM(rc_timestamp >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 WEEK), '%Y%m%d%H%i%S')) AS weekly_actions,
-    SUM(rc_timestamp >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y%m%d%H%i%S')) AS monthly_actions,
-    SUM(rc_timestamp >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y%m%d%H%i%S')) AS quarterly_actions
-FROM
-    mwdb_7b97892aeb.mwt_d192403ea5_recentchanges rc
-INNER JOIN mwdb_7b97892aeb.mwt_d192403ea5_actor a ON rc.rc_actor = a.actor_id
-// Conditions below added for consistency with Wikidata: https://phabricator.wikimedia.org/diffusion/ADES/browse/master/src/wikidata/site_stats/sql/active_user_changes.sql
-AND a.actor_user != 0
-AND rc.rc_bot = 0
-AND ( rc.rc_log_type != 'newusers' OR rc.rc_log_type IS NULL)
-
-*/
