@@ -27,6 +27,8 @@ class WikiDailyMetrics extends Model
         'weekly_actions',
         'monthly_actions',
         'quarterly_actions',
+        'number_of_triples',
+
     ];
 
     // list of properties which are actual wiki metrics
@@ -36,7 +38,8 @@ class WikiDailyMetrics extends Model
         'daily_actions',
         'weekly_actions',
         'monthly_actions',
-        'quarterly_actions'
+        'quarterly_actions',
+        'number_of_triples',
     ];
 
     public function areMetricsEqual(WikiDailyMetrics $wikiDailyMetrics): bool

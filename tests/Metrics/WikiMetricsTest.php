@@ -9,6 +9,7 @@ use App\WikiDailyMetrics;
 use App\Jobs\ProvisionWikiDbJob;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class WikiMetricsTest extends TestCase
@@ -93,6 +94,42 @@ class WikiMetricsTest extends TestCase
             'wiki_id' => $wiki->id,
             'is_deleted' => 1,
             'date' => now()->toDateString()
+        ]);
+    }
+    public function testItSaveTripleCountSuccessfully()
+    {
+        $wiki = Wiki::factory()->create([
+            'domain' => 'somewikiforunittest.wikibase.cloud'
+        ]);
+        Http::fake([
+            'https://somewikiforunittest.wikibase.cloud/query/sparql*' => Http::response([
+                'results' => [
+                    'bindings' => [
+                        [
+                            'triples' => ['type' => 'literal', 'value' => '12345']
+                        ]
+                    ]
+                ]
+            ], 200)
+        ]);
+        (new WikiMetrics())->saveMetrics($wiki);
+        $this->assertDatabaseHas('wiki_daily_metrics', [
+            'wiki_id' => $wiki->id,
+            'number_of_triples' => 12345
+        ]);
+    }
+    public function testSaveNullForFailedRequestOfTriplesCount()
+    {
+        $wiki = Wiki::factory()->create([
+            'domain' => 'somewikitest.wikibase.cloud'
+        ]);
+        Http::fake([
+            'https://somewikitest.wikibase.cloud/query/sparql*' => Http::response('Error', 500)
+        ]);
+        (new WikiMetrics())->saveMetrics($wiki);
+        $this->assertDatabaseHas('wiki_daily_metrics', [
+            'wiki_id' => $wiki->id,
+            'number_of_triples' => null
         ]);
     }
 }
