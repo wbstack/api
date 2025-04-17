@@ -23,6 +23,7 @@ class WikiDailyMetrics extends Model
         'date',
         'pages',
         'is_deleted',
+        'number_of_triples',
     ];
 
 
