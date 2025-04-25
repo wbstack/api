@@ -75,7 +75,7 @@ class WikiMetrics
                 ]
         )) { return null; }
 
-        $wikiDb = Wiki::with('wikiDb')->where('id', $this->wiki->id)->first()->wikiDb;
+        $wikiDb = Wiki::withTrashed()->with('wikiDb')->where('id', $this->wiki->id)->first()->wikiDb;
         $tableRecentChanges = $wikiDb->name . '.' . $wikiDb->prefix . '_recentchanges';
         $tableActor = $wikiDb->name . '.' . $wikiDb->prefix . '_actor';
 
