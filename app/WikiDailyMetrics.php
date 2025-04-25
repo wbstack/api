@@ -26,18 +26,19 @@ class WikiDailyMetrics extends Model
     ];
 
     // list of properties which are actual wiki metrics
-    static public $metricNames = [
+    public static $metricNames = [
         'pages',
         'is_deleted',
     ];
 
-    public function areMetricsEqual(WikiDailyMetrics $wikiDailyMetrics) {
-
+    public function areMetricsEqual(WikiDailyMetrics $wikiDailyMetrics): bool
+    {
         foreach(self::$metricNames as $field) {
-            if ($this->$field !== $wikiDailyMetrics->$field) {
+            if ($this->$field != $wikiDailyMetrics->$field) {
                 return false;
             }
         }
+
         return true;
     }
 }

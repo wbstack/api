@@ -40,6 +40,4 @@ class WikiMetrics
 
         \Log::info("New metric recorded for WikiMetrics ID {$wiki->id}");
     }
-
 }
-
