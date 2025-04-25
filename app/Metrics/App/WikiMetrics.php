@@ -92,13 +92,9 @@ class WikiMetrics
         AND rc.rc_bot = 0
         AND ( rc.rc_log_type != 'newusers' OR rc.rc_log_type IS NULL)";
 
-        $result = DB::select($query, [ $interval ]);
-
-        dd($result);
-
+        $result = DB::select($query);
+        
         $actions = Arr::get($result, 'sum_actions', null);
-
-        dd($actions);
 
         return $actions;
     }
