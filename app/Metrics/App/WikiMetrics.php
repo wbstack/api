@@ -4,7 +4,6 @@ namespace App\Metrics\App;
 
 use App\Wiki;
 use App\WikiDailyMetrics;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
 
 class WikiMetrics
@@ -75,7 +74,7 @@ class WikiMetrics
                 ]
         )) { return null; }
 
-        $wikiDb = Wiki::withTrashed()->with('wikiDb')->where('id', $this->wiki->id)->first()->wikiDb;
+        $wikiDb = $this->wiki->wikiDb;
         $tableRecentChanges = $wikiDb->name . '.' . $wikiDb->prefix . '_recentchanges';
         $tableActor = $wikiDb->name . '.' . $wikiDb->prefix . '_actor';
 
