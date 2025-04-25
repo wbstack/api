@@ -23,12 +23,20 @@ class WikiDailyMetrics extends Model
         'date',
         'pages',
         'is_deleted',
+        'daily_actions',
+        'weekly_actions',
+        'monthly_actions',
+        'quarterly_actions',
     ];
 
     // list of properties which are actual wiki metrics
     public static $metricNames = [
         'pages',
         'is_deleted',
+        'daily_actions',
+        'weekly_actions',
+        'monthly_actions',
+        'quarterly_actions'
     ];
 
     public function areMetricsEqual(WikiDailyMetrics $wikiDailyMetrics): bool
