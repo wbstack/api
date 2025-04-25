@@ -92,8 +92,12 @@ class WikiMetrics
         AND rc.rc_bot = 0
         AND ( rc.rc_log_type != 'newusers' OR rc.rc_log_type IS NULL)";
 
-        $result = DB::select($query);
-        
+        $manager = app()->db;
+        $manager->purge('mw');
+        $conn = $manager->connection('mw');
+        $pdo = $conn->getPdo();
+        $result = $pdo->query($query)->fetch();
+
         $actions = Arr::get($result, 'sum_actions', null);
 
         return $actions;
