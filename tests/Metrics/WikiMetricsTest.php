@@ -27,7 +27,6 @@ class WikiMetricsTest extends TestCase
         ]);
     }
 
-
     public function testDoesNotAddDuplicateRecordsWithOnlyDateChange()
     {
         $wiki = Wiki::factory()->create([

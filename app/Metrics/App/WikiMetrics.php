@@ -14,18 +14,6 @@ class WikiMetrics
     const INTERVAL_MONTHLY = 'INTERVAL 1 MONTH';
     const INTERVAL_QUARTERLY = 'INTERVAL 3 MONTH';
 
-    const QUERY_NUMBER_OF_ACTIONS = <<<EOF
-SELECT
-    SUM(rc_timestamp >= DATE_FORMAT(DATE_SUB(NOW(), ?), '%Y%m%d%H%i%S')) AS sum_actions
-FROM
-    ? AS rc
-INNER JOIN ? AS a ON rc.rc_actor = a.actor_id
-// Conditions below added for consistency with Wikidata: https://phabricator.wikimedia.org/diffusion/ADES/browse/master/src/wikidata/site_stats/sql/active_user_changes.sql
-AND a.actor_user != 0
-AND rc.rc_bot = 0
-AND ( rc.rc_log_type != 'newusers' OR rc.rc_log_type IS NULL)
-EOF;
-
     protected $wiki;
 
     public function saveMetrics(Wiki $wiki): void
@@ -77,17 +65,40 @@ EOF;
     {
         $actions = null;
 
+        // safeguard
+        if (false === in_array($interval, 
+        [
+                self::INTERVAL_DAILY,
+                self::INTERVAL_WEEKLY,
+                self::INTERVAL_MONTHLY,
+                self::INTERVAL_QUARTERLY
+                ]
+        )) { return null; }
+
         $wikiDb = Wiki::with('wikiDb')->where('id', $this->wiki->id)->first()->wikiDb;
         $tableRecentChanges = $wikiDb->name . '.' . $wikiDb->prefix . '_recentchanges';
         $tableActor = $wikiDb->name . '.' . $wikiDb->prefix . '_actor';
 
-        $result = DB::select(self::QUERY_NUMBER_OF_ACTIONS, [
-            $interval,
-            $tableRecentChanges,
-            $tableActor,
-        ]);
+        $query = "SELECT
+            SUM(rc_timestamp >= DATE_FORMAT(DATE_SUB(NOW(), $interval), '%Y%m%d%H%i%S')) AS sum_actions
+        FROM
+            $tableRecentChanges AS rc
+        INNER JOIN $tableActor AS a ON rc.rc_actor = a.actor_id
+        WHERE
+        /*
+        Conditions below added for consistency with Wikidata: https://phabricator.wikimedia.org/diffusion/ADES/browse/master/src/wikidata/site_stats/sql/active_user_changes.sql
+        */
+        a.actor_user != 0
+        AND rc.rc_bot = 0
+        AND ( rc.rc_log_type != 'newusers' OR rc.rc_log_type IS NULL)";
+
+        $result = DB::select($query, [ $interval ]);
+
+        dd($result);
 
         $actions = Arr::get($result, 'sum_actions', null);
+
+        dd($actions);
 
         return $actions;
     }
