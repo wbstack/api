@@ -61,7 +61,7 @@ class WikiMetrics
         \Log::info("New metric recorded for Wiki ID {$wiki->id}");
     }
 
-    protected function getNumberOfActions($interval): null|int
+    protected function getNumberOfActions(string $interval): null|int
     {
         $actions = null;
 
