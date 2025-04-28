@@ -1,5 +1,8 @@
 # api
 
+## 10x.19.0
+- Expand WikiDailyMetrics with number of actions
+
 ## 10x.18.11
 - Try to avoid overlapping jobs
 
