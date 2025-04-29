@@ -114,10 +114,15 @@ class WikiMetricsTest extends TestCase
         ]);
 
         DB::table('queryservice_namespaces')->where(['id'=>$dbRow->id])->limit(1)->update(['wiki_id' => $wiki->id]);
-
-        //Insert an old metric value for a wiki
+        WikiDailyMetrics::create([
+            'id' => $wiki->id. '_'. Carbon::yesterday()->toDateString(),
+            'wiki_id' => $wiki->id,
+            'date' => Carbon::yesterday()->toDateString(),
+            'pages' => 0,
+            'is_deleted' => 0
+        ]);
         Http::fake([
-            'https://somewikiforunittest.wikibase.cloud/query/sparql*' => Http::response([
+            '*' => Http::response([
                 'results' => [
                     'bindings' => [
                         [
@@ -126,13 +131,6 @@ class WikiMetricsTest extends TestCase
                     ]
                 ]
             ], 200)
-        ]);
-        WikiDailyMetrics::create([
-            'id' => $wiki->id. '_'. Carbon::yesterday()->toDateString(),
-            'wiki_id' => $wiki->id,
-            'date' => Carbon::yesterday()->toDateString(),
-            'pages' => 0,
-            'is_deleted' => 0
         ]);
         (new WikiMetrics())->saveMetrics($wiki);
         $this->assertDatabaseHas('wiki_daily_metrics', [
@@ -145,8 +143,26 @@ class WikiMetricsTest extends TestCase
         $wiki = Wiki::factory()->create([
             'domain' => 'somewikitest.wikibase.cloud'
         ]);
+        $wikiDb = WikiDb::first();
+        $wikiDb->update( ['wiki_id' => $wiki->id] );
+        $namespace = 'asdf';
+        $host = config('app.queryservice_host');
+
+        $dbRow = QueryserviceNamespace::create([
+            'namespace' => $namespace,
+            'backend' => $host,
+        ]);
+
+        DB::table('queryservice_namespaces')->where(['id'=>$dbRow->id])->limit(1)->update(['wiki_id' => $wiki->id]);
+        WikiDailyMetrics::create([
+            'id' => $wiki->id. '_'. Carbon::yesterday()->toDateString(),
+            'wiki_id' => $wiki->id,
+            'date' => Carbon::yesterday()->toDateString(),
+            'pages' => 0,
+            'is_deleted' => 0
+        ]);
         Http::fake([
-            'https://somewikitest.wikibase.cloud/query/sparql*' => Http::response('Error', 500)
+            '*' => Http::response('Error', 500)
         ]);
         (new WikiMetrics())->saveMetrics($wiki);
         $this->assertDatabaseHas('wiki_daily_metrics', [

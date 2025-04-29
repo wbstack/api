@@ -7,6 +7,7 @@ use App\Wiki;
 use App\WikiDailyMetrics;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class WikiMetrics
 {
@@ -48,12 +49,12 @@ class WikiMetrics
         // compare current record to old record and only save if there is a change
         if ($oldRecord) {
             if ($oldRecord->is_deleted) {
-                \Log::info("Wiki is deleted, no new record for Wiki ID {$wiki->id}.");
+                Log::info("Wiki is deleted, no new record for Wiki ID {$wiki->id}.");
                 return;
             }
             if (!$isDeleted) {
                 if ($oldRecord->areMetricsEqual($dailyMetrics)) {
-                    \Log::info("Record unchanged for Wiki ID {$wiki->id}, no new record added.");
+                    Log::info("Record unchanged for Wiki ID {$wiki->id}, no new record added.");
                     return;
                 }
             }
@@ -61,14 +62,14 @@ class WikiMetrics
 
         $dailyMetrics->save();
 
-        \Log::info("New metric recorded for Wiki ID {$wiki->id}");
+        Log::info("New metric recorded for Wiki ID {$wiki->id}");
     }
     protected function getNumOfTriples(): ?int
     {
         $qsNamespace = QueryserviceNamespace::whereWikiId($this->wiki->id)->first();
 
         if( !$qsNamespace ) {
-            \Log::info( new \RuntimeException("Namespace for wiki {$this->wiki->id} not found.") );
+            Log::info( new \RuntimeException("Namespace for wiki {$this->wiki->id} not found.") );
             return null;
         }
 
