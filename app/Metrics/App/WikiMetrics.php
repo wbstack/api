@@ -38,7 +38,7 @@ class WikiMetrics
             'is_deleted' => $isDeleted,
             'date' => $today,
             'wiki_id' => $wiki->id,
-            'triple_count' => $tripleCount,
+            'number_of_triples' => $tripleCount,
             'daily_actions' => $dailyActions,
             'weekly_actions' => $weeklyActions,
             'monthly_actions' => $monthlyActions,
@@ -68,13 +68,11 @@ class WikiMetrics
         $qsNamespace = QueryserviceNamespace::whereWikiId($this->wiki->id)->first();
 
         if( !$qsNamespace ) {
-            $this->fail( new \RuntimeException("Namespace for wiki {$this->wiki->id} not found.") );
+            \Log::info( new \RuntimeException("Namespace for wiki {$this->wiki->id} not found.") );
             return null;
         }
 
-        $url = $qsNamespace->backend . '/bigdata/namespace/' . $qsNamespace->namespace;
-        $endpoint = 'https://'. $this->wiki->domain .'/query/sparql';
-
+        $endpoint = $qsNamespace->backend . '/bigdata/namespace/' . $qsNamespace->namespace. '/sparql';
         $query = 'SELECT (COUNT(*) AS ?triples) WHERE { ?s ?p ?o }';
 
         $response = Http::withHeaders([
@@ -82,6 +80,7 @@ class WikiMetrics
         ])->get($endpoint, [
             'query' => $query
         ]);
+
         if ($response->successful()) {
             $data = $response->json();
             return $data['results']['bindings'][0]['triples']['value'];
