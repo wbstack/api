@@ -46,6 +46,7 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
             $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
             $router->get('entityImport', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiEntityImportController@get']);
             $router->post('entityImport', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiEntityImportController@create']);
+            $router->post('profile', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiProfileController@create']);
         });
         $router->apiResource('deletedWikiMetrics', 'DeletedWikiMetricsController')->only(['index'])
             ->middleware(AuthorisedUsersForDeletedWikiMetricsMiddleware::class);
