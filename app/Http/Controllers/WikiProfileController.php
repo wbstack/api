@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helper\ProfileValidator;
+use App\Rules\NonEmptyJsonRule;
 use App\Wiki;
 use App\WikiProfile;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class WikiProfileController extends Controller
     {
         $validatedInput = $request->validate([
             'wiki' => ['required', 'integer'],
-            'profile' => ['required', 'json']
+            'profile' => ['required', 'json', new NonEmptyJsonRule]
         ]);
 
         $wiki = Wiki::find($validatedInput['wiki']);

@@ -74,6 +74,24 @@ class ProfileControllerTest extends TestCase
         ->assertStatus(403);
     }
 
+    public function testFailOnEmptyProfile(): void
+    {
+        $userWiki = Wiki::factory()->create();
+        $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
+
+        $this->actingAs($user, 'api')
+        ->json(
+            'POST',
+            $this->route,
+            [
+                'wiki' => $userWiki->id,
+                'profile' => '{}'
+            ]
+        )
+        ->assertStatus(422);
+    }
+
     public function testFailOnInvalidProfile(): void
     {
         $wiki = Wiki::factory()->create();
