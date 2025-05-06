@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helper\ProfileValidator;
+use App\Http\Resources\WikiResource;
 use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
@@ -17,9 +18,7 @@ use App\WikiManager;
 use App\WikiProfile;
 use App\WikiSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
 use App\Helper\DomainValidator;
@@ -63,14 +62,14 @@ class WikiController extends Controller
             'username' => 'required',
             'profile' => 'nullable|json',
         ]);
-        
+
         $rawProfile = false;
         if ($request->filled('profile') ) {
             $rawProfile = json_decode($request->input('profile'), true);
             $profileValidator = $this->profileValidator->validate($rawProfile);
             $profileValidator->validateWithBag('post');
         }
-        
+
         $wiki = null;
         $dbAssignment = null;
 
@@ -160,12 +159,12 @@ class WikiController extends Controller
               'user_id' => $user->id,
               'wiki_id' => $wiki->id,
             ]);
-            
+
             // Create WikiProfile
             if ($rawProfile) {
                 WikiProfile::create([ 'wiki_id' => $wiki->id, ...$rawProfile ] );
             }
-            
+
 
             // TODO maybe always make these run in a certain order..?
             dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
@@ -263,5 +262,11 @@ class WikiController extends Controller
     public static function isSubDomain( string $domain, string $subDomainSuffix = null  ): bool {
         $subDomainSuffix = $subDomainSuffix ?? Config::get('wbstack.subdomain_suffix');
         return preg_match('/' . preg_quote( $subDomainSuffix ) . '$/', $domain) === 1;
+    }
+
+    public function show(Wiki $wiki)
+    {
+        $wiki->load('latestProfile');
+        return new WikiResource($wiki);
     }
 }
