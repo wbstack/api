@@ -1,5 +1,8 @@
 # api
 
+## 10x.19.4
+- Extend wiki details with profile data
+
 ## 10x.19.3
 - Set specific Helm and Helmfile versions
 
