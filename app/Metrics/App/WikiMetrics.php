@@ -2,9 +2,12 @@
 
 namespace App\Metrics\App;
 
+use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDailyMetrics;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class WikiMetrics
 {
@@ -21,6 +24,7 @@ class WikiMetrics
 
         $today = now()->format('Y-m-d');
         $oldRecord = WikiDailyMetrics::where('wiki_id', $wiki->id)->latest('date')->first();
+        $tripleCount = $this->getNumOfTriples();
         $todayPageCount = $wiki->wikiSiteStats()->first()->pages ?? 0;
         $isDeleted = (bool)$wiki->deleted_at;
 
@@ -35,21 +39,22 @@ class WikiMetrics
             'is_deleted' => $isDeleted,
             'date' => $today,
             'wiki_id' => $wiki->id,
-            'daily_actions'=> $dailyActions,
-            'weekly_actions'=> $weeklyActions,
-            'monthly_actions'=> $monthlyActions,
-            'quarterly_actions'=> $quarterlyActions,
+            'number_of_triples' => $tripleCount,
+            'daily_actions' => $dailyActions,
+            'weekly_actions' => $weeklyActions,
+            'monthly_actions' => $monthlyActions,
+            'quarterly_actions' => $quarterlyActions,
         ]);
 
         // compare current record to old record and only save if there is a change
         if ($oldRecord) {
             if ($oldRecord->is_deleted) {
-                \Log::info("Wiki is deleted, no new record for WikiMetrics ID {$wiki->id}.");
+                Log::info("Wiki is deleted, no new record for Wiki ID {$wiki->id}.");
                 return;
             }
             if (!$isDeleted) {
                 if ($oldRecord->areMetricsEqual($dailyMetrics)) {
-                    \Log::info("Record unchanged for WikiMetrics ID {$wiki->id}, no new record added.");
+                    Log::info("Record unchanged for Wiki ID {$wiki->id}, no new record added.");
                     return;
                 }
             }
@@ -57,7 +62,31 @@ class WikiMetrics
 
         $dailyMetrics->save();
 
-        \Log::info("New metric recorded for Wiki ID {$wiki->id}");
+        Log::info("New metric recorded for Wiki ID {$wiki->id}");
+    }
+    protected function getNumOfTriples(): ?int
+    {
+        $qsNamespace = QueryserviceNamespace::whereWikiId($this->wiki->id)->first();
+
+        if( !$qsNamespace ) {
+            Log::info( new \RuntimeException("Namespace for wiki {$this->wiki->id} not found.") );
+            return null;
+        }
+
+        $endpoint = $qsNamespace->backend . '/bigdata/namespace/' . $qsNamespace->namespace. '/sparql';
+        $query = 'SELECT (COUNT(*) AS ?triples) WHERE { ?s ?p ?o }';
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/sparql-results+json'
+        ])->get($endpoint, [
+            'query' => $query
+        ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            return $data['results']['bindings'][0]['triples']['value'];
+        }
+        return null;
     }
 
     protected function getNumberOfActions(string $interval): null|int
@@ -65,7 +94,7 @@ class WikiMetrics
         $actions = null;
 
         // safeguard
-        if (false === in_array($interval, 
+        if (false === in_array($interval,
         [
                 self::INTERVAL_DAILY,
                 self::INTERVAL_WEEKLY,

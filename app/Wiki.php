@@ -182,4 +182,8 @@ class Wiki extends Model
     public function getDomainDecodedAttribute(): string {
         return DomainHelper::decode($this->domain);
     }
+
+    public function wikiLatestProfile() {
+        return $this->hasOne(WikiProfile::class)->latestOfMany();
+    }
 }
