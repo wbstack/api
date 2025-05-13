@@ -1,5 +1,8 @@
 # api
 
+## 10x.19.5
+- Add POST endpoint for wiki profiles
+
 ## 10x.19.4
 - Extend wiki details with profile data
 
