@@ -17,9 +17,7 @@ use App\WikiManager;
 use App\WikiProfile;
 use App\WikiSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
 use App\Helper\DomainValidator;
@@ -63,14 +61,14 @@ class WikiController extends Controller
             'username' => 'required',
             'profile' => 'nullable|json',
         ]);
-        
+
         $rawProfile = false;
         if ($request->filled('profile') ) {
             $rawProfile = json_decode($request->input('profile'), true);
             $profileValidator = $this->profileValidator->validate($rawProfile);
             $profileValidator->validateWithBag('post');
         }
-        
+
         $wiki = null;
         $dbAssignment = null;
 
@@ -160,12 +158,12 @@ class WikiController extends Controller
               'user_id' => $user->id,
               'wiki_id' => $wiki->id,
             ]);
-            
+
             // Create WikiProfile
             if ($rawProfile) {
                 WikiProfile::create([ 'wiki_id' => $wiki->id, ...$rawProfile ] );
             }
-            
+
 
             // TODO maybe always make these run in a certain order..?
             dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
@@ -250,6 +248,7 @@ class WikiController extends Controller
         $wiki = Wiki::where('id', $wikiId)
       ->with('wikiManagers')
       ->with('wikiDbVersion')
+      ->with('wikiLatestProfile')
       ->with('publicSettings')->first();
 
         $res = [
