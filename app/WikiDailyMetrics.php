@@ -28,6 +28,8 @@ class WikiDailyMetrics extends Model
         'monthly_actions',
         'quarterly_actions',
         'number_of_triples',
+        'monthly_casual_users',
+        'monthly_active_users',
 
     ];
 
