@@ -10,21 +10,32 @@ use App\WikiManager;
 class LimitWikiAccess
 {
     /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * Reject any incoming request unless the user is a manager of the
+     * requested wiki. If the user is authorized, inject the wiki
+     * object into the request context.
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $userHasAccess = WikiManager::where([
-            'user_id' => $request->user()?->id,
-            'wiki_id' => $request->input('wiki'),
-        ])->exists();
+        $validatedInput = $request->validate([
+            'wiki' => ['required', 'integer']
+        ]);
 
-        if (!$userHasAccess) {
+        $wikiManager = WikiManager::where([
+            'user_id' => $request->user()?->id,
+            'wiki_id' => $validatedInput['wiki'],
+        ])
+        ->with('wiki')
+        ->first();
+
+        if (!$wikiManager) {
             abort(403);
         }
 
+        if (!$wikiManager->wiki) {
+            abort(404, 'No such wiki');
+        }
+
+        $request->attributes->set('wiki', $wikiManager->wiki);
         return $next($request);
     }
 }
