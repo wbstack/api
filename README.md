@@ -98,6 +98,12 @@ Currently most of the tests require the DB connection to exist.
 docker-compose exec api vendor/bin/phpunit
 ```
 
+### Linting
+
+```sh
+docker compose exec api vendor/bin/pint --test -v
+```
+
 #### Debugging
 
 If you get a CORS error from an API when testing, it might be due to an exception internally, resulting in a 500 response with no CORS.
