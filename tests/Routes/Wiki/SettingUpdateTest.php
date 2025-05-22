@@ -38,18 +38,20 @@ class SettingUpdateTest extends TestCase
           ->assertJsonStructure(['errors' => ['setting']]);
     }
 
-    public function testValidSettingNoWiki()
+    public function testFailOnWrongWikiManager(): void
     {
         $settingName = 'wwExtEnableConfirmAccount';
-
+        $userWiki = Wiki::factory()->create();
+        $otherWiki = Wiki::factory()->create();
         $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
-            ->json('POST', str_replace('foo', $settingName, $this->route), [
-            'wiki' => 99856,
-            'setting' => $settingName,
-            'value' => '1',
-          ])
-          ->assertStatus(401);
+            ->postJson(str_replace('foo', $settingName, $this->route), [
+                'wiki' => $otherWiki->id,
+                'setting' => $settingName,
+                'value' => '1'
+            ])
+            ->assertStatus(401);
     }
 
     static public function provideValidSettings()
