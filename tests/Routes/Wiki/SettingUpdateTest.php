@@ -26,11 +26,12 @@ class SettingUpdateTest extends TestCase
     public function testSetInvalidSetting()
     {
         $settingName = 'iDoNotExistAsASetting';
-
+        $wiki = Wiki::factory()->create();
         $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [
-            'wiki' => 1,
+            'wiki' => $wiki->id,
             'setting' => $settingName,
             'value' => '1',
           ])
@@ -51,7 +52,7 @@ class SettingUpdateTest extends TestCase
                 'setting' => $settingName,
                 'value' => '1'
             ])
-            ->assertStatus(401);
+            ->assertStatus(403);
     }
 
     static public function provideValidSettings()
@@ -156,11 +157,13 @@ class SettingUpdateTest extends TestCase
      */
     public function testValidSettingBadValues($settingName, $settingValue)
     {
+        $wiki = Wiki::factory()->create();
         $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [
-            'wiki' => 1,
+            'wiki' => $wiki->id,
             'setting' => $settingName,
             'value' => $settingValue,
             ])

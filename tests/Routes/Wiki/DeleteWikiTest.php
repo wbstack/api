@@ -43,6 +43,6 @@ class DeleteWikiTest extends TestCase
         WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
             ->post('wiki/delete', ['wiki' => $otherWiki->id])
-            ->assertStatus(401);
+            ->assertStatus(403);
     }
 }
