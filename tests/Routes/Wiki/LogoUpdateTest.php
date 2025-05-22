@@ -65,6 +65,6 @@ class LogoUpdateTest extends TestCase
             ->createWithContent("logo_200x200.png", file_get_contents(__DIR__ . "/../../data/logo_200x200.png"));
         $this->actingAs($user, 'api')
             ->post('wiki/logo/update', ['wiki' => $otherWiki->id, 'logo' => $file])
-            ->assertStatus(401);
+            ->assertStatus(403);
     }
 }
