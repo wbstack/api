@@ -22,7 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('wiki_daily_metric', function (Blueprint $table) {
+        Schema::table('wiki_daily_metrics', function (Blueprint $table) {
+            $table->dropColumn('monthly_casual_users');
+            $table->dropColumn('monthly_active_users');
         });
     }
 };
