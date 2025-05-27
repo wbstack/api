@@ -33,6 +33,8 @@ class WikiMetrics
         $monthlyActions = $this->getNumberOfActions(self::INTERVAL_MONTHLY);
         $quarterlyActions = $this->getNumberOfActions(self::INTERVAL_QUARTERLY);
 
+        $monthlyNumberOfUsersPerActivityType = $this->getNumberOfUsersPerActivityType();
+
         $dailyMetrics = new WikiDailyMetrics([
             'id' => $wiki->id . '_' . date('Y-m-d'),
             'pages' => $todayPageCount,
@@ -44,6 +46,8 @@ class WikiMetrics
             'weekly_actions' => $weeklyActions,
             'monthly_actions' => $monthlyActions,
             'quarterly_actions' => $quarterlyActions,
+            'monthly_casual_users' => $monthlyNumberOfUsersPerActivityType[0],
+            'monthly_active_users' => $monthlyNumberOfUsersPerActivityType[1],
         ]);
 
         // compare current record to old record and only save if there is a change
@@ -129,5 +133,42 @@ class WikiMetrics
         $actions = Arr::get($result, 'sum_actions', null);
 
         return $actions;
+    }
+
+    private function getNumberOfUsersPerActivityType() : array
+    {
+        $wikiDb = $this->wiki->wikiDb;
+        $tableRecentChanges = $wikiDb->name . '.' . $wikiDb->prefix . '_recentchanges';
+        $tableActor = $wikiDb->name . '.' . $wikiDb->prefix . '_actor';
+        $query = "SELECT
+            COUNT(CASE WHEN activity_count >= 1 AND activity_count < 5 THEN 1 END) AS monthly_casual_users,
+            COUNT(CASE WHEN activity_count >= 5 THEN 1 END) AS monthly_active_users
+        FROM (
+            SELECT
+                rc.rc_actor,
+                COUNT(*) AS activity_count
+            FROM
+                $tableRecentChanges AS rc
+                INNER JOIN $tableActor AS a ON rc.rc_actor = a.actor_id
+	        WHERE rc.rc_timestamp >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y%m%d%H%i%S') -- monthly
+		        /*
+		        Conditions below added for consistency with Wikidata: https://phabricator.wikimedia.org/diffusion/ADES/browse/master/src/wikidata/site_stats/sql/active_user_changes.sql
+		        */
+    	       AND a.actor_user != 0
+    	       AND rc.rc_bot = 0
+    	       AND (rc.rc_log_type != 'newusers' OR rc.rc_log_type IS NULL)
+               GROUP BY rc.rc_actor
+        ) AS actor_activity";
+
+        $manager = app()->db;
+        $manager->purge('mw');
+        $conn = $manager->connection('mw');
+        $pdo = $conn->getPdo();
+        $result = $pdo->query($query)->fetch();
+
+        return [
+            Arr::get($result, 'monthly_casual_users', null),
+            Arr::get($result, 'monthly_active_users',null)
+        ];
     }
 }
