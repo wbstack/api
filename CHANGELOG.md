@@ -1,5 +1,8 @@
 # api
 
+## 10x.19.6
+- Add metrics, monthly casual users and active users
+
 ## 10x.19.5
 - Add POST endpoint for wiki profiles
 
