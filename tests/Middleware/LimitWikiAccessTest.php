@@ -64,6 +64,7 @@ class LimitWikiAccessTest extends TestCase
     public function testFailOnDeletedWiki(): void
     {
         [$wiki, $user] = $this->createWikiAndUser();
+        $wiki->wikiManagers()->delete();
         $wiki->delete();
         $this->actingAs($user)->json('GET', $this->getURI($wiki))->assertStatus(404);
     }

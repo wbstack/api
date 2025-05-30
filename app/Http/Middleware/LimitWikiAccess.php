@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\WikiManager;
+use App\Wiki;
 
 class LimitWikiAccess
 {
@@ -20,22 +20,21 @@ class LimitWikiAccess
             'wiki' => ['required', 'integer']
         ]);
 
-        $wikiManager = WikiManager::where([
-            'user_id' => $request->user()?->id,
-            'wiki_id' => $validatedInput['wiki'],
-        ])
-        ->with('wiki')
-        ->first();
+        $wiki = Wiki::find($validatedInput['wiki']);
+
+        if (!$wiki) {
+            abort(404, 'No such wiki');
+        }
+
+        $wikiManager = $wiki->wikiManagers()
+            ->where('user_id', $request->user()?->id)
+            ->first();
 
         if (!$wikiManager) {
             abort(403);
         }
 
-        if (!$wikiManager->wiki) {
-            abort(404, 'No such wiki');
-        }
-
-        $request->attributes->set('wiki', $wikiManager->wiki);
+        $request->attributes->set('wiki', $wiki);
         return $next($request);
     }
 }
