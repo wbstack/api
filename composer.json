@@ -36,6 +36,7 @@
     "require-dev": {
         "barryvdh/laravel-ide-helper": "2.13",
         "fakerphp/faker": "^1.17",
+        "laravel/pint": "^1.22",
         "mockery/mockery": "^1.4",
         "phpunit/phpunit": "^10.5",
         "psalm/plugin-laravel": "^2.8",
@@ -68,8 +69,7 @@
         ],
         "psalm": "vendor/bin/psalm",
         "phpunit": "vendor/bin/phpunit",
-        "check-style": "php-cs-fixer fix --dry-run --diff",
-        "fix-style": "php-cs-fixer fix"
+        "pint": "vendor/bin/pint"
     },
     "config": {
         "platform": {
