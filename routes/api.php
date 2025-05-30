@@ -43,8 +43,6 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
             $router->get('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
             $router->post('logo/update', ['uses' => 'WikiLogoController@update']);
             $router->post('setting/{setting}/update', ['uses' => 'WikiSettingController@update']);
-            // TODO should wiki managers really be here?
-            $router->post('managers/list', ['uses' => 'WikiManagersController@getManagersOfWiki']);
             $router->get('entityImport', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiEntityImportController@get']);
             $router->post('entityImport', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiEntityImportController@create']);
             $router->post('profile', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiProfileController@create']);
