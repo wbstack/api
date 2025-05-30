@@ -8,9 +8,12 @@ use App\WikiManager;
 use Illuminate\Http\Request;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class LimitWikiAccessTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function setUp(): void
     {
         parent::setUp();
