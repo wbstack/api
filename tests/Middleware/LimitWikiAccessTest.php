@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Route;
 
-class LimitWikiAccessText extends TestCase
+class LimitWikiAccessTest extends TestCase
 {
     public function setUp(): void
     {
