@@ -26,7 +26,7 @@ If the address includes the placeholder `<subject>`, it gets replaced with a sho
 
 It is recommened to install the php dependencies via a composer docker container as that contains the required php extensions: 
 ```
-docker run --rm -it -v $PWD:/app -u $(id -u):$(id -g) composer install
+docker run --rm -it -v $PWD:/app -u $(id -u):$(id -g) composer install --ignore-platform-reqs
 ```
 
 Alternatively, you can run `composer` on your local machine (ignoring platform requirements):
@@ -38,14 +38,18 @@ composer install --ignore-platform-reqs
 
 `cp .env.example .env` and modify the contents accordingly.
 
-### docker-compose
+### Docker compose
 
-You should be able to run some amount of this application in docker-compose.
+You should be able to run some amount of this application in docker compose.
 
 Though the experience is not that refined...
 
 ```sh
-docker-compose up -d
+# Start the stack in the background
+docker compose up -d
+
+# Stop the stack and delete all volumes
+docker compose down --volumes
 ```
 
 ### Migrations  
@@ -53,31 +57,31 @@ docker-compose up -d
 Run everything in one go ...
 
 ```sh
-docker-compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install && php artisan db:seed && php artisan key:generate && php artisan storage:link'
+docker compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install && php artisan db:seed && php artisan key:generate && php artisan storage:link'
 ```
 
 Or each command separately ...
 
 ```sh
 # Create the SQL tables needed
-docker-compose exec api php artisan migrate:fresh
+docker compose exec api php artisan migrate:fresh
 
 # Create some certs needed for authentication (passport is a laravel plugin)
-docker-compose exec api php artisan passport:install
+docker compose exec api php artisan passport:install
 
 # Seed some useful development data
-docker-compose exec api php artisan db:seed
+docker compose exec api php artisan db:seed
 
 # Generate and set the APP_KEY env variable.
-docker-compose exec api php artisan key:generate
+docker compose exec api php artisan key:generate
 
 # Create a symlink from `public/storage` to `storage/app/public`
-docker-compose exec api php artisan storage:link
+docker compose exec api php artisan storage:link
 ```
 
 Try loading http://localhost:8070/ until the DB is up and the connection works.
 
-If you want to develop with the UI then simply point the UI docker-compose setup to localhost:8082
+If you want to develop with the UI then simply point the UI docker compose setup to localhost:8082
 
 ### Seeded data
 
@@ -95,7 +99,7 @@ And create a wiki.
 Currently most of the tests require the DB connection to exist.
 
 ```sh
-docker-compose exec api vendor/bin/phpunit
+docker compose exec api vendor/bin/phpunit
 ```
 
 ### Linting
