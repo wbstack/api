@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\WikiEntityImportStatus;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Wiki;
 use App\WikiEntityImport;
 use App\Jobs\WikiEntityImportJob;
 use Carbon\Carbon;

@@ -47,9 +47,9 @@ class LimitWikiAccessTest extends TestCase
         [$wiki, $user] = $this->createWikiAndUser();
 
         $this->actingAs($user)
-        ->json('GET', $this->getURI($wiki))
-        ->assertStatus(200)
-        ->assertJson(['wiki_id' => $wiki->id]);
+            ->json('GET', $this->getURI($wiki))
+            ->assertStatus(200)
+            ->assertJson(['wiki_id' => $wiki->id]);
     }
 
     public function testFailOnWrongWikiManager(): void

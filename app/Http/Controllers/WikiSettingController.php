@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Rules\SettingCaptchaQuestions;
 use App\Rules\SettingWikibaseManifestEquivEntities;
-use App\WikiManager;
 use App\WikiSetting;
 use Illuminate\Http\Request;
 

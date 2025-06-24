@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\Routes\Traits\PostRequestNeedAuthentication;
 use Tests\TestCase;
-use Database\Factories\UserFactory;
 
 class SettingUpdateTest extends TestCase
 {
