@@ -108,6 +108,10 @@ class Wiki extends Model
         return $this->hasMany(WikiEntityImport::class);
     }
 
+    public function wikiManagers(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany(WikiManager::class);
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      *
@@ -150,7 +154,7 @@ class Wiki extends Model
     );
     }
 
-    public function wikiManagers()
+    public function wikiManagersWithEmail()
     {
         // TODO should this be hasMany ?
         /**

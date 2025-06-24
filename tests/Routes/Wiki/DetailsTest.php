@@ -61,6 +61,17 @@ class DetailsTest extends TestCase
         $this->assertEquals(1, $publicSettings[0]['value']);
     }
 
+    public function testFailOnWrongWikiManager(): void
+    {
+        $userWiki = Wiki::factory()->create();
+        $otherWiki = Wiki::factory()->create();
+        $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
+        $this->actingAs($user, 'api')
+            ->postJson($this->route, ['wiki' => $otherWiki->id])
+            ->assertStatus(403);
+    }
+
     public function testWikiProfile()
     {
         $wiki = Wiki::factory()->create();
