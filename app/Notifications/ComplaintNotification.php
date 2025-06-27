@@ -11,24 +11,24 @@ use Illuminate\Support\Facades\Lang;
  */
 class ComplaintNotification extends Notification
 {
-    public $textUrls;
-    public $textReason;
+    public $offendingUrls;
+    public $reason;
     public $name;
     public $mailAddress;
 
     /**
      * Create a notification instance.
      *
-     * @param  string  $textUrls
-     * @param  string  $textReason
+     * @param  string  $offendingUrls
+     * @param  string  $reason
      * @param  string  $name
      * @param  string  $mailAddress
      * @return void
      */
-    public function __construct($textUrls, $textReason, $name='', $mailAddress='')
+    public function __construct($offendingUrls, $reason, $name='', $mailAddress='')
     {
-        $this->textUrls = $textUrls;
-        $this->textReason = $textReason;
+        $this->offendingUrls = $offendingUrls;
+        $this->reason = $reason;
         $this->name = $name;
         $this->mailAddress = $mailAddress;
     }
@@ -65,10 +65,10 @@ class ComplaintNotification extends Notification
             ->line(Lang::get('Reporter name: ') . $name)
             ->line(Lang::get('Reporter email address: ') . $mailAddress)
             ->line(Lang::get('Reason:'))
-            ->line($this->textReason)
+            ->line($this->reason)
             ->line('---')
             ->line(Lang::get('Reported URLs:'))
-            ->line($this->textUrls)
+            ->line($this->offendingUrls)
             ->line('---');
     }
 }
