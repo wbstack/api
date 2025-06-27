@@ -25,7 +25,7 @@ class ComplaintNotification extends Notification
      * @param  string  $mailAddress
      * @return void
      */
-    public function __construct($offendingUrls, $reason, $name='None', $mailAddress='None')
+    public function __construct($offendingUrls, $reason, $name=null, $mailAddress=null)
     {
         $this->offendingUrls = $offendingUrls;
         $this->reason = $reason;
@@ -52,6 +52,17 @@ class ComplaintNotification extends Notification
      */
     public function toMail($notifiable)
     {
+        $name = $this->name;
+        $mailAddress = $this->mailAddress;
+
+        if (empty($name)) {
+            $name = 'None';
+        }
+
+        if (empty($mailAddress)) {
+            $mailAddress = 'None';
+        }
+
         $mailFrom = config('app.complaint-mail-sender');
         $mailSubject = config('app.name') . ': Report of Illegal Content';
 
@@ -59,11 +70,10 @@ class ComplaintNotification extends Notification
             ->from($mailFrom)
             ->subject($mailSubject)
             ->line(Lang::get('A message via the wikibase.cloud form for reporting illegal content has been submitted.'))
-            ->line(Lang::get('Reporter name: ') . $this->name)
-            ->line(Lang::get('Reporter email address: ') . $this->mailAddress)
+            ->line(Lang::get('Reporter name: ') . $name)
+            ->line(Lang::get('Reporter email address: ') . $mailAddress)
             ->line(Lang::get('Reason why the information in question is illegal content:'))
             ->line($this->reason)
-            ->line('---')
             ->line(Lang::get('URL(s) for the content in question:'))
             ->line($this->offendingUrls)
             ->line('---');

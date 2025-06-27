@@ -74,13 +74,8 @@ class ComplaintController extends Controller
      */
     protected function validator(array $data): \Illuminate\Validation\Validator
     {
-        if (! isset($data['name'])) {
-            $data['name'] = '';
-        }
-
-        if (! isset($data['mailAddress'])) {
-            $data['mailAddress'] = '';
-        }
+        $data['name'] = $data['name'] ?? '';
+        $data['mailAddress'] = $data['mailAddress'] ?? '';
 
         $validation = [
             'recaptcha'      => ['required', 'string', 'bail', $this->recaptchaValidation],
