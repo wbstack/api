@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\ExternalComplaintNotification;
 use App\Notifications\ComplaintNotification;
 use App\Rules\ReCaptchaValidation;
 use Illuminate\Http\Request;
@@ -51,6 +52,19 @@ class ComplaintController extends Controller
                 $validated['mailAddress'],
             )
         );
+
+        if (! empty($validated['mailAddress'])) {
+            Notification::route('mail', [
+                $validated['mailAddress'],
+            ])->notify(
+                new ExternalComplaintNotification(
+                    $validated['offendingUrls'],
+                    $validated['reason'],
+                    $validated['name'],
+                    $validated['mailAddress'],
+                )
+            );
+        }
 
         return response()->json('Success', 200);
     }
