@@ -14,7 +14,7 @@
         "firebase/php-jwt": "^6.10",
         "google/recaptcha": "^1.2",
         "guzzlehttp/guzzle": "^7.8",
-        "guzzlehttp/psr7": "^1.9",
+        "guzzlehttp/psr7": "^2.7",
         "hackzilla/password-generator": "^1.6",
         "intervention/image": "^2.5",
         "laravel/framework": "^10.10",
