@@ -42,17 +42,6 @@ class ComplaintController extends Controller
 
         $validated = $validator->safe();
 
-        Notification::route('mail', [
-            config('app.complaint-mail-recipient'),
-        ])->notify(
-            new ComplaintNotification(
-                $validated['offendingUrls'],
-                $validated['reason'],
-                $validated['name'],
-                $validated['mailAddress'],
-            )
-        );
-
         if (! empty($validated['mailAddress'])) {
             Notification::route('mail', [
                 $validated['mailAddress'],
@@ -65,6 +54,17 @@ class ComplaintController extends Controller
                 )
             );
         }
+
+        Notification::route('mail', [
+            config('app.complaint-mail-recipient'),
+        ])->notify(
+            new ComplaintNotification(
+                $validated['offendingUrls'],
+                $validated['reason'],
+                $validated['name'],
+                $validated['mailAddress'],
+            )
+        );
 
         return response()->json('Success', 200);
     }
