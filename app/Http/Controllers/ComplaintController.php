@@ -88,7 +88,7 @@ class ComplaintController extends Controller
                 'max:300',
                 Rule::when(
                     !empty($mailAddress), 
-                    ['email:rfc,dns']
+                    ['email:rfc']
                 ),
             ],
         ];
