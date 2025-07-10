@@ -87,7 +87,7 @@ class ComplaintController extends Controller
                 'nullable',
                 'max:300',
                 Rule::when(
-                    !empty($mailAddress), 
+                    !empty($data['mailAddress']),
                     ['email:rfc']
                 ),
             ],
