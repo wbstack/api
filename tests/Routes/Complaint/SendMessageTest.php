@@ -49,12 +49,22 @@ class SendMessageTest extends TestCase
         $response->assertStatus(401);
     }
 
-    public function testSendMessage_InvalidMailAddress()
+    public function testSendMessage_InvalidMailAddressRfc()
     {
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateFilled;
         $data['mailAddress'] = "invalid-mail-address";
+        $response = $this->json('POST', $this->route, $data);
+        $response->assertStatus(400);
+    }
+
+    public function testSendMessage_InvalidMailAddressMulti()
+    {
+        $this->mockReCaptchaValidation();
+
+        $data = $this->postDataTemplateFilled;
+        $data['mailAddress'] = "mail@example.com, foo@bar.com";
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
     }
@@ -88,7 +98,6 @@ class SendMessageTest extends TestCase
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
     }
-
 
     public function testSendMessage_NoNameNorMailAddress()
     {
