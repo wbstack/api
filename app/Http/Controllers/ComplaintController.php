@@ -43,16 +43,18 @@ class ComplaintController extends Controller
         $validated = $validator->safe();
 
         if (! empty($validated['mailAddress'])) {
-            Notification::route('mail', [
-                $validated['mailAddress'],
-            ])->notify(
-                new ComplaintNotificationExternal(
+            $internalNotification = new ComplaintNotificationExternal(
                     $validated['offendingUrls'],
                     $validated['reason'],
                     $validated['name'],
                     $validated['mailAddress'],
-                )
             );
+
+            Notification::route('mail', [
+                $validated['mailAddress'],
+            ])->notify($internalNotification);
+
+            Notification::route('database', $validated['mailAddress'])->notify($internalNotification);
         }
 
         Notification::route('mail', [

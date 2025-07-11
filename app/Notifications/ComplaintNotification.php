@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
@@ -77,5 +78,11 @@ class ComplaintNotification extends Notification
             ->line(Lang::get('URL(s) for the content in question:'))
             ->line($this->offendingUrls)
             ->line('---');
+    }
+
+    public function toDatabase($notifiable) {
+        $mail = $this->toMail($notifiable);
+
+        return (new DatabaseMessage($mail->toArray()));
     }
 }
