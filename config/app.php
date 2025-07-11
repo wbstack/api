@@ -10,6 +10,9 @@ return [
     'contact-mail-recipient' => env('WBSTACK_CONTACT_MAIL_RECIPIENT', 'wikibase-cloud-owner@lists.wikimedia.org'),
     'contact-mail-sender' => env('WBSTACK_CONTACT_MAIL_SENDER', 'contact-<subject>@wikibase.cloud'),
 
+    'complaint-mail-recipient' => env('WBSTACK_COMPLAINT_MAIL_RECIPIENT', 'dsa-meldung@wikimedia.de'),
+    'complaint-mail-sender' => env('WBSTACK_COMPLAINT_MAIL_SENDER', 'dsa@wikibase.cloud'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
