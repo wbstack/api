@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Lang;
 /**
  * A notification to be sent when the legal complaint form is being used.
  */
-class ExternalComplaintNotification extends ComplaintNotification
+class ComplaintNotificationExternal extends ComplaintNotification
 {
     /**
      * Build the mail representation of the notification.
