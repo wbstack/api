@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
+use App\ComplaintRecord;
 
 class ComplaintController extends Controller
 {
@@ -42,31 +43,39 @@ class ComplaintController extends Controller
 
         $validated = $validator->safe();
 
-        if (! empty($validated['mailAddress'])) {
-            $internalNotification = new ComplaintNotificationExternal(
-                    $validated['offendingUrls'],
-                    $validated['reason'],
-                    $validated['name'],
-                    $validated['mailAddress'],
-            );
+        $complaintRecord = new ComplaintRecord;
+        $complaintRecord->name = $validated['name'];
+        $complaintRecord->mail_address = $validated['mailAddress'];
+        $complaintRecord->reason = $validated['reason'];
+        $complaintRecord->offending_urls = $validated['offendingUrls'];
+        $complaintRecord->save();
 
+        if (! empty($validated['mailAddress'])) {
             Notification::route('mail', [
                 $validated['mailAddress'],
-            ])->notify($internalNotification);
-
-            Notification::route('database', $validated['mailAddress'])->notify($internalNotification);
+            ])->notify(
+                new ComplaintNotificationExternal(
+                    $complaintRecord->offending_urls,
+                    $complaintRecord->reason,
+                    $complaintRecord->name,
+                    $complaintRecord->mail_address,
+                )
+            );
         }
 
         Notification::route('mail', [
             config('app.complaint-mail-recipient'),
         ])->notify(
-            new ComplaintNotification(
-                $validated['offendingUrls'],
-                $validated['reason'],
-                $validated['name'],
-                $validated['mailAddress'],
+    new ComplaintNotification(
+            $complaintRecord->offending_urls,
+            $complaintRecord->reason,
+            $complaintRecord->name,
+            $complaintRecord->mail_address,
             )
         );
+
+        $complaintRecord->markAsDispatched();
+        $complaintRecord->save();
 
         return response()->json('Success', 200);
     }
