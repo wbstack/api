@@ -45,14 +45,14 @@ class ComplaintController extends Controller
 
         $complaintRecord = new ComplaintRecord;
         $complaintRecord->name = $validated['name'];
-        $complaintRecord->mail_address = $validated['mailAddress'];
-        $complaintRecord->reason = $validated['reason'];
-        $complaintRecord->offending_urls = $validated['offendingUrls'];
+        $complaintRecord->mail_address = $validated['email'];
+        $complaintRecord->reason = $validated['message'];
+        $complaintRecord->offending_urls = $validated['url'];
         $complaintRecord->save();
 
-        if (! empty($validated['mailAddress'])) {
+        if (! empty($complaintRecord->mail_address)) {
             Notification::route('mail', [
-                $validated['mailAddress'],
+               $complaintRecord->mail_address,
             ])->notify(
                 new ComplaintNotificationExternal(
                     $complaintRecord->offending_urls,
@@ -86,15 +86,15 @@ class ComplaintController extends Controller
     protected function validator(array $data): \Illuminate\Validation\Validator
     {
         $data['name'] = $data['name'] ?? '';
-        $data['mailAddress'] = $data['mailAddress'] ?? '';
+        $data['email'] = $data['email'] ?? '';
 
         $validation = [
             'recaptcha'      => ['required', 'string', 'bail', $this->recaptchaValidation],
             'name'           => ['nullable', 'string', 'max:300'],
-            'reason'         => ['required', 'string', 'max:10000'],
-            'offendingUrls'  => ['required', 'string', 'max:10000'],
+            'message'        => ['required', 'string', 'max:10000'],
+            'url'            => ['required', 'string', 'max:10000'],
 
-            'mailAddress'    => [
+            'email'    => [
                 'nullable',
                 'max:300',
                 Rule::when(
