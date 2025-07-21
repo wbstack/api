@@ -23,7 +23,37 @@ class WikiDailyMetrics extends Model
         'date',
         'pages',
         'is_deleted',
+        'daily_actions',
+        'weekly_actions',
+        'monthly_actions',
+        'quarterly_actions',
+        'number_of_triples',
+        'monthly_casual_users',
+        'monthly_active_users',
+
     ];
 
+    // list of properties which are actual wiki metrics
+    public static $metricNames = [
+        'pages',
+        'is_deleted',
+        'daily_actions',
+        'weekly_actions',
+        'monthly_actions',
+        'quarterly_actions',
+        'number_of_triples',
+        'monthly_casual_users',
+        'monthly_active_users',
+    ];
 
+    public function areMetricsEqual(WikiDailyMetrics $wikiDailyMetrics): bool
+    {
+        foreach(self::$metricNames as $field) {
+            if ($this->$field != $wikiDailyMetrics->$field) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

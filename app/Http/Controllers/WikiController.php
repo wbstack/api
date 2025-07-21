@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\ProfileValidator;
 use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
@@ -13,9 +14,9 @@ use App\Wiki;
 use App\WikiDb;
 use App\WikiDomain;
 use App\WikiManager;
+use App\WikiProfile;
 use App\WikiSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Config;
@@ -25,9 +26,11 @@ use App\Helper\DomainHelper;
 class WikiController extends Controller
 {
     private $domainValidator;
+    private $profileValidator;
 
-    public function __construct( DomainValidator $domainValidator )
+    public function __construct( DomainValidator $domainValidator, ProfileValidator $profileValidator )
     {
+        $this->profileValidator = $profileValidator;
         $this->domainValidator = $domainValidator;
     }
 
@@ -42,28 +45,35 @@ class WikiController extends Controller
                 abort(503, 'Search enabled, but its configuration is invalid');
             }
         }
-
         $user = $request->user();
 
         $submittedDomain = strtolower($request->input('domain'));
         $submittedDomain = DomainHelper::encode($submittedDomain);
 
-        $validator = $this->domainValidator->validate( $submittedDomain );
+        $domainValidator = $this->domainValidator->validate( $submittedDomain );
         $isSubdomain = $this->isSubDomain($submittedDomain);
 
-        $validator->validateWithBag('post');
+        $domainValidator->validateWithBag('post');
 
         // TODO extra validation that username is correct?
         $request->validate([
             'sitename' => 'required|min:3',
             'username' => 'required',
+            'profile' => 'nullable|json',
         ]);
+
+        $rawProfile = false;
+        if ($request->filled('profile') ) {
+            $rawProfile = json_decode($request->input('profile'), true);
+            $profileValidator = $this->profileValidator->validate($rawProfile);
+            $profileValidator->validateWithBag('post');
+        }
 
         $wiki = null;
         $dbAssignment = null;
 
         // TODO create with some sort of owner etc?
-        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain, $submittedDomain) {
+        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain, $submittedDomain, $rawProfile) {
             $dbVersion = Config::get('wbstack.wiki_db_use_version');
             $wikiDbCondition = ['wiki_id'=>null, 'version'=>$dbVersion];
 
@@ -97,12 +107,37 @@ class WikiController extends Controller
                 abort(503, 'QS Namespace ready, but failed to assign');
             }
 
+            // Create keys for OAuth2
+            // T336937
+            $keyPair = openssl_pkey_new([
+                'private_key_bits' => 2048,
+                'private_key_type' => OPENSSL_KEYTYPE_RSA,
+            ]);
+            // Extract private key
+            openssl_pkey_export($keyPair, $wgOAuth2PrivateKey);
+            // Extract pub key
+            $keyDetails = openssl_pkey_get_details($keyPair);
+            $wgOAuth2PublicKey = $keyDetails['key'];
+
+            WikiSetting::create([
+                'wiki_id' => $wiki->id,
+                'name' => WikiSetting::wgOAuth2PrivateKey,
+                'value' => $wgOAuth2PrivateKey,
+            ]);
+
+            WikiSetting::create([
+                'wiki_id' => $wiki->id,
+                'name' => WikiSetting::wgOAuth2PublicKey,
+                'value' => $wgOAuth2PublicKey,
+            ]);
+
             // Create initial needed non default settings
             // Docs: https://www.mediawiki.org/wiki/Manual:$wgSecretKey
             WikiSetting::create([
                 'wiki_id' => $wiki->id,
                 'name' => WikiSetting::wgSecretKey,
                 'value' => Str::random(64),
+
             ]);
 
             // Create the elasticsearch setting
@@ -123,6 +158,12 @@ class WikiController extends Controller
               'user_id' => $user->id,
               'wiki_id' => $wiki->id,
             ]);
+
+            // Create WikiProfile
+            if ($rawProfile) {
+                WikiProfile::create([ 'wiki_id' => $wiki->id, ...$rawProfile ] );
+            }
+
 
             // TODO maybe always make these run in a certain order..?
             dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
@@ -207,6 +248,7 @@ class WikiController extends Controller
         $wiki = Wiki::where('id', $wikiId)
       ->with('wikiManagers')
       ->with('wikiDbVersion')
+      ->with('wikiLatestProfile')
       ->with('publicSettings')->first();
 
         $res = [

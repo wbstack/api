@@ -10,6 +10,7 @@ use App\Wiki;
 use App\WikiSetting;
 use App\User;
 use App\WikiManager;
+use App\WikiProfile;
 
 class DetailsTest extends TestCase
 {
@@ -58,5 +59,42 @@ class DetailsTest extends TestCase
         $this->assertCount(1, $publicSettings);
         $this->assertEquals('wwUseQuestyCaptcha', $publicSettings[0]['name']);
         $this->assertEquals(1, $publicSettings[0]['value']);
+    }
+
+    public function testWikiProfile()
+    {
+        $wiki = Wiki::factory()->create();
+        $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+
+        $versionA = WikiProfile::create([
+            'wiki_id' => $wiki->id,
+            'audience' => 'wide',
+            'temporality' => 'temporary',
+            'purpose' => 'data_hub'
+        ])->refresh()->toArray();
+
+        $response = $this->actingAs($user, 'api')
+        ->postJson($this->route, ['wiki' => $wiki->id])
+        ->assertStatus(200);
+
+        $profile = data_get($response->json(), 'data.wiki_latest_profile', []);
+        $this->assertNotEmpty($profile);
+        $this->assertEquals($versionA, $profile);
+
+        $versionB = WikiProfile::create([
+            'wiki_id' => $wiki->id,
+            'audience' => 'wide',
+            'temporality' => 'permanent',
+            'purpose' => 'data_hub'
+        ])->refresh()->toArray();
+
+        $response = $this->actingAs($user, 'api')
+        ->postJson($this->route, ['wiki' => $wiki->id])
+        ->assertStatus(200);
+
+        $profile = data_get($response->json(), 'data.wiki_latest_profile', []);
+        $this->assertNotEmpty($profile);
+        $this->assertEquals($versionB, $profile);
     }
 }
