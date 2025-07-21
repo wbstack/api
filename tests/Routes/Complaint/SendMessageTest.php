@@ -18,19 +18,19 @@ class SendMessageTest extends TestCase
     protected $route = 'complaint/sendMessage';
 
     protected $postDataTemplateEmpty = [
-        'name'           => '',
-        'mailAddress'    => '',
-        'reason'         => '',
-        'offendingUrls'  => '',
-        'recaptcha'      => '',
+        'name'      => '',
+        'email'     => '',
+        'message'   => '',
+        'url'       => '',
+        'recaptcha' => '',
     ];
 
     protected $postDataTemplateFilled = [
-        'name'           => 'Jane Doe',
-        'mailAddress'    => 'jane.doe@example.com',
-        'reason'         => 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-        'offendingUrls'  => 'https://example.com/1, https://example.com/2, https://example.com/3',
-        'recaptcha'      => 'fake-token',
+        'name'      => 'Jane Doe',
+        'email'     => 'jane.doe@example.com',
+        'message'   => 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
+        'url'       => 'https://example.com/1, https://example.com/2, https://example.com/3',
+        'recaptcha' => 'fake-token',
     ];
 
     private function mockReCaptchaValidation($passes=true)
@@ -107,7 +107,7 @@ class SendMessageTest extends TestCase
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateFilled;
-        $data['mailAddress'] = "invalid-mail-address";
+        $data['email'] = "invalid-mail-address";
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
 
@@ -123,7 +123,7 @@ class SendMessageTest extends TestCase
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateFilled;
-        $data['mailAddress'] = "mail@example.com, foo@bar.com";
+        $data['email'] = "mail@example.com, foo@bar.com";
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
 
@@ -165,7 +165,7 @@ class SendMessageTest extends TestCase
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateFilled;
-        $data['offendingUrls'] = str_repeat("Hi!", 10000);
+        $data['url'] = str_repeat("Hi!", 10000);
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
 
@@ -180,7 +180,7 @@ class SendMessageTest extends TestCase
 
         $data = $this->postDataTemplateFilled;
         $data['name'] = '';
-        $data['mailAddress'] = '';
+        $data['email'] = '';
 
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(200);
