@@ -409,7 +409,7 @@ INSERT INTO `<<prefix>>_interwiki` (`iw_prefix`, `iw_url`, `iw_api`, `iw_wikiid`
 (UNHEX('6F656973'),	'https://oeis.org/$1',	'',	UNHEX(''),	0,	0),
 (UNHEX('706D6964'),	'https://www.ncbi.nlm.nih.gov/pubmed/$1?dopt=Abstract',	'',	UNHEX(''),	0,	0),
 (UNHEX('707974686F6E696E666F'),	'https://wiki.python.org/moin/$1',	'',	UNHEX(''),	0,	0),
-(UNHEX('726663'),	'https://tools.ietf.org/html/rfc$1',	'',	UNHEX(''),	0,	0),
+(UNHEX('726663'),	'https://datatracker.ietf.org/doc/html/rfc$1',	'',	UNHEX(''),	0,	0),
 (UNHEX('73656E736569736C696272617279'),	'https://senseis.xmp.net/?$1',	'',	UNHEX(''),	0,	0),
 (UNHEX('73686F757477696B69'),	'https://www.shoutwiki.com/wiki/$1',	'https://www.shoutwiki.com/w/api.php',	UNHEX(''),	0,	0),
 (UNHEX('7468656F7065646961'),	'https://www.theopedia.com/$1',	'',	UNHEX(''),	0,	0),
@@ -436,10 +436,10 @@ INSERT INTO `<<prefix>>_interwiki` (`iw_prefix`, `iw_url`, `iw_api`, `iw_wikiid`
 CREATE TABLE `<<prefix>>_invitesignup` (
   `is_hash` varbinary(40) NOT NULL,
   `is_inviter` int(10) unsigned NOT NULL,
-  `is_invitee` int(10) unsigned NOT NULL,
+  `is_invitee` int(10) unsigned DEFAULT NULL,
   `is_email` varbinary(255) NOT NULL,
   `is_when` binary(14) NOT NULL,
-  `is_used` binary(14) NOT NULL,
+  `is_used` binary(14) DEFAULT NULL,
   `is_groups` longblob NOT NULL,
   PRIMARY KEY (`is_hash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
@@ -796,7 +796,6 @@ CREATE TABLE `<<prefix>>_revision` (
   KEY `rev_actor_timestamp` (`rev_actor`,`rev_timestamp`,`rev_id`),
   KEY `rev_page_actor_timestamp` (`rev_page`,`rev_actor`,`rev_timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
-SET NAMES utf8mb4;
 
 CREATE TABLE `<<prefix>>_searchindex` (
   `si_page` int(10) unsigned NOT NULL,
@@ -1182,4 +1181,4 @@ CREATE TABLE `<<prefix>>_wb_property_info` (
   PRIMARY KEY (`pi_property_id`),
   KEY `pi_type` (`pi_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
--- 2025-02-19 14:28:01
+-- 2025-07-21 12:14:54
