@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
 use App\ComplaintRecord;
+use Illuminate\Support\Facades\Log;
 
 class ComplaintController extends Controller
 {
@@ -98,7 +99,7 @@ class ComplaintController extends Controller
                 'nullable',
                 'max:300',
                 Rule::when(
-                    !empty($data['mailAddress']),
+                    !empty($data['email']),
                     ['email:rfc']
                 ),
             ],

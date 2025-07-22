@@ -137,7 +137,7 @@ class SendMessageTest extends TestCase
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateFilled;
-        $data['reason'] = str_repeat("Hi!", 10000);
+        $data['message'] = str_repeat("Hi!", 10000);
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
 
