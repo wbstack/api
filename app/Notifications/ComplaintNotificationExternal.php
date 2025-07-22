@@ -32,12 +32,6 @@ class ComplaintNotificationExternal extends ComplaintNotification
             ->from($mailFrom)
             ->subject($mailSubject)
             ->line(Lang::get('Your message via the wikibase.cloud form for reporting illegal content has been submitted.'))
-            ->line(Lang::get('Name: ') . $name)
-            ->line(Lang::get('Email address: ') . $this->mailAddress)
-            ->line(Lang::get('Reason why the information in question is illegal content:'))
-            ->line($this->reason)
-            ->line(Lang::get('URL(s) for the content in question:'))
-            ->line($this->offendingUrls)
             ->line('---');
     }
 }
