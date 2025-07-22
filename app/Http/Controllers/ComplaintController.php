@@ -91,8 +91,8 @@ class ComplaintController extends Controller
         $validation = [
             'recaptcha'      => ['required', 'string', 'bail', $this->recaptchaValidation],
             'name'           => ['nullable', 'string', 'max:300'],
-            'message'        => ['required', 'string', 'max:10000'],
-            'url'            => ['required', 'string', 'max:10000'],
+            'message'        => ['required', 'string', 'max:1000'],
+            'url'            => ['required', 'string', 'max:1000'],
 
             'email'    => [
                 'nullable',
