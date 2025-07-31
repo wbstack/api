@@ -5,26 +5,36 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\WikiManager;
+use App\Wiki;
 
 class LimitWikiAccess
 {
     /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * Reject any incoming request unless the user is a manager of the
+     * requested wiki. If the user is authorized, inject the wiki
+     * object into the request context.
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $userHasAccess = WikiManager::where([
-            'user_id' => $request->user()?->id,
-            'wiki_id' => $request->input('wiki'),
-        ])->exists();
+        $validatedInput = $request->validate([
+            'wiki' => ['required', 'integer']
+        ]);
 
-        if (!$userHasAccess) {
+        $wiki = Wiki::find($validatedInput['wiki']);
+
+        if (!$wiki) {
+            abort(404, 'No such wiki');
+        }
+
+        $wikiManager = $wiki->wikiManagers()
+            ->where('user_id', $request->user()?->id)
+            ->first();
+
+        if (!$wikiManager) {
             abort(403);
         }
 
+        $request->attributes->set('wiki', $wiki);
         return $next($request);
     }
 }

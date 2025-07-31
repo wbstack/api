@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\WikiEntityImportStatus;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Wiki;
 use App\WikiEntityImport;
 use App\Jobs\WikiEntityImportJob;
 use Carbon\Carbon;
@@ -32,14 +31,7 @@ class WikiEntityImportController extends Controller
     }
     public function get(Request $request): \Illuminate\Http\JsonResponse
     {
-        $validatedInput = $request->validate([
-            'wiki' => ['required', 'integer'],
-        ]);
-        $wiki = Wiki::find($validatedInput['wiki']);
-        if (!$wiki) {
-            abort(404, 'No such wiki');
-        }
-
+        $wiki = $request->attributes->get('wiki');
         $imports = $wiki->wikiEntityImports()->get();
         return response()->json(['data' => $imports]);
     }
@@ -47,7 +39,6 @@ class WikiEntityImportController extends Controller
     public function create(Request $request): \Illuminate\Http\JsonResponse
     {
         $validatedInput = $request->validate([
-            'wiki' => ['required', 'integer'],
             'source_wiki_url' => ['required', 'url'],
             'entity_ids' => ['required', 'string', function (string $attr, mixed $value, \Closure $fail) {
                 $chunks = explode(',', $value);
@@ -59,11 +50,7 @@ class WikiEntityImportController extends Controller
             }],
         ]);
 
-        $wiki = Wiki::find($validatedInput['wiki']);
-        if (!$wiki) {
-            abort(404, 'No such wiki');
-        }
-
+        $wiki = $request->attributes->get('wiki');
         $imports = $wiki->wikiEntityImports()->get();
         foreach ($imports as $import) {
             if ($import->status === WikiEntityImportStatus::Success) {
