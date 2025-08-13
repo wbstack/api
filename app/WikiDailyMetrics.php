@@ -28,6 +28,10 @@ class WikiDailyMetrics extends Model
         'monthly_actions',
         'quarterly_actions',
         'number_of_triples',
+        'item_count',
+        'property_count',
+        'lexeme_count',
+        'entity_schema_count',
         'monthly_casual_users',
         'monthly_active_users',
 
@@ -42,6 +46,10 @@ class WikiDailyMetrics extends Model
         'monthly_actions',
         'quarterly_actions',
         'number_of_triples',
+        'item_count',
+        'property_count',
+        'lexeme_count',
+        'entity_schema_count',
         'monthly_casual_users',
         'monthly_active_users',
     ];

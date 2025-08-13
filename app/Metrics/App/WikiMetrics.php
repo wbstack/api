@@ -8,6 +8,7 @@ use App\WikiDailyMetrics;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use PDO;
 
 class WikiMetrics
 {
@@ -32,7 +33,7 @@ class WikiMetrics
         $weeklyActions = $this->getNumberOfActions(self::INTERVAL_WEEKLY);
         $monthlyActions = $this->getNumberOfActions(self::INTERVAL_MONTHLY);
         $quarterlyActions = $this->getNumberOfActions(self::INTERVAL_QUARTERLY);
-
+        $numberOfEntities = $this->getNumberOfEntities();
         $monthlyNumberOfUsersPerActivityType = $this->getNumberOfUsersPerActivityType();
 
         $dailyMetrics = new WikiDailyMetrics([
@@ -46,6 +47,10 @@ class WikiMetrics
             'weekly_actions' => $weeklyActions,
             'monthly_actions' => $monthlyActions,
             'quarterly_actions' => $quarterlyActions,
+            'item_count' => $numberOfEntities['120'],
+            'property_count' => $numberOfEntities['122'],
+            'lexeme_count' => $numberOfEntities['146'],
+            'entity_schema_count' => $numberOfEntities['640'],
             'monthly_casual_users' => $monthlyNumberOfUsersPerActivityType[0],
             'monthly_active_users' => $monthlyNumberOfUsersPerActivityType[1],
         ]);
@@ -170,5 +175,31 @@ class WikiMetrics
             Arr::get($result, 'monthly_casual_users', null),
             Arr::get($result, 'monthly_active_users',null)
         ];
+    }
+
+    private function getNumberOfEntities() : array
+    {
+        $resultArray = [ 120 => 0, 122 => 0, 146 => 0, 640 => 0 ];
+        $wikiDb = $this->wiki->wikiDb;
+        $tablePage = $wikiDb->name . '.' . $wikiDb->prefix . '_page';
+        $query = "SELECT
+              page_namespace AS namespace,
+              COUNT(*) AS count
+            FROM $tablePage
+            WHERE page_namespace in (120, 146, 122, 640)
+                        AND page_is_redirect=0 -- non-redirects only
+            GROUP BY page_namespace";
+
+        $manager = app()->db;
+        $manager->purge('mw');
+        $conn = $manager->connection('mw');
+        $pdo = $conn->getPdo();
+        $result = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        if (count($result) === 0){
+            return $resultArray;
+        }
+        $resultArray = array_column($result, 'count', 'namespace');
+
+        return $resultArray;
     }
 }
