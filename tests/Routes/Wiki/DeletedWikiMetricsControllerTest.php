@@ -4,6 +4,7 @@ namespace Tests\Routes\Wiki;
 use App\User;
 use App\WikiManager;
 use Carbon\CarbonImmutable;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
 use App\WikiSiteStats;
@@ -16,7 +17,7 @@ class DeletedWikiMetricsControllerTest extends TestCase
     protected string $route = 'deletedWikiMetrics';
 
     use OptionsRequestAllowed;
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function setUp(): void
     {
