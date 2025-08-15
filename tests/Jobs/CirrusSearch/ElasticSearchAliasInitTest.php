@@ -101,6 +101,22 @@ class ElasticSearchAliasInitTest extends TestCase
         $job->handle( $request );
     }
 
+    public function testElasticFailure()
+    {
+        $error = json_encode( [ 'error' => [ 'root_cause' => [ [ 'type' => 'index_not_found_exception' ] ] ] ] );
+        $request = $this->getMockRequest();
+        $request->method( 'execute' )->willReturn( $error );
+
+        $mockJob = $this->createMock( Job::class );
+        $mockJob->expects( $this->once() )
+                ->method( 'fail' )
+                ->with( new \RuntimeException( "Updating Elasticsearch aliases failed for $this->wikiId with " . $error ) );
+
+        $job = new ElasticSearchAliasInit( $this->wikiId, $this->prefix );
+        $job->setJob( $mockJob );
+        $job->handle( $request );
+    }
+
     public function testMissingDatabaseFailure()
     {
         $this->wikiId = -1;

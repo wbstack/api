@@ -93,7 +93,7 @@ class ElasticSearchAliasInit extends Job
         }
 
         $json = json_decode( $rawResponse, true );
-        if ( $json[ 'acknowledged' ] !== true ) {
+        if ( !isset( $json[ 'acknowledged' ] ) || $json[ 'acknowledged' ] !== true ) {
             Log::error( __METHOD__ . ": Updating Elasticsearch aliases failed for $this->wikiId with $rawResponse" );
             $this->fail(
                 new \RuntimeException( "Updating Elasticsearch aliases failed for $this->wikiId with $rawResponse" )
