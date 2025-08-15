@@ -24,7 +24,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.11.1
       - name: Set up helmfile
-        uses: helmfile/helmfile-action@v2.0.4
+        uses: helmfile/helmfile-action@v2.0.5
         with:
           helmfile-version: 'v0.162.0'
           helm-version: 'v3.12.2'
