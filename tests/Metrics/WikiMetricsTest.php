@@ -9,9 +9,11 @@ use App\WikiDb;
 use App\WikiDailyMetrics;
 use App\Jobs\ProvisionWikiDbJob;
 use Carbon\Carbon;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class WikiMetricsTest extends TestCase
@@ -182,17 +184,17 @@ class WikiMetricsTest extends TestCase
 
         $tablePage = $wikiDb->name . '.' . $wikiDb->prefix . '_page';
 
-        DB::statement("CREATE TABLE IF NOT EXISTS $tablePage (
-        page_id INT AUTO_INCREMENT PRIMARY KEY,
-        page_namespace INT,
-        page_is_redirect TINYINT(1) DEFAULT 0,
-        page_title VARCHAR(255),
-        page_random DOUBLE,
-        page_touched BINARY(14),
-        page_latest INT,
-        page_len INT
-
-    )");
+        Schema::dropIfExists($tablePage);
+        Schema::create($tablePage, function (Blueprint $table) {
+            $table->increments('page_id');
+            $table->integer('page_namespace');
+            $table->boolean('page_is_redirect')->default(0);
+            $table->string('page_title', 255);
+            $table->double('page_random');
+            $table->binary('page_touched');
+            $table->integer('page_latest');
+            $table->integer('page_len');
+        });
 
         // Insert dummy data
         DB::table($tablePage)->insert([
@@ -269,6 +271,9 @@ class WikiMetricsTest extends TestCase
             'entity_schema_count' => 1 // the redirect should be ignored
         ]);
 
+        //clean up after the test
+        $wiki->forceDelete();
+        Schema::dropIfExists($tablePage);
     }
 }
 
