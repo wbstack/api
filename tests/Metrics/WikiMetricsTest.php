@@ -215,7 +215,7 @@ class WikiMetricsTest extends TestCase
                 'page_touched' => random_bytes(10),
                 'page_latest' => 0,
                 'page_len' => 2
-            ], // item_rand
+            ], // item
             [
                 'page_namespace' => 122,
                 'page_is_redirect' => 0,
@@ -251,7 +251,7 @@ class WikiMetricsTest extends TestCase
                 'page_touched' => random_bytes(10),
                 'page_latest' => 1,
                 'page_len' => 2
-            ], // entity schema (redirect, ignored)
+            ], // entity schema
         ]);
         WikiDailyMetrics::create([
             'id' => $wiki->id . '_' . now()->subDay()->toDateString(),
