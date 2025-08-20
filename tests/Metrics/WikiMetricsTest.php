@@ -257,11 +257,15 @@ class WikiMetricsTest extends TestCase
             'id' => $wiki->id . '_' . now()->subDay()->toDateString(),
             'wiki_id' => $wiki->id,
             'date' => now()->subDay()->toDateString(),
-            'pages' => 0,
+            'pages' => 6,
             'is_deleted' => 0
         ]);
 
         (new WikiMetrics())->saveMetrics($wiki);
+
+        //clean up after the test
+        $wiki->forceDelete();
+        Schema::dropIfExists($tablePage);
 
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
@@ -270,10 +274,6 @@ class WikiMetricsTest extends TestCase
             'lexeme_count' => 1,
             'entity_schema_count' => 1 // the redirect should be ignored
         ]);
-
-        //clean up after the test
-        $wiki->forceDelete();
-        Schema::dropIfExists($tablePage);
     }
 }
 
