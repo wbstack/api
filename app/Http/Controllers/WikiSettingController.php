@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Rules\SettingCaptchaQuestions;
 use App\Rules\SettingWikibaseManifestEquivEntities;
-use App\WikiManager;
 use App\WikiSetting;
 use Illuminate\Http\Request;
 
@@ -40,7 +39,6 @@ class WikiSettingController extends Controller
         $settingValidations = $this->getSettingValidations();
 
         $request->validate([
-            'wiki' => 'required|numeric',
             // Allow both internal and external setting names, see normalizeSetting
             'setting' => 'required|string|in:'.implode(',', array_keys($settingValidations)),
         ]);
@@ -48,21 +46,11 @@ class WikiSettingController extends Controller
 
         $request->validate(['value' => $settingValidations[$settingName]]);
         $value = $request->input('value');
-
-        $user = $request->user();
-        $wikiId = $request->input('wiki');
-        $userId = $user->id;
-
-        // Check that the requesting user manages the wiki
-        // TODO turn this into a generic guard for all of these types of routes...
-        if (WikiManager::where('user_id', $userId)->where('wiki_id', $wikiId)->count() !== 1) {
-            // The deletion was requested by a user that does not manage the wiki
-            return response()->json('Unauthorized', 401);
-        }
+        $wiki = $request->attributes->get('wiki');
 
         WikiSetting::updateOrCreate(
             [
-                'wiki_id' => $wikiId,
+                'wiki_id' => $wiki->id,
                 'name' => $settingName,
             ],
             [

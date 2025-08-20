@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\Routes\Traits\PostRequestNeedAuthentication;
 use Tests\TestCase;
-use Database\Factories\UserFactory;
 
 class SettingUpdateTest extends TestCase
 {
@@ -26,11 +25,12 @@ class SettingUpdateTest extends TestCase
     public function testSetInvalidSetting()
     {
         $settingName = 'iDoNotExistAsASetting';
-
+        $wiki = Wiki::factory()->create();
         $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [
-            'wiki' => 1,
+            'wiki' => $wiki->id,
             'setting' => $settingName,
             'value' => '1',
           ])
@@ -38,18 +38,20 @@ class SettingUpdateTest extends TestCase
           ->assertJsonStructure(['errors' => ['setting']]);
     }
 
-    public function testValidSettingNoWiki()
+    public function testFailOnWrongWikiManager(): void
     {
         $settingName = 'wwExtEnableConfirmAccount';
-
+        $userWiki = Wiki::factory()->create();
+        $otherWiki = Wiki::factory()->create();
         $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
-            ->json('POST', str_replace('foo', $settingName, $this->route), [
-            'wiki' => 99856,
-            'setting' => $settingName,
-            'value' => '1',
-          ])
-          ->assertStatus(401);
+            ->postJson(str_replace('foo', $settingName, $this->route), [
+                'wiki' => $otherWiki->id,
+                'setting' => $settingName,
+                'value' => '1'
+            ])
+            ->assertStatus(403);
     }
 
     static public function provideValidSettings()
@@ -154,11 +156,13 @@ class SettingUpdateTest extends TestCase
      */
     public function testValidSettingBadValues($settingName, $settingValue)
     {
+        $wiki = Wiki::factory()->create();
         $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [
-            'wiki' => 1,
+            'wiki' => $wiki->id,
             'setting' => $settingName,
             'value' => $settingValue,
             ])
