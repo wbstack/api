@@ -218,10 +218,10 @@ class WikiController extends Controller
     public function getWikiDetailsForIdForOwner(Request $request): \Illuminate\Http\Response
     {
         $wiki = $request->attributes->get('wiki')
-            ->with('wikiManagers')
-            ->with('wikiDbVersion')
-            ->with('wikiLatestProfile')
-            ->with('publicSettings')->first();
+            ->load('wikiManagers')
+            ->load('wikiDbVersion')
+            ->load('wikiLatestProfile')
+            ->load('publicSettings');
 
         $res = [
             'success' => true,
