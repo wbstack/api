@@ -2,27 +2,26 @@
 
 namespace Tests\Jobs;
 
-use Tests\TestCase;
 use App\Http\Curl\HttpRequest;
-use Illuminate\Contracts\Queue\Job;
-use PHPUnit\TextUI\RuntimeException;
 use App\Jobs\MediawikiInit;
+use Illuminate\Contracts\Queue\Job;
+use Tests\TestCase;
 
-class MediawikiInitTest extends TestCase
-{
-
+class MediawikiInitTest extends TestCase {
     private $wikiDomain;
+
     private $email;
+
     private $username;
 
-    public function setUp(): void {
+    protected function setUp(): void {
         parent::setUp();
-        $this->wikiDomain = "some.domain.com";
-        $this->username = "username";
-        $this->email = "some@email.com";
+        $this->wikiDomain = 'some.domain.com';
+        $this->username = 'username';
+        $this->email = 'some@email.com';
     }
 
-    private function getMockRequest( string $mockResponse ): HttpRequest {
+    private function getMockRequest(string $mockResponse): HttpRequest {
         $request = $this->createMock(HttpRequest::class);
         $request->method('execute')->willReturn($mockResponse);
 
@@ -30,7 +29,7 @@ class MediawikiInitTest extends TestCase
             ->method('setOptions')
             ->with(
                 [
-                    CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackInit&format=json',
+                    CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=wbstackInit&format=json',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_TIMEOUT => 60,
@@ -42,7 +41,7 @@ class MediawikiInitTest extends TestCase
                     ]),
                     CURLOPT_HTTPHEADER => [
                         'content-type: application/x-www-form-urlencoded',
-                        'host: '.$this->wikiDomain,
+                        'host: ' . $this->wikiDomain,
                     ],
                 ]
             );
@@ -50,31 +49,29 @@ class MediawikiInitTest extends TestCase
         return $request;
     }
 
-    public function testSuccess()
-    {
+    public function testSuccess() {
         $mockResponse = [
             'warnings' => [],
             'wbstackInit' => [
-                "success" => 1,
-                "output" => []
-            ]
+                'success' => 1,
+                'output' => [],
+            ],
         ];
 
         $mockResponseString = json_encode($mockResponse);
-        $request = $this->getMockRequest( $mockResponseString );
+        $request = $this->getMockRequest($mockResponseString);
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())
-                ->method('fail')
-                ->withAnyParameters();
+            ->method('fail')
+            ->withAnyParameters();
 
-        $job = new MediawikiInit( $this->wikiDomain, $this->username, $this->email );
+        $job = new MediawikiInit($this->wikiDomain, $this->username, $this->email);
         $job->setJob($mockJob);
         $job->handle($request);
     }
 
-    public function testFatalErrorIsHandled()
-    {
+    public function testFatalErrorIsHandled() {
         $mockResponse = 'oh no';
         $request = $this->getMockRequest($mockResponse);
 
@@ -82,7 +79,7 @@ class MediawikiInitTest extends TestCase
 
         $mockJob = $this->createMock(Job::class);
 
-        $job = new MediawikiInit( $this->wikiDomain, $this->username, $this->email );
+        $job = new MediawikiInit($this->wikiDomain, $this->username, $this->email);
         $job->setJob($mockJob);
 
         $this->expectException(\RuntimeException::class);

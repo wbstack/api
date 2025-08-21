@@ -2,23 +2,22 @@
 
 namespace App\Jobs;
 
+use App\Wiki;
+use App\WikiEntityImport;
 use App\WikiEntityImportStatus;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Config;
-use App\Wiki;
-use App\WikiEntityImport;
-use Carbon\Carbon;
 use Maclof\Kubernetes\Client;
 use Maclof\Kubernetes\Models\Job as KubernetesJob;
 
-class WikiEntityImportJob implements ShouldQueue
-{
+class WikiEntityImportJob implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
@@ -29,16 +28,14 @@ class WikiEntityImportJob implements ShouldQueue
         public string $sourceWikiUrl,
         public array $entityIds,
         public int $importId,
-    )
-    {}
+    ) {}
 
     private string $targetWikiUrl;
 
     /**
      * Execute the job.
      */
-    public function handle(Client $kubernetesClient): void
-    {
+    public function handle(Client $kubernetesClient): void {
         $import = null;
         try {
             $wiki = Wiki::findOrFail($this->wikiId);
@@ -58,32 +55,31 @@ class WikiEntityImportJob implements ShouldQueue
             );
             $jobName = $kubernetesJob->spawn();
             Log::info(
-                'transferbot job for wiki "'.$wiki->domain.'" was created with name "'.$jobName.'".'
+                'transferbot job for wiki "' . $wiki->domain . '" was created with name "' . $jobName . '".'
             );
         } catch (\Exception $ex) {
-            Log::error('Entity import job failed with error: '.$ex->getMessage());
+            Log::error('Entity import job failed with error: ' . $ex->getMessage());
             $import?->update([
                 'status' => WikiEntityImportStatus::Failed,
                 'finished_at' => Carbon::now(),
             ]);
             $this->fail(
-                new \Exception('Error spawning transferbot for wiki '.$this->wikiId.': '.$ex->getMessage()),
+                new \Exception('Error spawning transferbot for wiki ' . $this->wikiId . ': ' . $ex->getMessage()),
             );
         }
     }
 
-    private static function domainToOrigin(string $domain): string
-    {
+    private static function domainToOrigin(string $domain): string {
         $tld = last(explode('.', $domain));
+
         return $tld === 'localhost'
-            ? "http://".$domain
-            : "https://".$domain;
+            ? 'http://' . $domain
+            : 'https://' . $domain;
     }
 
-    private static function acquireCredentials(string $wikiDomain): OAuthCredentials
-    {
+    private static function acquireCredentials(string $wikiDomain): OAuthCredentials {
         $response = Http::withHeaders(['host' => $wikiDomain])->asForm()->post(
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackPlatformOauthGet&format=json',
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=wbstackPlatformOauthGet&format=json',
             [
                 'consumerName' => 'WikiEntityImportJob',
                 'ownerOnly' => '1',
@@ -94,20 +90,19 @@ class WikiEntityImportJob implements ShouldQueue
         );
 
         if ($response->status() > 399) {
-            throw new \Exception('Unexpected status code '.$response->status().' from Mediawiki');
+            throw new \Exception('Unexpected status code ' . $response->status() . ' from Mediawiki');
         }
 
         $body = $response->json();
-        if (!$body || $body['wbstackPlatformOauthGet']['success'] !== '1') {
-            throw new \ErrorException('Unexpected error acquiring oauth credentials for wiki '.$wikiDomain);
+        if (! $body || $body['wbstackPlatformOauthGet']['success'] !== '1') {
+            throw new \ErrorException('Unexpected error acquiring oauth credentials for wiki ' . $wikiDomain);
         }
 
         return OAuthCredentials::unmarshalMediaWikiResponse($body);
     }
 }
 
-class TransferBotKubernetesJob
-{
+class TransferBotKubernetesJob {
     public function __construct(
         public Client $kubernetesClient,
         public Wiki $wiki,
@@ -116,36 +111,37 @@ class TransferBotKubernetesJob
         public string $sourceWikiUrl,
         public string $targetWikiUrl,
         public int $importId,
-    ){
+    ) {
         $this->kubernetesNamespace = Config::get('wbstack.api_job_namespace');
         $this->transferbotImageRepo = Config::get('wbstack.transferbot_image_repo');
         $this->transferbotImageVersion = Config::get('wbstack.transferbot_image_version');
     }
 
     private string $kubernetesNamespace;
+
     private string $transferbotImageRepo;
+
     private string $transferbotImageVersion;
 
-    public function spawn(): string
-    {
+    public function spawn(): string {
         $spec = $this->constructSpec();
         $jobSpec = new KubernetesJob($spec);
 
         $this->kubernetesClient->setNamespace($this->kubernetesNamespace);
         $jobObject = $this->kubernetesClient->jobs()->apply($jobSpec);
         $jobName = data_get($jobObject, 'metadata.name');
-        if (data_get($jobObject, 'status') === 'Failure' || !$jobName) {
+        if (data_get($jobObject, 'status') === 'Failure' || ! $jobName) {
             // The k8s client does not fail reliably on 4xx responses, so checking the name
             // currently serves as poor man's error handling.
             throw new \RuntimeException(
-                'transferbot creation for wiki "'.$this->wiki->domain.'" failed with message: '.data_get($jobObject, 'message', 'n/a')
+                'transferbot creation for wiki "' . $this->wiki->domain . '" failed with message: ' . data_get($jobObject, 'message', 'n/a')
             );
         }
+
         return $jobName;
     }
 
-    private function constructSpec(): array
-    {
+    private function constructSpec(): array {
         return [
             'metadata' => [
                 'generateName' => 'run-transferbot-',
@@ -153,30 +149,30 @@ class TransferBotKubernetesJob
                 'labels' => [
                     'app.kubernetes.io/instance' => $this->wiki->domain,
                     'app.kubernetes.io/name' => 'run-transferbot',
-                ]
+                ],
             ],
             'spec' => [
                 'ttlSecondsAfterFinished' => 0,
                 'backoffLimit' => 0,
                 'template' => [
                     'metadata' => [
-                        'name' => 'run-entity-import'
+                        'name' => 'run-entity-import',
                     ],
                     'spec' => [
                         'containers' => [
                             0 => [
                                 'hostNetwork' => true,
                                 'name' => 'run-entity-import',
-                                'image' => $this->transferbotImageRepo.':'.$this->transferbotImageVersion,
+                                'image' => $this->transferbotImageRepo . ':' . $this->transferbotImageVersion,
                                 'env' => [
                                     ...$this->creds->marshalEnv(),
                                     [
                                         'name' => 'CALLBACK_ON_FAILURE',
-                                        'value' => 'curl -sS -H "Accept: application/json" -H "Content-Type: application/json" --data \'{"wiki_entity_import":'.$this->importId.',"status":"failed"}\' -XPATCH http://api-app-backend.default.svc.cluster.local/backend/wiki/updateEntityImport'
+                                        'value' => 'curl -sS -H "Accept: application/json" -H "Content-Type: application/json" --data \'{"wiki_entity_import":' . $this->importId . ',"status":"failed"}\' -XPATCH http://api-app-backend.default.svc.cluster.local/backend/wiki/updateEntityImport',
                                     ],
                                     [
                                         'name' => 'CALLBACK_ON_SUCCESS',
-                                        'value' => 'curl -sS -H "Accept: application/json" -H "Content-Type: application/json" --data \'{"wiki_entity_import":'.$this->importId.',"status":"success"}\' -XPATCH http://api-app-backend.default.svc.cluster.local/backend/wiki/updateEntityImport'
+                                        'value' => 'curl -sS -H "Accept: application/json" -H "Content-Type: application/json" --data \'{"wiki_entity_import":' . $this->importId . ',"status":"success"}\' -XPATCH http://api-app-backend.default.svc.cluster.local/backend/wiki/updateEntityImport',
                                     ],
                                 ],
                                 'command' => [
@@ -195,29 +191,27 @@ class TransferBotKubernetesJob
                                         'memory' => '500Mi',
                                     ],
                                 ],
-                            ]
+                            ],
                         ],
-                        'restartPolicy' => 'Never'
-                    ]
-                ]
-            ]
+                        'restartPolicy' => 'Never',
+                    ],
+                ],
+            ],
         ];
     }
 }
 
-class OAuthCredentials
-{
+class OAuthCredentials {
     public function __construct(
         public string $consumerToken,
         public string $consumerSecret,
         public string $accessToken,
         public string $accessSecret,
-    )
-    {}
+    ) {}
 
-    public static function unmarshalMediaWikiResponse(array $response): OAuthCredentials
-    {
+    public static function unmarshalMediaWikiResponse(array $response): OAuthCredentials {
         $data = $response['wbstackPlatformOauthGet']['data'];
+
         return new OAuthCredentials(
             consumerToken: $data['consumerKey'],
             consumerSecret: $data['consumerSecret'],
@@ -226,23 +220,22 @@ class OAuthCredentials
         );
     }
 
-    public function marshalEnv(string $prefix = 'TARGET_WIKI_OAUTH'): array
-    {
+    public function marshalEnv(string $prefix = 'TARGET_WIKI_OAUTH'): array {
         return [
             [
-                'name' => $prefix.'_CONSUMER_TOKEN',
+                'name' => $prefix . '_CONSUMER_TOKEN',
                 'value' => $this->consumerToken,
             ],
             [
-                'name' => $prefix.'_CONSUMER_SECRET',
+                'name' => $prefix . '_CONSUMER_SECRET',
                 'value' => $this->consumerSecret,
             ],
             [
-                'name' => $prefix.'_ACCESS_TOKEN',
+                'name' => $prefix . '_ACCESS_TOKEN',
                 'value' => $this->accessToken,
             ],
             [
-                'name' => $prefix.'_ACCESS_SECRET',
+                'name' => $prefix . '_ACCESS_SECRET',
                 'value' => $this->accessSecret,
             ],
         ];

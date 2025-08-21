@@ -10,10 +10,8 @@ use Illuminate\Http\Request;
 /**
  * Verification of user emails.
  */
-class UserVerificationTokenController extends Controller
-{
-    public function verify(Request $request): \Illuminate\Http\Response
-    {
+class UserVerificationTokenController extends Controller {
+    public function verify(Request $request): \Illuminate\Http\Response {
         $request->validate([
             'token' => 'required|exists:user_verification_tokens,token',
         ]);
@@ -39,8 +37,7 @@ class UserVerificationTokenController extends Controller
         return response($res);
     }
 
-    public function createAndSendForUser(Request $request): \Illuminate\Http\Response
-    {
+    public function createAndSendForUser(Request $request): \Illuminate\Http\Response {
         $user = $request->user();
 
         if ($user->verified) {

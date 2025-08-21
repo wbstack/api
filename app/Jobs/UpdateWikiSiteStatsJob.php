@@ -4,21 +4,20 @@ namespace App\Jobs;
 
 use App\Wiki;
 use App\WikiSiteStats;
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Client\Pool;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Carbon\Carbon;
 
-class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
-{
+class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
     use Dispatchable;
+
     public $timeout = 3600;
-    public function handle (): void
-    {
+
+    public function handle(): void {
         $allWikis = Wiki::all();
         foreach ($allWikis as $wiki) {
             try {
@@ -27,13 +26,13 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
             } catch (\Exception $ex) {
                 $this->job->markAsFailed();
                 Log::error(
-                    'Failure polling wiki '.$wiki->getAttribute('domain').' for sitestats: '.$ex->getMessage()
+                    'Failure polling wiki ' . $wiki->getAttribute('domain') . ' for sitestats: ' . $ex->getMessage()
                 );
             }
         }
     }
 
-    private function updateLifecycleEvents (Wiki $wiki): void {
+    private function updateLifecycleEvents(Wiki $wiki): void {
         $update = [];
 
         $firstEdited = $this->getFirstEditedDate($wiki);
@@ -51,22 +50,21 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         });
     }
 
-    private function updateSiteStats (Wiki $wiki): void
-    {
+    private function updateSiteStats(Wiki $wiki): void {
         $response = Http::withHeaders([
-            'host' => $wiki->getAttribute('domain')
+            'host' => $wiki->getAttribute('domain'),
         ])->get(
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
         );
 
         if ($response->failed()) {
-            throw new \Exception('Request failed with reason '.$response->body());
+            throw new \Exception('Request failed with reason ' . $response->body());
         }
 
         $responseBody = $response->json();
         $update = [];
         foreach (WikiSiteStats::FIELDS as $field) {
-            $value = data_get($responseBody, 'query.statistics.'.$field, null);
+            $value = data_get($responseBody, 'query.statistics.' . $field, null);
             if ($value !== null) {
                 $update[$field] = $value;
             }
@@ -76,10 +74,9 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
         });
     }
 
-    private function getFirstEditedDate (Wiki $wiki): ?CarbonInterface
-    {
+    private function getFirstEditedDate(Wiki $wiki): ?CarbonInterface {
         $allRevisions = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php',
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php',
             [
                 'action' => 'query',
                 'format' => 'json',
@@ -92,12 +89,12 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
             ],
         );
         $firstRevision = data_get($allRevisions->json(), 'query.allrevisions.0.revisions.0.revid');
-        if (!$firstRevision) {
+        if (! $firstRevision) {
             return null;
         }
 
         $revisionInfo = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php',
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php',
             [
                 'action' => 'query',
                 'format' => 'json',
@@ -108,16 +105,16 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
             ],
         );
         $result = data_get($revisionInfo->json(), 'query.pages.0.revisions.0.timestamp');
-        if (!$result) {
+        if (! $result) {
             return null;
         }
+
         return Carbon::parse($result);
     }
 
-    private function getLastEditedDate (Wiki $wiki): ?CarbonInterface
-    {
+    private function getLastEditedDate(Wiki $wiki): ?CarbonInterface {
         $allRevisions = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php',
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php',
             [
                 'action' => 'query',
                 'format' => 'json',
@@ -130,12 +127,12 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
             ],
         );
         $lastRevision = data_get($allRevisions->json(), 'query.allrevisions.0.revisions.0.revid');
-        if (!$lastRevision) {
+        if (! $lastRevision) {
             return null;
         }
 
         $revisionInfo = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php',
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php',
             [
                 'action' => 'query',
                 'format' => 'json',
@@ -146,9 +143,10 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique
             ],
         );
         $result = data_get($revisionInfo->json(), 'query.pages.0.revisions.0.timestamp');
-        if (!$result) {
+        if (! $result) {
             return null;
         }
+
         return Carbon::parse($result);
     }
 }

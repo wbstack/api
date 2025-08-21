@@ -2,16 +2,15 @@
 
 namespace App\Jobs;
 
-class MediawikiSandboxLoadData extends Job
-{
+class MediawikiSandboxLoadData extends Job {
     private $wikiDomain;
+
     private $dataSet;
 
     /**
      * @return void
      */
-    public function __construct($wikiDomain, $dataSet)
-    {
+    public function __construct($wikiDomain, $dataSet) {
         $this->wikiDomain = $wikiDomain;
         $this->dataSet = $dataSet;
     }
@@ -19,15 +18,14 @@ class MediawikiSandboxLoadData extends Job
     /**
      * @return void
      */
-    public function handle()
-    {
+    public function handle() {
         $data = [
             'dataSet' => $this->dataSet,
         ];
 
         $curl = curl_init();
         curl_setopt_array($curl, [
-            CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/rest.php/wikibase-exampledata/v0/load',
+            CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/rest.php/wikibase-exampledata/v0/load',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 10 * 60, // TODO Long 10 mins (probably shouldn't keep the request open...)
@@ -36,7 +34,7 @@ class MediawikiSandboxLoadData extends Job
             CURLOPT_POSTFIELDS => http_build_query($data),
             CURLOPT_HTTPHEADER => [
                 'content-type: application/x-www-form-urlencoded',
-                'host: '.$this->wikiDomain,
+                'host: ' . $this->wikiDomain,
             ],
         ]);
 
@@ -44,20 +42,20 @@ class MediawikiSandboxLoadData extends Job
         $err = curl_error($curl);
         if ($err) {
             $this->fail(
-                new \RuntimeException('wikibase-exampledata/v0/load curl error for '.$this->wikiDomain.': '.$err)
+                new \RuntimeException('wikibase-exampledata/v0/load curl error for ' . $this->wikiDomain . ': ' . $err)
             );
 
-            return; //safegaurd
+            return; // safegaurd
         }
 
         curl_close($curl);
 
         if (! strstr($rawResponse, 'Done!')) {
             $this->fail(
-                new \RuntimeException('wikibase-exampledata/v0/load call for '.$this->wikiDomain.' was not successful:'.$rawResponse)
+                new \RuntimeException('wikibase-exampledata/v0/load call for ' . $this->wikiDomain . ' was not successful:' . $rawResponse)
             );
 
-            return; //safegaurd
+            return; // safegaurd
         }
     }
 }

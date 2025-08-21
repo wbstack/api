@@ -2,21 +2,18 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\ServiceProvider;
+use LKDevelopment\HorizonPrometheusExporter\Repository\ExporterRepository;
 use Prometheus\CollectorRegistry;
 use Prometheus\Storage\Redis;
-use Illuminate\Contracts\Foundation\Application;
-use LKDevelopment\HorizonPrometheusExporter\Repository\ExporterRepository;
 
-
-class CollectorRegistryProvider extends ServiceProvider
-{
+class CollectorRegistryProvider extends ServiceProvider {
     /**
      * Register services.
      */
-    public function register(): void
-    {
+    public function register(): void {
         $this->app->bind(CollectorRegistry::class, function (Application $app) {
             return new CollectorRegistry(new Redis([
                 'host' => Config::get('database.redis.metrics.host'),
@@ -24,7 +21,7 @@ class CollectorRegistryProvider extends ServiceProvider
                 'password' => Config::get('database.redis.metrics.password'),
                 'timeout' => 0.1, // in seconds
                 'read_timeout' => '10', // in seconds
-                'persistent_connections' => false
+                'persistent_connections' => false,
             ]));
         }, true);
     }
@@ -32,8 +29,7 @@ class CollectorRegistryProvider extends ServiceProvider
     /**
      * Bootstrap services.
      */
-    public function boot(): void
-    {
+    public function boot(): void {
         ExporterRepository::setRegistry(
             $this->app->make(CollectorRegistry::class),
         );

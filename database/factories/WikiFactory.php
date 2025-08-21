@@ -5,8 +5,7 @@ namespace Database\Factories;
 use App\Wiki;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class WikiFactory extends Factory
-{
+class WikiFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,8 +18,7 @@ class WikiFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         $sitename = $this->faker->unique()->text(30);
         $sitename = strtolower($sitename);
         $sitename = str_replace(' ', '_', $sitename);

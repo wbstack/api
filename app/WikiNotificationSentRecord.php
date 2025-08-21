@@ -5,13 +5,12 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class WikiNotificationSentRecord extends Model
-{
+class WikiNotificationSentRecord extends Model {
     use HasFactory;
 
     const FIELDS = [
         'notification_type',
-        'user_id'
+        'user_id',
     ];
 
     protected $fillable = self::FIELDS;

@@ -5,15 +5,13 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateQsCheckpointsTable extends Migration
-{
+class CreateQsCheckpointsTable extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
+    public function up() {
         Schema::create('qs_checkpoints', function (Blueprint $table) {
             // This does not use the `id` method as it would mean we
             // get auto-increment, which is not what we want in this case
@@ -35,8 +33,7 @@ class CreateQsCheckpointsTable extends Migration
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('qs_checkpoints');
 
         Schema::table('qs_batches', function (Blueprint $table) {

@@ -17,14 +17,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class SandboxController extends Controller
-{
+class SandboxController extends Controller {
     const WIKIBASE_DOMAIN = 'wikibase.cloud';
+
     const MW_VERSION = 'mw1.35-wbs1';
+
     const DOT = '.';
 
-    public function create(Request $request): \Illuminate\Http\Response
-    {
+    public function create(Request $request): \Illuminate\Http\Response {
         $validation = [
             'recaptcha' => 'required|captcha',
             // TODO validate dataSet param
@@ -37,7 +37,7 @@ class SandboxController extends Controller
 
         $wiki = null;
         DB::transaction(function () use (&$wiki, $domain) {
-            $wikiDbCondition = ['wiki_id'=>null, 'version'=> self::MW_VERSION];
+            $wikiDbCondition = ['wiki_id' => null, 'version' => self::MW_VERSION];
 
             // Fail if there is not enough storage ready
             if (WikiDb::where($wikiDbCondition)->count() == 0) {
@@ -57,7 +57,7 @@ class SandboxController extends Controller
             if (! $dbAssignment) {
                 abort(503, 'Database ready, but failed to assign');
             }
-            $nsAssignment = DB::table('queryservice_namespaces')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
+            $nsAssignment = DB::table('queryservice_namespaces')->where(['wiki_id' => null])->limit(1)->update(['wiki_id' => $wiki->id]);
             if (! $nsAssignment) {
                 abort(503, 'QS Namespace ready, but failed to assign');
             }
@@ -103,8 +103,7 @@ class SandboxController extends Controller
         return response($res);
     }
 
-    private function generateUnusedDomain()
-    {
+    private function generateUnusedDomain() {
         $domain = $this->generateDomain();
         if (! WikiDomain::whereDomain($domain)->first()) {
             return $domain;
@@ -113,17 +112,16 @@ class SandboxController extends Controller
         return $this->generateUnusedDomain();
     }
 
-    private function generateDomain(): string
-    {
-        $generator = new HumanPasswordGenerator();
+    private function generateDomain(): string {
+        $generator = new HumanPasswordGenerator;
 
         $generator
-        ->setWordList(__DIR__.'/words')
-        ->setWordCount(3)
-        ->setWordSeparator('-');
+            ->setWordList(__DIR__ . '/words')
+            ->setWordCount(3)
+            ->setWordSeparator('-');
 
         $password = $generator->generatePassword();
 
-        return $password.self::DOT.self::WIKIBASE_DOMAIN;
+        return $password . self::DOT . self::WIKIBASE_DOMAIN;
     }
 }

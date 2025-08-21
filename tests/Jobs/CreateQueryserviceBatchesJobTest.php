@@ -3,24 +3,22 @@
 namespace Tests\Jobs;
 
 use App\Constants\MediawikiNamespace;
+use App\EventPageUpdate;
+use App\Jobs\CreateQueryserviceBatchesJob;
 use App\QsBatch;
 use App\QsCheckpoint;
 use App\Wiki;
-use App\EventPageUpdate;
-use App\Jobs\CreateQueryserviceBatchesJob;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use Tests\TestCase;
 
-class CreateQueryserviceBatchesJobTest extends TestCase
-{
+class CreateQueryserviceBatchesJobTest extends TestCase {
     use RefreshDatabase;
 
     private int $prevEntityLimit;
 
-    public function setUp(): void
-    {
+    protected function setUp(): void {
         parent::setUp();
         Wiki::query()->delete();
         QsBatch::query()->delete();
@@ -31,8 +29,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         Config::set('wbstack.qs_batch_entity_limit', 10);
     }
 
-    public function tearDown(): void
-    {
+    protected function tearDown(): void {
         Wiki::query()->delete();
         QsBatch::query()->delete();
         EventPageUpdate::query()->delete();
@@ -41,18 +38,16 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         parent::tearDown();
     }
 
-    public function testEmpty (): void
-    {
+    public function testEmpty(): void {
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob();
+        $job = new CreateQueryserviceBatchesJob;
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
         $job->handle();
     }
 
-    public function testBatchCreation (): void
-    {
+    public function testBatchCreation(): void {
         Wiki::factory()->create(['id' => 1, 'domain' => 'deleted.wikibase.cloud'])->delete();
         Wiki::factory()->create(['id' => 88, 'domain' => 'test1.wikibase.cloud']);
         Wiki::factory()->create(['id' => 99, 'domain' => 'test2.wikibase.cloud']);
@@ -69,7 +64,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         EventPageUpdate::factory()->create(['id' => 6, 'wiki_id' => 1, 'namespace' => MediawikiNamespace::item, 'title' => 'Q152']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob();
+        $job = new CreateQueryserviceBatchesJob;
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -84,8 +79,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         $this->assertNull($batchForDeletedWiki);
     }
 
-    public function testBatchMerging(): void
-    {
+    public function testBatchMerging(): void {
         Wiki::factory()->create(['id' => 88, 'domain' => 'test1.wikibase.cloud']);
         Wiki::factory()->create(['id' => 99, 'domain' => 'test2.wikibase.cloud']);
         Wiki::factory()->create(['id' => 111, 'domain' => 'test3.wikibase.cloud']);
@@ -95,7 +89,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         EventPageUpdate::factory()->create(['id' => 234, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q34']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob();
+        $job = new CreateQueryserviceBatchesJob;
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -108,8 +102,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         $this->assertEquals(3, QsBatch::query()->count());
     }
 
-    function testBigBatches(): void
-    {
+    public function testBigBatches(): void {
         Wiki::factory()->create(['id' => 88, 'domain' => 'test1.wikibase.cloud']);
         QsBatch::factory()->create(['id' => 1, 'done' => 0, 'wiki_id' => 88, 'entityIds' => 'Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,Q9,Q10']);
         EventPageUpdate::factory()->create(['id' => 123, 'wiki_id' => 88, 'namespace' => MediawikiNamespace::item, 'title' => 'Q11']);
@@ -122,7 +115,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         EventPageUpdate::factory()->create(['id' => 124, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q11']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob();
+        $job = new CreateQueryserviceBatchesJob;
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -147,7 +140,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         EventPageUpdate::factory()->create(['id' => 125, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q999']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob();
+        $job = new CreateQueryserviceBatchesJob;
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -158,8 +151,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         $this->assertEquals($existingBatches->values()->get(2)->entityIds, 'Q999,Q11,Q12');
     }
 
-    function testBackpressure(): void
-    {
+    public function testBackpressure(): void {
         Wiki::factory()->create(['id' => 99, 'domain' => 'test.wikibase.cloud']);
         EventPageUpdate::factory()->create(['id' => 124, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q1']);
         EventPageUpdate::factory()->create(['id' => 125, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q2']);
@@ -174,7 +166,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         EventPageUpdate::factory()->create(['id' => 134, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q12']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob();
+        $job = new CreateQueryserviceBatchesJob;
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -183,8 +175,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         $this->assertEquals(2, QsBatch::query()->count());
     }
 
-    function testCheckpoints(): void
-    {
+    public function testCheckpoints(): void {
         Wiki::factory()->create(['id' => 99, 'domain' => 'test.wikibase.cloud']);
         EventPageUpdate::factory()->create(['id' => 124, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q1']);
         EventPageUpdate::factory()->create(['id' => 125, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q2']);
@@ -198,7 +189,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         EventPageUpdate::factory()->create(['id' => 188, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q12']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob();
+        $job = new CreateQueryserviceBatchesJob;
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -210,7 +201,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase
         EventPageUpdate::factory()->create(['id' => 198, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q126']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob();
+        $job = new CreateQueryserviceBatchesJob;
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');

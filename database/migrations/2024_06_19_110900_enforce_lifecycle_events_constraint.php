@@ -1,20 +1,18 @@
 <?php
 
+use App\Wiki;
 use App\WikiLifecycleEvents;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Wiki;
 
-class EnforceLifecycleEventsConstraint extends Migration
-{
+class EnforceLifecycleEventsConstraint extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
+    public function up() {
         $allWikis = Wiki::withTrashed()->get();
         // Albeit `createOrUpdate` was used when creating lifecycle events
         // was used, multiple copies per wiki were created. To clean up before
@@ -41,8 +39,7 @@ class EnforceLifecycleEventsConstraint extends Migration
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         // foreign key constraints need to be disabled as per https://github.com/laravel/framework/issues/13873
         Schema::disableForeignKeyConstraints();
         Schema::table('wiki_lifecycle_events', function (Blueprint $table) {

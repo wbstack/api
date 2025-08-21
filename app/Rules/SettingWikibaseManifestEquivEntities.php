@@ -4,9 +4,9 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class SettingWikibaseManifestEquivEntities implements Rule
-{
+class SettingWikibaseManifestEquivEntities implements Rule {
     public static $entityTypes = ['properties', 'items'];
+
     public static $entityTypeValidation = [
         'properties' => '/^(P)\d+$/',
         'items' => '/^(Q)\d+$/',
@@ -19,8 +19,7 @@ class SettingWikibaseManifestEquivEntities implements Rule
      * @param  mixed  $value
      * @return bool
      */
-    public function passes($attribute, $value)
-    {
+    public function passes($attribute, $value) {
         $value = json_decode($value, true);
 
         if ($value === null) {
@@ -50,8 +49,7 @@ class SettingWikibaseManifestEquivEntities implements Rule
      *
      * @return string
      */
-    public function message()
-    {
+    public function message() {
         return 'Value must be a JSON string mapping Wikidata Item or Property Ids to local Item or Property Ids';
     }
 }

@@ -5,8 +5,7 @@ namespace Database\Factories;
 use App\QueryserviceNamespace;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class QueryserviceNamespaceFactory extends Factory
-{
+class QueryserviceNamespaceFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,8 +18,7 @@ class QueryserviceNamespaceFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         return [];
     }
 }

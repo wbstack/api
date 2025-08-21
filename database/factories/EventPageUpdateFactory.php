@@ -5,8 +5,7 @@ namespace Database\Factories;
 use App\EventPageUpdate;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class EventPageUpdateFactory extends Factory
-{
+class EventPageUpdateFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,8 +18,7 @@ class EventPageUpdateFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         return [];
     }
 }

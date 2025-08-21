@@ -4,10 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEventPageUpdatesTable extends Migration
-{
-    public function up()
-    {
+class CreateEventPageUpdatesTable extends Migration {
+    public function up() {
         Schema::create('event_page_updates', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('wiki_id');
@@ -24,8 +22,7 @@ class CreateEventPageUpdatesTable extends Migration
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('event_page_updates');
     }
 }

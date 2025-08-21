@@ -9,24 +9,25 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class WikiMetrics
-{
+class WikiMetrics {
     const INTERVAL_DAILY = 'INTERVAL 1 DAY';
+
     const INTERVAL_WEEKLY = ' INTERVAL 1 WEEK';
+
     const INTERVAL_MONTHLY = 'INTERVAL 1 MONTH';
+
     const INTERVAL_QUARTERLY = 'INTERVAL 3 MONTH';
 
     protected $wiki;
 
-    public function saveMetrics(Wiki $wiki): void
-    {
+    public function saveMetrics(Wiki $wiki): void {
         $this->wiki = $wiki;
 
         $today = now()->format('Y-m-d');
         $oldRecord = WikiDailyMetrics::where('wiki_id', $wiki->id)->latest('date')->first();
         $tripleCount = $this->getNumOfTriples();
         $todayPageCount = $wiki->wikiSiteStats()->first()->pages ?? 0;
-        $isDeleted = (bool)$wiki->deleted_at;
+        $isDeleted = (bool) $wiki->deleted_at;
 
         $dailyActions = $this->getNumberOfActions(self::INTERVAL_DAILY);
         $weeklyActions = $this->getNumberOfActions(self::INTERVAL_WEEKLY);
@@ -54,11 +55,13 @@ class WikiMetrics
         if ($oldRecord) {
             if ($oldRecord->is_deleted) {
                 Log::info("Wiki is deleted, no new record for Wiki ID {$wiki->id}.");
+
                 return;
             }
-            if (!$isDeleted) {
+            if (! $isDeleted) {
                 if ($oldRecord->areMetricsEqual($dailyMetrics)) {
                     Log::info("Record unchanged for Wiki ID {$wiki->id}, no new record added.");
+
                     return;
                 }
             }
@@ -68,44 +71,48 @@ class WikiMetrics
 
         Log::info("New metric recorded for Wiki ID {$wiki->id}");
     }
-    protected function getNumOfTriples(): ?int
-    {
+
+    protected function getNumOfTriples(): ?int {
         $qsNamespace = QueryserviceNamespace::whereWikiId($this->wiki->id)->first();
 
-        if( !$qsNamespace ) {
-            Log::info( new \RuntimeException("Namespace for wiki {$this->wiki->id} not found.") );
+        if (! $qsNamespace) {
+            Log::info(new \RuntimeException("Namespace for wiki {$this->wiki->id} not found."));
+
             return null;
         }
 
-        $endpoint = $qsNamespace->backend . '/bigdata/namespace/' . $qsNamespace->namespace. '/sparql';
+        $endpoint = $qsNamespace->backend . '/bigdata/namespace/' . $qsNamespace->namespace . '/sparql';
         $query = 'SELECT (COUNT(*) AS ?triples) WHERE { ?s ?p ?o }';
 
         $response = Http::withHeaders([
-            'Accept' => 'application/sparql-results+json'
+            'Accept' => 'application/sparql-results+json',
         ])->get($endpoint, [
-            'query' => $query
+            'query' => $query,
         ]);
 
         if ($response->successful()) {
             $data = $response->json();
+
             return $data['results']['bindings'][0]['triples']['value'];
         }
+
         return null;
     }
 
-    protected function getNumberOfActions(string $interval): null|int
-    {
+    protected function getNumberOfActions(string $interval): ?int {
         $actions = null;
 
         // safeguard
-        if (false === in_array($interval,
-        [
+        if (in_array($interval,
+            [
                 self::INTERVAL_DAILY,
                 self::INTERVAL_WEEKLY,
                 self::INTERVAL_MONTHLY,
-                self::INTERVAL_QUARTERLY
-                ]
-        )) { return null; }
+                self::INTERVAL_QUARTERLY,
+            ]
+        ) === false) {
+            return null;
+        }
 
         $wikiDb = $this->wiki->wikiDb;
         $tableRecentChanges = $wikiDb->name . '.' . $wikiDb->prefix . '_recentchanges';
@@ -135,8 +142,7 @@ class WikiMetrics
         return $actions;
     }
 
-    private function getNumberOfUsersPerActivityType() : array
-    {
+    private function getNumberOfUsersPerActivityType(): array {
         $wikiDb = $this->wiki->wikiDb;
         $tableRecentChanges = $wikiDb->name . '.' . $wikiDb->prefix . '_recentchanges';
         $tableActor = $wikiDb->name . '.' . $wikiDb->prefix . '_actor';
@@ -168,7 +174,7 @@ class WikiMetrics
 
         return [
             Arr::get($result, 'monthly_casual_users', null),
-            Arr::get($result, 'monthly_active_users',null)
+            Arr::get($result, 'monthly_active_users', null),
         ];
     }
 }

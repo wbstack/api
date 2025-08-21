@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
+use Illuminate\Support\Facades\Log;
 use Maclof\Kubernetes\Client;
 use Maclof\Kubernetes\Models\Ingress;
-use Illuminate\Support\Facades\Log;
 
 /**
  * This can be run with for example:
@@ -12,34 +12,32 @@ use Illuminate\Support\Facades\Log;
  *
  * If you need to cleanup a test run of this you need to remove the ingress and the related secret
  */
-class KubernetesIngressCreate extends Job
-{
+class KubernetesIngressCreate extends Job {
     private $id;
+
     private $wikiDomain;
 
     /**
-     * @param int|string $wikiId
-     * @param string $wikiDomain
+     * @param  int|string  $wikiId
+     * @param  string  $wikiDomain
      */
-    public function __construct($wikiId, $wikiDomain)
-    {
+    public function __construct($wikiId, $wikiDomain) {
         $this->id = $wikiId;
         $this->wikiDomain = $wikiDomain;
     }
 
-    public static function getKubernetesIngressName( $wikiId ): string {
+    public static function getKubernetesIngressName($wikiId): string {
         return 'mediawiki-site-' . $wikiId;
     }
 
     /**
      * @return void
      */
-    public function handle( Client $client )
-    {
+    public function handle(Client $client) {
         // Docs for the client https://github.com/maclof/kubernetes-client
 
         // Connection example from: https://github.com/maclof/kubernetes-client#using-a-service-account
-        Log::info( 'Creating k8s client' );
+        Log::info('Creating k8s client');
 
         $ingress = new Ingress([
             'metadata' => [
@@ -73,7 +71,7 @@ class KubernetesIngressCreate extends Job
                         'hosts' => [
                             $this->wikiDomain,
                         ],
-                        'secretName' => 'mediawiki-site-tls-'.$this->id,
+                        'secretName' => 'mediawiki-site-tls-' . $this->id,
                     ],
                 ],
                 'rules' => [
@@ -103,14 +101,14 @@ class KubernetesIngressCreate extends Job
 
         Log::info('Getting ingress resources');
         $ingresses = $client->ingresses();
-        Log::info('Checking if resource exists: '.$ingress->getMetadata('name'));
+        Log::info('Checking if resource exists: ' . $ingress->getMetadata('name'));
         $exists = $ingresses->exists($ingress->getMetadata('name'));
         if ($exists) {
             $this->fail(
                 new \RuntimeException('Ingress already exists, but it should not')
             );
 
-            return; //safegaurd
+            return; // safegaurd
         }
 
         Log::info('Creating ingress resource');

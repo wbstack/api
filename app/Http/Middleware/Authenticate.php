@@ -7,10 +7,8 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Support\Facades\Config;
 
-class Authenticate extends Middleware
-{
-    public function handle($request, Closure $next, ...$guards)
-    {
+class Authenticate extends Middleware {
+    public function handle($request, Closure $next, ...$guards) {
         try {
             // Passport wants to read tokens from Authorization headers, so
             // we'll pass on a value if set in a cookie. This means the
@@ -18,7 +16,7 @@ class Authenticate extends Middleware
             // are set.
             $token = $request->cookie(Config::get('auth.cookies.key'));
             if ($token) {
-                $request->headers->set('Authorization', 'Bearer '.$token);
+                $request->headers->set('Authorization', 'Bearer ' . $token);
             }
             $this->authenticate($request, $guards);
         } catch (AuthenticationException $e) {

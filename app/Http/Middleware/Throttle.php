@@ -6,12 +6,10 @@ use Closure;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 
 class Throttle extends ThrottleRequests {
-
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
      * @param  string  $prefix
@@ -23,6 +21,7 @@ class Throttle extends ThrottleRequests {
         if (config('app.env') === 'local') {
             return $next($request);
         }
+
         return parent::handle($request, $next, $maxAttempts, $decayMinutes, $prefix);
     }
 }

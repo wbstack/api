@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\WikiDb.
@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Wiki|null $wiki
+ *
  * @method static \Database\Factories\WikiDbFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDb newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDb newQuery()
@@ -31,10 +32,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDb whereUser($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDb whereVersion($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDb whereWikiId($value)
+ *
  * @mixin \Eloquent
  */
-class WikiDb extends Model
-{
+class WikiDb extends Model {
     use HasFactory;
 
     /**
@@ -52,12 +53,9 @@ class WikiDb extends Model
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     *
      * @psalm-return \Illuminate\Database\Eloquent\Relations\BelongsTo<Wiki>
      */
-    public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
+    public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
         return $this->belongsTo(Wiki::class);
     }
 }

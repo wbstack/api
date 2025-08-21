@@ -6,14 +6,12 @@ use App\Wiki;
 use Maclof\Kubernetes\Client;
 use Maclof\Kubernetes\Models\ConfigMap;
 
-class UpdateQueryserviceAllowList extends Job
-{
-    public function handle(Client $k8s)
-    {
+class UpdateQueryserviceAllowList extends Job {
+    public function handle(Client $k8s) {
         $allowList = implode(
             PHP_EOL,
             array_map(
-                fn($domain) => "https://{$domain}/query/sparql",
+                fn ($domain) => "https://{$domain}/query/sparql",
                 Wiki::all()->pluck('domain')->toArray()
             )
         );
@@ -21,7 +19,7 @@ class UpdateQueryserviceAllowList extends Job
         $k8s->setNamespace('default');
         $configName = 'queryservice-allowlist';
         $config = $k8s->configMaps()->setFieldSelector([
-            'metadata.name' => $configName
+            'metadata.name' => $configName,
         ])->first();
 
         if ($config === null) {
@@ -30,6 +28,7 @@ class UpdateQueryserviceAllowList extends Job
                     "Queryservice config map '{$configName}' does not exist."
                 )
             );
+
             return;
         }
 

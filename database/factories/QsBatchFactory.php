@@ -5,8 +5,7 @@ namespace Database\Factories;
 use App\QsBatch;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class QsBatchFactory extends Factory
-{
+class QsBatchFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,8 +18,7 @@ class QsBatchFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         return [];
     }
 }

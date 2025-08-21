@@ -2,13 +2,11 @@
 
 namespace App;
 
-use App\Wiki;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class WikiProfile extends Model
-{
+class WikiProfile extends Model {
     use HasFactory;
 
     protected $fillable = [
@@ -21,9 +19,7 @@ class WikiProfile extends Model
         'temporality_other',
     ];
 
-    public function wiki(): BelongsTo
-    {
+    public function wiki(): BelongsTo {
         return $this->belongsTo(Wiki::class);
     }
-
 }

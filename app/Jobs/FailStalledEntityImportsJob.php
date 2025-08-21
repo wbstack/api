@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\WikiEntityImport;
 use App\WikiEntityImportStatus;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -10,13 +11,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use App\WikiEntityImport;
 
-class FailStalledEntityImportsJob implements ShouldQueue
-{
+class FailStalledEntityImportsJob implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    public function handle(): void
-    {
+
+    public function handle(): void {
         $deadline = Carbon::now()->subHours(24);
         $now = Carbon::now();
 
@@ -31,7 +30,7 @@ class FailStalledEntityImportsJob implements ShouldQueue
 
         if ($stalledImports->count() > 0) {
             Log::info(
-                "Marked ".$stalledImports->count()." WikiEntityImports as failed as they seem to be stalled."
+                'Marked ' . $stalledImports->count() . ' WikiEntityImports as failed as they seem to be stalled.'
             );
         }
     }

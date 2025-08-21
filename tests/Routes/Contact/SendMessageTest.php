@@ -7,26 +7,24 @@ use App\Rules\ReCaptchaValidation;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
-use Tests\Feature\ReCaptchaValidationTest;
 
-class SendMessageTest extends TestCase
-{
+class SendMessageTest extends TestCase {
     protected $route = 'contact/sendMessage';
 
     protected $postDataTemplateEmpty = [
-        'name'           => '',
+        'name' => '',
         'contactDetails' => '',
-        'subject'        => '',
-        'message'        => '',
-        'recaptcha'      => '',
+        'subject' => '',
+        'message' => '',
+        'recaptcha' => '',
     ];
 
     protected $postDataTemplateValid = [
-        'name'           => 'foo',
+        'name' => 'foo',
         'contactDetails' => 'bar',
-        'subject'        => 'general-question',
-        'message'        => 'baz',
-        'recaptcha'      => 'fake-token',
+        'subject' => 'general-question',
+        'message' => 'baz',
+        'recaptcha' => 'fake-token',
     ];
 
     protected $validSubjects = [
@@ -37,18 +35,16 @@ class SendMessageTest extends TestCase
         'other',
     ];
 
-    private function mockReCaptchaValidation($passes=true)
-    {
+    private function mockReCaptchaValidation($passes = true) {
         // replace injected ReCaptchaValidation class with mock (ContactController::$recaptchaValidation)
         $mockRule = $this->createMock(ReCaptchaValidation::class);
         $mockRule->method('passes')
             ->willReturn($passes);
-    
+
         $this->app->instance(ReCaptchaValidation::class, $mockRule);
     }
 
-    public function testSendMessage_NoData()
-    {
+    public function testSendMessageNoData() {
         $this->mockReCaptchaValidation(false);
 
         $data = $this->postDataTemplateEmpty;
@@ -57,90 +53,83 @@ class SendMessageTest extends TestCase
         $response->assertStatus(401);
     }
 
-    public function testSendMessage_InvalidDataSubject()
-    {
+    public function testSendMessageInvalidDataSubject() {
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateValid;
-        $data['message'] = "Hi!";
-        $data['subject'] = "not-valid";
+        $data['message'] = 'Hi!';
+        $data['subject'] = 'not-valid';
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
     }
 
-    public function testSendMessage_MessageTooLong()
-    {
+    public function testSendMessageMessageTooLong() {
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateValid;
-        $data['message'] = str_repeat("Hi!", 10000);
+        $data['message'] = str_repeat('Hi!', 10000);
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
     }
 
-    public function testSendMessage_NameTooLong()
-    {
+    public function testSendMessageNameTooLong() {
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateValid;
-        $data['name'] = str_repeat("Hi!", 10000);
+        $data['name'] = str_repeat('Hi!', 10000);
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
     }
 
-    public function testSendMessage_ContactDetailsTooLong()
-    {
+    public function testSendMessageContactDetailsTooLong() {
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateValid;
-        $data['contactDetails'] = str_repeat("Hi!", 10000);
+        $data['contactDetails'] = str_repeat('Hi!', 10000);
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
     }
 
-
-    public function testSendMessage_NoContactDetails()
-    {
+    public function testSendMessageNoContactDetails() {
         $this->mockReCaptchaValidation();
         Notification::fake();
 
         $data = [
-            'name'           => 'foo',
-            'subject'        => 'general-question',
-            'message'        => 'baz',
-            'recaptcha'      => 'fake-token',
+            'name' => 'foo',
+            'subject' => 'general-question',
+            'message' => 'baz',
+            'recaptcha' => 'fake-token',
         ];
 
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(200);
     }
 
-    public function testSendMessage_Success()
-    {
+    public function testSendMessageSuccess() {
         $this->mockReCaptchaValidation();
         Notification::fake();
 
         $data = [
-            'name'           => 'foo',
+            'name' => 'foo',
             'contactDetails' => 'bar',
-            'subject'        => 'general-question',
-            'message'        => 'baz',
-            'recaptcha'      => 'fake-token',
+            'subject' => 'general-question',
+            'message' => 'baz',
+            'recaptcha' => 'fake-token',
         ];
 
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(200);
-        Notification::assertSentTo(new AnonymousNotifiable(), ContactNotification::class, function ($notification) {
+        Notification::assertSentTo(new AnonymousNotifiable, ContactNotification::class, function ($notification) {
             $this->assertSame(
-                "contact-general-question@wikibase.cloud",
-                $notification->toMail(new AnonymousNotifiable())->from[0]
+                'contact-general-question@wikibase.cloud',
+                $notification->toMail(new AnonymousNotifiable)->from[0]
             );
+
             return true;
         });
     }
 
-    public function testSendMessage_RecaptchaFailure()
-    {
+    public function testSendMessageRecaptchaFailure() {
         $this->mockReCaptchaValidation(false);
         Notification::fake();
 

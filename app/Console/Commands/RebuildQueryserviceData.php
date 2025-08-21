@@ -3,18 +3,16 @@
 namespace App\Console\Commands;
 
 use App\Constants\MediawikiNamespace;
+use App\Jobs\SpawnQueryserviceUpdaterJob;
+use App\QueryserviceNamespace;
 use App\Traits;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Queue;
 use App\Wiki;
 use App\WikiSetting;
-use App\QueryserviceNamespace;
-use App\Jobs\SpawnQueryserviceUpdaterJob;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 
-class RebuildQueryserviceData extends Command
-{
+class RebuildQueryserviceData extends Command {
     use Traits\PageFetcher;
 
     protected $signature = 'wbs-qs:rebuild {--domain=*} {--chunkSize=50} {--queueName=manual-intervention} {--sparqlUrlFormat=http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql}';
@@ -22,15 +20,16 @@ class RebuildQueryserviceData extends Command
     protected $description = 'Rebuild the queryservice data for a certain wiki or all wikis';
 
     protected int $chunkSize;
+
     protected string $sparqlUrlFormat;
+
     protected string $queueName;
 
-    public function handle()
-    {
+    public function handle() {
         $this->chunkSize = intval($this->option('chunkSize'));
         $this->sparqlUrlFormat = $this->option('sparqlUrlFormat');
         $this->queueName = $this->option('queueName');
-        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
+        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php';
 
         $wikiDomains = $this->option('domain');
         $exitCode = 0;
@@ -48,7 +47,7 @@ class RebuildQueryserviceData extends Command
                 $sparqlUrl = $this->getSparqlUrl($wiki);
             } catch (\Exception $ex) {
                 Log::error(
-                    'Failed to get prerequisites for enqueuing wiki '.$wiki->domain.', will not dispatch jobs.',
+                    'Failed to get prerequisites for enqueuing wiki ' . $wiki->domain . ', will not dispatch jobs.',
                     [$ex],
                 );
                 $exitCode = 1;
@@ -66,24 +65,24 @@ class RebuildQueryserviceData extends Command
             }
             $jobTotal += count($entityChunks);
             $processedWikis += 1;
-            Log::info('Dispatched '.count($entityChunks).' job(s) for wiki '.$wiki->domain.'.');
+            Log::info('Dispatched ' . count($entityChunks) . ' job(s) for wiki ' . $wiki->domain . '.');
         }
 
         Log::info(
-            'Done. Jobs dispatched: '.$jobTotal.' Wikis processed: '.$processedWikis.' Wikis skipped: '.$skippedWikis
+            'Done. Jobs dispatched: ' . $jobTotal . ' Wikis processed: ' . $processedWikis . ' Wikis skipped: ' . $skippedWikis
         );
+
         return $exitCode;
     }
 
-    private function getEntitiesForWiki (Wiki $wiki): array
-    {
+    private function getEntitiesForWiki(Wiki $wiki): array {
         $items = $this->fetchPagesInNamespace($wiki->domain, MediawikiNamespace::item);
         $properties = $this->fetchPagesInNamespace($wiki->domain, MediawikiNamespace::property);
 
         $lexemesSetting = WikiSetting::where(
             [
                 'wiki_id' => $wiki->id,
-                'name' => WikiSetting::wwExtEnableWikibaseLexeme
+                'name' => WikiSetting::wwExtEnableWikibaseLexeme,
             ],
         )->first();
         $hasLexemesEnabled = $lexemesSetting !== null && $lexemesSetting->value === '1';
@@ -93,22 +92,22 @@ class RebuildQueryserviceData extends Command
 
         $merged = array_merge($items, $properties, $lexemes);
         $this->stripPrefixes($merged);
+
         return $merged;
     }
 
-    private function getSparqlUrl (Wiki $wiki): string
-    {
+    private function getSparqlUrl(Wiki $wiki): string {
         $match = QueryserviceNamespace::where(['wiki_id' => $wiki->id])->first();
-        if (!$match) {
+        if (! $match) {
             throw new \Exception(
-                'Unable to find queryservice namespace record for wiki '.$wiki->domain
+                'Unable to find queryservice namespace record for wiki ' . $wiki->domain
             );
         }
+
         return sprintf($this->sparqlUrlFormat, $match->namespace);
     }
 
-    private static function stripPrefixes (array &$items): void
-    {
+    private static function stripPrefixes(array &$items): void {
         foreach ($items as &$item) {
             $e = explode(':', $item);
             $item = end($e);

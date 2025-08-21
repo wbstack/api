@@ -6,12 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Wiki;
 use Illuminate\Http\Request;
 
-class WikiController extends Controller
-{
+class WikiController extends Controller {
     private static $with = ['wikiDb', 'wikiQueryserviceNamespace', 'settings'];
 
-    public function getWikiForDomain(Request $request): \Illuminate\Http\JsonResponse
-    {
+    public function getWikiForDomain(Request $request): \Illuminate\Http\JsonResponse {
         $domain = $request->input('domain');
 
         // XXX: this same logic is in quickstatements.php and platform api WikiController backend
@@ -27,7 +25,7 @@ class WikiController extends Controller
             return response()->json($ex->getMessage(), 500);
         }
 
-        if (!$result) {
+        if (! $result) {
             return response()->json(['error' => 'Not found'], 404);
         }
 
