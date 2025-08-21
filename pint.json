@@ -1,3 +1,18 @@
 {
-  "preset": "laravel"
+  "preset": "laravel",
+  "rules": {
+    "php_unit_method_casing": {
+      "case": "camel_case"
+    },
+    "braces_position": {
+      "anonymous_classes_opening_brace": "same_line",
+      "anonymous_functions_opening_brace": "same_line",
+      "classes_opening_brace": "same_line",
+      "control_structures_opening_brace": "same_line",
+      "functions_opening_brace": "same_line"
+    },
+    "concat_space": {
+      "spacing": "one"
+    }
+  }
 }
