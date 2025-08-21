@@ -32,13 +32,13 @@ class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique {
     public function handle(HttpRequest $request) {
         $wiki = Wiki::withTrashed()->where(['id' => $this->wikiId])->first();
 
-        if (! $wiki) {
+        if (!$wiki) {
             $this->fail(new \RuntimeException("Wiki not found for {$this->wikiId}"));
 
             return;
         }
 
-        if (! $wiki->deleted_at) {
+        if (!$wiki->deleted_at) {
             $this->fail(new \RuntimeException("Wiki {$this->wikiId} is not marked for deletion."));
 
             return;
@@ -46,7 +46,7 @@ class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique {
 
         $qsNamespace = QueryserviceNamespace::whereWikiId($this->wikiId)->first();
 
-        if (! $qsNamespace) {
+        if (!$qsNamespace) {
             $this->fail(new \RuntimeException("Namespace for wiki {$this->wikiId} not found."));
 
             return;

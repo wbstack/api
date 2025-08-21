@@ -89,7 +89,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
             ],
         );
         $firstRevision = data_get($allRevisions->json(), 'query.allrevisions.0.revisions.0.revid');
-        if (! $firstRevision) {
+        if (!$firstRevision) {
             return null;
         }
 
@@ -105,7 +105,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
             ],
         );
         $result = data_get($revisionInfo->json(), 'query.pages.0.revisions.0.timestamp');
-        if (! $result) {
+        if (!$result) {
             return null;
         }
 
@@ -127,7 +127,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
             ],
         );
         $lastRevision = data_get($allRevisions->json(), 'query.allrevisions.0.revisions.0.revid');
-        if (! $lastRevision) {
+        if (!$lastRevision) {
             return null;
         }
 
@@ -143,7 +143,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
             ],
         );
         $result = data_get($revisionInfo->json(), 'query.pages.0.revisions.0.timestamp');
-        if (! $result) {
+        if (!$result) {
             return null;
         }
 

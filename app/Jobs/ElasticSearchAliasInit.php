@@ -24,7 +24,7 @@ class ElasticSearchAliasInit extends Job {
     public function handle(HttpRequest $request) {
         Log::info(__METHOD__ . ": Updating Elasticsearch aliases for $this->wikiId");
 
-        if (! $this->sharedPrefix) {
+        if (!$this->sharedPrefix) {
             Log::error(__METHOD__ . ": Missing shared index prefix for $this->wikiId");
             $this->fail(
                 new \RuntimeException("Missing shared index prefix for $this->wikiId")
@@ -36,7 +36,7 @@ class ElasticSearchAliasInit extends Job {
         Log::info(__METHOD__ . ": Using '$this->sharedPrefix' as the shared prefix for $this->wikiId");
 
         $this->dbName = WikiDb::where('wiki_id', $this->wikiId)->pluck('name')->first();
-        if (! $this->dbName) {
+        if (!$this->dbName) {
             Log::error(__METHOD__ . ": Failed to get database name for $this->wikiId");
             $this->fail(
                 new \RuntimeException("Failed to get database name for $this->wikiId")

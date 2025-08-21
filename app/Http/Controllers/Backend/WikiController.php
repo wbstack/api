@@ -25,7 +25,7 @@ class WikiController extends Controller {
             return response()->json($ex->getMessage(), 500);
         }
 
-        if (! $result) {
+        if (!$result) {
             return response()->json(['error' => 'Not found'], 404);
         }
 

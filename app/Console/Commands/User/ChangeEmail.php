@@ -17,7 +17,7 @@ class ChangeEmail extends Command {
 
         $user = User::whereEmail($emailOld)->first();
 
-        if (! $user) {
+        if (!$user) {
             $this->error("Error: Could not find a user for '$emailOld'.");
 
             return 1;

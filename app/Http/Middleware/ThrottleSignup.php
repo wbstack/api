@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class ThrottleSignup {
     public function handle(Request $request, Closure $next, string $limit, string $range) {
-        if (! $limit || ! $range) {
+        if (!$limit || !$range) {
             return $next($request);
         }
 

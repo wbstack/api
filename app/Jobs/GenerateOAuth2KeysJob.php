@@ -23,7 +23,7 @@ class GenerateOAuth2KeysJob extends Job implements ShouldQueue {
                     ->where('name', 'wgOAuth2PrivateKey')
                     ->exists();
 
-                if (! $hasPrivateKey) {
+                if (!$hasPrivateKey) {
                     $keyPair = openssl_pkey_new([
                         'private_key_bits' => 2048,
                         'private_key_type' => OPENSSL_KEYTYPE_RSA,

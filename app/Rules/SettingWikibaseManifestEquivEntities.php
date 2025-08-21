@@ -27,7 +27,7 @@ class SettingWikibaseManifestEquivEntities implements Rule {
         }
 
         foreach (self::$entityTypes as $entityType) {
-            if (! array_key_exists($entityType, $value)) {
+            if (!array_key_exists($entityType, $value)) {
                 return false;
             }
 
@@ -35,7 +35,7 @@ class SettingWikibaseManifestEquivEntities implements Rule {
 
             foreach ($value[$entityType] as $local => $wikidata) {
                 // Make sure that we have a single array mapping some property to some value
-                if (! preg_match($validationRule, $local) || ! is_string($wikidata) || ! preg_match($validationRule, $wikidata)) {
+                if (!preg_match($validationRule, $local) || !is_string($wikidata) || !preg_match($validationRule, $wikidata)) {
                     return false;
                 }
             }

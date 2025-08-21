@@ -55,7 +55,7 @@ class ContactController extends Controller {
      * Get a validator for an incoming contact page request.
      */
     protected function validator(array $data): \Illuminate\Validation\Validator {
-        if (! isset($data['contactDetails'])) {
+        if (!isset($data['contactDetails'])) {
             $data['contactDetails'] = ''; // could we skip this using some feature of the validator?
         }
 

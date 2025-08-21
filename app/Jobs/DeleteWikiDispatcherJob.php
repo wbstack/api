@@ -23,7 +23,7 @@ class DeleteWikiDispatcherJob extends Job {
         );
         $wikis = Wiki::withTrashed()->whereDate('deleted_at', '<=', $deleteCutoff)->get();
 
-        if (! $wikis->count()) {
+        if (!$wikis->count()) {
             Log::info(__METHOD__ . ': Found no soft deleted wikis over threshold. exiting.');
 
             return;
@@ -53,7 +53,7 @@ class DeleteWikiDispatcherJob extends Job {
             }
 
             // if domain is not subdomain remove kubernetes ingress if any
-            if (! WikiController::isSubDomain($wiki->domain)) {
+            if (!WikiController::isSubDomain($wiki->domain)) {
                 $jobs[] = new KubernetesIngressDeleteJob($wiki->id);
             }
 

@@ -78,7 +78,7 @@ class PlatformStatsSummaryJob extends Job {
 
         foreach ($wikis as $wiki) {
 
-            if (! is_null($wiki->deleted_at)) {
+            if (!is_null($wiki->deleted_at)) {
                 $deletedWikis[] = $wiki;
 
                 continue;
@@ -100,7 +100,7 @@ class PlatformStatsSummaryJob extends Job {
 
             $wikiDb = $wiki->wikiDb()->first();
 
-            if (! $wikiDb) {
+            if (!$wikiDb) {
                 Log::error(__METHOD__ . ": Could not find WikiDB for {$wiki->domain}");
 
                 continue;
@@ -126,7 +126,7 @@ class PlatformStatsSummaryJob extends Job {
             $nonDeletedStats[] = $stats;
 
             // is it edited in the last 90 days?
-            if (! is_null($stats['lastEdit'])) {
+            if (!is_null($stats['lastEdit'])) {
                 $lastTimestamp = MWTimestampHelper::getCarbonFromMWTimestamp(intval($stats['lastEdit']));
                 $diff = $lastTimestamp->diffInSeconds($currentTime);
 
@@ -170,7 +170,7 @@ class PlatformStatsSummaryJob extends Job {
         $conn = $manager->connection('mysql');
         $mwConn = $manager->connection('mw');
 
-        if (! $conn instanceof \Illuminate\Database\Connection || ! $mwConn instanceof \Illuminate\Database\Connection) {
+        if (!$conn instanceof \Illuminate\Database\Connection || !$mwConn instanceof \Illuminate\Database\Connection) {
             throw new \RuntimeException('Must be run on a PDO based DB connection');
         }
 
@@ -198,8 +198,8 @@ class PlatformStatsSummaryJob extends Job {
         $summary = array_merge($summary, $creationStats);
 
         // Output to be scraped from logs
-        if (! App::runningUnitTests()) {
-            echo  json_encode($summary) . PHP_EOL;
+        if (!App::runningUnitTests()) {
+            echo json_encode($summary) . PHP_EOL;
         }
     }
 

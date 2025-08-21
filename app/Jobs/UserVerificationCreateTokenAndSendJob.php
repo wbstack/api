@@ -32,7 +32,7 @@ class UserVerificationCreateTokenAndSendJob extends Job {
     public function __construct(User $user, string $notificationClass) {
         $this->user = $user;
         $this->notificationClass = $notificationClass;
-        if (! class_exists($notificationClass)) {
+        if (!class_exists($notificationClass)) {
             throw new \InvalidArgumentException("$notificationClass not found for notification");
         }
     }

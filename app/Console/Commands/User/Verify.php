@@ -15,7 +15,7 @@ class Verify extends Command {
         $state = (int) $this->argument('verificationState');
 
         $user = User::whereEmail($email)->first();
-        if (! $user) {
+        if (!$user) {
             $this->error("User not found for $email");
 
             return 1;

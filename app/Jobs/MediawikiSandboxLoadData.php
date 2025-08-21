@@ -50,7 +50,7 @@ class MediawikiSandboxLoadData extends Job {
 
         curl_close($curl);
 
-        if (! strstr($rawResponse, 'Done!')) {
+        if (!strstr($rawResponse, 'Done!')) {
             $this->fail(
                 new \RuntimeException('wikibase-exampledata/v0/load call for ' . $this->wikiDomain . ' was not successful:' . $rawResponse)
             );

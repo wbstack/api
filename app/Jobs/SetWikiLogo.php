@@ -31,7 +31,7 @@ class SetWikiLogo extends Job {
     }
 
     public function handle(): void {
-        if (! file_exists($this->logoPath)) {
+        if (!file_exists($this->logoPath)) {
             $this->fail(new \InvalidArgumentException("Logo not found at '{$this->logoPath}'"));
 
             return;  // safeguard
@@ -58,7 +58,7 @@ class SetWikiLogo extends Job {
 
         // Get the cloud disk we use to store logos
         $storage = Storage::disk('static-assets');
-        if (! $storage instanceof FilesystemAdapter) {
+        if (!$storage instanceof FilesystemAdapter) {
             // TODO: Use a more specific exception?
             $this->fail(new \RuntimeException('Invalid storage (not cloud)'));
 

@@ -27,7 +27,7 @@ class QueryserviceNamespaceJobTest extends TestCase {
 
     protected function setUp(): void {
         parent::setUp();
-        if (! getenv('RUN_PHPUNIT_INTEGRATION_TEST')) {
+        if (!getenv('RUN_PHPUNIT_INTEGRATION_TEST')) {
             $this->markTestSkipped('No blazegraph instance to connect to');
         }
     }

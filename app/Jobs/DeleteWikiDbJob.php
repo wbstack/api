@@ -36,13 +36,13 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique {
     public function handle(DatabaseManager $manager) {
         $wiki = Wiki::withTrashed()->where(['id' => $this->wikiId])->first();
 
-        if (! $wiki) {
+        if (!$wiki) {
             $this->fail(new \RuntimeException("Wiki not found for {$this->wikiId}"));
 
             return;
         }
 
-        if (! $wiki->deleted_at) {
+        if (!$wiki->deleted_at) {
             $this->fail(new \RuntimeException("Wiki {$this->wikiId} is not marked for deletion."));
 
             return;
@@ -50,7 +50,7 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique {
 
         $wikiDB = WikiDb::whereWikiId($this->wikiId)->first();
 
-        if (! $wikiDB) {
+        if (!$wikiDB) {
             $this->fail(new \RuntimeException("WikiDb not found for {$this->wikiId}"));
 
             return;
@@ -61,7 +61,7 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique {
             $manager->purge('mw');
             $conn = $manager->connection('mw');
 
-            if (! $conn instanceof \Illuminate\Database\Connection) {
+            if (!$conn instanceof \Illuminate\Database\Connection) {
                 throw new \RuntimeException('Must be run on a PDO based DB connection');
             }
 

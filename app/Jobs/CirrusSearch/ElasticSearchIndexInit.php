@@ -27,13 +27,13 @@ class ElasticSearchIndexInit extends CirrusSearchJob {
     public function handleResponse(string $rawResponse, $error): void {
         $response = json_decode($rawResponse, true);
 
-        if (! $this->validateOrFailRequest($response, $rawResponse, $error)) {
+        if (!$this->validateOrFailRequest($response, $rawResponse, $error)) {
             $this->logFailure();
 
             return;
         }
 
-        if (! $this->validateSuccess($response, $rawResponse, $error)) {
+        if (!$this->validateSuccess($response, $rawResponse, $error)) {
             $this->logFailure();
 
             return;
@@ -42,7 +42,7 @@ class ElasticSearchIndexInit extends CirrusSearchJob {
         $output = $response[$this->apiModule()]['output'];
 
         // if newly created index failed, script ran and update was unsuccessful, then log error.
-        if (! (
+        if (!(
             in_array("\tCreating index...ok", $output) ||
             in_array("\t\tValidating {$this->wikiDB->name}_general alias...ok", $output)
         )) {

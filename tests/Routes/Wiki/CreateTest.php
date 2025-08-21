@@ -87,7 +87,7 @@ class CreateTest extends TestCase {
             Queue::assertNotPushed(ElasticSearchAliasInit::class);
         }
 
-        if ($enabledForNewWikis && ! $clusterWithoutSharedIndex && ! ($sharedIndexHost && $sharedIndexPrefix)) {
+        if ($enabledForNewWikis && !$clusterWithoutSharedIndex && !($sharedIndexHost && $sharedIndexPrefix)) {
             $response->assertStatus(503)
                 ->assertJsonPath('message', 'Search enabled, but its configuration is invalid');
 

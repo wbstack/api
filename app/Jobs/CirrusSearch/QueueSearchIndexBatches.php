@@ -38,7 +38,7 @@ class QueueSearchIndexBatches extends CirrusSearchJob {
             $fromId = $matches[1][0];
             $toId = $matches[2][0];
 
-            if ((! is_numeric($fromId) || ! is_numeric($toId)) && intval($fromId) <= intval($toId)) {
+            if ((!is_numeric($fromId) || !is_numeric($toId)) && intval($fromId) <= intval($toId)) {
                 throw new \RuntimeException('Batch parameters from command looks weird! fromId: ' . $fromId . ' toId: ' . $toId);
             }
 
@@ -51,21 +51,21 @@ class QueueSearchIndexBatches extends CirrusSearchJob {
     public function handleResponse(string $rawResponse, $error): void {
         $response = json_decode($rawResponse, true);
 
-        if (! $this->validateOrFailRequest($response, $rawResponse, $error)) {
+        if (!$this->validateOrFailRequest($response, $rawResponse, $error)) {
             return;
         }
 
         $output = $response[$this->apiModule()]['output'];
 
         // if there are no pages to index, just exit now.
-        if (! $this->isSuccessful($response) &&
+        if (!$this->isSuccessful($response) &&
             is_array($output) && count($output) == 1 && $output[0] == "Couldn't find any pages to index.  fromId =  =  = toId.") {
             Log::warning(__METHOD__ . ': ForceSearchIndex could not find any pages to index. ' . $rawResponse);
 
             return;
         }
 
-        if (! $this->validateSuccess($response, $rawResponse, $error)) {
+        if (!$this->validateSuccess($response, $rawResponse, $error)) {
             return;
         }
 
@@ -80,7 +80,7 @@ class QueueSearchIndexBatches extends CirrusSearchJob {
             return;
         }
 
-        if (! empty($batches)) {
+        if (!empty($batches)) {
             // todo rewrite as batch
             foreach ($batches as $job) {
                 dispatch($job);

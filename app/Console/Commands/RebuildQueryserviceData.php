@@ -98,7 +98,7 @@ class RebuildQueryserviceData extends Command {
 
     private function getSparqlUrl(Wiki $wiki): string {
         $match = QueryserviceNamespace::where(['wiki_id' => $wiki->id])->first();
-        if (! $match) {
+        if (!$match) {
             throw new \Exception(
                 'Unable to find queryservice namespace record for wiki ' . $wiki->domain
             );

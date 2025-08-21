@@ -26,13 +26,13 @@ class KubernetesIngressDeleteJob extends Job {
     public function handle(Client $client) {
         $wiki = Wiki::withTrashed()->where('id', $this->id)->first();
 
-        if (! $wiki) {
+        if (!$wiki) {
             $this->fail(new \RuntimeException("Could not find wiki with id {$this->id}"));
 
             return;
         }
 
-        if (! $wiki->deleted_at) {
+        if (!$wiki->deleted_at) {
             $this->fail(new \RuntimeException("Wiki {$this->id} is not deleted, but it's ingress got called to be deleted."));
 
             return;
@@ -41,7 +41,7 @@ class KubernetesIngressDeleteJob extends Job {
         $exists = $client->ingresses()->exists(KubernetesIngressCreate::getKubernetesIngressName($this->id));
 
         // just exit if there is nothing no need to fail
-        if (! $exists) {
+        if (!$exists) {
             return;
         }
 

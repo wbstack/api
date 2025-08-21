@@ -46,7 +46,7 @@ class ComplaintController extends Controller {
         $complaintRecord->offending_urls = $validated['url'];
         $complaintRecord->save();
 
-        if (! empty($complaintRecord->mail_address)) {
+        if (!empty($complaintRecord->mail_address)) {
             Notification::route('mail', [
                 $complaintRecord->mail_address,
             ])->notify(
@@ -93,7 +93,7 @@ class ComplaintController extends Controller {
                 'nullable',
                 'max:300',
                 Rule::when(
-                    ! empty($data['email']),
+                    !empty($data['email']),
                     ['email:rfc']
                 ),
             ],

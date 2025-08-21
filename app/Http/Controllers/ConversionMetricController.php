@@ -21,7 +21,7 @@ class ConversionMetricController extends Controller {
             $lifecycleEvents = $wiki->wikiLifecycleEvents()->orderBy('id', 'desc')->first();
             $wikiLastEditedTime = null;
             $wikiFirstEditedTime = null;
-            if (! empty($lifecycleEvents)) {
+            if (!empty($lifecycleEvents)) {
                 if ($lifecycleEvents['last_edited']) {
                     $wikiLastEditedTime = CarbonImmutable::parse($lifecycleEvents['last_edited']);
                 }
@@ -32,7 +32,7 @@ class ConversionMetricController extends Controller {
             $time_before_wiki_abandoned_days = null;
             $time_to_engage_days = null;
 
-            if (! is_null($wikiLastEditedTime) && ($wikiLastEditedTime->diffInDays($current_date, false) >= 90)) {
+            if (!is_null($wikiLastEditedTime) && ($wikiLastEditedTime->diffInDays($current_date, false) >= 90)) {
                 $time_before_wiki_abandoned_days = $wiki->created_at->diffInDays($wikiLastEditedTime, false);
             }
             if ($wikiFirstEditedTime !== null) {

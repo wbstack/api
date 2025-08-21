@@ -59,13 +59,13 @@ class ElasticSearchIndexDeleteTest extends TestCase {
     }
 
     public function testDeletion() {
-        if (! getenv('RUN_PHPUNIT_INTEGRATION_TEST')) {
+        if (!getenv('RUN_PHPUNIT_INTEGRATION_TEST')) {
             $this->markTestSkipped('No blazegraph instance to connect to');
         }
 
         $ELASTICSEARCH_HOST = data_get(Config::get('wbstack.elasticsearch_hosts'), 0);
 
-        if (! $ELASTICSEARCH_HOST) {
+        if (!$ELASTICSEARCH_HOST) {
             throw new \Exception('ELASTICSEARCH_HOST / wbstack.elasticsearch_hosts not set');
         }
 

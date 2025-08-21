@@ -127,7 +127,7 @@ class MediawikiUpdate extends Job {
         echo json_encode('success: ' . $success) . PHP_EOL;
 
         // Exception if really bad
-        if (! $success) {
+        if (!$success) {
             $this->fail(
                 new \RuntimeException('wbstackUpdate call for ' . $wikiDomain . ' was not successful:' . $rawResponse)
             );

@@ -58,7 +58,7 @@ class WikiMetrics {
 
                 return;
             }
-            if (! $isDeleted) {
+            if (!$isDeleted) {
                 if ($oldRecord->areMetricsEqual($dailyMetrics)) {
                     Log::info("Record unchanged for Wiki ID {$wiki->id}, no new record added.");
 
@@ -75,7 +75,7 @@ class WikiMetrics {
     protected function getNumOfTriples(): ?int {
         $qsNamespace = QueryserviceNamespace::whereWikiId($this->wiki->id)->first();
 
-        if (! $qsNamespace) {
+        if (!$qsNamespace) {
             Log::info(new \RuntimeException("Namespace for wiki {$this->wiki->id} not found."));
 
             return null;

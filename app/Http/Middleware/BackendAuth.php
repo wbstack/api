@@ -41,7 +41,7 @@ class BackendAuth {
         $tokenOk = $token === 'backend-token';
         $serviceOk = $service === 'backend-service';
 
-        if (! $tokenOk || ! $serviceOk) {
+        if (!$tokenOk || !$serviceOk) {
             // TODO log failures
             return response()->json([
                 'error' => 'Unauthorized.',

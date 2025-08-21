@@ -54,11 +54,11 @@ class SandboxController extends Controller {
 
             // Assign storage
             $dbAssignment = DB::table('wiki_dbs')->where($wikiDbCondition)->limit(1)->update(['wiki_id' => $wiki->id]);
-            if (! $dbAssignment) {
+            if (!$dbAssignment) {
                 abort(503, 'Database ready, but failed to assign');
             }
             $nsAssignment = DB::table('queryservice_namespaces')->where(['wiki_id' => null])->limit(1)->update(['wiki_id' => $wiki->id]);
-            if (! $nsAssignment) {
+            if (!$nsAssignment) {
                 abort(503, 'QS Namespace ready, but failed to assign');
             }
 
@@ -105,7 +105,7 @@ class SandboxController extends Controller {
 
     private function generateUnusedDomain() {
         $domain = $this->generateDomain();
-        if (! WikiDomain::whereDomain($domain)->first()) {
+        if (!WikiDomain::whereDomain($domain)->first()) {
             return $domain;
         }
 

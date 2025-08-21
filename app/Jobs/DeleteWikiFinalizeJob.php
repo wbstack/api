@@ -37,13 +37,13 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique {
     public function handle(HttpRequest $request) {
         $wiki = Wiki::withTrashed()->where('id', $this->wikiId)->first();
 
-        if (! $wiki) {
+        if (!$wiki) {
             $this->fail(new \RuntimeException("Wiki not found for {$this->wikiId}"));
 
             return;
         }
 
-        if (! $wiki->deleted_at) {
+        if (!$wiki->deleted_at) {
             $this->fail(new \RuntimeException("Wiki {$this->wikiId} is not deleted, but job got dispatched."));
 
             return;
@@ -84,7 +84,7 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique {
             return;
         }
 
-        if (! $this->deleteSiteDirectory($wiki->id)) {
+        if (!$this->deleteSiteDirectory($wiki->id)) {
             $this->fail(new \RuntimeException('Failed deleting site directory.'));
 
             return;
@@ -100,7 +100,7 @@ class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique {
     public function deleteSiteDirectory(int $wiki_id): bool {
         try {
             $disk = Storage::disk('static-assets');
-            if (! $disk instanceof Cloud) {
+            if (!$disk instanceof Cloud) {
                 $this->fail(new \RuntimeException('Invalid storage (not cloud).'));
 
                 return false;

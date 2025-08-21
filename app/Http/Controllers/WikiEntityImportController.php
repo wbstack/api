@@ -42,7 +42,7 @@ class WikiEntityImportController extends Controller {
             'entity_ids' => ['required', 'string', function (string $attr, mixed $value, \Closure $fail) {
                 $chunks = explode(',', $value);
                 foreach ($chunks as $chunk) {
-                    if (! preg_match("/^[A-Z]\d+(@\d+)?$/", $chunk)) {
+                    if (!preg_match("/^[A-Z]\d+(@\d+)?$/", $chunk)) {
                         $fail("Received unexpected input '{$chunk}' cannot continue.");
                     }
                 }
@@ -90,7 +90,7 @@ class WikiEntityImportController extends Controller {
         ]);
 
         $import = WikiEntityImport::find($validatedInput['wiki_entity_import']);
-        if (! $import) {
+        if (!$import) {
             abort(404, 'No such import');
         }
 

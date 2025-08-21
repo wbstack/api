@@ -20,7 +20,7 @@ class LimitWikiAccess {
 
         $wiki = Wiki::find($validatedInput['wiki']);
 
-        if (! $wiki) {
+        if (!$wiki) {
             abort(404, 'No such wiki');
         }
 
@@ -28,7 +28,7 @@ class LimitWikiAccess {
             ->where('user_id', $request->user()?->id)
             ->first();
 
-        if (! $wikiManager) {
+        if (!$wikiManager) {
             abort(403);
         }
 

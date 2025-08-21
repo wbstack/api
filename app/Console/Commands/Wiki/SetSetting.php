@@ -27,7 +27,7 @@ class SetSetting extends Command {
 
         // TODO don't select the timestamps and redundant info for the settings?
         $wiki = Wiki::where($wikiKey, $wikiValue)->first();
-        if (! $wiki) {
+        if (!$wiki) {
             $this->error('Wiki not found');
 
             return 1;

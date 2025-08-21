@@ -99,7 +99,7 @@ class ProcessMediaWikiJobsJob implements ShouldBeUnique, ShouldQueue {
 
         $job = $kubernetesClient->jobs()->apply($jobSpec);
         $jobName = data_get($job, 'metadata.name');
-        if (data_get($job, 'status') === 'Failure' || ! $jobName) {
+        if (data_get($job, 'status') === 'Failure' || !$jobName) {
             // The k8s client does not fail reliably on 4xx responses, so checking the name
             // currently serves as poor man's error handling.
             $this->fail(

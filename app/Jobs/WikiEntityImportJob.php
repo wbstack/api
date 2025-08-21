@@ -94,7 +94,7 @@ class WikiEntityImportJob implements ShouldQueue {
         }
 
         $body = $response->json();
-        if (! $body || $body['wbstackPlatformOauthGet']['success'] !== '1') {
+        if (!$body || $body['wbstackPlatformOauthGet']['success'] !== '1') {
             throw new \ErrorException('Unexpected error acquiring oauth credentials for wiki ' . $wikiDomain);
         }
 
@@ -130,7 +130,7 @@ class TransferBotKubernetesJob {
         $this->kubernetesClient->setNamespace($this->kubernetesNamespace);
         $jobObject = $this->kubernetesClient->jobs()->apply($jobSpec);
         $jobName = data_get($jobObject, 'metadata.name');
-        if (data_get($jobObject, 'status') === 'Failure' || ! $jobName) {
+        if (data_get($jobObject, 'status') === 'Failure' || !$jobName) {
             // The k8s client does not fail reliably on 4xx responses, so checking the name
             // currently serves as poor man's error handling.
             throw new \RuntimeException(

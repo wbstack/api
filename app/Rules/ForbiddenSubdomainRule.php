@@ -39,7 +39,7 @@ class ForbiddenSubdomainRule implements Rule {
 
         $subdomain = $matches[1][0];
 
-        return $value !== null && ! in_array($subdomain, $this->badWords);
+        return $value !== null && !in_array($subdomain, $this->badWords);
     }
 
     /**

@@ -50,11 +50,11 @@ class ForceSearchIndex extends CirrusSearchJob {
     public function handleResponse(string $rawResponse, $error): void {
         $response = json_decode($rawResponse, true);
 
-        if (! $this->validateOrFailRequest($response, $rawResponse, $error)) {
+        if (!$this->validateOrFailRequest($response, $rawResponse, $error)) {
             return;
         }
 
-        if (! $this->validateSuccess($response, $rawResponse, $error)) {
+        if (!$this->validateSuccess($response, $rawResponse, $error)) {
             return;
         }
 

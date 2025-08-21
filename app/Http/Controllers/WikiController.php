@@ -39,7 +39,7 @@ class WikiController extends Controller {
         $sharedIndexPrefix = Config::get('wbstack.elasticsearch_shared_index_prefix');
 
         if (Config::get('wbstack.elasticsearch_enabled_by_default')) {
-            if (! $clusterWithoutSharedIndex && ! ($sharedIndexHost && $sharedIndexPrefix)) {
+            if (!$clusterWithoutSharedIndex && !($sharedIndexHost && $sharedIndexPrefix)) {
                 abort(503, 'Search enabled, but its configuration is invalid');
             }
         }
@@ -97,11 +97,11 @@ class WikiController extends Controller {
 
             // Assign storage
             $dbAssignment = DB::table('wiki_dbs')->where($wikiDbCondition)->limit(1)->update(['wiki_id' => $wiki->id]);
-            if (! $dbAssignment) {
+            if (!$dbAssignment) {
                 abort(503, 'Database ready, but failed to assign');
             }
             $nsAssignment = DB::table('queryservice_namespaces')->where(['wiki_id' => null])->limit(1)->update(['wiki_id' => $wiki->id]);
-            if (! $nsAssignment) {
+            if (!$nsAssignment) {
                 abort(503, 'QS Namespace ready, but failed to assign');
             }
 
@@ -165,7 +165,7 @@ class WikiController extends Controller {
             // TODO maybe always make these run in a certain order..?
             dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
             // Only dispatch a job to add a k8s ingress IF we are using a custom domain...
-            if (! $isSubdomain) {
+            if (!$isSubdomain) {
                 dispatch(new KubernetesIngressCreate($wiki->id, $wiki->domain));
             }
         });

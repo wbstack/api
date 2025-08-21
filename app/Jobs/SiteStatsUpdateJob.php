@@ -26,7 +26,7 @@ class SiteStatsUpdateJob extends Job {
         $timeStart = microtime(true);
 
         $wiki = Wiki::where('id', $this->wiki_id)->first();
-        if (! $wiki) {
+        if (!$wiki) {
             $this->fail(new \RuntimeException(" Could not find wiki with id: $this->wiki_id"));
         }
 
@@ -60,7 +60,7 @@ class SiteStatsUpdateJob extends Job {
 
         $response = json_decode($rawResponse, true);
 
-        if (! is_array($response) || ! array_key_exists('wbstackSiteStatsUpdate', $response)) {
+        if (!is_array($response) || !array_key_exists('wbstackSiteStatsUpdate', $response)) {
             $this->fail(
                 new \RuntimeException('wbstackSiteStatsUpdate call for ' . $wiki->domain . '. No wbstackSiteStatsUpdate key in response: ' . $rawResponse)
             );

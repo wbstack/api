@@ -20,7 +20,7 @@ class SettingCaptchaQuestions implements Rule {
         }
 
         foreach (array_keys($value) as $question) {
-            if (! is_string($question)) {
+            if (!is_string($question)) {
                 return false;
             }
             /**
@@ -32,14 +32,14 @@ class SettingCaptchaQuestions implements Rule {
         }
 
         foreach (array_values($value) as $answers) {
-            if (! is_array($answers)) {
+            if (!is_array($answers)) {
                 return false;
             }
             if (count((array) $answers) === 0) {
                 return false;
             }
             foreach ($answers as $answer) {
-                if (! is_string($answer)) {
+                if (!is_string($answer)) {
                     return false;
                 }
                 if (strlen($answer) > 200) {

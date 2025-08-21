@@ -26,7 +26,7 @@ class QsCheckpoint extends Model {
 
     public static function get(): int {
         $match = self::where(['id' => self::CHECKPOINT_ID])->first();
-        if (! $match) {
+        if (!$match) {
             throw new ModelNotFoundException(
                 'No QsCheckpoint found. Is your table properly initialized?'
             );
@@ -37,7 +37,7 @@ class QsCheckpoint extends Model {
 
     public static function set(int $val): void {
         $match = self::where(['id' => self::CHECKPOINT_ID])->first();
-        if (! $match) {
+        if (!$match) {
             throw new ModelNotFoundException(
                 'No QsCheckpoint found. Is your table properly initialized?'
             );

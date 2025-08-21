@@ -45,7 +45,7 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
         $this->wiki = Wiki::whereId($this->wikiId)->with('settings')->with('wikiDb')->first();
 
         // job got triggered but no wiki
-        if (! $this->wiki) {
+        if (!$this->wiki) {
             $this->fail(new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId . ' was triggered but not wiki available.'));
 
             return;
@@ -53,7 +53,7 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
 
         $this->setting = $this->wiki->settings()->where(['name' => WikiSetting::wwExtEnableElasticSearch])->first();
         // job got triggered but no setting
-        if (! $this->setting) {
+        if (!$this->setting) {
             $this->fail(new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId . ' was triggered but not setting available'));
 
             return;
@@ -61,7 +61,7 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
 
         $this->wikiDB = $this->wiki->wikiDb()->first();
         // no wikiDB around
-        if (! $this->wikiDB) {
+        if (!$this->wikiDB) {
             $this->fail(new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId . ' was triggered but not WikiDb available'));
 
             return;
@@ -102,7 +102,7 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
             return false;
         }
 
-        if (! $this->isValid($response)) {
+        if (!$this->isValid($response)) {
             $this->fail(new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId . '. No ' . $this->apiModule() . ' key in response: ' . $rawResponse));
 
             return false;
@@ -112,7 +112,7 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
     }
 
     protected function validateSuccess(array $response, string $rawResponse, $error): bool {
-        if (! $this->isSuccessful($response)) {
+        if (!$this->isSuccessful($response)) {
             $this->fail(new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId . ' was not successful:' . $rawResponse));
 
             return false;

@@ -53,7 +53,7 @@ class MediawikiInit extends Job {
 
         $response = json_decode($rawResponse, true);
 
-        if (! is_array($response) || ! array_key_exists('wbstackInit', $response)) {
+        if (!is_array($response) || !array_key_exists('wbstackInit', $response)) {
             throw new \RuntimeException('wbstackInit call for ' . $this->wikiDomain . '. No wbstackInit key in response: ' . $rawResponse);
         }
 

@@ -81,7 +81,7 @@ class ProvisionWikiDbJob extends Job {
 
         $manager->purge('mw');
         $conn = $manager->connection('mw');
-        if (! $conn instanceof \Illuminate\Database\Connection) {
+        if (!$conn instanceof \Illuminate\Database\Connection) {
             $this->fail(new \RuntimeException('Must be run on a PDO based DB connection'));
 
             return; // safegaurd

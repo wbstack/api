@@ -34,27 +34,27 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique {
     public function handle(HttpRequest $request) {
         $wiki = Wiki::withTrashed()->where(['id' => $this->wikiId])->with('settings')->with('wikiDb')->first();
 
-        if (! $wiki) {
+        if (!$wiki) {
             $this->fail(new \RuntimeException('ElasticSearchIndexDelete job for ' . $this->wikiId . ' was triggered but no wiki available.'));
 
             return;
         }
 
-        if (! $wiki->deleted_at) {
+        if (!$wiki->deleted_at) {
             $this->fail(new \RuntimeException('ElasticSearchIndexDelete job for ' . $this->wikiId . ' but that wiki is not marked as deleted.'));
 
             return;
         }
 
         $setting = $wiki->settings()->where(['name' => WikiSetting::wwExtEnableElasticSearch])->first();
-        if (! $setting) {
+        if (!$setting) {
             $this->fail(new \RuntimeException('ElasticSearchIndexDelete job for ' . $this->wikiId . ' was triggered but no setting available'));
 
             return;
         }
 
         $wikiDB = $wiki->wikiDb()->first();
-        if (! $wikiDB) {
+        if (!$wikiDB) {
             $this->fail(new \RuntimeException('ElasticSearchIndexDelete job for ' . $this->wikiId . ' was triggered but no WikiDb available'));
             $setting->update(['value' => false]);
 
@@ -75,7 +75,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique {
                 $elasticSearchHelper = new ElasticSearchHelper($elasticSearchHost, $elasticSearchBaseName);
 
                 // Not having any indices to remove should not fail the job
-                if (! $elasticSearchHelper->hasIndices($request)) {
+                if (!$elasticSearchHelper->hasIndices($request)) {
                     $setting->update(['value' => false]);
 
                     continue;
@@ -117,7 +117,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique {
 
             $response = json_decode($rawResponse, true);
 
-            if (! is_array($response) || ! array_key_exists('acknowledged', $response) || $response['acknowledged'] !== true) {
+            if (!is_array($response) || !array_key_exists('acknowledged', $response) || $response['acknowledged'] !== true) {
                 $this->fail(new \RuntimeException('ElasticSearchIndexDelete job for ' . $this->wikiId . ' was not successful: ' . $rawResponse));
 
                 continue;
