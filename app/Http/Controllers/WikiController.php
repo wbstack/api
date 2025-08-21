@@ -200,22 +200,8 @@ class WikiController extends Controller
 
     public function delete(Request $request): \Illuminate\Http\JsonResponse
     {
-        $user = $request->user();
-
-        $request->validate([
-            'wiki' => 'required|numeric',
-        ]);
-
-        $wikiId = $request->input('wiki');
-        $userId = $user->id;
         $wikiDeletionReason = $request->input('deletionReasons');
-
-        // Check that the requesting user manages the wiki
-        if (WikiManager::where('user_id', $userId)->where('wiki_id', $wikiId)->count() !== 1) {
-            // The deletion was requested by a user that does not manage the wiki
-            return response()->json('Unauthorized', 401);
-        }
-        $wiki = Wiki::find($wikiId);
+        $wiki = $request->attributes->get('wiki');
 
         if(isset($wikiDeletionReason)){
             //Save the wiki deletion reason
@@ -231,25 +217,11 @@ class WikiController extends Controller
     // TODO should this just be get wiki?
     public function getWikiDetailsForIdForOwner(Request $request): \Illuminate\Http\Response
     {
-        $user = $request->user();
-
-        $wikiId = $request->input('wiki');
-
-        // TODO general check to make sure current user can manage the wiki
-        // this should probably be middle ware?
-        // TODO only do 1 query where instead of 2?
-        $test = WikiManager::where('user_id', $user->id)
-      ->where('wiki_id', $wikiId)
-      ->first();
-        if (! $test) {
-            abort(403);
-        }
-
-        $wiki = Wiki::where('id', $wikiId)
-      ->with('wikiManagers')
-      ->with('wikiDbVersion')
-      ->with('wikiLatestProfile')
-      ->with('publicSettings')->first();
+        $wiki = $request->attributes->get('wiki')
+            ->load('wikiManagers')
+            ->load('wikiDbVersion')
+            ->load('wikiLatestProfile')
+            ->load('publicSettings');
 
         $res = [
             'success' => true,

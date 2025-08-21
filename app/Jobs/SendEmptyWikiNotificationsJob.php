@@ -59,7 +59,7 @@ class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique
 
     public function sendEmptyWikiNotification (Wiki $wiki): void
     {
-        $wikiManagers = $wiki->wikiManagers()->get();
+        $wikiManagers = $wiki->wikiManagersWithEmail()->get();
 
         foreach($wikiManagers as $wikiManager) {
             // we think the order here matters, so that people do not get spammed in case creating a record fails

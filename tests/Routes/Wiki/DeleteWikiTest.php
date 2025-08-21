@@ -34,4 +34,15 @@ class DeleteWikiTest extends TestCase
             Wiki::withTrashed()->find($wiki->id)->wiki_deletion_reason
         );
     }
+
+    public function testFailOnWrongWikiManager(): void
+    {
+        $userWiki = Wiki::factory()->create();
+        $otherWiki = Wiki::factory()->create();
+        $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
+        $this->actingAs($user, 'api')
+            ->post('wiki/delete', ['wiki' => $otherWiki->id])
+            ->assertStatus(403);
+    }
 }

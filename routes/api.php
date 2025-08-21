@@ -18,6 +18,7 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
     $router->post('user/forgotPassword', ['uses' => 'Auth\ForgotPasswordController@sendResetLinkEmail']);
     $router->post('user/resetPassword', ['uses' => 'Auth\ResetPasswordController@reset']);
     $router->post('contact/sendMessage', ['uses' => 'ContactController@sendMessage']);
+    $router->post('complaint/sendMessage', ['uses' => 'ComplaintController@sendMessage']);
 
     $router->post('auth/login', ['uses' => 'Auth\LoginController@postLogin'])->name('login');
     // Authed
@@ -38,14 +39,16 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
         });
         $router->group(['prefix' => 'wiki', 'middleware' => ['verified']], function () use ($router) {
             $router->post('create', ['uses' => 'WikiController@create']);
-            $router->post('delete', ['uses' => 'WikiController@delete']);
-            $router->post('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
-            $router->get('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
-            $router->post('logo/update', ['uses' => 'WikiLogoController@update']);
-            $router->post('setting/{setting}/update', ['uses' => 'WikiSettingController@update']);
-            $router->get('entityImport', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiEntityImportController@get']);
-            $router->post('entityImport', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiEntityImportController@create']);
-            $router->post('profile', ['middleware' => 'limit_wiki_access', 'uses' => 'WikiProfileController@create']);
+            $router->group(['middleware' => 'limit_wiki_access'], function () use ($router) {
+                $router->post('delete', ['uses' => 'WikiController@delete']);
+                $router->post('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
+                $router->get('details', ['uses' => 'WikiController@getWikiDetailsForIdForOwner']);
+                $router->post('logo/update', ['uses' => 'WikiLogoController@update']);
+                $router->post('setting/{setting}/update', ['uses' => 'WikiSettingController@update']);
+                $router->get('entityImport', ['uses' => 'WikiEntityImportController@get']);
+                $router->post('entityImport', ['uses' => 'WikiEntityImportController@create']);
+                $router->post('profile', ['uses' => 'WikiProfileController@create']);
+            });
         });
         $router->apiResource('deletedWikiMetrics', 'DeletedWikiMetricsController')->only(['index'])
             ->middleware(AuthorisedUsersForDeletedWikiMetricsMiddleware::class);
