@@ -5,79 +5,71 @@ namespace Tests\Routes\Complaint;
 use App\ComplaintRecord;
 use App\Notifications\ComplaintNotification;
 use App\Rules\ReCaptchaValidation;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
-use Tests\Feature\ReCaptchaValidationTest;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class SendMessageTest extends TestCase
-{
+class SendMessageTest extends TestCase {
     use RefreshDatabase;
-    
+
     protected $route = 'complaint/sendMessage';
 
     protected $postDataTemplateEmpty = [
-        'name'      => '',
-        'email'     => '',
-        'message'   => '',
-        'url'       => '',
+        'name' => '',
+        'email' => '',
+        'message' => '',
+        'url' => '',
         'recaptcha' => '',
     ];
 
     protected $postDataTemplateFilled = [
-        'name'      => 'Jane Doe',
-        'email'     => 'jane.doe@example.com',
-        'message'   => 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-        'url'       => 'https://example.com/1, https://example.com/2, https://example.com/3',
+        'name' => 'Jane Doe',
+        'email' => 'jane.doe@example.com',
+        'message' => 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
+        'url' => 'https://example.com/1, https://example.com/2, https://example.com/3',
         'recaptcha' => 'fake-token',
     ];
 
-    private function mockReCaptchaValidation($passes=true)
-    {
+    private function mockReCaptchaValidation($passes = true) {
         // replace injected ReCaptchaValidation class with mock (ComplaintController::$recaptchaValidation)
         $mockRule = $this->createMock(ReCaptchaValidation::class);
         $mockRule->method('passes')
             ->willReturn($passes);
-    
+
         $this->app->instance(ReCaptchaValidation::class, $mockRule);
     }
-    private function assertRecordCount(int $count)
-    {
+
+    private function assertRecordCount(int $count) {
         $this->assertEquals(ComplaintRecord::count(), $count);
     }
 
-    private function assertComplaintMarkedAsDispatched()
-    {
+    private function assertComplaintMarkedAsDispatched() {
         $complaintRecord = ComplaintRecord::first();
         $this->assertNotEmpty($complaintRecord->dispatched_at);
     }
 
-    private function assertComplaintNotMarkedAsDispatched()
-    {
+    private function assertComplaintNotMarkedAsDispatched() {
         $complaintRecord = ComplaintRecord::first();
         $this->assertEmpty($complaintRecord->dispatched_at);
     }
 
-    private function assertComplaintRecorded()
-    {
+    private function assertComplaintRecorded() {
         $this->assertRecordCount(1);
     }
 
-    private function assertComplaintNotRecorded()
-    {
+    private function assertComplaintNotRecorded() {
         $this->assertRecordCount(0);
     }
 
-    public function testRecordOnMailFail()
-    {
+    public function testRecordOnMailFail() {
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateFilled;
 
         try {
             $response = $this->json('POST', $this->route, $data);
-        } catch(\Symfony\Component\Mailer\Exception\TransportException $e) {
+        } catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
             return;
         }
 
@@ -87,8 +79,7 @@ class SendMessageTest extends TestCase
         $this->assertComplaintNotMarkedAsDispatched();
     }
 
-    public function testSendMessage_NoData()
-    {
+    public function testSendMessageNoData() {
         Notification::fake();
         $this->mockReCaptchaValidation(false);
 
@@ -101,13 +92,12 @@ class SendMessageTest extends TestCase
         $this->assertComplaintNotRecorded();
     }
 
-    public function testSendMessage_InvalidMailAddressRfc()
-    {
+    public function testSendMessageInvalidMailAddressRfc() {
         Notification::fake();
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateFilled;
-        $data['email'] = "invalid-mail-address";
+        $data['email'] = 'invalid-mail-address';
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
 
@@ -117,13 +107,12 @@ class SendMessageTest extends TestCase
         $this->assertComplaintNotRecorded();
     }
 
-    public function testSendMessage_InvalidMailAddressMulti()
-    {
+    public function testSendMessageInvalidMailAddressMulti() {
         Notification::fake();
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateFilled;
-        $data['email'] = "mail@example.com, foo@bar.com";
+        $data['email'] = 'mail@example.com, foo@bar.com';
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
 
@@ -131,13 +120,12 @@ class SendMessageTest extends TestCase
         $this->assertComplaintNotRecorded();
     }
 
-    public function testSendMessage_ReasonTooLong()
-    {
+    public function testSendMessageReasonTooLong() {
         Notification::fake();
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateFilled;
-        $data['message'] = str_repeat("Hi!", 10000);
+        $data['message'] = str_repeat('Hi!', 10000);
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
 
@@ -145,13 +133,12 @@ class SendMessageTest extends TestCase
         $this->assertComplaintNotRecorded();
     }
 
-    public function testSendMessage_NameTooLong()
-    {
+    public function testSendMessageNameTooLong() {
         Notification::fake();
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateFilled;
-        $data['name'] = str_repeat("Hi!", 10000);
+        $data['name'] = str_repeat('Hi!', 10000);
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
 
@@ -159,13 +146,12 @@ class SendMessageTest extends TestCase
         $this->assertComplaintNotRecorded();
     }
 
-    public function testSendMessage_OffendingUrlsTooLong()
-    {
+    public function testSendMessageOffendingUrlsTooLong() {
         Notification::fake();
         $this->mockReCaptchaValidation();
 
         $data = $this->postDataTemplateFilled;
-        $data['url'] = str_repeat("Hi!", 10000);
+        $data['url'] = str_repeat('Hi!', 10000);
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(400);
 
@@ -173,8 +159,7 @@ class SendMessageTest extends TestCase
         $this->assertComplaintNotRecorded();
     }
 
-    public function testSendMessage_NoNameNorMailAddress()
-    {
+    public function testSendMessageNoNameNorMailAddress() {
         Notification::fake();
         $this->mockReCaptchaValidation();
 
@@ -190,8 +175,7 @@ class SendMessageTest extends TestCase
         $this->assertComplaintMarkedAsDispatched();
     }
 
-    public function testSendMessage_Success()
-    {
+    public function testSendMessageSuccess() {
         Notification::fake();
         $this->mockReCaptchaValidation();
 
@@ -199,11 +183,12 @@ class SendMessageTest extends TestCase
 
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(200);
-        Notification::assertSentTo(new AnonymousNotifiable(), ComplaintNotification::class, function ($notification) {
+        Notification::assertSentTo(new AnonymousNotifiable, ComplaintNotification::class, function ($notification) {
             $this->assertSame(
-                "dsa@wikibase.cloud",
-                $notification->toMail(new AnonymousNotifiable())->from[0]
+                'dsa@wikibase.cloud',
+                $notification->toMail(new AnonymousNotifiable)->from[0]
             );
+
             return true;
         });
 
@@ -212,8 +197,7 @@ class SendMessageTest extends TestCase
         $this->assertComplaintMarkedAsDispatched();
     }
 
-    public function testSendMessage_RecaptchaFailure()
-    {
+    public function testSendMessageRecaptchaFailure() {
         Notification::fake();
         $this->mockReCaptchaValidation(false);
 

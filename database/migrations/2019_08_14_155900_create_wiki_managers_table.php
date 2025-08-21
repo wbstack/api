@@ -4,15 +4,13 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateWikiManagersTable extends Migration
-{
+class CreateWikiManagersTable extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
+    public function up() {
         Schema::create('wiki_managers', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
@@ -27,8 +25,7 @@ class CreateWikiManagersTable extends Migration
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('wiki_managers');
     }
 }

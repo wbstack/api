@@ -4,24 +4,22 @@ namespace Tests\Routes\User;
 
 use App\Invitation;
 use App\Notifications\UserCreationNotification;
-use App\User;
 use App\Rules\ReCaptchaValidation;
+use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Notification;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
 
-class RegisterTest extends TestCase
-{
+class RegisterTest extends TestCase {
     protected $route = 'user/register';
 
-    use OptionsRequestAllowed;
     use DatabaseTransactions;
+    use OptionsRequestAllowed;
 
     // TODO test password length when not deving
 
-    private function mockReCaptchaValidation($passes=true)
-    {
+    private function mockReCaptchaValidation($passes = true) {
         // replace injected ReCaptchaValidation class with mock (ContactController::$recaptchaValidation)
         $mockRule = $this->createMock(ReCaptchaValidation::class);
         $mockRule->method('passes')
@@ -30,8 +28,7 @@ class RegisterTest extends TestCase
         $this->app->instance(ReCaptchaValidation::class, $mockRule);
     }
 
-    public function testCreate_Success()
-    {
+    public function testCreateSuccess() {
         $this->mockReCaptchaValidation();
         Notification::fake();
 
@@ -39,72 +36,68 @@ class RegisterTest extends TestCase
         $userToCreate = User::factory()->make();
 
         $resp = $this->json('POST', $this->route, [
-          'email' => $userToCreate->email,
-          'password' => 'anyPassword',
-          'recaptcha' => 'someToken'
+            'email' => $userToCreate->email,
+            'password' => 'anyPassword',
+            'recaptcha' => 'someToken',
         ]);
 
         $resp->assertStatus(200)
-        ->assertJsonStructure(['data' => ['email', 'id'], 'message', 'success'])
-        ->assertJsonFragment(['email' => $userToCreate->email, 'success' => true]);
+            ->assertJsonStructure(['data' => ['email', 'id'], 'message', 'success'])
+            ->assertJsonFragment(['email' => $userToCreate->email, 'success' => true]);
 
         Notification::assertSentTo(
             [User::whereEmail($userToCreate->email)->first()], UserCreationNotification::class
         );
 
         // SHIFT doesnt have missingFromDatabase
-        //->missingFromDatabase('invitations', ['code' => $invite->code]);
+        // ->missingFromDatabase('invitations', ['code' => $invite->code]);
     }
 
-    public function testCreate_EmailAlreadyTaken()
-    {
+    public function testCreateEmailAlreadyTaken() {
         $this->mockReCaptchaValidation();
 
         $invite = Invitation::factory()->create();
         $user = User::factory()->create();
 
         $this->json('POST', $this->route, [
-          'email' => $user->email,
-          'password' => 'anyPassword',
+            'email' => $user->email,
+            'password' => 'anyPassword',
         ])
-        ->assertStatus(422)
-        ->assertJsonStructure(['errors' => ['email']]);
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['email']]);
     }
 
-    public function testCreate_NoToken()
-    {
+    public function testCreateNoToken() {
         $this->mockReCaptchaValidation(false);
 
         $invite = Invitation::factory()->create();
         $user = User::factory()->make();
 
         $this->json('POST', $this->route, [
-          'email' => $user->email,
-          'password' => 'anyPassword',
+            'email' => $user->email,
+            'password' => 'anyPassword',
         ])
-        ->assertStatus(422)
-        ->assertJsonStructure(['errors' => ['recaptcha']]);
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['recaptcha']]);
     }
 
-    public function testCreate_NoEmailOrPassword()
-    {
+    public function testCreateNoEmailOrPassword() {
         $this->mockReCaptchaValidation();
         $this->json('POST', $this->route, [])
-        ->assertStatus(422)
-        ->assertJsonStructure(['errors' => ['email', 'password']]);
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['email', 'password']]);
     }
 
-    public function testCreate_BadEmail()
-    {
+    public function testCreateBadEmail() {
         $this->mockReCaptchaValidation();
 
         $invite = Invitation::factory()->create();
 
         $this->json('POST', $this->route, [
-          'email' => 'notAnEmail',
-          'password' => 'anyPassword',
+            'email' => 'notAnEmail',
+            'password' => 'anyPassword',
         ])
-        ->assertStatus(422)
-        ->assertJsonStructure(['errors' => ['email']]);
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['email']]);
     }
 }

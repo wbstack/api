@@ -7,20 +7,17 @@ use App\Rules\NonEmptyJsonRule;
 use App\WikiProfile;
 use Illuminate\Http\Request;
 
-class WikiProfileController extends Controller
-{
+class WikiProfileController extends Controller {
     private $profileValidator;
 
-    public function __construct(ProfileValidator $profileValidator)
-    {
+    public function __construct(ProfileValidator $profileValidator) {
         $this->profileValidator = $profileValidator;
     }
 
-    public function create(Request $request): \Illuminate\Http\JsonResponse
-    {
+    public function create(Request $request): \Illuminate\Http\JsonResponse {
         $wiki = $request->attributes->get('wiki');
         $validatedInput = $request->validate([
-            'profile' => ['required', 'json', new NonEmptyJsonRule]
+            'profile' => ['required', 'json', new NonEmptyJsonRule],
         ]);
 
         $rawProfile = json_decode($validatedInput['profile'], true);
@@ -28,6 +25,7 @@ class WikiProfileController extends Controller
         $profileValidator->validateWithBag('post');
 
         $profile = WikiProfile::create(['wiki_id' => $wiki->id, ...$rawProfile]);
+
         return response()->json(['data' => $profile]);
     }
 }

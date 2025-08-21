@@ -1,12 +1,11 @@
 <?php
+
 namespace App\Helper;
 
 use Illuminate\Support\Facades\Validator;
-use App\Http\Controllers\WikiController;
 
-class ProfileValidator 
-{
-    public function validate( $profile ): \Illuminate\Validation\Validator {
+class ProfileValidator {
+    public function validate($profile): \Illuminate\Validation\Validator {
 
         return Validator::make($profile, [
             'purpose' => 'in:data_hub,data_lab,tool_lab,test_drive,decide_later,other',
@@ -17,5 +16,4 @@ class ProfileValidator
             'temporality_other' => 'string|required_if:temporality,other|missing_unless:temporality,other',
         ]);
     }
-
 }

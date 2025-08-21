@@ -2,19 +2,17 @@
 
 namespace Tests\Routes\Ingress;
 
-use Tests\TestCase;
 use App\Wiki;
 use App\WikiDb;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-class GetWikiVersionForDomainTest extends TestCase
-{
+class GetWikiVersionForDomainTest extends TestCase {
     protected $route = '/backend/ingress/getWikiVersionForDomain';
 
     use RefreshDatabase;
 
-    public function tearDown(): void
-    {
+    protected function tearDown(): void {
         Wiki::query()->delete();
         parent::tearDown();
     }
@@ -27,18 +25,16 @@ class GetWikiVersionForDomainTest extends TestCase
             'password' => 'somePassword',
             'version' => $version,
             'prefix' => 'somePrefix',
-            'wiki_id' => $wiki->id
+            'wiki_id' => $wiki->id,
         ]);
     }
 
-    public function testNotFound()
-    {
+    public function testNotFound() {
         $this->createWiki('found.wikibase.cloud', 'someVersion');
         $this->json('GET', $this->route . '?domain=notfound.wikibase.cloud')->assertStatus(401);
     }
 
-    public function testFoundVersion()
-    {
+    public function testFoundVersion() {
         $version = 'someVersion';
         $this->createWiki('found.wikibase.cloud', $version);
         $this->createWiki('other.wikibase.cloud', 'otherVersion');

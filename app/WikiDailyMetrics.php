@@ -5,8 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class WikiDailyMetrics extends Model
-{
+class WikiDailyMetrics extends Model {
     use HasFactory;
 
     protected $table = 'wiki_daily_metrics';
@@ -46,9 +45,8 @@ class WikiDailyMetrics extends Model
         'monthly_active_users',
     ];
 
-    public function areMetricsEqual(WikiDailyMetrics $wikiDailyMetrics): bool
-    {
-        foreach(self::$metricNames as $field) {
+    public function areMetricsEqual(WikiDailyMetrics $wikiDailyMetrics): bool {
+        foreach (self::$metricNames as $field) {
             if ($this->$field != $wikiDailyMetrics->$field) {
                 return false;
             }

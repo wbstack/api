@@ -5,8 +5,7 @@ namespace Database\Factories;
 use App\WikiLifecycleEvents;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class WikiLifecycleEventsFactory extends Factory
-{
+class WikiLifecycleEventsFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,8 +18,7 @@ class WikiLifecycleEventsFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         return [];
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use App\Wiki;
-use Closure;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
@@ -12,9 +11,7 @@ use Illuminate\Support\HtmlString;
 /**
  * Notification to be sent to empty Wikibase owner if the wiki stay empty longer than 30 days
  */
-
-class EmptyWikiNotification extends Notification
-{
+class EmptyWikiNotification extends Notification {
     const TYPE = 'empty_wiki_notification';
 
     private string $sitename;
@@ -22,11 +19,9 @@ class EmptyWikiNotification extends Notification
     /**
      * Create a notification instance.
      *
-     * @param string $sitename
      * @return void
      */
-    public function __construct(string $sitename)
-    {
+    public function __construct(string $sitename) {
         $this->sitename = $sitename;
     }
 
@@ -36,8 +31,7 @@ class EmptyWikiNotification extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable)
-    {
+    public function via($notifiable) {
         return ['mail'];
     }
 
@@ -47,14 +41,13 @@ class EmptyWikiNotification extends Notification
      * @param  mixed  $notifiable
      * @return MailMessage
      */
-    public function toMail($notifiable)
-    {
+    public function toMail($notifiable) {
         $days = intval(config('wbstack.wiki_empty_notification_threshold'));
 
         return (new MailMessage)
             ->from('noreply@wikibase.cloud', 'Wikibase Cloud')
             ->subject(Lang::get('Need some help with your Wikibase?'))
-            ->line(Lang::get('Thanks for creating a Wikibase instance on Wikibase Cloud! That was at least '.$days.' days ago. We couldn’t help but notice that your Wikibase instance `'.$this->sitename.'` remains empty, so we’re checking in to see if we can help.'))
+            ->line(Lang::get('Thanks for creating a Wikibase instance on Wikibase Cloud! That was at least ' . $days . ' days ago. We couldn’t help but notice that your Wikibase instance `' . $this->sitename . '` remains empty, so we’re checking in to see if we can help.'))
             ->line(Lang::get('If you’re still planning to use Wikibase for your project but just haven’t gotten around to doing so, no worries -- feel free to ignore this email.'))
             ->line(Lang::get('Are you having trouble getting started? We have some resources that might help:'))
             ->line(new HtmlString('<ul>'))

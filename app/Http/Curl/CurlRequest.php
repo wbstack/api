@@ -1,8 +1,8 @@
 <?php
+
 namespace App\Http\Curl;
 
-class CurlRequest implements HttpRequest
-{
+class CurlRequest implements HttpRequest {
     private $handle = null;
 
     public function __construct() {
@@ -12,8 +12,8 @@ class CurlRequest implements HttpRequest
     /**
      * @return void
      */
-    public function setOptions( array $options ) {
-        curl_setopt_array( $this->handle, $options );
+    public function setOptions(array $options) {
+        curl_setopt_array($this->handle, $options);
     }
 
     /**
@@ -38,7 +38,7 @@ class CurlRequest implements HttpRequest
      * @return void
      */
     public function close() {
-        if( $this->handle ) {
+        if ($this->handle) {
             curl_close($this->handle);
             $this->handle = null;
         }
@@ -48,7 +48,7 @@ class CurlRequest implements HttpRequest
      * @return void
      */
     public function reset() {
-        if( $this->handle ) {
+        if ($this->handle) {
             $this->close();
         }
 

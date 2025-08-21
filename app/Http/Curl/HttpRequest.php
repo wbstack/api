@@ -2,13 +2,16 @@
 
 namespace App\Http\Curl;
 
-interface HttpRequest
-{
+interface HttpRequest {
     public function setOptions(array $options);
-    public function execute();
-    public function getInfo($name);
-    public function close();
-    public function error();
-    public function reset();
 
+    public function execute();
+
+    public function getInfo($name);
+
+    public function close();
+
+    public function error();
+
+    public function reset();
 }

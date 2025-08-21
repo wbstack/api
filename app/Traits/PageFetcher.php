@@ -5,13 +5,11 @@ namespace App\Traits;
 use App\Constants\MediawikiNamespace;
 use Illuminate\Support\Facades\Http;
 
-trait PageFetcher
-{
+trait PageFetcher {
     private string $apiUrl;
 
-    //this function is used to fetch pages on namespace
-    function fetchPagesInNamespace(string $wikiDomain, MediawikiNamespace $namespace): array
-    {
+    // this function is used to fetch pages on namespace
+    public function fetchPagesInNamespace(string $wikiDomain, MediawikiNamespace $namespace): array {
         if (empty($this->apiUrl)) {
             throw new \RuntimeException('API URL has not been set.');
         }
@@ -20,7 +18,7 @@ trait PageFetcher
         $cursor = '';
         while (true) {
             $response = Http::withHeaders([
-                'host' => $wikiDomain
+                'host' => $wikiDomain,
             ])->get(
                 $this->apiUrl,
                 [
@@ -35,7 +33,7 @@ trait PageFetcher
 
             if ($response->failed()) {
                 throw new \Exception(
-                    'Failed to fetch allpages for wiki '.$wikiDomain
+                    'Failed to fetch allpages for wiki ' . $wikiDomain
                 );
             }
 
@@ -43,7 +41,7 @@ trait PageFetcher
             $error = data_get($jsonResponse, 'error');
             if ($error !== null) {
                 throw new \Exception(
-                    'Error response fetching allpages for wiki '.$wikiDomain.': '.$error
+                    'Error response fetching allpages for wiki ' . $wikiDomain . ': ' . $error
                 );
             }
 

@@ -1,18 +1,16 @@
 <?php
 
-
 namespace App\Metrics;
 
-use LKDevelopment\HorizonPrometheusExporter\Contracts\Exporter;
-use Prometheus\CollectorRegistry;
 use App\WikiEntityImport;
 use App\WikiEntityImportStatus;
+use LKDevelopment\HorizonPrometheusExporter\Contracts\Exporter;
+use Prometheus\CollectorRegistry;
 
-class WikiEntityImports implements Exporter
-{
+class WikiEntityImports implements Exporter {
     protected $pending;
-    public function metrics(CollectorRegistry $collectorRegistry)
-    {
+
+    public function metrics(CollectorRegistry $collectorRegistry) {
         $this->pending = $collectorRegistry->getOrRegisterGauge(
             config('horizon-exporter.namespace'),
             'wiki_entity_imports_pending',
@@ -20,9 +18,7 @@ class WikiEntityImports implements Exporter
         );
     }
 
-
-    public function collect()
-    {
+    public function collect() {
         // counters for failed / success are incremented in the HTTP controller
         $this->pending->set(
             WikiEntityImport::where(['status' => WikiEntityImportStatus::Pending])->count()

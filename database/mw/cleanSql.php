@@ -6,7 +6,7 @@
 
 // TODO allow passing in file? or run for all files?
 $placeholder = '<<prefix>>_';
-$filename = __DIR__.'/new/mw1.39-wbs1.sql';
+$filename = __DIR__ . '/new/mw1.39-wbs1.sql';
 
 // Get the file
 $text = file_get_contents($filename);
@@ -19,15 +19,15 @@ $text = str_replace($placeholder, '', $text);
 
 // Add new placeholders and space out the statements
 $replacementPrefixes = [
-  'CREATE TABLE `',
-  'INSERT INTO `',
-  'REPLACE INTO `',
+    'CREATE TABLE `',
+    'INSERT INTO `',
+    'REPLACE INTO `',
 ];
 foreach ($replacementPrefixes as $prefix) {
-    $text = str_replace($prefix, "\n".$prefix.$placeholder, $text);
+    $text = str_replace($prefix, "\n" . $prefix . $placeholder, $text);
 }
 
 // Write the file
 file_put_contents($filename, $text);
 
-echo 'Done!'.PHP_EOL;
+echo 'Done!' . PHP_EOL;

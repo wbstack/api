@@ -5,10 +5,10 @@ namespace App;
 use App\Notifications\ResetPasswordNotification;
 use http\Exception\RuntimeException;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * App\User.
@@ -32,7 +32,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Token[] $tokens
  * @property-read int|null $tokens_count
- * @method static \Database\Factories\UserFactory   factory(...$parameters)
+ *
+ * @method static \Database\Factories\UserFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User query()
@@ -47,11 +48,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereTrialEndsAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereVerified($value)
+ *
  * @mixin \Eloquent
  */
-class User extends Authenticatable implements MustVerifyEmail
-{
-    use HasApiTokens, Notifiable, HasFactory;
+class User extends Authenticatable implements MustVerifyEmail {
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -86,45 +87,37 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
-    public function sendPasswordResetNotification($token)
-    {
+    public function sendPasswordResetNotification($token) {
         $this->notify(new ResetPasswordNotification($token));
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     *
      * @psalm-return \Illuminate\Database\Eloquent\Relations\BelongsToMany<Wiki>
      */
-    public function managesWikis(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
+    public function managesWikis(): \Illuminate\Database\Eloquent\Relations\BelongsToMany {
         return $this->belongsToMany(Wiki::class, 'wiki_managers');
     }
 
-    public function hasVerifiedEmail()
-    {
+    public function hasVerifiedEmail() {
         return (bool) $this->verified;
     }
 
-    public function markEmailAsVerified()
-    {
+    public function markEmailAsVerified() {
         $this->verified = 1;
 
         return true;
     }
 
-    public function sendEmailVerificationNotification()
-    {
+    public function sendEmailVerificationNotification() {
         // This is required by the MustVerifyEmail interface that we use for middle ware.
         // But we currently send our emails via a different means, so we havn't implemented this..
 
         // We can not throw an exception here as this is still called! (even if we don't use it)
         // https://github.com/addshore/wbstack/issues/120
-        //throw new RuntimeException('Not yet implemented');
+        // throw new RuntimeException('Not yet implemented');
     }
 
-    public function getEmailForVerification()
-    {
+    public function getEmailForVerification() {
         return $this->email;
     }
 }

@@ -10,8 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 // `?action=query&meta=siteinfo&siprop=statistics`
 // When adding additional data about a wiki that comes from a different
 // source, consider storing it elsewhere.
-class WikiSiteStats extends Model
-{
+class WikiSiteStats extends Model {
     use HasFactory;
 
     const FIELDS = [
@@ -23,7 +22,7 @@ class WikiSiteStats extends Model
         'activeusers',
         'admins',
         'jobs',
-        'cirrussearch-article-words'
+        'cirrussearch-article-words',
     ];
 
     protected $fillable = self::FIELDS;

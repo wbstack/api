@@ -2,21 +2,18 @@
 
 namespace App\Jobs;
 
-use App\QueryserviceNamespace;
-use App\Http\Curl\CurlRequest;
 use App\Http\Curl\HttpRequest;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+use App\QueryserviceNamespace;
 use App\Wiki;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 
-class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
-{
+class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique {
     private $wikiId;
 
     /**
      * @return void
      */
-    public function __construct( $wikiId )
-    {
+    public function __construct($wikiId) {
         $this->wikiId = $wikiId;
     }
 
@@ -25,32 +22,33 @@ class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
      *
      * @return string
      */
-    public function uniqueId()
-    {
+    public function uniqueId() {
         return strval($this->wikiId);
     }
 
     /**
      * @return void
      */
-    public function handle( HttpRequest $request )
-    {
+    public function handle(HttpRequest $request) {
         $wiki = Wiki::withTrashed()->where(['id' => $this->wikiId])->first();
 
-        if( !$wiki ) {
+        if (!$wiki) {
             $this->fail(new \RuntimeException("Wiki not found for {$this->wikiId}"));
+
             return;
         }
 
-        if( !$wiki->deleted_at ) {
+        if (!$wiki->deleted_at) {
             $this->fail(new \RuntimeException("Wiki {$this->wikiId} is not marked for deletion."));
+
             return;
         }
-        
+
         $qsNamespace = QueryserviceNamespace::whereWikiId($this->wikiId)->first();
 
-        if( !$qsNamespace ) {
-            $this->fail( new \RuntimeException("Namespace for wiki {$this->wikiId} not found.") );
+        if (!$qsNamespace) {
+            $this->fail(new \RuntimeException("Namespace for wiki {$this->wikiId} not found."));
+
             return;
         }
 
@@ -76,15 +74,17 @@ class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique
         $request->close();
 
         if ($err) {
-            $this->fail( new \RuntimeException('cURL Error #:'.$err) );
+            $this->fail(new \RuntimeException('cURL Error #:' . $err));
+
             return;
         } else {
-            if ($response === 'DELETED: '.$qsNamespace->namespace) {
+            if ($response === 'DELETED: ' . $qsNamespace->namespace) {
 
                 $qsNamespace->delete();
 
             } else {
-                $this->fail( new \RuntimeException('Valid response, but couldn\'t find "DELETED: " in: '.$response) );
+                $this->fail(new \RuntimeException('Valid response, but couldn\'t find "DELETED: " in: ' . $response));
+
                 return;
             }
         }

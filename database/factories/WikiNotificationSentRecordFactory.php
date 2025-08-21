@@ -2,12 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Notifications\EmptyWikiNotification;
 use App\WikiNotificationSentRecord;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class WikiNotificationSentRecordFactory extends Factory
-{
+class WikiNotificationSentRecordFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -20,8 +18,7 @@ class WikiNotificationSentRecordFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         return [];
     }
 }

@@ -10,11 +10,13 @@ use Illuminate\Support\Facades\Lang;
 /**
  * A notification to be sent when the legal complaint form is being used.
  */
-class ComplaintNotification extends Notification
-{
+class ComplaintNotification extends Notification {
     public $offendingUrls;
+
     public $reason;
+
     public $name;
+
     public $mailAddress;
 
     /**
@@ -26,8 +28,7 @@ class ComplaintNotification extends Notification
      * @param  string  $mailAddress
      * @return void
      */
-    public function __construct($offendingUrls, $reason, $name=null, $mailAddress=null)
-    {
+    public function __construct($offendingUrls, $reason, $name = null, $mailAddress = null) {
         $this->offendingUrls = $offendingUrls;
         $this->reason = $reason;
         $this->name = $name;
@@ -40,8 +41,7 @@ class ComplaintNotification extends Notification
      * @param  mixed  $notifiable
      * @return array|string
      */
-    public function via($notifiable)
-    {
+    public function via($notifiable) {
         return ['database', 'mail'];
     }
 
@@ -51,8 +51,7 @@ class ComplaintNotification extends Notification
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
-    {
+    public function toMail($notifiable) {
         $name = $this->name;
         $mailAddress = $this->mailAddress;
 
@@ -83,6 +82,6 @@ class ComplaintNotification extends Notification
     public function toDatabase($notifiable) {
         $mail = $this->toMail($notifiable);
 
-        return (new DatabaseMessage($mail->toArray()));
+        return new DatabaseMessage($mail->toArray());
     }
 }

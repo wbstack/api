@@ -11,17 +11,13 @@ use Symfony\Component\HttpFoundation\Response;
  * The purpose of RedirectIfAuthenticated is to keep an already authenticated user
  * from reaching the login or registration routes/views since they're already logged in.
  */
-class RedirectIfAuthenticated
-{
+class RedirectIfAuthenticated {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  string|null  $guard
      */
-    public function handle(Request $request, Closure $next, string ...$guards): Response
-    {
+    public function handle(Request $request, Closure $next, string ...$guards): Response {
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {
@@ -29,6 +25,7 @@ class RedirectIfAuthenticated
                 return response()->json('Endpoint not needed', 400);
             }
         }
+
         return $next($request);
     }
 }

@@ -17,10 +17,10 @@ use Illuminate\Support\Carbon;
  * @property \Illuminate\Support\Carbon|null $dispatched_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @mixin \Eloquent
  */
-class ComplaintRecord extends Model
-{
+class ComplaintRecord extends Model {
     use HasFactory;
 
     protected $fillable = [
@@ -30,8 +30,7 @@ class ComplaintRecord extends Model
         'offending_urls',
     ];
 
-    public function markAsDispatched()
-    {
+    public function markAsDispatched() {
         $this->dispatched_at = Carbon::now();
     }
 }

@@ -2,14 +2,14 @@
 
 namespace Tests\Jobs;
 
-use Tests\TestCase;
 use App\Helper\DomainHelper;
+use Tests\TestCase;
 
 class DomainHelperTest extends TestCase {
     /**
      * @return string[][]
      */
-    static public function provideUnicodeDomains(): array {
+    public static function provideUnicodeDomains(): array {
         return [
             'Example IDNA encoding' => [
                 'bücher.example',
@@ -17,19 +17,19 @@ class DomainHelperTest extends TestCase {
             ],
             'Example IDNA encoding #2 - Latin-1' => [
                 'então.carolinadoran.com',
-                'xn--ento-ioa.carolinadoran.com'
+                'xn--ento-ioa.carolinadoran.com',
             ],
             'Example IDNA encoding #3 - Greek' => [
                 'άλφα.wikibase.cloud',
-                'xn--hxak3a7b.wikibase.cloud'
+                'xn--hxak3a7b.wikibase.cloud',
             ],
             'Example IDNA encoding #4 - Japanese' => [
                 'ドメイン名例.wikibase.cloud',
-                'xn--eckwd4c7cu47r2wf.wikibase.cloud'
+                'xn--eckwd4c7cu47r2wf.wikibase.cloud',
             ],
             'Example IDNA encoding #5 - Emoji' => [
                 '😃.wikibase.cloud',
-                'xn--h28h.wikibase.cloud'
+                'xn--h28h.wikibase.cloud',
             ],
             'No double-encoding of "münchen.wikibase.cloud"' => [
                 'xn--mnchen-3ya.wikibase.cloud',
@@ -49,7 +49,7 @@ class DomainHelperTest extends TestCase {
     /**
      * @return string[][]
      */
-    static public function provideAsciiDomains(): array {
+    public static function provideAsciiDomains(): array {
         return [
             'Example IDNA decoding' => [
                 'xn--bcher-kva.example',
@@ -91,7 +91,7 @@ class DomainHelperTest extends TestCase {
      */
     public function testEncoding($input, $expectedOutput) {
         $encoded = DomainHelper::encode($input);
-        
+
         $this->assertSame(
             $encoded,
             $expectedOutput
@@ -103,7 +103,7 @@ class DomainHelperTest extends TestCase {
      */
     public function testDecoding($input, $expectedOutput) {
         $decoded = DomainHelper::decode($input);
-        
+
         $this->assertSame(
             $decoded,
             $expectedOutput

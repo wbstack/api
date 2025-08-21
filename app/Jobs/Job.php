@@ -8,8 +8,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Config;
 
-abstract class Job implements ShouldQueue
-{
+abstract class Job implements ShouldQueue {
     /*
     |--------------------------------------------------------------------------
     | Queueable Jobs
@@ -24,8 +23,7 @@ abstract class Job implements ShouldQueue
 
     public $timeout = 60;
 
-    public function backoff(): array
-    {
+    public function backoff(): array {
         return Config::get('queue.backoff');
     }
 }

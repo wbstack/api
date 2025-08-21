@@ -2,32 +2,30 @@
 
 namespace Tests\Commands;
 
+use App\Notifications\EmailReverificationNotification;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\TestCase;
-use App\Notifications\EmailReverificationNotification;
 use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
-class ChangeEmailTest extends TestCase
-{
+class ChangeEmailTest extends TestCase {
     use DatabaseTransactions;
 
     const EMAIL_OLD = 'old@example.com';
+
     const EMAIL_NEW = 'new@example.com';
-    
-    private function createUser($email)
-    {
+
+    private function createUser($email) {
         $user = new User([
             'email' => $email,
-            'password' => 'worldsstrongestpassword'
+            'password' => 'worldsstrongestpassword',
         ]);
         $user->save();
-        
+
         return $user;
     }
 
-    public function testSuccess()
-    {
+    public function testSuccess() {
         Notification::fake();
 
         $oldUser = $this->createUser(self::EMAIL_OLD);
@@ -48,8 +46,7 @@ class ChangeEmailTest extends TestCase
         Notification::assertSentTo([$newUser], EmailReverificationNotification::class);
     }
 
-    public function testSame()
-    {
+    public function testSame() {
         Notification::fake();
 
         $oldUser = $this->createUser(self::EMAIL_OLD);
@@ -70,8 +67,7 @@ class ChangeEmailTest extends TestCase
         Notification::assertNothingSent();
     }
 
-    public function testUserNotFound()
-    {
+    public function testUserNotFound() {
         Notification::fake();
 
         $oldUser = $this->createUser(self::EMAIL_OLD);

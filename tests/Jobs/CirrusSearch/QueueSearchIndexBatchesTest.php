@@ -2,31 +2,31 @@
 
 namespace Tests\Jobs\CirrusSearch;
 
-use App\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\TestCase;
 use App\Http\Curl\HttpRequest;
+use App\Jobs\CirrusSearch\ForceSearchIndex;
+use App\Jobs\CirrusSearch\QueueSearchIndexBatches;
+use App\User;
+use App\Wiki;
+use App\WikiDb;
 use App\WikiManager;
 use App\WikiSetting;
-use App\Wiki;
 use Illuminate\Contracts\Queue\Job;
-use App\WikiDb;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use PHPUnit\TextUI\RuntimeException;
-use App\Jobs\CirrusSearch\QueueSearchIndexBatches;
-use App\Jobs\CirrusSearch\ForceSearchIndex;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Queue;
+use Tests\TestCase;
 
-class QueueSearchIndexBatchesTest extends TestCase
-{
+class QueueSearchIndexBatchesTest extends TestCase {
     use DatabaseTransactions;
     use DispatchesJobs;
 
     private $wiki;
+
     private $wikiDb;
+
     private $user;
 
-    public function setUp(): void {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->user = User::factory()->create(['verified' => true]);
@@ -36,28 +36,28 @@ class QueueSearchIndexBatchesTest extends TestCase
             [
                 'wiki_id' => $this->wiki->id,
                 'name' => WikiSetting::wwExtEnableElasticSearch,
-                'value' => true
+                'value' => true,
             ]
         );
 
         $this->wikiDb = WikiDb::factory()->create([
-            'wiki_id' => $this->wiki->id
+            'wiki_id' => $this->wiki->id,
         ]);
     }
-    public function testSuccess()
-    {
+
+    public function testSuccess() {
         Queue::fake();
-        
+
         $mockResponse = [
             'warnings' => [],
             'wbstackQueueSearchIndexBatches' => [
-                "return" => 0,
-                "output" => [
-                    "php /var/www/html/w/extensions/CirrusSearch/maintenance/ForceSearchIndex.php --queue 1 --skipLinks 1 --indexOnSkip 1 --fromId 0 --toId 1000",
-                    "php /var/www/html/w/extensions/CirrusSearch/maintenance/ForceSearchIndex.php --queue 1 --skipLinks 1 --indexOnSkip 1 --fromId 1001 --toId 1234",
-                    "php /var/www/html/w/extensions/CirrusSearch/maintenance/ForceSearchIndex.php --queue 1 --skipLinks 1 --indexOnSkip 1 --fromId 1235 --toId 1236",
-                ]
-            ]
+                'return' => 0,
+                'output' => [
+                    'php /var/www/html/w/extensions/CirrusSearch/maintenance/ForceSearchIndex.php --queue 1 --skipLinks 1 --indexOnSkip 1 --fromId 0 --toId 1000',
+                    'php /var/www/html/w/extensions/CirrusSearch/maintenance/ForceSearchIndex.php --queue 1 --skipLinks 1 --indexOnSkip 1 --fromId 1001 --toId 1234',
+                    'php /var/www/html/w/extensions/CirrusSearch/maintenance/ForceSearchIndex.php --queue 1 --skipLinks 1 --indexOnSkip 1 --fromId 1235 --toId 1236',
+                ],
+            ],
         ];
         $request = $this->createMock(HttpRequest::class);
         $request->method('execute')->willReturn(json_encode($mockResponse));
@@ -65,7 +65,7 @@ class QueueSearchIndexBatchesTest extends TestCase
         $request->expects($this->once())
             ->method('setOptions')
             ->with([
-                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackQueueSearchIndexBatches&format=json',
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=wbstackQueueSearchIndexBatches&format=json',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 1000,
@@ -73,14 +73,14 @@ class QueueSearchIndexBatchesTest extends TestCase
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_HTTPHEADER => [
                     'content-type: application/x-www-form-urlencoded',
-                    'host: '.$this->wiki->domain,
-                ]
-        ]);
+                    'host: ' . $this->wiki->domain,
+                ],
+            ]);
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())
-                ->method('fail')
-                ->withAnyParameters();
+            ->method('fail')
+            ->withAnyParameters();
 
         $job = new QueueSearchIndexBatches($this->wiki->id);
         $job->setJob($mockJob);
@@ -105,7 +105,7 @@ class QueueSearchIndexBatchesTest extends TestCase
 
     public function testMediawikiErrorResponse() {
         $errorResponse = file_get_contents(
-            __DIR__.'/../../data/mediawiki-api-error-response.json'
+            __DIR__ . '/../../data/mediawiki-api-error-response.json'
         );
 
         $request = $this->createMock(HttpRequest::class);
@@ -114,7 +114,7 @@ class QueueSearchIndexBatchesTest extends TestCase
         $request->expects($this->once())
             ->method('setOptions')
             ->with([
-                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackQueueSearchIndexBatches&format=json',
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=wbstackQueueSearchIndexBatches&format=json',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 1000,
@@ -122,18 +122,17 @@ class QueueSearchIndexBatchesTest extends TestCase
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_HTTPHEADER => [
                     'content-type: application/x-www-form-urlencoded',
-                    'host: '.$this->wiki->domain,
-                ]
-        ]);
+                    'host: ' . $this->wiki->domain,
+                ],
+            ]);
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())
-                ->method('fail')
-                ->with(new \RuntimeException('wbstackQueueSearchIndexBatches call failed with api error: Unrecognized value for parameter "action": wbstackQueueSearchIndexBatches.'));
+            ->method('fail')
+            ->with(new \RuntimeException('wbstackQueueSearchIndexBatches call failed with api error: Unrecognized value for parameter "action": wbstackQueueSearchIndexBatches.'));
 
         $job = new QueueSearchIndexBatches($this->wiki->id);
         $job->setJob($mockJob);
         $job->handle($request);
     }
-
 }

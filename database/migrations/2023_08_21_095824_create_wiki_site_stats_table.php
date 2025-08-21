@@ -1,21 +1,16 @@
 <?php
 
-use App\Wiki;
-
-use App\WikiSiteStats;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateWikiSiteStatsTable extends Migration
-{
+class CreateWikiSiteStatsTable extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
+    public function up() {
         Schema::dropIfExists('wiki_site_stats');
         Schema::create('wiki_site_stats', function (Blueprint $table) {
             $table->id();
@@ -46,8 +41,7 @@ class CreateWikiSiteStatsTable extends Migration
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('wiki_site_stats');
         Schema::dropColumns('wikis', ['description', 'is_featured']);
     }

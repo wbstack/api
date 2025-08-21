@@ -2,22 +2,20 @@
 
 namespace Tests\Jobs;
 
-use App\Wiki;
 use App\Jobs\UpdateWikiSiteStatsJob;
-use Tests\TestCase;
+use App\Wiki;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http;
+use Tests\TestCase;
 
-class UpdateWikiSiteStatsJobTest extends TestCase
-{
-
+class UpdateWikiSiteStatsJobTest extends TestCase {
     use RefreshDatabase;
 
     private $fakeResponses;
 
-    public function setUp(): void {
+    protected function setUp(): void {
         // Other tests leave dangling wikis around so we need to clean them up
         parent::setUp();
         Wiki::query()->delete();
@@ -25,79 +23,79 @@ class UpdateWikiSiteStatsJobTest extends TestCase
         Http::preventStrayRequests();
     }
 
-    public function tearDown(): void {
+    protected function tearDown(): void {
         Wiki::query()->delete();
         parent::tearDown();
     }
 
     private function addFakeSiteStatsResponse($site, $response) {
-        $siteStatsUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json';
+        $siteStatsUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json';
         $this->fakeResponses[$siteStatsUrl][$site] = $response;
     }
 
     private function addFakeRevisionTimestamp($site, $revid, $timestamp) {
-        $revTimestampUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&prop=revisions&rvprop=timestamp&formatversion=2&revids=' . $revid;
+        $revTimestampUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&format=json&prop=revisions&rvprop=timestamp&formatversion=2&revids=' . $revid;
         $this->fakeResponses[$revTimestampUrl][$site] = Http::response([
             'query' => [
                 'pages' => [
                     [
                         'revisions' => [
                             [
-                                'timestamp' => $timestamp
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                'timestamp' => $timestamp,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 
     private function addFakeEmptyRevisionList($site) {
-        $firstRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer';
+        $firstRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer';
         $this->fakeResponses[$firstRevisionIdUrl][$site] = Http::response([
             'query' => [
-                'allrevisions' => []
-            ]
+                'allrevisions' => [],
+            ],
         ]);
-        $lastRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=older';
+        $lastRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=older';
         $this->fakeResponses[$lastRevisionIdUrl][$site] = Http::response([
             'query' => [
-                'allrevisions' => []
-            ]
+                'allrevisions' => [],
+            ],
         ]);
     }
 
     private function addFakeFirstRevisionId($site, $id) {
-        $firstRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer';
+        $firstRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer';
         $this->fakeResponses[$firstRevisionIdUrl][$site] = Http::response([
             'query' => [
                 'allrevisions' => [
                     [
                         'revisions' => [
                             [
-                                'revid' => $id
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                'revid' => $id,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 
     private function addFakeLastRevisionId($site, $id) {
-        $lastRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=older';
+        $lastRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=older';
         $this->fakeResponses[$lastRevisionIdUrl][$site] = Http::response([
             'query' => [
                 'allrevisions' => [
                     [
                         'revisions' => [
                             [
-                                'revid' => $id
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                'revid' => $id,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -114,15 +112,16 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                     return $responses[$url][$hostHeader];
                 }
             }
+
             return Http::response('not found', 404);
         };
 
-        Http::fake( $fakeFunction );
+        Http::fake($fakeFunction);
     }
 
     public function testWikiSiteStatsIsSuccessfullyUpdated() {
         Wiki::factory()->create([
-            'domain' => 'this.wikibase.cloud'
+            'domain' => 'this.wikibase.cloud',
         ]);
 
         $this->addFakeSiteStatsResponse(
@@ -137,14 +136,14 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                     'activeusers' => 6,
                     'admins' => 7,
                     'jobs' => 8,
-                    'cirrussearch-article-words' => 9
-                ]
+                    'cirrussearch-article-words' => 9,
+                ],
             ]])
         );
         $this->fakeResponse();
 
         $mockJob = $this->createMock(Job::class);
-        $job = new UpdateWikiSiteStatsJob();
+        $job = new UpdateWikiSiteStatsJob;
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
@@ -156,14 +155,13 @@ class UpdateWikiSiteStatsJobTest extends TestCase
 
     }
 
-    public function testSuccessOfMultipleWikisTogether()
-    {
-        
+    public function testSuccessOfMultipleWikisTogether() {
+
         Wiki::factory()->create([
-            'domain' => 'that.wikibase.cloud'
+            'domain' => 'that.wikibase.cloud',
         ]);
         Wiki::factory()->create([
-            'domain' => 'this.wikibase.cloud'
+            'domain' => 'this.wikibase.cloud',
         ]);
 
         $this->addFakeSiteStatsResponse(
@@ -178,8 +176,8 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                     'activeusers' => 6,
                     'admins' => 7,
                     'jobs' => 8,
-                    'cirrussearch-article-words' => 9
-                ]
+                    'cirrussearch-article-words' => 9,
+                ],
             ]])
         );
 
@@ -195,11 +193,11 @@ class UpdateWikiSiteStatsJobTest extends TestCase
                     'activeusers' => 14,
                     'admins' => 13,
                     'jobs' => 12,
-                    'cirrussearch-article-words' => 11
-                ]
+                    'cirrussearch-article-words' => 11,
+                ],
             ]])
         );
-        
+
         $this->addFakeFirstRevisionId('this.wikibase.cloud', 2);
         $this->addFakeFirstRevisionId('that.wikibase.cloud', 2);
         $this->addFakeLastRevisionId('this.wikibase.cloud', 1);
@@ -211,7 +209,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase
         $this->fakeResponse();
 
         $mockJob = $this->createMock(Job::class);
-        $job = new UpdateWikiSiteStatsJob();
+        $job = new UpdateWikiSiteStatsJob;
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
@@ -233,7 +231,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase
 
     public function testJobFailsIfSiteStatsLookupFails() {
         Wiki::factory()->create([
-            'domain' => 'fail.wikibase.cloud'
+            'domain' => 'fail.wikibase.cloud',
         ]);
 
         $this->addFakeSiteStatsResponse(
@@ -244,7 +242,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase
         $this->fakeResponse();
 
         $mockJob = $this->createMock(Job::class);
-        $job = new UpdateWikiSiteStatsJob();
+        $job = new UpdateWikiSiteStatsJob;
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
@@ -254,27 +252,26 @@ class UpdateWikiSiteStatsJobTest extends TestCase
 
     public function testIncompleteSiteStatsDoesNotCauseFailure() {
         Wiki::factory()->create([
-            'domain' => 'incomplete.wikibase.cloud'
+            'domain' => 'incomplete.wikibase.cloud',
         ]);
 
         $this->addFakeSiteStatsResponse(
             'incomplete.wikibase.cloud',
             Http::response(['query' => [
-            'statistics' => [
-                'articles' => 99,
-                'not' => 129,
-                'sure' => 11,
-                'what' => 102,
-                'happened' => 20
-                ]
+                'statistics' => [
+                    'articles' => 99,
+                    'not' => 129,
+                    'sure' => 11,
+                    'what' => 102,
+                    'happened' => 20,
+                ],
             ]])
         );
 
         $this->fakeResponse();
 
-
         $mockJob = $this->createMock(Job::class);
-        $job = new UpdateWikiSiteStatsJob();
+        $job = new UpdateWikiSiteStatsJob;
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
@@ -288,25 +285,23 @@ class UpdateWikiSiteStatsJobTest extends TestCase
 
     public function testNeverEditedWikiCreatesEmptyLifecycleEvents() {
         Wiki::factory()->create([
-            'domain' => 'this.wikibase.cloud'
+            'domain' => 'this.wikibase.cloud',
         ]);
 
         $this->addFakeSiteStatsResponse('this.wikibase.cloud', Http::response());
         $this->addFakeEmptyRevisionList('this.wikibase.cloud');
         $this->fakeResponse();
 
-
         $mockJob = $this->createMock(Job::class);
-        $job = new UpdateWikiSiteStatsJob();
+        $job = new UpdateWikiSiteStatsJob;
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
         $mockJob->expects($this->never())->method('markAsFailed');
         $job->handle();
-        
+
         $events = Wiki::with('wikiLifecycleEvents')->where(['domain' => 'this.wikibase.cloud'])->first()->wikiLifecycleEvents()->first();
         $this->assertNull($events['first_edited']);
         $this->assertNull($events['last_edited']);
     }
-
 }

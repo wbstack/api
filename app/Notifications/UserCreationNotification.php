@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\Lang;
 /**
  * Notification to be sent after account creation that includes a verification link.
  */
-class UserCreationNotification extends Notification
-{
+class UserCreationNotification extends Notification {
     /**
      * The email verification token.
      *
@@ -31,8 +30,7 @@ class UserCreationNotification extends Notification
      * @param  string  $token
      * @return void
      */
-    public function __construct($token)
-    {
+    public function __construct($token) {
         $this->token = $token;
     }
 
@@ -42,8 +40,7 @@ class UserCreationNotification extends Notification
      * @param  mixed  $notifiable
      * @return array|string
      */
-    public function via($notifiable)
-    {
+    public function via($notifiable) {
         return ['mail'];
     }
 
@@ -53,13 +50,12 @@ class UserCreationNotification extends Notification
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
-    {
+    public function toMail($notifiable) {
         if (static::$toMailCallback) {
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        $verifyEmailLink = config('wbstack.ui_url') . '/emailVerification/'.$this->token;
+        $verifyEmailLink = config('wbstack.ui_url') . '/emailVerification/' . $this->token;
 
         return (new MailMessage)
             ->subject(Lang::get('Action Needed: Please verify your email'))
@@ -74,8 +70,7 @@ class UserCreationNotification extends Notification
      * @param  \Closure  $callback
      * @return void
      */
-    public static function toMailUsing($callback)
-    {
+    public static function toMailUsing($callback) {
         static::$toMailCallback = $callback;
     }
 }

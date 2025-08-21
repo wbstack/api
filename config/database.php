@@ -54,8 +54,8 @@ return [
             // If the sticky option is enabled and a "write" operation has been performed
             // against the database during the current request cycle,
             // any further "read" operations will use the "write" connection.
-            'sticky'    => true,
-            'driver'    => 'mysql',
+            'sticky' => true,
+            'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE'),
@@ -88,7 +88,7 @@ return [
             // If the sticky option is enabled and a "write" operation has been performed
             // against the database during the current request cycle,
             // any further "read" operations will use the "write" connection.
-            'sticky'    => true,
+            'sticky' => true,
             'driver' => 'mysql',
             'url' => env('MW_DATABASE_URL'),
             'port' => env('MW_DB_PORT', '3306'),
@@ -140,7 +140,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'predis'),
-            'prefix' => Str::slug(env('APP_NAME', 'laravel'), '_').'_database_',
+            'prefix' => Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_',
         ],
 
         'default' => [

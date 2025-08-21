@@ -15,13 +15,11 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Tests\TestCase;
 
-class SetWikiLogoTest extends TestCase
-{
+class SetWikiLogoTest extends TestCase {
     use DatabaseTransactions;
     use DispatchesJobs;
 
-    private function assertJobFails(string $wikiKey, string $wikiValue, string $logoPath)
-    {
+    private function assertJobFails(string $wikiKey, string $wikiValue, string $logoPath) {
         $mockJob = $this->createMock(Job::class);
         $job = new SetWikiLogo($wikiKey, $wikiValue, $logoPath);
         $job->setJob($mockJob);
@@ -30,8 +28,7 @@ class SetWikiLogoTest extends TestCase
         $job->handle();
     }
 
-    private function assertJobSucceeds(string $wikiKey, string $wikiValue, string $logoPath)
-    {
+    private function assertJobSucceeds(string $wikiKey, string $wikiValue, string $logoPath) {
         $mockJob = $this->createMock(Job::class);
         $job = new SetWikiLogo($wikiKey, $wikiValue, $logoPath);
         $job->setJob($mockJob);
@@ -43,8 +40,7 @@ class SetWikiLogoTest extends TestCase
     /**
      * @dataProvider invalidProvider
      */
-    public function testSetLogoFails($wikiKey, $wikiValue, $logoPath)
-    {
+    public function testSetLogoFails($wikiKey, $wikiValue, $logoPath) {
         $storage = Storage::fake('static-assets');
         $this->assertJobFails($wikiKey, $wikiValue, $logoPath);
 
@@ -57,8 +53,7 @@ class SetWikiLogoTest extends TestCase
     /**
      * @dataProvider validProvider
      */
-    public function testSetLogoSucceeds($wikiKey, $wikiValue, $logoPath)
-    {
+    public function testSetLogoSucceeds($wikiKey, $wikiValue, $logoPath) {
         // create user and wiki for this test
         $user = User::factory()->create(['verified' => true]);
         $wiki = Wiki::factory('nodb')->create([$wikiKey => $wikiValue]);
@@ -107,19 +102,17 @@ class SetWikiLogoTest extends TestCase
         $this->assertStringEndsWith($logoDir . '/64.ico', $currentFaviconSettingURL['path']);
     }
 
-    static public function validProvider()
-    {
-        # $wikiKey, $wikiValue, $logoPath
-        yield ['id', 42, __DIR__ . "/../data/logo_200x200.png"];
-        yield ['domain', 'example.test.dev', __DIR__ . "/../data/logo_200x200.png"];
+    public static function validProvider() {
+        // $wikiKey, $wikiValue, $logoPath
+        yield ['id', 42, __DIR__ . '/../data/logo_200x200.png'];
+        yield ['domain', 'example.test.dev', __DIR__ . '/../data/logo_200x200.png'];
     }
 
-    static public function invalidProvider()
-    {
-        # $wikiKey, $wikiValue, $logoPath
-        yield "id doesn't exist" => ['id', 999, __DIR__ . "/../data/logo_200x200.png"];
-        yield "logo path doesn't exist" => ['id', 1, "/invalid/logo/path.png"];
-        yield "domain doesn't exist" => ['domain', 'non.existant.dev', __DIR__ . "/../data/logo_200x200.png"];
-        yield "invalid key" => ['wikiid', 1, __DIR__ . "/../data/logo_200x200.png"];
+    public static function invalidProvider() {
+        // $wikiKey, $wikiValue, $logoPath
+        yield "id doesn't exist" => ['id', 999, __DIR__ . '/../data/logo_200x200.png'];
+        yield "logo path doesn't exist" => ['id', 1, '/invalid/logo/path.png'];
+        yield "domain doesn't exist" => ['domain', 'non.existant.dev', __DIR__ . '/../data/logo_200x200.png'];
+        yield 'invalid key' => ['wikiid', 1, __DIR__ . '/../data/logo_200x200.png'];
     }
 }

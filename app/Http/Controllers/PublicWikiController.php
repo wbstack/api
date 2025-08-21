@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PublicWikiResource;
+use App\Wiki;
 use App\WikiSiteStats;
 use Illuminate\Http\Request;
-use App\Wiki;
-use App\Http\Resources\PublicWikiResource;
 
-class PublicWikiController extends Controller
-{
+class PublicWikiController extends Controller {
     private static $defaultParams = [
         'sort' => 'sitename',
-        'direction' => 'asc'
+        'direction' => 'asc',
     ];
 
     private static $activeThresholdPageCount = 2;
@@ -19,15 +18,14 @@ class PublicWikiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $request->validate([
             'sort' => 'in:sitename,pages',
             'direction' => 'in:desc,asc',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
             'per_page' => 'numeric',
-            'page' => 'numeric'
+            'page' => 'numeric',
         ]);
 
         $params = array_merge(self::$defaultParams, $request->input());
@@ -35,7 +33,7 @@ class PublicWikiController extends Controller
 
         if (array_key_exists('is_featured', $params)) {
             $query = $query->where([
-                'is_featured' => boolval($params['is_featured'])
+                'is_featured' => boolval($params['is_featured']),
             ]);
         }
 
@@ -46,20 +44,20 @@ class PublicWikiController extends Controller
         }
 
         switch ($params['sort']) {
-        case 'sitename':
-            $query = $query->orderBy(
-                'sitename',
-                $params['direction']
-            );
-            break;
-        case 'pages':
-            $query = $query->orderBy(
-                WikiSiteStats::query()
-                    ->select('pages')
-                    ->whereColumn('wiki_site_stats.wiki_id', 'wikis.id'),
-                $params['direction']
-            );
-            break;
+            case 'sitename':
+                $query = $query->orderBy(
+                    'sitename',
+                    $params['direction']
+                );
+                break;
+            case 'pages':
+                $query = $query->orderBy(
+                    WikiSiteStats::query()
+                        ->select('pages')
+                        ->whereColumn('wiki_site_stats.wiki_id', 'wikis.id'),
+                    $params['direction']
+                );
+                break;
         }
 
         $perPage = null;
@@ -73,8 +71,7 @@ class PublicWikiController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
-    {
+    public function show($id) {
         return new PublicWikiResource(Wiki::findOrFail($id));
     }
 }

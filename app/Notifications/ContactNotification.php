@@ -9,11 +9,13 @@ use Illuminate\Support\Facades\Lang;
 /**
  * A notification to be sent when the contact form is being used.
  */
-class ContactNotification extends Notification
-{
+class ContactNotification extends Notification {
     public $name;
+
     public $subject;
+
     public $message;
+
     public $contactDetails;
 
     /**
@@ -25,8 +27,7 @@ class ContactNotification extends Notification
      * @param  string  $contactDetails
      * @return void
      */
-    public function __construct($name, $subject, $message, $contactDetails='')
-    {
+    public function __construct($name, $subject, $message, $contactDetails = '') {
         $this->name = $name;
         $this->message = $message;
         $this->subject = $subject;
@@ -39,8 +40,7 @@ class ContactNotification extends Notification
      * @param  mixed  $notifiable
      * @return array|string
      */
-    public function via($notifiable)
-    {
+    public function via($notifiable) {
         return ['mail'];
     }
 
@@ -50,10 +50,9 @@ class ContactNotification extends Notification
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
-    {
+    public function toMail($notifiable) {
         $subject = Lang::get('contact.' . $this->subject);
-        $contactDetails = $this->contactDetails ? $this->contactDetails:'None';
+        $contactDetails = $this->contactDetails ? $this->contactDetails : 'None';
 
         $mailFrom = str_replace('<subject>', $this->subject, config('app.contact-mail-sender'));
         $mailSubject = config('app.name') . Lang::get(' contact form message: ') . $subject;

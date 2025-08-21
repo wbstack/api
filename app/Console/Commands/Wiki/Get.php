@@ -5,8 +5,7 @@ namespace App\Console\Commands\Wiki;
 use App\Wiki;
 use Illuminate\Console\Command;
 
-class Get extends Command
-{
+class Get extends Command {
     protected $signature = 'wbs-wiki:get {key} {value?}';
 
     protected $description = 'Get Wiki data by key and value.';
@@ -16,8 +15,7 @@ class Get extends Command
      *
      * @return mixed
      */
-    public function handle()
-    {
+    public function handle() {
         $key = trim($this->argument('key'));
         $value = trim($this->argument('value'));
         // TODO don't select the timestamps and redundant info for the settings?

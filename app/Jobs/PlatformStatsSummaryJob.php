@@ -3,16 +3,16 @@
 namespace App\Jobs;
 
 use App\Constants\MediawikiNamespace;
-use App\Traits;
 use App\Helper\MWTimestampHelper;
-use App\Wiki;
+use App\Traits;
 use App\User;
-use Illuminate\Database\DatabaseManager;
-use PDO;
+use App\Wiki;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Config;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
+use PDO;
 
 /*
 *
@@ -28,25 +28,25 @@ use Illuminate\Support\Facades\App;
 *
 * Example: php artisan job:dispatch PlatformStatsSummaryJob
 */
-class PlatformStatsSummaryJob extends Job
-{
+class PlatformStatsSummaryJob extends Job {
     use Traits\PageFetcher;
 
     public $timeout = 3600;
 
     private $inactiveThreshold;
+
     private $creationRateRanges;
 
-    private $platformSummaryStatsVersion = "v1";
+    private $platformSummaryStatsVersion = 'v1';
 
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
         $this->creationRateRanges = Config::get('wbstack.platform_summary_creation_rate_ranges');
-        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php';
+        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php';
     }
 
-    private function isNullOrEmpty( $value ): bool {
-        return is_null($value) || intVal($value) === 0;
+    private function isNullOrEmpty($value): bool {
+        return is_null($value) || intval($value) === 0;
 
     }
 
@@ -56,14 +56,15 @@ class PlatformStatsSummaryJob extends Job
         foreach ($this->creationRateRanges as $range) {
             $limit = $now->clone()->sub(new \DateInterval($range));
             $wikis = Wiki::where('created_at', '>=', $limit)->count();
-            $result['wikis_created_'.$range] = $wikis;
+            $result['wikis_created_' . $range] = $wikis;
             $users = User::where('created_at', '>=', $limit)->count();
-            $result['users_created_'.$range] = $users;
+            $result['users_created_' . $range] = $users;
         }
+
         return $result;
     }
 
-    public function prepareStats( array $allStats, $wikis): array {
+    public function prepareStats(array $allStats, $wikis): array {
 
         $deletedWikis = [];
         $editedLast90DaysWikis = [];
@@ -75,58 +76,63 @@ class PlatformStatsSummaryJob extends Job
 
         $currentTime = CarbonImmutable::now();
 
-        foreach( $wikis as $wiki ) {
+        foreach ($wikis as $wiki) {
 
-            if( !is_null($wiki->deleted_at) ) {
+            if (!is_null($wiki->deleted_at)) {
                 $deletedWikis[] = $wiki;
+
                 continue;
             }
 
-            //add items and properties counts of the wiki to the corresponded arrays
+            // add items and properties counts of the wiki to the corresponded arrays
             try {
                 $nextItemCount = count($this->fetchPagesInNamespace($wiki->domain, MediawikiNamespace::item));
                 array_push($itemsCount, $nextItemCount);
             } catch (\Exception $ex) {
-                Log::warning("Failed to fetch item count for wiki ".$wiki->domain.", will use 0 instead.");
+                Log::warning('Failed to fetch item count for wiki ' . $wiki->domain . ', will use 0 instead.');
             }
             try {
                 $nextPropertyCount = count($this->fetchPagesInNamespace($wiki->domain, MediawikiNamespace::property));
                 array_push($propertiesCount, $nextPropertyCount);
             } catch (\Exception $ex) {
-                Log::warning("Failed to fetch property count for wiki ".$wiki->domain.", will use 0 instead.");
+                Log::warning('Failed to fetch property count for wiki ' . $wiki->domain . ', will use 0 instead.');
             }
 
             $wikiDb = $wiki->wikiDb()->first();
 
-            if( !$wikiDb ) {
+            if (!$wikiDb) {
                 Log::error(__METHOD__ . ": Could not find WikiDB for {$wiki->domain}");
+
                 continue;
             }
 
             $found_key = array_search($wiki->domain, array_column($allStats, 'wiki'));
 
-            if($found_key === false) {
+            if ($found_key === false) {
                 Log::warning(__METHOD__ . ": Could not find stats for {$wiki->domain}");
+
                 continue;
             }
 
             $stats = $allStats[$found_key];
 
             // is it empty?
-            if( $this->isNullOrEmpty($stats['edits']) && $this->isNullOrEmpty($stats['pages']) && $this->isNullOrEmpty($stats['lastEdit'])) {
+            if ($this->isNullOrEmpty($stats['edits']) && $this->isNullOrEmpty($stats['pages']) && $this->isNullOrEmpty($stats['lastEdit'])) {
                 $emptyWikis[] = $wiki;
+
                 continue;
             }
 
             $nonDeletedStats[] = $stats;
 
             // is it edited in the last 90 days?
-            if(!is_null($stats['lastEdit'])){
-                $lastTimestamp = MWTimestampHelper::getCarbonFromMWTimestamp(intVal($stats['lastEdit']));
+            if (!is_null($stats['lastEdit'])) {
+                $lastTimestamp = MWTimestampHelper::getCarbonFromMWTimestamp(intval($stats['lastEdit']));
                 $diff = $lastTimestamp->diffInSeconds($currentTime);
 
                 if ($diff <= $this->inactiveThreshold) {
                     $editedLast90DaysWikis[] = $wiki;
+
                     continue;
                 }
             }
@@ -154,19 +160,18 @@ class PlatformStatsSummaryJob extends Job
             'total_non_deleted_pages' => $totalNonDeletedPages,
             'total_non_deleted_edits' => $totalNonDeletedEdits,
             'total_items_count' => $totalItemsCount,
-            'total_properties_count' => $totalPropertiesCount
+            'total_properties_count' => $totalPropertiesCount,
         ];
     }
 
-    public function handle( DatabaseManager $manager ): void
-    {
+    public function handle(DatabaseManager $manager): void {
         $wikis = Wiki::withTrashed()->with('wikidb')->get();
 
         $conn = $manager->connection('mysql');
         $mwConn = $manager->connection('mw');
 
-        if (!$conn instanceof \Illuminate\Database\Connection || !$mwConn instanceof \Illuminate\Database\Connection ) {
-           throw new \RuntimeException('Must be run on a PDO based DB connection');
+        if (!$conn instanceof \Illuminate\Database\Connection || !$mwConn instanceof \Illuminate\Database\Connection) {
+            throw new \RuntimeException('Must be run on a PDO based DB connection');
         }
 
         $pdo = $conn->getPdo();
@@ -187,18 +192,18 @@ class PlatformStatsSummaryJob extends Job
         // Execute the second query using the mw
         // PDO to talk to mediawiki dbs
         $allStats = $mediawikiPdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
-        $summary = $this->prepareStats( $allStats, $wikis );
+        $summary = $this->prepareStats($allStats, $wikis);
 
         $creationStats = $this->getCreationStats();
         $summary = array_merge($summary, $creationStats);
 
         // Output to be scraped from logs
-        if( !App::runningUnitTests() ) {
-            print( json_encode($summary) . PHP_EOL );
+        if (!App::runningUnitTests()) {
+            echo json_encode($summary) . PHP_EOL;
         }
     }
 
-    private $wikiStatsQuery = <<<EOD
+    private $wikiStatsQuery = <<<'EOD'
 SELECT GROUP_CONCAT(CONCAT(
 
 "SELECT *
@@ -230,5 +235,4 @@ SELECT '",wikis.domain,"' as wiki
     LEFT JOIN apidb.wikis ON wiki_dbs.wiki_id = wikis.id;
 
 EOD;
-
 }

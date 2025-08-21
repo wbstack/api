@@ -4,8 +4,7 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class SettingCaptchaQuestions implements Rule
-{
+class SettingCaptchaQuestions implements Rule {
     /**
      * Determine if the validation rule passes.
      *
@@ -13,8 +12,7 @@ class SettingCaptchaQuestions implements Rule
      * @param  mixed  $value
      * @return bool
      */
-    public function passes($attribute, $value)
-    {
+    public function passes($attribute, $value) {
         $value = json_decode($value, true);
 
         if ($value === null) {
@@ -49,14 +47,14 @@ class SettingCaptchaQuestions implements Rule
                 }
             }
         }
+
         return true;
     }
 
     /**
      * Get the validation error message.
      */
-    public function message(): string
-    {
+    public function message(): string {
         return 'Value must be JSON mapping of questions to an array of answers and neither question nor answers may be longer than 200 chars';
     }
 }

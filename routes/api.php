@@ -6,13 +6,14 @@ use Illuminate\Support\Facades\Config;
 /**
  * This route file is loaded in the RouteServiceProvider optionally when an env var is set.
  * You'll find that service in the Providers directory.
+ *
  * @var Illuminate\Routing\Router $router
  */
 $router->group(['middleware' => ['throttle:45,1']], function () use ($router) {
     // TODO actually use logout route in VUE app..
     $router->post('user/register', [
-        'middleware' => ['throttle.signup:'.Config::get('wbstack.signup_throttling_limit').','.Config::get('wbstack.signup_throttling_range')],
-        'uses' => 'Auth\RegisterController@register'
+        'middleware' => ['throttle.signup:' . Config::get('wbstack.signup_throttling_limit') . ',' . Config::get('wbstack.signup_throttling_range')],
+        'uses' => 'Auth\RegisterController@register',
     ]);
     $router->post('user/verifyEmail', ['uses' => 'UserVerificationTokenController@verify']);
     $router->post('user/forgotPassword', ['uses' => 'Auth\ForgotPasswordController@sendResetLinkEmail']);

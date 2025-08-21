@@ -1,48 +1,45 @@
 <?php
 
 namespace Tests\Routes\Wiki;
+
 use App\User;
+use App\Wiki;
 use App\WikiManager;
+use App\WikiSetting;
+use App\WikiSiteStats;
 use Carbon\CarbonImmutable;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
-use App\WikiSiteStats;
-use App\WikiSetting;
-use App\Wiki;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class DeletedWikiMetricsControllerTest extends TestCase
-{
+class DeletedWikiMetricsControllerTest extends TestCase {
     protected string $route = 'deletedWikiMetrics';
 
-    use OptionsRequestAllowed;
     use DatabaseTransactions;
+    use OptionsRequestAllowed;
 
-    public function setUp(): void
-    {
+    protected function setUp(): void {
         parent::setUp();
         Wiki::query()->delete();
         WikiSiteStats::query()->delete();
         WikiSetting::query()->delete();
     }
 
-    public function tearDown(): void
-    {
+    protected function tearDown(): void {
         Wiki::query()->delete();
         WikiSiteStats::query()->delete();
         WikiSetting::query()->delete();
         parent::tearDown();
     }
 
-    public function testUnauthorisedStatusIfUserNotLoggedIn()
-    {
+    public function testUnauthorisedStatusIfUserNotLoggedIn() {
         $this->createAndDeleteTestWiki('one.wikibase.cloud', 0, '', 1, 2);
         $this->createAndDeleteTestWiki('two.wikibase.cloud', 10, 'Some Reason', 0, 3);
         $response = $this->get($this->route);
         $response->assertStatus(401);
     }
-    public function testRedirectIfUserIsLoggedInAsNotAdmin()
-    {
+
+    public function testRedirectIfUserIsLoggedInAsNotAdmin() {
         $user = $this->createUserWithPrivileges(0);
         $this->actingAs($user, 'api')->get('auth/login');
         $this->createAndDeleteTestWiki('one.wikibase.cloud', 0, '', 1, 2);
@@ -51,8 +48,7 @@ class DeletedWikiMetricsControllerTest extends TestCase
         $response->assertStatus(302);
     }
 
-    public function testDownloadCsvIfUserIsLoggedInAsAdmin()
-    {
+    public function testDownloadCsvIfUserIsLoggedInAsAdmin() {
         $user = $this->createUserWithPrivileges(1);
         $this->actingAs($user, 'api')->get('auth/login');
         $this->createAndDeleteTestWiki('one.wikibase.cloud', 0, '', 1, 2);
@@ -62,10 +58,9 @@ class DeletedWikiMetricsControllerTest extends TestCase
             ->assertDownload(CarbonImmutable::now()->toIso8601String() . '-deleted_wiki_metric.csv');
     }
 
-    public function testOutputHasCorrectContent()
-    {
-        $user1 = User::factory()->create(['verified' => true,]);
-        $user2 = User::factory()->create(['verified' => true,]);
+    public function testOutputHasCorrectContent() {
+        $user1 = User::factory()->create(['verified' => true]);
+        $user2 = User::factory()->create(['verified' => true]);
         $deletedWikis = [
             $this->createAndDeleteTestWiki('one.wikibase.cloud', $user1->id, '', 1, 2),
             $this->createAndDeleteTestWiki('two.wikibase.cloud', $user2->id, 'Some Reason', 0, 3),
@@ -80,22 +75,21 @@ class DeletedWikiMetricsControllerTest extends TestCase
         $output = array_map('str_getcsv', explode("\n", $rawCsv));
         $this->assertSame('one.wikibase.cloud', $output[1][0]);
         $this->assertSame('two.wikibase.cloud', $output[2][0]);
-        $this->assertSame('Some Reason',$output[2][1]);
+        $this->assertSame('Some Reason', $output[2][1]);
     }
 
-    private function createUserWithPrivileges($userPrivilege)
-    {
+    private function createUserWithPrivileges($userPrivilege) {
         $password = 'apassword';
+
         return User::factory()->create([
             'verified' => true,
             'email' => 'atestmail@gmail.com',
             'password' => password_hash($password, PASSWORD_DEFAULT),
-            'is_admin' => $userPrivilege
+            'is_admin' => $userPrivilege,
         ]);
     }
 
-    private function createAndDeleteTestWiki($domain, $user_id, $wikiDeletionReason, $createdWeeksAgo = 1, $wiki_users = 1)
-    {
+    private function createAndDeleteTestWiki($domain, $user_id, $wikiDeletionReason, $createdWeeksAgo = 1, $wiki_users = 1) {
         $current_date = CarbonImmutable::now();
 
         $wiki = Wiki::factory()->create([
@@ -105,12 +99,13 @@ class DeletedWikiMetricsControllerTest extends TestCase
             'wiki_id' => $wiki->id, 'user_id' => $user_id,
         ]);
         WikiSiteStats::factory()->create([
-            'wiki_id' => $wiki->id, 'pages' => 77, 'users' => $wiki_users
+            'wiki_id' => $wiki->id, 'pages' => 77, 'users' => $wiki_users,
         ]);
 
         $wiki->save();
         $wiki->update(['wiki_deletion_reason' => $wikiDeletionReason]);
         $wiki->delete();
+
         return $wiki;
     }
 }

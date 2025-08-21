@@ -5,8 +5,7 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
-class RouteServiceProvider extends ServiceProvider
-{
+class RouteServiceProvider extends ServiceProvider {
     /**
      * This namespace is applied to your controller routes.
      *
@@ -19,8 +18,7 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Define your route model bindings, pattern filters, etc.
      */
-    public function boot(): void
-    {
+    public function boot(): void {
         //
 
         parent::boot();
@@ -30,8 +28,7 @@ class RouteServiceProvider extends ServiceProvider
      * Define the routes for the application.
      * These are optionally loaded based on environment variables.
      */
-    public function map(): void
-    {
+    public function map(): void {
         $this->mapGeneralRoutes();
         if (getenv('ROUTES_LOAD_WEB') == 1) {
             $this->mapApiRoutes();
@@ -44,28 +41,24 @@ class RouteServiceProvider extends ServiceProvider
         }
     }
 
-    protected function mapGeneralRoutes(): void
-    {
+    protected function mapGeneralRoutes(): void {
         Route::namespace($this->namespace)
-             ->group(base_path('routes/general.php'));
+            ->group(base_path('routes/general.php'));
     }
 
-    protected function mapApiRoutes(): void
-    {
+    protected function mapApiRoutes(): void {
         Route::namespace($this->namespace)
-             ->group(base_path('routes/api.php'));
+            ->group(base_path('routes/api.php'));
     }
 
-    protected function mapSandboxRoutes(): void
-    {
+    protected function mapSandboxRoutes(): void {
         Route::namespace($this->namespace)
-             ->group(base_path('routes/sandbox.php'));
+            ->group(base_path('routes/sandbox.php'));
     }
 
-    protected function mapBackendRoutes(): void
-    {
+    protected function mapBackendRoutes(): void {
         Route::prefix('backend')
-             ->namespace($this->namespace.'\Backend')
-             ->group(base_path('routes/backend.php'));
+            ->namespace($this->namespace . '\Backend')
+            ->group(base_path('routes/backend.php'));
     }
 }

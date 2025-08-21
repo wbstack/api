@@ -2,25 +2,24 @@
 
 namespace Tests\Routes\Wiki\Managers;
 
-use App\WikiProfile;
-use Tests\Routes\Traits\OptionsRequestAllowed;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use App\User;
-use Illuminate\Support\Facades\Queue;
 use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Jobs\ElasticSearchAliasInit;
-use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\MediawikiInit;
-use App\WikiSetting;
-use App\WikiManager;
-use App\Wiki;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Config;
+use App\Jobs\ProvisionWikiDbJob;
 use App\QueryserviceNamespace;
+use App\User;
+use App\Wiki;
+use App\WikiManager;
+use App\WikiProfile;
+use App\WikiSetting;
+use Carbon\Carbon;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Queue;
+use Tests\Routes\Traits\OptionsRequestAllowed;
+use Tests\TestCase;
 
-class CreateTest extends TestCase
-{
+class CreateTest extends TestCase {
     protected $route = 'wiki/create';
 
     const defaultData = [
@@ -31,26 +30,25 @@ class CreateTest extends TestCase
                         "audience": "narrow",
                         "temporality": "permanent",
                         "purpose": "data_hub"
-                      }'
+                      }',
     ];
 
-    use OptionsRequestAllowed;
     use DatabaseTransactions;
+    use OptionsRequestAllowed;
 
     /**
-	 * @dataProvider createDispatchesSomeJobsProvider
-	 */
-    public function testWikiCreateDispatchesSomeJobs( $elasticSearchConfig )
-    {
-        $enabledForNewWikis = $elasticSearchConfig[ 'enabledForNewWikis' ];
-        $clusterWithoutSharedIndex = $elasticSearchConfig[ 'clusterWithoutSharedIndex' ] ?? null;
-        $sharedIndexHost = $elasticSearchConfig[ 'sharedIndexHost' ] ?? null;
-        $sharedIndexPrefix = $elasticSearchConfig[ 'sharedIndexPrefix' ] ?? null;
+     * @dataProvider createDispatchesSomeJobsProvider
+     */
+    public function testWikiCreateDispatchesSomeJobs($elasticSearchConfig) {
+        $enabledForNewWikis = $elasticSearchConfig['enabledForNewWikis'];
+        $clusterWithoutSharedIndex = $elasticSearchConfig['clusterWithoutSharedIndex'] ?? null;
+        $sharedIndexHost = $elasticSearchConfig['sharedIndexHost'] ?? null;
+        $sharedIndexPrefix = $elasticSearchConfig['sharedIndexPrefix'] ?? null;
 
-        Config::set( 'wbstack.elasticsearch_enabled_by_default', $enabledForNewWikis );
-        Config::set( 'wbstack.elasticsearch_cluster_without_shared_index', $clusterWithoutSharedIndex );
-        Config::set( 'wbstack.elasticsearch_shared_index_host', $sharedIndexHost );
-        Config::set( 'wbstack.elasticsearch_shared_index_prefix', $sharedIndexPrefix );
+        Config::set('wbstack.elasticsearch_enabled_by_default', $enabledForNewWikis);
+        Config::set('wbstack.elasticsearch_cluster_without_shared_index', $clusterWithoutSharedIndex);
+        Config::set('wbstack.elasticsearch_shared_index_host', $sharedIndexHost);
+        Config::set('wbstack.elasticsearch_shared_index_prefix', $sharedIndexPrefix);
 
         $this->createSQLandQSDBs();
 
@@ -60,114 +58,113 @@ class CreateTest extends TestCase
         Queue::assertNothingPushed();
 
         $response = $this->actingAs($user, 'api')
-        ->json(
-            'POST',
-            $this->route,
-            [
-                'domain' => 'dErP.com',
-                'sitename' => 'merp',
-                'username' => 'AdminBoss',
-                'profile' => '{
+            ->json(
+                'POST',
+                $this->route,
+                [
+                    'domain' => 'dErP.com',
+                    'sitename' => 'merp',
+                    'username' => 'AdminBoss',
+                    'profile' => '{
                                 "audience": "narrow",
                                 "temporality": "permanent",
                                 "purpose": "data_hub"
-                              }'
-            ]
-        );
+                              }',
+                ]
+            );
 
-        if ( $enabledForNewWikis && $clusterWithoutSharedIndex ) {
-            Queue::assertPushed( function ( ElasticSearchIndexInit $job ) use ( $clusterWithoutSharedIndex ) {
+        if ($enabledForNewWikis && $clusterWithoutSharedIndex) {
+            Queue::assertPushed(function (ElasticSearchIndexInit $job) use ($clusterWithoutSharedIndex) {
                 return $job->cluster() === $clusterWithoutSharedIndex;
-            } );
+            });
         } else {
-            Queue::assertNotPushed( ElasticSearchIndexInit::class );
+            Queue::assertNotPushed(ElasticSearchIndexInit::class);
         }
 
-        if ( $enabledForNewWikis && $sharedIndexHost && $sharedIndexPrefix ) {
-            Queue::assertPushed( ElasticSearchAliasInit::class, 1 );
+        if ($enabledForNewWikis && $sharedIndexHost && $sharedIndexPrefix) {
+            Queue::assertPushed(ElasticSearchAliasInit::class, 1);
         } else {
-            Queue::assertNotPushed( ElasticSearchAliasInit::class );
+            Queue::assertNotPushed(ElasticSearchAliasInit::class);
         }
 
-        if ( $enabledForNewWikis && !$clusterWithoutSharedIndex && !( $sharedIndexHost && $sharedIndexPrefix ) ) {
-            $response->assertStatus( 503 )
-                ->assertJsonPath( 'message', 'Search enabled, but its configuration is invalid' );
+        if ($enabledForNewWikis && !$clusterWithoutSharedIndex && !($sharedIndexHost && $sharedIndexPrefix)) {
+            $response->assertStatus(503)
+                ->assertJsonPath('message', 'Search enabled, but its configuration is invalid');
 
-            Queue::assertNotPushed( ProvisionWikiDbJob::class );
-            Queue::assertNotPushed( MediawikiInit::class );
+            Queue::assertNotPushed(ProvisionWikiDbJob::class);
+            Queue::assertNotPushed(MediawikiInit::class);
         } else {
-            $response->assertStatus( 200 )
-                ->assertJsonPath( 'data.domain', 'derp.com' )
-                ->assertJsonPath( 'data.name', null )
-                ->assertJsonPath( 'success', true );
+            $response->assertStatus(200)
+                ->assertJsonPath('data.domain', 'derp.com')
+                ->assertJsonPath('data.name', null)
+                ->assertJsonPath('success', true);
 
-            Queue::assertPushed( ProvisionWikiDbJob::class, 1 );
-            Queue::assertPushed( MediawikiInit::class, 1 );
+            Queue::assertPushed(ProvisionWikiDbJob::class, 1);
+            Queue::assertPushed(MediawikiInit::class, 1);
 
-            $id = $response->original[ 'data' ][ 'id' ];
+            $id = $response->original['data']['id'];
 
             $this->assertSame(
                 1,
-                WikiSetting::where( [ 'name' => WikiSetting::wgSecretKey, 'wiki_id' => $id ] )->count()
+                WikiSetting::where(['name' => WikiSetting::wgSecretKey, 'wiki_id' => $id])->count()
             );
 
             $this->assertSame(
                 1,
-                WikiSetting::where( [ 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => $enabledForNewWikis, 'wiki_id' => $id ] )->count()
+                WikiSetting::where(['name' => WikiSetting::wwExtEnableElasticSearch, 'value' => $enabledForNewWikis, 'wiki_id' => $id])->count()
             );
         }
     }
 
-    static public function createDispatchesSomeJobsProvider() {
-        yield [ [
+    public static function createDispatchesSomeJobsProvider() {
+        yield [[
             'enabledForNewWikis' => true,
             'clusterWithoutSharedIndex' => 'all',
             'sharedIndexHost' => 'somehost',
-            'sharedIndexPrefix' => 'testing_1'
-        ] ];
+            'sharedIndexPrefix' => 'testing_1',
+        ]];
 
-        yield [ [
+        yield [[
             'enabledForNewWikis' => true,
             'clusterWithoutSharedIndex' => 'default',
-        ] ];
+        ]];
 
-        yield [ [
+        yield [[
             'enabledForNewWikis' => true,
             'sharedIndexHost' => 'somehost',
-            'sharedIndexPrefix' => 'testing_1'
-        ] ];
+            'sharedIndexPrefix' => 'testing_1',
+        ]];
 
-        yield [ [
+        yield [[
             'enabledForNewWikis' => true,
-            'sharedIndexPrefix' => 'testing_1'
-        ] ];
+            'sharedIndexPrefix' => 'testing_1',
+        ]];
 
-        yield [ [
-            'enabledForNewWikis' => true
-        ] ];
+        yield [[
+            'enabledForNewWikis' => true,
+        ]];
 
-        yield [ [
-            'enabledForNewWikis' => false
-        ] ];
+        yield [[
+            'enabledForNewWikis' => false,
+        ]];
     }
 
-    public function testCreateWikiLimitsNumWikisPerUser()
-    {
+    public function testCreateWikiLimitsNumWikisPerUser() {
         $manager = $this->app->make('db');
 
-        $job1 = new ProvisionWikiDbJob();
+        $job1 = new ProvisionWikiDbJob;
         $job1->handle($manager);
 
-        $job2 = new ProvisionWikiDbJob();
+        $job2 = new ProvisionWikiDbJob;
         $job2->handle($manager);
 
         QueryserviceNamespace::create([
-            'namespace' => "ns-1",
-            'backend' => "wdqs.svc",
+            'namespace' => 'ns-1',
+            'backend' => 'wdqs.svc',
         ]);
         QueryserviceNamespace::create([
-            'namespace' => "ns-2",
-            'backend' => "wdqs.svc",
+            'namespace' => 'ns-2',
+            'backend' => 'wdqs.svc',
         ]);
 
         Config::set('wbstack.wiki_max_per_user', 1);
@@ -178,23 +175,23 @@ class CreateTest extends TestCase
         Queue::assertNothingPushed();
 
         // This shouldn't stop first create since it's deleted
-        $this->wiki = Wiki::factory()->create( [ 'deleted_at' => Carbon::now()->timestamp ] );
+        $this->wiki = Wiki::factory()->create(['deleted_at' => Carbon::now()->timestamp]);
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $user->id]);
 
         $response = $this->actingAs($user, 'api')
-        ->json(
-            'POST',
-            $this->route,
-            [
-                'domain' => 'mywikidomain.com',
-                'sitename' => 'merp',
-                'username' => 'AdminBoss'
-            ]
-        );
+            ->json(
+                'POST',
+                $this->route,
+                [
+                    'domain' => 'mywikidomain.com',
+                    'sitename' => 'merp',
+                    'username' => 'AdminBoss',
+                ]
+            );
 
         $response->assertStatus(200)
             ->assertJsonPath('data.domain', 'mywikidomain.com')
-            ->assertJsonPath('success', true );
+            ->assertJsonPath('success', true);
 
         $response = $this->actingAs($user, 'api')
             ->json(
@@ -203,7 +200,7 @@ class CreateTest extends TestCase
                 [
                     'domain' => 'mywikidomain-2.com',
                     'sitename' => 'merp',
-                    'username' => 'AdminBoss'
+                    'username' => 'AdminBoss',
                 ]
             );
         $response->assertStatus(403)
@@ -213,30 +210,29 @@ class CreateTest extends TestCase
         Config::set('wbstack.wiki_max_per_user', false);
 
         $response = $this->actingAs($user, 'api')
-        ->json(
-            'POST',
-            $this->route,
-            [
-                'domain' => 'mywikidomain-2.com',
-                'sitename' => 'merp',
-                'username' => 'AdminBoss'
-            ]
-        );
-
+            ->json(
+                'POST',
+                $this->route,
+                [
+                    'domain' => 'mywikidomain-2.com',
+                    'sitename' => 'merp',
+                    'username' => 'AdminBoss',
+                ]
+            );
 
         $response->assertStatus(200)
             ->assertJsonPath('data.domain', 'mywikidomain-2.com')
-            ->assertJsonPath('success', true );
+            ->assertJsonPath('success', true);
     }
 
     private function createSQLandQSDBs(): void {
         $manager = $this->app->make('db');
-        $job = new ProvisionWikiDbJob();
+        $job = new ProvisionWikiDbJob;
         $job->handle($manager);
 
         QueryserviceNamespace::create([
-            'namespace' => "derp",
-            'backend' => "wdqs.svc",
+            'namespace' => 'derp',
+            'backend' => 'wdqs.svc',
         ]);
     }
 
@@ -248,15 +244,15 @@ class CreateTest extends TestCase
         Queue::fake();
         $user = User::factory()->create(['verified' => true]);
         $response = $this->actingAs($user, 'api')
-        ->json(
-            'POST',
-            $this->route,
-            $data
-        );
-        $response->assertStatus( $expectedStatus );
+            ->json(
+                'POST',
+                $this->route,
+                $data
+            );
+        $response->assertStatus($expectedStatus);
     }
 
-    static public function createWikiHandlesRangeOfPostValuesProvider(): array {
+    public static function createWikiHandlesRangeOfPostValuesProvider(): array {
         $noDomain = self::defaultData;
         unset($noDomain['domain']);
         $noSitename = self::defaultData;
@@ -278,20 +274,21 @@ class CreateTest extends TestCase
             "temporality": "permanent",
             "purpose": "data_hub"
           }';
-        $profileWithExtraneousOther =  self::defaultData;
+        $profileWithExtraneousOther = self::defaultData;
         $profileWithExtraneousOther['profile'] = '{
                         "audience_other": "just my cat",
                         "temporality": "permanent",
                         "purpose": "data_hub"
                       }';
-        $profileWithAudienceBlank =  self::defaultData;
+        $profileWithAudienceBlank = self::defaultData;
         $profileWithAudienceBlank['profile'] = '{
                         "audience": "",
                         "temporality": "permanent",
                         "purpose": "data_hub"
                     }';
+
         return [
-            'all params present' => [self::defaultData , 200],
+            'all params present' => [self::defaultData, 200],
             'missing domain' => [$noDomain, 422],
             'missing sitename' => [$noSitename, 422],
             'missing username' => [$noUsername, 422],
@@ -299,7 +296,7 @@ class CreateTest extends TestCase
             'profile with other' => [$profileWithOther, 200],
             'profile with other string missing' => [$profileWithOtherStringMissing, 422],
             'profile with extraneous other' => [$profileWithExtraneousOther, 422],
-            'profile with audience blank string' => [$profileWithAudienceBlank, 422]
+            'profile with audience blank string' => [$profileWithAudienceBlank, 422],
         ];
     }
 
@@ -308,15 +305,14 @@ class CreateTest extends TestCase
         Queue::fake();
         $user = User::factory()->create(['verified' => true]);
         $response = $this->actingAs($user, 'api')
-        ->json(
-            'POST',
-            $this->route,
-            self::defaultData
-        );
+            ->json(
+                'POST',
+                $this->route,
+                self::defaultData
+            );
         $id = $response->decodeResponseJson()['data']['id'];
-        $this->assertEquals( 1,
-            WikiProfile::where( [ 'wiki_id' => $id ] )->count()
+        $this->assertEquals(1,
+            WikiProfile::where(['wiki_id' => $id])->count()
         );
     }
-
 }

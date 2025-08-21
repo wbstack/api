@@ -5,8 +5,7 @@ namespace Database\Factories;
 use App\WikiSetting;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class WikiSettingFactory extends Factory
-{
+class WikiSettingFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,8 +18,7 @@ class WikiSettingFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         return [];
     }
 }

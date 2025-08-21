@@ -8,8 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 // This class is supposed to contain information about certain events
 // in a wiki's lifecycle, e.g. the time of the last edit. Sources for these
 // points in time can be chosen as needed.
-class WikiLifecycleEvents extends Model
-{
+class WikiLifecycleEvents extends Model {
     use HasFactory;
 
     const FIELDS = [

@@ -4,15 +4,13 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateWikidbsTable extends Migration
-{
+class CreateWikidbsTable extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
+    public function up() {
         Schema::create('wiki_dbs', function (Blueprint $table) {
             $table->increments('id');
 
@@ -39,8 +37,7 @@ class CreateWikidbsTable extends Migration
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('wiki_dbs');
     }
 }

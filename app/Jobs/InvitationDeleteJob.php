@@ -4,23 +4,20 @@ namespace App\Jobs;
 
 use App\Invitation;
 
-class InvitationDeleteJob extends Job
-{
+class InvitationDeleteJob extends Job {
     private $code;
 
     /**
      * @return void
      */
-    public function __construct(string $code)
-    {
+    public function __construct(string $code) {
         $this->code = strtolower($code);
     }
 
     /**
      * @return void
      */
-    public function handle()
-    {
+    public function handle() {
         $invite = Invitation::where('code', $this->code)->first();
         if ($invite) {
             $invite->delete();
@@ -29,7 +26,7 @@ class InvitationDeleteJob extends Job
                 new \RuntimeException('Invitation not found, so can\'t delete')
             );
 
-            return; //safegaurd
+            return; // safegaurd
         }
     }
 }

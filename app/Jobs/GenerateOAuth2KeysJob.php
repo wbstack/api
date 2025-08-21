@@ -5,25 +5,23 @@ namespace App\Jobs;
 use App\Wiki;
 use App\WikiSetting;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
-class GenerateOAuth2KeysJob extends Job implements ShouldQueue
-{
+class GenerateOAuth2KeysJob extends Job implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function handle()
-    {
+    public function handle() {
         $allWikis = Wiki::all();
 
         foreach ($allWikis as $wiki) {
             try {
                 $hasPrivateKey = WikiSetting::where('wiki_id', $wiki->id)
-                ->where('name', 'wgOAuth2PrivateKey')
-                ->exists();
+                    ->where('name', 'wgOAuth2PrivateKey')
+                    ->exists();
 
                 if (!$hasPrivateKey) {
                     $keyPair = openssl_pkey_new([
@@ -51,7 +49,7 @@ class GenerateOAuth2KeysJob extends Job implements ShouldQueue
             } catch (\Exception $ex) {
                 $this->job->markAsFailed();
                 Log::error(
-                    'Failure generating keys for '.$wiki->getAttribute('domain').' for sitestats: '.$ex->getMessage()
+                    'Failure generating keys for ' . $wiki->getAttribute('domain') . ' for sitestats: ' . $ex->getMessage()
                 );
             }
         }

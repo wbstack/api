@@ -5,22 +5,21 @@ namespace App\Rules;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use \ReCaptcha\ReCaptcha;
+use ReCaptcha\ReCaptcha;
 
-class ReCaptchaValidation implements ImplicitRule
-{
+class ReCaptchaValidation implements ImplicitRule {
     /**
-     * @var \ReCaptcha\ReCaptcha $recaptcha  instance
+     * @var \ReCaptcha\ReCaptcha instance
      */
     protected $recaptcha;
 
     /**
-     * @var string $minScore Lowest score to pass (0.0 - 1.0)
+     * @var string Lowest score to pass (0.0 - 1.0)
      */
     protected $minScore;
 
     /**
-     * @var string $appUrl App URL of client request
+     * @var string App URL of client request
      */
     protected $appUrl;
 
@@ -32,17 +31,16 @@ class ReCaptchaValidation implements ImplicitRule
 
     /**
      * Comparison against expected hostname.
-     * 
-     * @param  string $hostname
-     * @return bool  
+     *
+     * @param  string  $hostname
+     * @return bool
      */
-    private function verifyHostname($hostname)
-    {
+    private function verifyHostname($hostname) {
         $parsedUrl = parse_url($this->appUrl);
         $expectedHostname = Arr::get($parsedUrl, 'host', null);
 
         if (filled($expectedHostname)) {
-            if (false === Str::of($expectedHostname)->exactly($hostname)) {
+            if (Str::of($expectedHostname)->exactly($hostname) === false) {
                 return false;
             }
         } else {
@@ -56,28 +54,27 @@ class ReCaptchaValidation implements ImplicitRule
 
     /**
      * Verifies the ReCaptcha Request with the official ReCaptcha service library
-     * 
-     * @param  string $secretKey
-     * @return \ReCaptcha\Response 
+     *
+     * @param  string  $secretKey
+     * @return \ReCaptcha\Response
      */
-    private function verify($token)
-    {
+    private function verify($token) {
         $recaptchaResponse = new \ReCaptcha\Response(false);
 
         try {
             $recaptchaResponse = $this->recaptcha
-            ->verify(
-                $token,
-                request()->getClientIp()
-            );
+                ->verify(
+                    $token,
+                    request()->getClientIp()
+                );
 
             logger()->debug('ReCaptcha response', [
-                'class'    => self::class,
-                'response' => $recaptchaResponse->toArray()
+                'class' => self::class,
+                'response' => $recaptchaResponse->toArray(),
             ]);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             logger()->error('Exception thrown by \Recaptcha\ReCaptcha::verify', [
-                'class'     => self::class,
+                'class' => self::class,
                 'exception' => $e,
             ]);
         }
@@ -92,23 +89,22 @@ class ReCaptchaValidation implements ImplicitRule
      * @param  mixed  $value
      * @return bool
      */
-    public function passes($attribute, $value)
-    {
+    public function passes($attribute, $value) {
         $recaptchaResponse = $this->verify($value);
 
-        if (false === $this->verifyHostname($recaptchaResponse->getHostname())) {
+        if ($this->verifyHostname($recaptchaResponse->getHostname()) === false) {
             return false;
         }
 
-        if (false === $recaptchaResponse->isSuccess()) {
+        if ($recaptchaResponse->isSuccess() === false) {
             return false;
         }
 
         if ($recaptchaResponse->getScore() < $this->minScore) {
             logger()->debug('ReCaptcha response below minScore', [
-                'class'    => self::class,
+                'class' => self::class,
                 'minScore' => $this->minScore,
-                'score'    => $recaptchaResponse->getScore()
+                'score' => $recaptchaResponse->getScore(),
             ]);
 
             return false;
@@ -122,8 +118,7 @@ class ReCaptchaValidation implements ImplicitRule
      *
      * @return string
      */
-    public function message()
-    {
+    public function message() {
         return 'ReCaptcha validation failed.';
     }
 }

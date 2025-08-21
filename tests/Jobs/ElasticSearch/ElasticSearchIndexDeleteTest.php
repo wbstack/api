@@ -2,26 +2,28 @@
 
 namespace Tests\Jobs\ElasticSearch;
 
-use App\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\TestCase;
 use App\Http\Curl\HttpRequest;
+use App\Jobs\ElasticSearchIndexDelete;
+use App\User;
+use App\Wiki;
+use App\WikiDb;
 use App\WikiManager;
 use App\WikiSetting;
-use App\Wiki;
-use App\Jobs\ElasticSearchIndexDelete;
-use App\WikiDb;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Config;
+use Tests\TestCase;
 
-class ElasticSearchIndexDeleteTest extends TestCase
-{
+class ElasticSearchIndexDeleteTest extends TestCase {
     use DatabaseTransactions;
+
     private $wiki;
+
     private $user;
+
     private $wikiDb;
 
-    public function setUp(): void {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->user = User::factory()->create(['verified' => true]);
@@ -31,16 +33,15 @@ class ElasticSearchIndexDeleteTest extends TestCase
             [
                 'wiki_id' => $this->wiki->id,
                 'name' => WikiSetting::wwExtEnableElasticSearch,
-                'value' => true
+                'value' => true,
             ]
         );
         $this->wikiDb = WikiDb::factory()->create([
-            'wiki_id' => $this->wiki->id
+            'wiki_id' => $this->wiki->id,
         ]);
     }
 
-    public function testDeletesElasticSearchIndex()
-    {
+    public function testDeletesElasticSearchIndex() {
         $this->wiki->delete();
         $wikiBaseName = $this->wikiDb->name;
 
@@ -52,33 +53,30 @@ class ElasticSearchIndexDeleteTest extends TestCase
             ->method('execute')
             ->willReturnOnConsecutiveCalls($mockResponse, $mockJsonSuccess);
 
-
         $request->expects($this->exactly(2))
             ->method('setOptions');
-
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
-        $job = new ElasticSearchIndexDelete( $this->wiki->id );
-        $job->setJob( $mockJob );
-        $job->handle( $request );
+        $job = new ElasticSearchIndexDelete($this->wiki->id);
+        $job->setJob($mockJob);
+        $job->handle($request);
 
         // feature should get disabled
         $this->assertSame(
-             1,
-             WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => false])->count()
+            1,
+            WikiSetting::where(['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => false])->count()
         );
     }
 
     /**
-	 * @dataProvider failureProvider
-	 */
-    public function testFailure(string $expectedFailure, $mockResponse, $settingStateInDatabase, $deleteWiki = true )
-    {
+     * @dataProvider failureProvider
+     */
+    public function testFailure(string $expectedFailure, $mockResponse, $settingStateInDatabase, $deleteWiki = true) {
         $request = $this->createMock(HttpRequest::class);
 
-        if ( $deleteWiki ) {
+        if ($deleteWiki) {
             $this->wiki->delete();
         }
 
@@ -87,24 +85,24 @@ class ElasticSearchIndexDeleteTest extends TestCase
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())
-                ->method('fail')
-                ->with(new \RuntimeException($expectedFailure));
+            ->method('fail')
+            ->with(new \RuntimeException($expectedFailure));
 
         $request->method('execute')
-            ->willReturnOnConsecutiveCalls( ...$mockResponse );
+            ->willReturnOnConsecutiveCalls(...$mockResponse);
 
         $job = new ElasticSearchIndexDelete($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle( $request );
+        $job->handle($request);
 
         $this->assertSame(
-             1,
-             WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => $settingStateInDatabase])->count()
+            1,
+            WikiSetting::where(['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => $settingStateInDatabase])->count()
         );
 
     }
 
-    static public function failureProvider() {
+    public static function failureProvider() {
 
         $mockResponse = "index\n" . "some_index_content_blabla\n" . "some_index_general_bla\n";
         $mockJsonSuccess = '{"acknowledged" : true}';
@@ -114,30 +112,29 @@ class ElasticSearchIndexDeleteTest extends TestCase
 
         yield [
             'ElasticSearchIndexDelete job for <WIKI_ID> was not successful: {"acknowledged" : false}',
-            [ $mockResponse, $mockFailure ],
-            true
+            [$mockResponse, $mockFailure],
+            true,
         ];
 
         yield [
             'ElasticSearchIndexDelete job for <WIKI_ID> was not successful: <html>',
-            [ $mockResponse, '<html>' ],
-            true
+            [$mockResponse, '<html>'],
+            true,
         ];
 
         if ($elasticSearchHost) {
             yield [
-                'Response looks weird when querying http://'.$elasticSearchHost.'/_cat/indices/<WIKI_DB_NAME>*?v&s=index&h=index',
-                [ "<html>asdasd\n\nasdasd", $mockJsonSuccess ],
-                true
+                'Response looks weird when querying http://' . $elasticSearchHost . '/_cat/indices/<WIKI_DB_NAME>*?v&s=index&h=index',
+                ["<html>asdasd\n\nasdasd", $mockJsonSuccess],
+                true,
             ];
         }
 
         yield [
             'ElasticSearchIndexDelete job for <WIKI_ID> but that wiki is not marked as deleted.',
-            [$mockResponse, $mockJsonSuccess ],
+            [$mockResponse, $mockJsonSuccess],
             true,
-            false // will not delete the wiki
+            false, // will not delete the wiki
         ];
     }
-
 }

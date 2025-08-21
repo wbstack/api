@@ -2,63 +2,56 @@
 
 namespace Tests\Routes\Wiki\Managers;
 
+use App\Jobs\WikiEntityImportJob;
+use App\User;
+use App\Wiki;
+use App\WikiEntityImport;
 use App\WikiEntityImportStatus;
+use App\WikiManager;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
-
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
-use App\Wiki;
-use App\WikiEntityImport;
-use App\User;
-use App\WikiManager;
-use App\Jobs\WikiEntityImportJob;
 
-class EntityImportTest extends TestCase
-{
+class EntityImportTest extends TestCase {
     protected $route = 'wiki/entityImport';
 
     use OptionsRequestAllowed, RefreshDatabase;
 
-    public function setUp(): void
-    {
+    protected function setUp(): void {
         parent::setUp();
         Wiki::query()->delete();
         WikiManager::query()->delete();
         WikiEntityImport::query()->delete();
     }
 
-    public function tearDown(): void
-    {
+    protected function tearDown(): void {
         Wiki::query()->delete();
         WikiManager::query()->delete();
         WikiEntityImport::query()->delete();
         parent::tearDown();
     }
 
-    public function testNoCredentials()
-    {
+    public function testNoCredentials() {
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         $user = User::factory()->create(['verified' => true]);
         $this->actingAs($user, 'api')
-            ->json('GET', $this->route.'?wiki='.$wiki->id)
+            ->json('GET', $this->route . '?wiki=' . $wiki->id)
             ->assertStatus(403);
     }
 
-    public function testEmpty()
-    {
+    public function testEmpty() {
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         $user = User::factory()->create(['verified' => true]);
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
-            ->json('GET', $this->route.'?wiki='.$wiki->id)
+            ->json('GET', $this->route . '?wiki=' . $wiki->id)
             ->assertStatus(200)
             ->assertJsonFragment(['data' => []]);
     }
 
-    public function testResults()
-    {
+    public function testResults() {
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         $otherWiki = Wiki::factory()->create(['domain' => 'other.wikibase.cloud']);
         $user = User::factory()->create(['verified' => true]);
@@ -79,14 +72,13 @@ class EntityImportTest extends TestCase
         ]);
 
         $this->actingAs($user, 'api')
-            ->json('GET', $this->route.'?wiki='.$wiki->id)
+            ->json('GET', $this->route . '?wiki=' . $wiki->id)
             ->assertStatus(200)
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.status', WikiEntityImportStatus::Success->value);
     }
 
-    public function testCreateWhilePending()
-    {
+    public function testCreateWhilePending() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         $user = User::factory()->create(['verified' => true]);
@@ -99,15 +91,14 @@ class EntityImportTest extends TestCase
         ]);
 
         $this->actingAs($user, 'api')
-            ->json('POST', $this->route.'?wiki='.$wiki->id, ['entity_ids' => 'P1', 'source_wiki_url' => 'https://source.wikibase.cloud'])
+            ->json('POST', $this->route . '?wiki=' . $wiki->id, ['entity_ids' => 'P1', 'source_wiki_url' => 'https://source.wikibase.cloud'])
             ->assertStatus(400);
 
         $this->assertEquals(1, WikiEntityImport::count());
         Bus::assertNothingDispatched();
     }
 
-    public function testCreateWhenSucceeded()
-    {
+    public function testCreateWhenSucceeded() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         $user = User::factory()->create(['verified' => true]);
@@ -120,44 +111,42 @@ class EntityImportTest extends TestCase
         ]);
 
         $this->actingAs($user, 'api')
-            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1'])
+            ->json('POST', $this->route . '?wiki=' . $wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1'])
             ->assertStatus(400);
 
         $this->assertEquals(1, WikiEntityImport::count());
         Bus::assertNothingDispatched();
     }
 
-    public function testCreateWhenEmpty()
-    {
+    public function testCreateWhenEmpty() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         $user = User::factory()->create(['verified' => true]);
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
-            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1,P2,Q1@123'])
+            ->json('POST', $this->route . '?wiki=' . $wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1,P2,Q1@123'])
             ->assertStatus(200);
 
         $this->assertEquals(1, WikiEntityImport::count());
         Bus::assertDispatchedTimes(WikiEntityImportJob::class, 1);
     }
 
-    public function testCreateValidation()
-    {
+    public function testCreateValidation() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         $user = User::factory()->create(['verified' => true]);
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
-            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1,P2; echo "P4Wn3D!!",Q42'])
+            ->json('POST', $this->route . '?wiki=' . $wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1,P2; echo "P4Wn3D!!",Q42'])
             ->assertStatus(422);
 
         $this->assertEquals(0, WikiEntityImport::count());
         Bus::assertDispatchedTimes(WikiEntityImportJob::class, 0);
     }
-    public function testCreateWhenFailed()
-    {
+
+    public function testCreateWhenFailed() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         $user = User::factory()->create(['verified' => true]);
@@ -170,7 +159,7 @@ class EntityImportTest extends TestCase
         ]);
 
         $this->actingAs($user, 'api')
-            ->json('POST', $this->route.'?wiki='.$wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1,P2'])
+            ->json('POST', $this->route . '?wiki=' . $wiki->id, ['source_wiki_url' => 'https://source.wikibase.cloud', 'entity_ids' => 'P1,P2'])
             ->assertStatus(200);
 
         $this->assertEquals(2, WikiEntityImport::count());

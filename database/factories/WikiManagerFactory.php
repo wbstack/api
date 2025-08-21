@@ -5,8 +5,7 @@ namespace Database\Factories;
 use App\WikiManager;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class WikiManagerFactory extends Factory
-{
+class WikiManagerFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,11 +18,10 @@ class WikiManagerFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         return [
             'user_id' => $this->faker->unique()->randomNumber(),
-            'wiki_id' => $this->faker->unique()->randomNumber()
+            'wiki_id' => $this->faker->unique()->randomNumber(),
         ];
     }
 }
