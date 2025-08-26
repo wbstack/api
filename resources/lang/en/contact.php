@@ -13,10 +13,10 @@ return [
     |
     */
 
-    'general-question'  => 'General question',
-    'feature-request'   => 'Feature request',
-    'report-a-problem'  => 'Report a problem',
-    'give-feedback'     => 'Give feedback',
-    'other'             => 'Other',
+    'general-question' => 'General question',
+    'feature-request' => 'Feature request',
+    'report-a-problem' => 'Report a problem',
+    'give-feedback' => 'Give feedback',
+    'other' => 'Other',
 
 ];

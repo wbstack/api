@@ -202,5 +202,5 @@ return [
     'www1',
     'www2',
     'wwww',
-    'zuul'
+    'zuul',
 ];

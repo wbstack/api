@@ -3,28 +3,29 @@
 namespace Tests\Jobs\CirrusSearch;
 
 use App\Http\Curl\CurlRequest;
-use App\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\TestCase;
-use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Http\Curl\HttpRequest;
+use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
+use App\User;
+use App\Wiki;
+use App\WikiDb;
 use App\WikiManager;
 use App\WikiSetting;
-use App\Wiki;
 use Illuminate\Contracts\Queue\Job;
-use App\WikiDb;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
-class ElasticSearchIndexInitTest extends TestCase
-{
+class ElasticSearchIndexInitTest extends TestCase {
     use DatabaseTransactions;
     use DispatchesJobs;
 
     private $wiki;
+
     private $wikiDb;
+
     private $user;
 
-    public function setUp(): void {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->user = User::factory()->create(['verified' => true]);
@@ -34,12 +35,12 @@ class ElasticSearchIndexInitTest extends TestCase
             [
                 'wiki_id' => $this->wiki->id,
                 'name' => WikiSetting::wwExtEnableElasticSearch,
-                'value' => true
+                'value' => true,
             ]
         );
 
         $this->wikiDb = WikiDb::factory()->create([
-            'wiki_id' => $this->wiki->id
+            'wiki_id' => $this->wiki->id,
         ]);
     }
 
@@ -52,16 +53,15 @@ class ElasticSearchIndexInitTest extends TestCase
         $job->handle(new CurlRequest);
     }
 
-    public function testSuccess()
-    {
+    public function testSuccess() {
         $mockResponse = [
             'warnings' => [],
             'wbstackElasticSearchInit' => [
-                "return" => 0,
-                "output" => [
-                    "\tCreating index...ok" // successfully created some index
-                ]
-            ]
+                'return' => 0,
+                'output' => [
+                    "\tCreating index...ok", // successfully created some index
+                ],
+            ],
         ];
         $request = $this->createMock(HttpRequest::class);
         $request->method('execute')->willReturn(json_encode($mockResponse));
@@ -71,7 +71,7 @@ class ElasticSearchIndexInitTest extends TestCase
         $request->expects($this->once())
             ->method('setOptions')
             ->with([
-                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=wbstackElasticSearchInit&format=json&cluster=all',
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=wbstackElasticSearchInit&format=json&cluster=all',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 1234,
@@ -79,14 +79,14 @@ class ElasticSearchIndexInitTest extends TestCase
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_HTTPHEADER => [
                     'content-type: application/x-www-form-urlencoded',
-                    'host: '.$this->wiki->domain,
-                ]
-        ]);
+                    'host: ' . $this->wiki->domain,
+                ],
+            ]);
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())
-                ->method('fail')
-                ->withAnyParameters();
+            ->method('fail')
+            ->withAnyParameters();
 
         $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
@@ -95,28 +95,27 @@ class ElasticSearchIndexInitTest extends TestCase
         // feature should get enabled
         $this->assertSame(
             1,
-            WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
+            WikiSetting::where(['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
         );
     }
 
-    public function testUpdate()
-    {
+    public function testUpdate() {
         $mockResponse = [
             'warnings' => [],
             'wbstackElasticSearchInit' => [
-                "return" => 0,
-                "output" => [
-                    "\t\tValidating {$this->wikiDb->name}_general alias...ok"
-                ]
-            ]
+                'return' => 0,
+                'output' => [
+                    "\t\tValidating {$this->wikiDb->name}_general alias...ok",
+                ],
+            ],
         ];
         $request = $this->createMock(HttpRequest::class);
         $request->method('execute')->willReturn(json_encode($mockResponse));
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())
-                ->method('fail')
-                ->withAnyParameters();
+            ->method('fail')
+            ->withAnyParameters();
 
         $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
@@ -124,30 +123,29 @@ class ElasticSearchIndexInitTest extends TestCase
 
         // feature should get enabled
         $this->assertSame(
-             1,
-             WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
+            1,
+            WikiSetting::where(['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
         );
     }
 
-    public function testJobTriggeredButNoSetting()
-    {
-        WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch ])->first()->delete();
+    public function testJobTriggeredButNoSetting() {
+        WikiSetting::where(['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch])->first()->delete();
         $request = $this->createMock(HttpRequest::class);
-        $request->expects( $this->never() )->method('execute');
+        $request->expects($this->never())->method('execute');
 
         $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->handle($request);
     }
 
     /**
-	 * @dataProvider failureProvider
+     * @dataProvider failureProvider
+     *
      * @expectedException RuntimeException
-	 */
-    public function testFailure( $request, string $expectedFailure, $mockResponse )
-    {
+     */
+    public function testFailure($request, string $expectedFailure, $mockResponse) {
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())
-                ->method('fail');
+            ->method('fail');
 
         $request->method('execute')->willReturn(json_encode($mockResponse));
 
@@ -157,7 +155,7 @@ class ElasticSearchIndexInitTest extends TestCase
 
         $this->assertSame(
             1,
-            WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
+            WikiSetting::where(['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
         );
     }
 
@@ -167,21 +165,21 @@ class ElasticSearchIndexInitTest extends TestCase
         yield [
             $this->createMock(HttpRequest::class),
             'wbstackElasticSearchInit call for <WIKI_ID>. No wbstackElasticSearchInit key in response: []',
-            $mockResponse
+            $mockResponse,
         ];
 
         $mockResponse = [
             'warnings' => [],
             'wbstackElasticSearchInit' => [
-                "return" => 0,
-                "output" => []
-            ]
+                'return' => 0,
+                'output' => [],
+            ],
         ];
 
         yield [
             $this->createMock(HttpRequest::class),
             'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"return":0,"output":[]}}',
-            $mockResponse
+            $mockResponse,
         ];
 
         $curlError = $this->createMock(HttpRequest::class);
@@ -189,15 +187,14 @@ class ElasticSearchIndexInitTest extends TestCase
         yield [
             $curlError,
             'wbstackElasticSearchInit curl error for <WIKI_ID>: Scary Error!',
-            $mockResponse
+            $mockResponse,
         ];
 
         $mockResponse['wbstackElasticSearchInit']['return'] = 1;
         yield [
             $this->createMock(HttpRequest::class),
             'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"return":1,"output":[]}}',
-            $mockResponse
+            $mockResponse,
         ];
     }
-
 }

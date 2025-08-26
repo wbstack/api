@@ -5,10 +5,8 @@ namespace App\Jobs;
 use App\QsBatch;
 use Carbon\Carbon;
 
-class PruneQueryserviceBatchesTable extends Job
-{
-    public function handle(): void
-    {
+class PruneQueryserviceBatchesTable extends Job {
+    public function handle(): void {
         QsBatch::where([
             ['done', '=', 1],
             ['pending_since', '=', null],

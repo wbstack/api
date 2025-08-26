@@ -3,24 +3,23 @@
 namespace App\Jobs;
 
 use App\WikiDb;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Example usage that will always provision a new DB:
  * php artisan job:dispatch ProvisionWikiDbJob
  */
-class ProvisionWikiDbJob extends Job
-{
+class ProvisionWikiDbJob extends Job {
     private $prefix;
 
     private $newSqlFile;
 
     /**
      * @var string|null|false
-     * null results in the default database being used
-     * false results in an auto generated name being used
-     * string results in that string being used
+     *                        null results in the default database being used
+     *                        false results in an auto generated name being used
+     *                        string results in that string being used
      */
     private $dbName;
 
@@ -33,14 +32,13 @@ class ProvisionWikiDbJob extends Job
     /**
      * @return void
      */
-    public function __construct($prefix = null, $dbName = false, $maxFree = null)
-    {
+    public function __construct($prefix = null, $dbName = false, $maxFree = null) {
         if (preg_match('/[^A-Za-z0-9\-_]/', $prefix)) {
-            throw new \InvalidArgumentException('Prefix must only contain [^A-Za-z0-9\-_], got '.$prefix);
+            throw new \InvalidArgumentException('Prefix must only contain [^A-Za-z0-9\-_], got ' . $prefix);
         }
 
         if ($dbName !== null && preg_match('/[^A-Za-z0-9\-_]/', $dbName)) {
-            throw new \InvalidArgumentException('dbName must only contain [^A-Za-z0-9\-_] or null, got '.$dbName);
+            throw new \InvalidArgumentException('dbName must only contain [^A-Za-z0-9\-_] or null, got ' . $dbName);
         }
 
         // Auto generation and corrections
@@ -49,13 +47,13 @@ class ProvisionWikiDbJob extends Job
             $dbName = env('MW_DB_DATABASE');
         }
         if ($dbName === 'null' || $dbName === null) {
-            $dbName = 'mwdb_'.substr(bin2hex(random_bytes(48)), 0, 10);
+            $dbName = 'mwdb_' . substr(bin2hex(random_bytes(48)), 0, 10);
         }
         if ($prefix === 'null' || $prefix === null) {
-            $prefix = 'mwt_'.substr(bin2hex(random_bytes(48)), 0, 10);
+            $prefix = 'mwt_' . substr(bin2hex(random_bytes(48)), 0, 10);
         }
 
-        $this->dbUser = 'mwu_'.substr(bin2hex(random_bytes(48)), 0, 10);
+        $this->dbUser = 'mwu_' . substr(bin2hex(random_bytes(48)), 0, 10);
         $this->dbPassword = substr(bin2hex(random_bytes(48)), 0, 14);
 
         $this->prefix = $prefix;
@@ -64,8 +62,7 @@ class ProvisionWikiDbJob extends Job
         $this->newSqlFile = config('wbstack.wiki_db_provision_version');
     }
 
-    private function doesMaxFreeSayWeShouldStop(): bool
-    {
+    private function doesMaxFreeSayWeShouldStop(): bool {
         $wikiDbCondition = ['wiki_id' => null, 'version' => $this->newSqlFile];
         $unassignedDbs = WikiDb::where($wikiDbCondition)->count();
         $toCreate = $this->maxFree - $unassignedDbs;
@@ -76,8 +73,7 @@ class ProvisionWikiDbJob extends Job
     /**
      * @return void
      */
-    public function handle( DatabaseManager $manager )
-    {
+    public function handle(DatabaseManager $manager) {
         // If the job is only meant to create so many DBs, then make sure we don't create too many.
         if ($this->maxFree && $this->doesMaxFreeSayWeShouldStop()) {
             return;
@@ -85,10 +81,10 @@ class ProvisionWikiDbJob extends Job
 
         $manager->purge('mw');
         $conn = $manager->connection('mw');
-        if (! $conn instanceof \Illuminate\Database\Connection) {
+        if (!$conn instanceof \Illuminate\Database\Connection) {
             $this->fail(new \RuntimeException('Must be run on a PDO based DB connection'));
 
-            return; //safegaurd
+            return; // safegaurd
         }
         $pdo = $conn->getPdo();
 
@@ -102,76 +98,76 @@ class ProvisionWikiDbJob extends Job
         // PDOException: SQLSTATE[HY000]: General error: 1396 Operation CREATE USER failed for 'mwu_0985131dfa'@'%'
         // So, catch this exception and check the error state ourselves, and allow us to continue past this?
         try {
-            $conn->statement("CREATE USER '".$this->dbUser."'@'%' IDENTIFIED BY '".$this->dbPassword."'");
+            $conn->statement("CREATE USER '" . $this->dbUser . "'@'%' IDENTIFIED BY '" . $this->dbPassword . "'");
         } catch (\Illuminate\Database\QueryException $e) {
             // Probably fine, and if not fine then the ALTER will fail below? :)
-            $conn->statement("ALTER USER '".$this->dbUser."'@'%' IDENTIFIED BY '".$this->dbPassword."'");
+            $conn->statement("ALTER USER '" . $this->dbUser . "'@'%' IDENTIFIED BY '" . $this->dbPassword . "'");
         }
 
         // CREATE (maybe) AND USE DB
         if ($this->dbName) {
-            if ($pdo->exec('CREATE DATABASE IF NOT EXISTS '.$this->dbName) === false) {
+            if ($pdo->exec('CREATE DATABASE IF NOT EXISTS ' . $this->dbName) === false) {
                 $this->fail(
-                    new \RuntimeException('Failed to create database with dbname: '.$this->dbName)
+                    new \RuntimeException('Failed to create database with dbname: ' . $this->dbName)
                 );
 
-                return; //safegaurd
+                return; // safegaurd
             }
         } else {
             // Default to mediawiki
             $this->dbName = 'mediawiki';
         }
-        if ($pdo->exec('USE '.$this->dbName) === false) {
+        if ($pdo->exec('USE ' . $this->dbName) === false) {
             $this->fail(
-                new \RuntimeException('Failed to use database with dbname: '.$this->dbName)
+                new \RuntimeException('Failed to use database with dbname: ' . $this->dbName)
             );
 
-            return; //safegaurd
+            return; // safegaurd
         }
 
         // GRANT THE USER ACCESS TO THE DB
         // TODO more limited GRANTS...
         // TODO cant grant based on table prefix, so maybe do have seperate dbs...?
-        if ($pdo->exec('GRANT ALL ON '.$this->dbName.'.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
+        if ($pdo->exec('GRANT ALL ON ' . $this->dbName . '.* TO \'' . $this->dbUser . '\'@\'%\'') === false) {
             $this->fail(
-                new \RuntimeException('Failed to grant user: '.$this->dbUser)
+                new \RuntimeException('Failed to grant user: ' . $this->dbUser)
             );
 
-            return; //safegaurd
+            return; // safegaurd
         }
 
         // Figure out the SQL version
-        $stmt = $pdo->query("SELECT version() AS version");
+        $stmt = $pdo->query('SELECT version() AS version');
         $fullVersion = $stmt->fetch()['version']; // "10.5.12-MariaDB-log"
         preg_match('/^(\d+\.\d+\.\d+)(?!\d).*?$/', $fullVersion, $versionMatches); // [ 0 => '10.5.12-MariaDB-log', 1 => '10.5.12' ]
         $sqlVersion = $versionMatches[1]; // '10.5.12'
-        $aboveMariaDb1059 = version_compare($sqlVersion,'10.5.9'); // 1 = higher, 0 = same, -1 = lower
-        $aboveMariaDb1052 = version_compare($sqlVersion,'10.5.2'); // 1 = higher, 0 = same, -1 = lower
+        $aboveMariaDb1059 = version_compare($sqlVersion, '10.5.9'); // 1 = higher, 0 = same, -1 = lower
+        $aboveMariaDb1052 = version_compare($sqlVersion, '10.5.2'); // 1 = higher, 0 = same, -1 = lower
 
-        if($aboveMariaDb1052 >= 0 && $aboveMariaDb1059 == -1) {
+        if ($aboveMariaDb1052 >= 0 && $aboveMariaDb1059 == -1) {
             $this->fail(
                 new \RuntimeException('Can not succeed on MariaDB versions between 10.5.2 and 10.5.9')
             );
         }
-        if($aboveMariaDb1059 == -1) {
+        if ($aboveMariaDb1059 == -1) {
             // GRANT the user access to see slave status
             // GRANT REPLICATION CLIENT ON *.* TO 'mwu_36be7164b0'@'%'
-            if ($pdo->exec('GRANT REPLICATION CLIENT ON *.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
+            if ($pdo->exec('GRANT REPLICATION CLIENT ON *.* TO \'' . $this->dbUser . '\'@\'%\'') === false) {
                 $this->fail(
-                    new \RuntimeException('Failed to grant user: '.$this->dbUser)
+                    new \RuntimeException('Failed to grant user: ' . $this->dbUser)
                 );
 
                 return;
             }
         }
-        if($aboveMariaDb1059 >= 0) {
-            // GRANT the user access to see slave status 
+        if ($aboveMariaDb1059 >= 0) {
+            // GRANT the user access to see slave status
             // Mariadb versions > 10.5.9 https://mariadb.com/kb/en/grant/#replica-monitor
             // https://mariadb.com/docs/reference/mdb/privileges/BINLOG_MONITOR/ required to query "SHOW MASTER STATUS"
             // GRANT REPLICA MONITOR, BINLOG MONITOR ON *.* TO 'mwu_36be7164b0'@'%'
-            if ($pdo->exec('GRANT REPLICA MONITOR, BINLOG MONITOR ON *.* TO \''.$this->dbUser.'\'@\'%\'') === false) {
+            if ($pdo->exec('GRANT REPLICA MONITOR, BINLOG MONITOR ON *.* TO \'' . $this->dbUser . '\'@\'%\'') === false) {
                 $this->fail(
-                    new \RuntimeException('Failed to grant REPLICA MONITOR to user: '.$this->dbUser)
+                    new \RuntimeException('Failed to grant REPLICA MONITOR to user: ' . $this->dbUser)
                 );
 
                 return;
@@ -180,7 +176,7 @@ class ProvisionWikiDbJob extends Job
 
         // ADD THE TABLES
         // Get SQL statements to run
-        $rawSql = file_get_contents(__DIR__.'/../../database/mw/new/'.$this->newSqlFile.'.sql');
+        $rawSql = file_get_contents(__DIR__ . '/../../database/mw/new/' . $this->newSqlFile . '.sql');
         $prefixedSql = str_replace('<<prefix>>', $this->prefix, $rawSql);
         $sqlParts = explode("\n\n", $prefixedSql);
 
@@ -193,10 +189,10 @@ class ProvisionWikiDbJob extends Job
             // Execute each chunk of SQL...
             if ($pdo->exec($part) === false) {
                 $this->fail(
-                    new \RuntimeException('SQL execution failed for prefix '.$this->prefix.' SQL part: '.$part)
+                    new \RuntimeException('SQL execution failed for prefix ' . $this->prefix . ' SQL part: ' . $part)
                 );
 
-                return; //safegaurd
+                return; // safegaurd
             }
         }
 
@@ -208,13 +204,13 @@ class ProvisionWikiDbJob extends Job
         //
         //  This way, if this wikiDb create fails, there is still a record of the DB that has been / is being created?
         WikiDb::create([
-          'name' => $this->dbName,
-          'user' => $this->dbUser,
-          'password' => $this->dbPassword,
-          'version' => $this->newSqlFile,
-          'prefix' => $this->prefix,
-      ]);
+            'name' => $this->dbName,
+            'user' => $this->dbUser,
+            'password' => $this->dbPassword,
+            'version' => $this->newSqlFile,
+            'prefix' => $this->prefix,
+        ]);
 
-      $manager->purge('mw');
+        $manager->purge('mw');
     }
 }

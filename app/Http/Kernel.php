@@ -4,8 +4,7 @@ namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
-class Kernel extends HttpKernel
-{
+class Kernel extends HttpKernel {
     /**
      * The application's global HTTP middleware stack.
      *
@@ -40,12 +39,12 @@ class Kernel extends HttpKernel
         'limit_wiki_access' => \App\Http\Middleware\LimitWikiAccess::class,
 
         // https://laravel-news.com/signed-routes
-        //'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
+        // 'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
 
         'backend.auth' => \App\Http\Middleware\BackendAuth::class,
         'throttle.signup' => \App\Http\Middleware\ThrottleSignup::class,
         'throttle' => \App\Http\Middleware\Throttle::class,
-        //'auth' => App\Http\Middleware\Authenticate::class,
+        // 'auth' => App\Http\Middleware\Authenticate::class,
     ];
 
     /**

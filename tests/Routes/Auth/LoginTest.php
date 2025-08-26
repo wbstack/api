@@ -7,36 +7,31 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
 
-class LoginTest extends TestCase
-{
+class LoginTest extends TestCase {
     protected $route = 'auth/login';
 
-    use OptionsRequestAllowed;
     use DatabaseTransactions;
+    use OptionsRequestAllowed;
 
-    public function setUp (): void
-    {
+    protected function setUp(): void {
         parent::setUp();
         $this->artisan('passport:install', ['--no-interaction' => true]);
     }
 
-    public function testLoginFail_noExistingUser()
-    {
+    public function testLoginFailNoExistingUser() {
         // This random user probably doesn't exist in the db
         $user = User::factory()->make();
         $this->json('POST', $this->route, ['email' => $user->email, 'password' => 'anyPassword'])
-        ->assertStatus(401);
+            ->assertStatus(401);
     }
 
-    public function testLoginFail_badPassword()
-    {
+    public function testLoginFailBadPassword() {
         $user = User::factory()->create();
         $this->json('POST', $this->route, ['email' => $user->email, 'password' => 'someOtherPassword'])
-        ->assertStatus(401);
+            ->assertStatus(401);
     }
 
-    public function testLoginSuccess()
-    {
+    public function testLoginSuccess() {
         $password = 'apassword';
         $user = User::factory()->create(['password' => password_hash($password, PASSWORD_DEFAULT)]);
         $response = $this->json('POST', $this->route, ['email' => $user->email, 'password' => $password]);
@@ -46,19 +41,18 @@ class LoginTest extends TestCase
         $userResponsePart = $response->json('user');
         $this->assertEquals($user->email, $userResponsePart['email']);
     }
-    public function testGet()
-    {
+
+    public function testGet() {
         $user = User::factory()->create();
         $this->actingAs($user, 'api')
-          ->get($this->route)
-          ->assertStatus(200);
+            ->get($this->route)
+            ->assertStatus(200);
     }
 
-    public function testDelete()
-    {
+    public function testDelete() {
         $user = User::factory()->create();
         $this->actingAs($user, 'api')
-          ->delete($this->route)
-          ->assertStatus(204);
+            ->delete($this->route)
+            ->assertStatus(204);
     }
 }

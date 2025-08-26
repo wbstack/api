@@ -11,19 +11,16 @@ use Illuminate\Support\Facades\Schema;
  *
  * As of writing this, this feature is not yet being turned on!
  */
-class ModifyOauthClientsProvider extends Migration
-{
-    public function up()
-    {
-        if (! Schema::hasColumn('oauth_clients', 'provider')) {
+class ModifyOauthClientsProvider extends Migration {
+    public function up() {
+        if (!Schema::hasColumn('oauth_clients', 'provider')) {
             Schema::table('oauth_clients', function (Blueprint $table) {
                 $table->string('provider')->after('secret')->nullable();
             });
         }
     }
 
-    public function down()
-    {
+    public function down() {
         Schema::table('oauth_clients', function ($table) {
             $table->dropColumn('provider');
         });

@@ -5,10 +5,8 @@ namespace Tests;
 use App\Wiki;
 use App\WikiProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class WikiProfileTest extends TestCase
-{
+class WikiProfileTest extends TestCase {
     use RefreshDatabase;
 
     protected Wiki $wiki;
@@ -17,9 +15,8 @@ class WikiProfileTest extends TestCase
         parent::setUp();
         $this->wiki = Wiki::factory()->create();
     }
-    
-    public function testCreateValidWikiProfile(): void
-    {
+
+    public function testCreateValidWikiProfile(): void {
         $profile = new WikiProfile([
             'wiki_id' => $this->wiki->id,
             'purpose' => 'data_hub',
@@ -37,8 +34,7 @@ class WikiProfileTest extends TestCase
         ]);
     }
 
-    public function testCreateWikiProfileWithOtherFields(): void
-    {
+    public function testCreateWikiProfileWithOtherFields(): void {
         $profile = new WikiProfile([
             'wiki_id' => $this->wiki->id,
             'purpose' => 'other',
@@ -61,5 +57,4 @@ class WikiProfileTest extends TestCase
             'temporality_other' => 'Custom temporality',
         ]);
     }
-
 }

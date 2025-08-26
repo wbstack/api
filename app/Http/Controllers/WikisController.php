@@ -2,21 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Wiki;
 use Illuminate\Http\Request;
 
-class WikisController extends Controller
-{
-    public function getWikisOwnedByCurrentUser(Request $request): \Illuminate\Http\Response
-    {
-      $wikis = $request->user()->managesWikis()->get();
+class WikisController extends Controller {
+    public function getWikisOwnedByCurrentUser(Request $request): \Illuminate\Http\Response {
+        $wikis = $request->user()->managesWikis()->get();
 
-      return response(
-        [
-          "wikis" => $wikis,
-          "count" => count($wikis),
-          "limit" => config('wbstack.wiki_max_per_user')
-        ]
-      );
+        return response(
+            [
+                'wikis' => $wikis,
+                'count' => count($wikis),
+                'limit' => config('wbstack.wiki_max_per_user'),
+            ]
+        );
     }
 }

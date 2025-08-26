@@ -5,8 +5,7 @@ namespace App\Console\Commands\Invitation;
 use App\Invitation;
 use Illuminate\Console\Command;
 
-class All extends Command
-{
+class All extends Command {
     protected $signature = 'wbs-invitation:all';
 
     protected $description = 'List all current invitations';
@@ -16,8 +15,7 @@ class All extends Command
      *
      * @return mixed
      */
-    public function handle()
-    {
+    public function handle() {
         foreach (Invitation::all() as $invitation) {
             $this->line($invitation->code);
         }

@@ -2,23 +2,20 @@
 
 namespace App\Notifications;
 
-use App\Notifications\ComplaintNotification;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Lang;
 
 /**
  * A notification to be sent when the legal complaint form is being used.
  */
-class ComplaintNotificationExternal extends ComplaintNotification
-{
+class ComplaintNotificationExternal extends ComplaintNotification {
     /**
      * Build the mail representation of the notification.
      *
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
-    {
+    public function toMail($notifiable) {
         $name = $this->name;
 
         if (empty($name)) {

@@ -2,17 +2,17 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
+use App\Jobs\PlatformStatsSummaryJob;
 use App\Jobs\SiteStatsUpdateJob;
 use App\Wiki;
-use App\Jobs\PlatformStatsSummaryJob;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
+
 /**
  * Schedules jobs for updating site_stats per wiki then platformsummaryjob
  */
-class ScheduleStatsUpdates extends Command
-{
+class ScheduleStatsUpdates extends Command {
     /**
      * The name and signature of the console command.
      *
@@ -32,8 +32,7 @@ class ScheduleStatsUpdates extends Command
      *
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
     }
 
@@ -42,20 +41,20 @@ class ScheduleStatsUpdates extends Command
      *
      * @return int
      */
-    public function handle()
-    {
+    public function handle() {
         $siteStatsUpdateJobs = [];
         foreach (Wiki::all() as $wiki) {
             $siteStatsUpdateJobs[] = new SiteStatsUpdateJob($wiki->id);
         }
 
-        Log::info(__METHOD__ . ": Scheduling updates for " . count($siteStatsUpdateJobs) . " wikis.");
+        Log::info(__METHOD__ . ': Scheduling updates for ' . count($siteStatsUpdateJobs) . ' wikis.');
 
         Bus::batch($siteStatsUpdateJobs)
             ->allowFailures()
             ->finally(function () {
-                dispatch(new PlatformStatsSummaryJob());
+                dispatch(new PlatformStatsSummaryJob);
             })->dispatch();
+
         return 0;
     }
 }

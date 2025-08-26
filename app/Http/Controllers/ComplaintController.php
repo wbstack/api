@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Notifications\ComplaintNotificationExternal;
+use App\ComplaintRecord;
 use App\Notifications\ComplaintNotification;
+use App\Notifications\ComplaintNotificationExternal;
 use App\Rules\ReCaptchaValidation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use App\ComplaintRecord;
-use Illuminate\Support\Facades\Log;
 
-class ComplaintController extends Controller
-{
+class ComplaintController extends Controller {
     /**
      * @var \App\Rules\ReCaptchaValidation
      */
@@ -25,11 +23,8 @@ class ComplaintController extends Controller
 
     /**
      * Handle a complaint report page request for the application.
-     *
-     * @param \Illuminate\Http\Request  $request
      */
-    public function sendMessage(Request $request): \Illuminate\Http\JsonResponse
-    {
+    public function sendMessage(Request $request): \Illuminate\Http\JsonResponse {
         $validator = $this->validator($request->all());
 
         if ($validator->fails()) {
@@ -51,9 +46,9 @@ class ComplaintController extends Controller
         $complaintRecord->offending_urls = $validated['url'];
         $complaintRecord->save();
 
-        if (! empty($complaintRecord->mail_address)) {
+        if (!empty($complaintRecord->mail_address)) {
             Notification::route('mail', [
-               $complaintRecord->mail_address,
+                $complaintRecord->mail_address,
             ])->notify(
                 new ComplaintNotificationExternal(
                     $complaintRecord->offending_urls,
@@ -67,11 +62,11 @@ class ComplaintController extends Controller
         Notification::route('mail', [
             config('app.complaint-mail-recipient'),
         ])->notify(
-    new ComplaintNotification(
-            $complaintRecord->offending_urls,
-            $complaintRecord->reason,
-            $complaintRecord->name,
-            $complaintRecord->mail_address,
+            new ComplaintNotification(
+                $complaintRecord->offending_urls,
+                $complaintRecord->reason,
+                $complaintRecord->name,
+                $complaintRecord->mail_address,
             )
         );
 
@@ -84,18 +79,17 @@ class ComplaintController extends Controller
     /**
      * Get a validator for an incoming complaint report page request.
      */
-    protected function validator(array $data): \Illuminate\Validation\Validator
-    {
+    protected function validator(array $data): \Illuminate\Validation\Validator {
         $data['name'] = $data['name'] ?? '';
         $data['email'] = $data['email'] ?? '';
 
         $validation = [
-            'recaptcha'      => ['required', 'string', 'bail', $this->recaptchaValidation],
-            'name'           => ['nullable', 'string', 'max:300'],
-            'message'        => ['required', 'string', 'max:1000'],
-            'url'            => ['required', 'string', 'max:1000'],
+            'recaptcha' => ['required', 'string', 'bail', $this->recaptchaValidation],
+            'name' => ['nullable', 'string', 'max:300'],
+            'message' => ['required', 'string', 'max:1000'],
+            'url' => ['required', 'string', 'max:1000'],
 
-            'email'    => [
+            'email' => [
                 'nullable',
                 'max:300',
                 Rule::when(

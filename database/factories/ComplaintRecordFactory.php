@@ -10,8 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  *
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<TModel>
  */
-class ComplaintRecordFactory extends Factory
-{
+class ComplaintRecordFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -24,8 +23,7 @@ class ComplaintRecordFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition(): array
-    {
+    public function definition(): array {
         return [
             'dispatched' => null,
         ];

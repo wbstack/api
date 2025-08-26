@@ -2,73 +2,65 @@
 
 namespace Tests\Routes\Wiki\Managers;
 
-use App\WikiEntityImportStatus;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-use Tests\TestCase;
 use App\Wiki;
 use App\WikiEntityImport;
+use App\WikiEntityImportStatus;
 use App\WikiManager;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-class EntityImportBackendTest extends TestCase
-{
+class EntityImportBackendTest extends TestCase {
     protected $route = 'backend/wiki/updateEntityImport';
 
     use RefreshDatabase;
 
-    public function setUp(): void
-    {
+    protected function setUp(): void {
         parent::setUp();
         Wiki::query()->delete();
         WikiManager::query()->delete();
         WikiEntityImport::query()->delete();
     }
 
-    public function tearDown(): void
-    {
+    protected function tearDown(): void {
         Wiki::query()->delete();
         WikiManager::query()->delete();
         WikiEntityImport::query()->delete();
         parent::tearDown();
     }
 
-    public function testNoUpdate()
-    {
+    public function testNoUpdate() {
         $this->json('PATCH', $this->route, ['wiki_entity_import' => 789, 'status' => 'success'])
             ->assertStatus(404);
     }
 
-    public function testBadStatus()
-    {
+    public function testBadStatus() {
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         $import = WikiEntityImport::factory()->create([
             'status' => WikiEntityImportStatus::Pending,
             'wiki_id' => $wiki->id,
         ]);
-        $this->json('PATCH', $this->route."?wiki_entity_import=".$import->id, ['status' => 'finished'])
+        $this->json('PATCH', $this->route . '?wiki_entity_import=' . $import->id, ['status' => 'finished'])
             ->assertStatus(422);
     }
 
-    public function testUpdate()
-    {
+    public function testUpdate() {
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         $import = WikiEntityImport::factory()->create([
             'status' => WikiEntityImportStatus::Pending,
             'wiki_id' => $wiki->id,
         ]);
-        $this->json('PATCH', $this->route."?wiki_entity_import=".$import->id, ['status' => 'failed'])
+        $this->json('PATCH', $this->route . '?wiki_entity_import=' . $import->id, ['status' => 'failed'])
             ->assertStatus(200)
             ->assertJsonPath('data.status', 'failed');
     }
 
-    public function testUpdateWhenDone()
-    {
+    public function testUpdateWhenDone() {
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         $import = WikiEntityImport::factory()->create([
             'status' => WikiEntityImportStatus::Failed,
             'wiki_id' => $wiki->id,
         ]);
-        $this->json('PATCH', $this->route."?wiki_entity_import=".$import->id, ['status' => 'success'])
+        $this->json('PATCH', $this->route . '?wiki_entity_import=' . $import->id, ['status' => 'success'])
             ->assertStatus(400);
         $this->assertEquals(
             WikiEntityImportStatus::Failed,

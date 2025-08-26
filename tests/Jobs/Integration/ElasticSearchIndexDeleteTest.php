@@ -2,18 +2,18 @@
 
 namespace Tests\Jobs\Integration;
 
+use App\Http\Curl\CurlRequest;
+use App\Jobs\ElasticSearchIndexDelete;
 use App\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\TestCase;
+use App\Wiki;
+use App\WikiDb;
 use App\WikiManager;
 use App\WikiSetting;
-use App\Wiki;
-use App\Jobs\ElasticSearchIndexDelete;
-use App\Http\Curl\CurlRequest;
-use App\WikiDb;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Config;
+use Tests\TestCase;
 
 /**
  * This is only meant to run when services is started with
@@ -25,17 +25,17 @@ use Illuminate\Support\Facades\Config;
  *
  * Example: docker-compose exec -e RUN_PHPUNIT_INTEGRATION_TEST=1 -e ELASTICSEARCH_HOST=elasticsearch.svc:9200 -T api vendor/bin/phpunit tests/Jobs/Integration/ElasticSearchIndexDeleteTest.php
  */
-class ElasticSearchIndexDeleteTest extends TestCase
-{
+class ElasticSearchIndexDeleteTest extends TestCase {
     use DatabaseTransactions;
     use DispatchesJobs;
 
     private $wiki;
+
     private $user;
 
-    public function makeRequest( $url, $method = 'GET' ) {
+    public function makeRequest($url, $method = 'GET') {
         // create some dummy index
-        $curlRequest = new CurlRequest();
+        $curlRequest = new CurlRequest;
         $curlRequest->setOptions(
             [
                 CURLOPT_URL => $url,
@@ -50,7 +50,7 @@ class ElasticSearchIndexDeleteTest extends TestCase
         $err = $curlRequest->error();
         var_dump($response);
 
-        if( $err ) {
+        if ($err) {
             var_dump($err);
         }
         $curlRequest->close();
@@ -58,18 +58,16 @@ class ElasticSearchIndexDeleteTest extends TestCase
         return json_decode($response, true);
     }
 
-    public function testDeletion()
-    {
-        if ( !getenv('RUN_PHPUNIT_INTEGRATION_TEST') ) {
+    public function testDeletion() {
+        if (!getenv('RUN_PHPUNIT_INTEGRATION_TEST')) {
             $this->markTestSkipped('No blazegraph instance to connect to');
         }
 
         $ELASTICSEARCH_HOST = data_get(Config::get('wbstack.elasticsearch_hosts'), 0);
 
-        if ( !$ELASTICSEARCH_HOST ) {
+        if (!$ELASTICSEARCH_HOST) {
             throw new \Exception('ELASTICSEARCH_HOST / wbstack.elasticsearch_hosts not set');
         }
-
 
         $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/someotherdbname_general_first?pretty", 'PUT');
         $this->assertTrue($response['acknowledged']);
@@ -87,24 +85,24 @@ class ElasticSearchIndexDeleteTest extends TestCase
             [
                 'wiki_id' => $this->wiki->id,
                 'name' => WikiSetting::wwExtEnableElasticSearch,
-                'value' => false
+                'value' => false,
             ]
         );
         WikiDb::factory()->create([
             'wiki_id' => $this->wiki->id,
-            'name' => 'test_db_name'
+            'name' => 'test_db_name',
         ]);
 
         $this->wiki->delete();
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
-        $job = new ElasticSearchIndexDelete( $this->wiki->id);
+        $job = new ElasticSearchIndexDelete($this->wiki->id);
         $job->setJob($mockJob);
         $this->dispatchSync($job);
 
         // feature should get disabled
-        $this->assertNull( WikiSetting::where( ['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->first());
+        $this->assertNull(WikiSetting::where(['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->first());
 
         // first index should be gone
         $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/test_db_name_content_first?pretty");
@@ -121,5 +119,4 @@ class ElasticSearchIndexDeleteTest extends TestCase
         $this->makeRequest("http://$ELASTICSEARCH_HOST/someotherdbname_general_first?pretty", 'DELETE');
 
     }
-
 }

@@ -9,18 +9,16 @@ use Illuminate\Support\Facades\Notification;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
 
-class ForgotPasswordTest extends TestCase
-{
+class ForgotPasswordTest extends TestCase {
     protected $route = 'user/forgotPassword';
 
-    use OptionsRequestAllowed;
     use DatabaseTransactions;
+    use OptionsRequestAllowed;
 
-    public function testForgotPasswordSubmission_Success()
-    {
+    public function testForgotPasswordSubmissionSuccess() {
         Notification::fake();
         $user = User::factory()->create(['email' => 'foo+bar@example.com']);
-        $this->json('POST', $this->route, ['email' => $user->email,])
+        $this->json('POST', $this->route, ['email' => $user->email])
             ->assertStatus(200);
         Notification::assertSentTo(
             $user,
@@ -30,11 +28,10 @@ class ForgotPasswordTest extends TestCase
         );
     }
 
-    public function testForgotPasswordSubmission_NotFound()
-    {
+    public function testForgotPasswordSubmissionNotFound() {
         Notification::fake();
         $user = User::factory()->create(['email' => 'foo+bar@example.com']);
-        $this->json('POST', $this->route, ['email' => 'foo+baz@example.com',])
+        $this->json('POST', $this->route, ['email' => 'foo+baz@example.com'])
             ->assertStatus(200);
         Notification::assertNothingSent();
     }

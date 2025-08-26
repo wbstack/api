@@ -19,7 +19,7 @@ return [
         // The transport type used for requests.
         // May be either `grpc` or `rest`.
         // **Defaults to** `grpc` if gRPC support  is detected on the system.
-        'transport' => null
+        'transport' => null,
     ],
     'PsrLogger' => [
         // Determines whether or not to use background batching.
@@ -32,5 +32,5 @@ return [
             'callPeriod' => 2.0,
             'workerNum' => 1,
         ],
-    ]
+    ],
 ];
