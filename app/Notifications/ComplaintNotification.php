@@ -70,11 +70,11 @@ class ComplaintNotification extends Notification {
             ->from($mailFrom)
             ->subject($mailSubject)
             ->line(Lang::get('A message via the wikibase.cloud form for reporting illegal content has been submitted.'))
-            ->line(Lang::get('Reporter name: ') . $name)
-            ->line(Lang::get('Reporter email address: ') . $mailAddress)
-            ->line(Lang::get('Reason why the information in question is illegal content:'))
+            ->line('**' . Lang::get('Reporter name:') . '** ' . $name)
+            ->line('**' . Lang::get('Reporter email address:') . '** ' . $mailAddress)
+            ->line('**' . Lang::get('Reason why the information in question is illegal content:') . '**')
             ->line($this->reason)
-            ->line(Lang::get('URL(s) for the content in question:'))
+            ->line('**' . Lang::get('URL(s) for the content in question:') . '**')
             ->line($this->offendingUrls)
             ->line('---');
     }
