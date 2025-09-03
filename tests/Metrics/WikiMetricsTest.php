@@ -168,10 +168,9 @@ class WikiMetricsTest extends TestCase {
         ]);
     }
 
-    public function testSavesEntityCountsCorrectly()
-    {
+    public function testSavesEntityCountsCorrectly() {
         $wiki = Wiki::factory()->create([
-            'domain' => 'entitycounttest.wikibase.cloud'
+            'domain' => 'entitycounttest.wikibase.cloud',
         ]);
 
         $wikiDb = WikiDb::first();
@@ -200,7 +199,7 @@ class WikiMetricsTest extends TestCase {
                 'page_random' => 0,
                 'page_touched' => random_bytes(10),
                 'page_latest' => 1,
-                'page_len' => 2
+                'page_len' => 2,
             ], // item
             [
                 'page_namespace' => 120,
@@ -209,7 +208,7 @@ class WikiMetricsTest extends TestCase {
                 'page_random' => 0,
                 'page_touched' => random_bytes(10),
                 'page_latest' => 0,
-                'page_len' => 2
+                'page_len' => 2,
             ], // item
             [
                 'page_namespace' => 122,
@@ -218,8 +217,7 @@ class WikiMetricsTest extends TestCase {
                 'page_random' => 0,
                 'page_touched' => random_bytes(10),
                 'page_latest' => 1,
-                'page_len' => 2]
-            , // property
+                'page_len' => 2], // property
             [
                 'page_namespace' => 640,
                 'page_is_redirect' => 0,
@@ -227,7 +225,7 @@ class WikiMetricsTest extends TestCase {
                 'page_random' => 0,
                 'page_touched' => random_bytes(10),
                 'page_latest' => 1,
-                'page_len' => 2
+                'page_len' => 2,
             ], // entity schema
             [
                 'page_namespace' => 146,
@@ -236,7 +234,7 @@ class WikiMetricsTest extends TestCase {
                 'page_random' => 0,
                 'page_touched' => random_bytes(10),
                 'page_latest' => 1,
-                'page_len' => 2
+                'page_len' => 2,
             ], // lexeme
             [
                 'page_namespace' => 640,
@@ -245,7 +243,7 @@ class WikiMetricsTest extends TestCase {
                 'page_random' => 0,
                 'page_touched' => random_bytes(10),
                 'page_latest' => 1,
-                'page_len' => 2
+                'page_len' => 2,
             ], // entity schema
         ]);
         WikiDailyMetrics::create([
@@ -253,12 +251,12 @@ class WikiMetricsTest extends TestCase {
             'wiki_id' => $wiki->id,
             'date' => now()->subDay()->toDateString(),
             'pages' => 6,
-            'is_deleted' => 0
+            'is_deleted' => 0,
         ]);
 
-        (new WikiMetrics())->saveMetrics($wiki);
+        (new WikiMetrics)->saveMetrics($wiki);
 
-        //clean up after the test
+        // clean up after the test
         $wiki->forceDelete();
         Schema::dropIfExists($tablePage);
 
@@ -267,7 +265,7 @@ class WikiMetricsTest extends TestCase {
             'item_count' => 2,
             'property_count' => 1,
             'lexeme_count' => 1,
-            'entity_schema_count' => 1 // the redirect should be ignored
+            'entity_schema_count' => 1, // the redirect should be ignored
         ]);
     }
 }
