@@ -85,7 +85,7 @@ class KubernetesIngressCreate extends Job {
                                     'backend' => [
                                         // TODO this should be an env var...
                                         'service' => [
-                                            'name' => 'platform-nginx',
+                                            'name' => 'anubis',
                                             'port' => [
                                                 'number' => 8080,
                                             ],
