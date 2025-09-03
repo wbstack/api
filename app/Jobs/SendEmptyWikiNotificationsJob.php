@@ -9,10 +9,8 @@ use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Facades\Log;
 
-class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique
-{
-    public function handle (): void
-    {
+class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique {
+    public function handle(): void {
         $wikis = Wiki::with(['wikiLifecycleEvents'])
             ->has('wikiLifecycleEvents')
             ->get();
@@ -24,15 +22,14 @@ class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique
                 }
             } catch (\Exception $exception) {
                 Log::error(
-                    'Failure processing wiki '.$wiki->getAttribute('domain').' for EmptyWikiNotification check: '.$exception->getMessage()
+                    'Failure processing wiki ' . $wiki->getAttribute('domain') . ' for EmptyWikiNotification check: ' . $exception->getMessage()
                 );
                 $this->fail();
             }
         }
     }
 
-    public function checkIfWikiIsOldAndEmpty(Wiki $wiki)
-    {
+    public function checkIfWikiIsOldAndEmpty(Wiki $wiki) {
         // Calculate how many days has passed since the wiki instance was first created
         $emptyDaysThreshold = config('wbstack.wiki_empty_notification_threshold');
         $createdAt = $wiki->created_at;
@@ -43,7 +40,7 @@ class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique
 
         $emptyWikiNotificationCount = WikiNotificationSentRecord::where([
             'wiki_id' => $wiki->id,
-            'notification_type' => EmptyWikiNotification::TYPE
+            'notification_type' => EmptyWikiNotification::TYPE,
         ])->count();
 
         if (
@@ -57,18 +54,17 @@ class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique
         }
     }
 
-    public function sendEmptyWikiNotification (Wiki $wiki): void
-    {
-        $wikiManagers = $wiki->wikiManagers()->get();
+    public function sendEmptyWikiNotification(Wiki $wiki): void {
+        $wikiManagers = $wiki->wikiManagersWithEmail()->get();
 
-        foreach($wikiManagers as $wikiManager) {
+        foreach ($wikiManagers as $wikiManager) {
             // we think the order here matters, so that people do not get spammed in case creating a record fails
             // discussed here https://github.com/wbstack/api/pull/656#discussion_r1392443739
             $wiki->wikiNotificationSentRecords()->create([
                 'notification_type' => EmptyWikiNotification::TYPE,
                 'user_id' => $wikiManager->pivot->user_id,
             ]);
-            $wikiManager->notify(new EmptyWikiNotification($wiki->sitename));    
+            $wikiManager->notify(new EmptyWikiNotification($wiki->sitename));
         }
     }
 }

@@ -12,14 +12,12 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Tests\TestCase;
 
-class LogoUpdateTest extends TestCase
-{
+class LogoUpdateTest extends TestCase {
     use HasFactory;
 
-    public function testUpdate()
-    {
+    public function testUpdate() {
         $storage = Storage::fake('static-assets');
-        $file = UploadedFile::fake()->createWithContent("logo_200x200.png", file_get_contents(__DIR__ . "/../../data/logo_200x200.png"));
+        $file = UploadedFile::fake()->createWithContent('logo_200x200.png', file_get_contents(__DIR__ . '/../../data/logo_200x200.png'));
 
         $user = User::factory()->create(['verified' => true]);
         $wiki = Wiki::factory('nodb')->create();
@@ -53,5 +51,17 @@ class LogoUpdateTest extends TestCase
         $logo = Image::make($storage->path($expectedFaviconPath));
         $this->assertSame(64, $logo->height());
         $this->assertSame(64, $logo->width());
+    }
+
+    public function testFailOnWrongWikiManager(): void {
+        $userWiki = Wiki::factory()->create();
+        $otherWiki = Wiki::factory()->create();
+        $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
+        $file = UploadedFile::fake()
+            ->createWithContent('logo_200x200.png', file_get_contents(__DIR__ . '/../../data/logo_200x200.png'));
+        $this->actingAs($user, 'api')
+            ->post('wiki/logo/update', ['wiki' => $otherWiki->id, 'logo' => $file])
+            ->assertStatus(403);
     }
 }

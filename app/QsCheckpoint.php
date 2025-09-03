@@ -5,8 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class QsCheckpoint extends Model
-{
+class QsCheckpoint extends Model {
     public const CHECKPOINT_ID = 0;
 
     const FIELDS = [
@@ -18,27 +17,25 @@ class QsCheckpoint extends Model
 
     protected $visible = self::FIELDS;
 
-    public static function init(int $value = 0): void
-    {
+    public static function init(int $value = 0): void {
         self::create([
             'id' => self::CHECKPOINT_ID,
             'checkpoint' => $value,
         ]);
     }
 
-    public static function get(): int
-    {
+    public static function get(): int {
         $match = self::where(['id' => self::CHECKPOINT_ID])->first();
         if (!$match) {
             throw new ModelNotFoundException(
                 'No QsCheckpoint found. Is your table properly initialized?'
             );
         }
+
         return $match->checkpoint;
     }
 
-    public static function set(int $val): void
-    {
+    public static function set(int $val): void {
         $match = self::where(['id' => self::CHECKPOINT_ID])->first();
         if (!$match) {
             throw new ModelNotFoundException(

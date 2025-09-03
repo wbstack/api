@@ -4,29 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Wiki;
 use Carbon\CarbonImmutable;
-use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 
-class ConversionMetricController extends Controller
-{
-
-    private string $fileName="conversion_metric_for_all_wikis.csv";
+class ConversionMetricController extends Controller {
+    private string $fileName = 'conversion_metric_for_all_wikis.csv';
 
     /**
      * Produce a downloadable csv file with conversion metrics for all wikis.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $allWikis = Wiki::all();
         $current_date = CarbonImmutable::now();
         $output = [];
-
 
         foreach ($allWikis as $wiki) {
             $lifecycleEvents = $wiki->wikiLifecycleEvents()->orderBy('id', 'desc')->first();
             $wikiLastEditedTime = null;
             $wikiFirstEditedTime = null;
-            if (!empty($lifecycleEvents)  ) {
+            if (!empty($lifecycleEvents)) {
                 if ($lifecycleEvents['last_edited']) {
                     $wikiLastEditedTime = CarbonImmutable::parse($lifecycleEvents['last_edited']);
                 }
@@ -52,30 +47,31 @@ class ConversionMetricController extends Controller
                 'number_of_active_editors' => $wiki_number_of_editors,
                 'wiki_creation_time' => $wiki->created_at,
                 'first_edited_time' => $wikiFirstEditedTime,
-                'last_edited_time' => $wikiLastEditedTime
+                'last_edited_time' => $wikiLastEditedTime,
             ];
 
         }
 
-        if ( $request->wantsJson() ) {
-            return response()->json( $output );
+        if ($request->wantsJson()) {
+            return response()->json($output);
         }
 
         return $this->returnCsv($output);
 
     }
 
-    private function returnCsv( $output ) {
+    private function returnCsv($output) {
         ob_start();
-		$handle = fopen('php://output', 'r+');
+        $handle = fopen('php://output', 'r+');
         fputcsv($handle, ['domain_name', 'time_to_engage_days', 'time_before_wiki_abandoned_days', 'number_of_active_editors', 'wiki_creation_time', 'first_edited_time', 'last_edited_time']);
         foreach ($output as $wikiMetrics) {
             fputcsv($handle, array_values($wikiMetrics));
         }
         $csv = ob_get_clean();
+
         return response($csv, 200, [
-			'Content-Type' => 'text/csv',
-			'Content-Disposition' => 'attachment;filename='.CarbonImmutable::now()->toIso8601String().'-'.$this->fileName
-		]);;
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment;filename=' . CarbonImmutable::now()->toIso8601String() . '-' . $this->fileName,
+        ]);
     }
 }

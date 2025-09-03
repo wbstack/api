@@ -5,8 +5,7 @@ namespace App\Console\Commands\Invitation;
 use App\Jobs\InvitationDeleteJob;
 use Illuminate\Console\Command;
 
-class Delete extends Command
-{
+class Delete extends Command {
     protected $signature = 'wbs-invitation:delete {code}';
 
     protected $description = 'Delete an invitation';
@@ -16,8 +15,7 @@ class Delete extends Command
      *
      * @return mixed
      */
-    public function handle()
-    {
+    public function handle() {
         $code = trim($this->argument('code'));
         (new InvitationDeleteJob($code))->handle();
 

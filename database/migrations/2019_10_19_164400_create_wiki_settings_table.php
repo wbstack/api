@@ -4,10 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateWikiSettingsTable extends Migration
-{
-    public function up()
-    {
+class CreateWikiSettingsTable extends Migration {
+    public function up() {
         Schema::create('wiki_settings', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 100);
@@ -26,8 +24,7 @@ class CreateWikiSettingsTable extends Migration
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('wiki_settings');
     }
 }

@@ -2,35 +2,31 @@
 
 namespace Tests\Jobs;
 
-use App\WikiEntityImportStatus;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Contracts\Queue\Job;
-use Carbon\Carbon;
+use App\Jobs\FailStalledEntityImportsJob;
 use App\Wiki;
 use App\WikiEntityImport;
-use App\Jobs\FailStalledEntityImportsJob;
+use App\WikiEntityImportStatus;
+use Carbon\Carbon;
+use Illuminate\Contracts\Queue\Job;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-class FailStalledEntityImportsJobTest extends TestCase
-{
-
+class FailStalledEntityImportsJobTest extends TestCase {
     use RefreshDatabase;
 
-    public function setUp(): void
-    {
+    protected function setUp(): void {
         parent::setUp();
         WikiEntityImport::query()->delete();
         Wiki::query()->delete();
     }
 
-    public function tearDown(): void
-    {
+    protected function tearDown(): void {
         WikiEntityImport::query()->delete();
         Wiki::query()->delete();
         parent::tearDown();
     }
-    public function testFailsEligible()
-    {
+
+    public function testFailsEligible() {
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         WikiEntityImport::factory()->create([
             'wiki_id' => $wiki->id,
@@ -51,7 +47,7 @@ class FailStalledEntityImportsJobTest extends TestCase
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
-        $job = new FailStalledEntityImportsJob();
+        $job = new FailStalledEntityImportsJob;
         $job->setJob($mockJob);
         $job->handle();
 

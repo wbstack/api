@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\DomainHelper;
+use App\Helper\DomainValidator;
 use App\Helper\ProfileValidator;
+use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
+use App\Jobs\ElasticSearchAliasInit;
 use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ProvisionWikiDbJob;
-use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
-use App\Jobs\ElasticSearchAliasInit;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
@@ -17,25 +19,21 @@ use App\WikiManager;
 use App\WikiProfile;
 use App\WikiSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Config;
-use App\Helper\DomainValidator;
-use App\Helper\DomainHelper;
 
-class WikiController extends Controller
-{
+class WikiController extends Controller {
     private $domainValidator;
+
     private $profileValidator;
 
-    public function __construct( DomainValidator $domainValidator, ProfileValidator $profileValidator )
-    {
+    public function __construct(DomainValidator $domainValidator, ProfileValidator $profileValidator) {
         $this->profileValidator = $profileValidator;
         $this->domainValidator = $domainValidator;
     }
 
-    public function create(Request $request): \Illuminate\Http\Response
-    {
+    public function create(Request $request): \Illuminate\Http\Response {
         $clusterWithoutSharedIndex = Config::get('wbstack.elasticsearch_cluster_without_shared_index');
         $sharedIndexHost = Config::get('wbstack.elasticsearch_shared_index_host');
         $sharedIndexPrefix = Config::get('wbstack.elasticsearch_shared_index_prefix');
@@ -50,7 +48,7 @@ class WikiController extends Controller
         $submittedDomain = strtolower($request->input('domain'));
         $submittedDomain = DomainHelper::encode($submittedDomain);
 
-        $domainValidator = $this->domainValidator->validate( $submittedDomain );
+        $domainValidator = $this->domainValidator->validate($submittedDomain);
         $isSubdomain = $this->isSubDomain($submittedDomain);
 
         $domainValidator->validateWithBag('post');
@@ -63,7 +61,7 @@ class WikiController extends Controller
         ]);
 
         $rawProfile = false;
-        if ($request->filled('profile') ) {
+        if ($request->filled('profile')) {
             $rawProfile = json_decode($request->input('profile'), true);
             $profileValidator = $this->profileValidator->validate($rawProfile);
             $profileValidator->validateWithBag('post');
@@ -75,7 +73,7 @@ class WikiController extends Controller
         // TODO create with some sort of owner etc?
         DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain, $submittedDomain, $rawProfile) {
             $dbVersion = Config::get('wbstack.wiki_db_use_version');
-            $wikiDbCondition = ['wiki_id'=>null, 'version'=>$dbVersion];
+            $wikiDbCondition = ['wiki_id' => null, 'version' => $dbVersion];
 
             // Fail if there is not enough storage ready
             if (WikiDb::where($wikiDbCondition)->count() == 0) {
@@ -88,22 +86,22 @@ class WikiController extends Controller
             $numWikis = $user->managesWikis()->count() + 1;
             $maxWikis = config('wbstack.wiki_max_per_user');
 
-            if ( config('wbstack.wiki_max_per_user') !== false && $numWikis > config('wbstack.wiki_max_per_user')) {
+            if (config('wbstack.wiki_max_per_user') !== false && $numWikis > config('wbstack.wiki_max_per_user')) {
                 abort(403, "Too many wikis. Your new total of {$numWikis} would exceed the limit of {$maxWikis} per user.");
             }
 
             $wiki = Wiki::create([
                 'sitename' => $request->input('sitename'),
-                'domain'   => $submittedDomain,
+                'domain' => $submittedDomain,
             ]);
 
             // Assign storage
             $dbAssignment = DB::table('wiki_dbs')->where($wikiDbCondition)->limit(1)->update(['wiki_id' => $wiki->id]);
-            if (! $dbAssignment) {
+            if (!$dbAssignment) {
                 abort(503, 'Database ready, but failed to assign');
             }
-            $nsAssignment = DB::table('queryservice_namespaces')->where(['wiki_id'=>null])->limit(1)->update(['wiki_id' => $wiki->id]);
-            if (! $nsAssignment) {
+            $nsAssignment = DB::table('queryservice_namespaces')->where(['wiki_id' => null])->limit(1)->update(['wiki_id' => $wiki->id]);
+            if (!$nsAssignment) {
                 abort(503, 'QS Namespace ready, but failed to assign');
             }
 
@@ -155,20 +153,19 @@ class WikiController extends Controller
             ]);
 
             $ownerAssignment = WikiManager::create([
-              'user_id' => $user->id,
-              'wiki_id' => $wiki->id,
+                'user_id' => $user->id,
+                'wiki_id' => $wiki->id,
             ]);
 
             // Create WikiProfile
             if ($rawProfile) {
-                WikiProfile::create([ 'wiki_id' => $wiki->id, ...$rawProfile ] );
+                WikiProfile::create(['wiki_id' => $wiki->id, ...$rawProfile]);
             }
-
 
             // TODO maybe always make these run in a certain order..?
             dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
             // Only dispatch a job to add a k8s ingress IF we are using a custom domain...
-            if (! $isSubdomain) {
+            if (!$isSubdomain) {
                 dispatch(new KubernetesIngressCreate($wiki->id, $wiki->domain));
             }
         });
@@ -198,69 +195,40 @@ class WikiController extends Controller
         return response($res);
     }
 
-    public function delete(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $user = $request->user();
-
-        $request->validate([
-            'wiki' => 'required|numeric',
-        ]);
-
-        $wikiId = $request->input('wiki');
-        $userId = $user->id;
+    public function delete(Request $request): \Illuminate\Http\JsonResponse {
         $wikiDeletionReason = $request->input('deletionReasons');
+        $wiki = $request->attributes->get('wiki');
 
-        // Check that the requesting user manages the wiki
-        if (WikiManager::where('user_id', $userId)->where('wiki_id', $wikiId)->count() !== 1) {
-            // The deletion was requested by a user that does not manage the wiki
-            return response()->json('Unauthorized', 401);
-        }
-        $wiki = Wiki::find($wikiId);
-
-        if(isset($wikiDeletionReason)){
-            //Save the wiki deletion reason
+        if (isset($wikiDeletionReason)) {
+            // Save the wiki deletion reason
             $wiki->update(['wiki_deletion_reason' => $wikiDeletionReason]);
         }
         // Delete the wiki
         $wiki->delete();
 
         // Return a success
-        return response()->json("Success", 200);
+        return response()->json('Success', 200);
     }
 
     // TODO should this just be get wiki?
-    public function getWikiDetailsForIdForOwner(Request $request): \Illuminate\Http\Response
-    {
-        $user = $request->user();
-
-        $wikiId = $request->input('wiki');
-
-        // TODO general check to make sure current user can manage the wiki
-        // this should probably be middle ware?
-        // TODO only do 1 query where instead of 2?
-        $test = WikiManager::where('user_id', $user->id)
-      ->where('wiki_id', $wikiId)
-      ->first();
-        if (! $test) {
-            abort(403);
-        }
-
-        $wiki = Wiki::where('id', $wikiId)
-      ->with('wikiManagers')
-      ->with('wikiDbVersion')
-      ->with('wikiLatestProfile')
-      ->with('publicSettings')->first();
+    public function getWikiDetailsForIdForOwner(Request $request): \Illuminate\Http\Response {
+        $wiki = $request->attributes->get('wiki')
+            ->load('wikiManagers')
+            ->load('wikiDbVersion')
+            ->load('wikiLatestProfile')
+            ->load('publicSettings');
 
         $res = [
             'success' => true,
-            'data'    => $wiki,
+            'data' => $wiki,
         ];
 
         return response($res);
     }
 
-    public static function isSubDomain( string $domain, string $subDomainSuffix = null  ): bool {
+    public static function isSubDomain(string $domain, ?string $subDomainSuffix = null): bool {
         $subDomainSuffix = $subDomainSuffix ?? Config::get('wbstack.subdomain_suffix');
-        return preg_match('/' . preg_quote( $subDomainSuffix ) . '$/', $domain) === 1;
+
+        return preg_match('/' . preg_quote($subDomainSuffix) . '$/', $domain) === 1;
     }
 }

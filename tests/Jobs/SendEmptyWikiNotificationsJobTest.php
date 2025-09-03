@@ -6,34 +6,31 @@ use App\Jobs\SendEmptyWikiNotificationsJob;
 use App\Notifications\EmptyWikiNotification;
 use App\User;
 use App\Wiki;
-use App\WikiNotificationSentRecord;
 use App\WikiLifecycleEvents;
 use App\WikiManager;
+use App\WikiNotificationSentRecord;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
-use Carbon\Carbon;
 
-class SendEmptyWikiNotificationsJobTest extends TestCase
-{
+class SendEmptyWikiNotificationsJobTest extends TestCase {
     use RefreshDatabase;
 
     // the job does not fail in general
-    public function testEmptyWikiNotifications_Success()
-    {
+    public function testEmptyWikiNotificationsSuccess() {
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())
-                ->method('fail')
-                ->withAnyParameters();
-        $job = new SendEmptyWikiNotificationsJob();
+            ->method('fail')
+            ->withAnyParameters();
+        $job = new SendEmptyWikiNotificationsJob;
         $job->setJob($mockJob);
         $job->handle();
     }
 
     // empty wikis, that are older than 30 days, trigger a notification
-    public function testEmptyWikiNotifications_SendNotification()
-    {
+    public function testEmptyWikiNotificationsSendNotification() {
         $thresholdDaysAgo = Carbon::now()->subDays(
             config('wbstack.wiki_empty_notification_threshold')
         )->toDateTimeString();
@@ -44,7 +41,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => null]);
 
-        $job = new SendEmptyWikiNotificationsJob();
+        $job = new SendEmptyWikiNotificationsJob;
         $job->handle();
 
         Notification::assertSentTo(
@@ -54,8 +51,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
     }
 
     // fresh wiki that does not have lifecycle event records yet
-    public function testEmptyWikiNotifications_FreshWiki()
-    {
+    public function testEmptyWikiNotificationsFreshWiki() {
         $now = Carbon::now()->toDateTimeString();
 
         Notification::fake();
@@ -63,12 +59,12 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
         $wiki = Wiki::factory()->create(['created_at' => $now]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
-        $job = new SendEmptyWikiNotificationsJob();
+        $job = new SendEmptyWikiNotificationsJob;
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())
-                ->method('fail')
-                ->withAnyParameters();
+            ->method('fail')
+            ->withAnyParameters();
 
         $job->setJob($mockJob);
         $job->handle();
@@ -77,8 +73,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
     }
 
     // non-empty wikis which are older than 30 days do not trigger notifications
-    public function testEmptyWikiNotifications_ActiveWiki()
-    {
+    public function testEmptyWikiNotificationsActiveWiki() {
         $thresholdDaysAgo = Carbon::now()->subDays(
             config('wbstack.wiki_empty_notification_threshold')
         )->toDateTimeString();
@@ -92,18 +87,17 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
 
         WikiLifecycleEvents::factory()->create([
             'wiki_id' => $wiki->id,
-            'first_edited' => $now
+            'first_edited' => $now,
         ]);
 
-        $job = new SendEmptyWikiNotificationsJob();
+        $job = new SendEmptyWikiNotificationsJob;
         $job->handle();
 
         Notification::assertNothingSent();
     }
 
     // notifications do not get sent again
-    public function testEmptyWikiNotifications_EmptyNotificationReceived()
-    {
+    public function testEmptyWikiNotificationsEmptyNotificationReceived() {
         $thresholdDaysAgo = Carbon::now()->subDays(
             config('wbstack.wiki_empty_notification_threshold')
         )->toDateTimeString();
@@ -119,7 +113,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase
             'user_id' => $manager->user_id,
         ]);
 
-        $job = new SendEmptyWikiNotificationsJob();
+        $job = new SendEmptyWikiNotificationsJob;
         $job->handle();
 
         Notification::assertNothingSent();

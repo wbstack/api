@@ -5,8 +5,7 @@ namespace Database\Factories;
 use App\Invitation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class InvitationFactory extends Factory
-{
+class InvitationFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,10 +18,9 @@ class InvitationFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         return [
-            'code' => $this->faker->unique()->text(20)
+            'code' => $this->faker->unique()->text(20),
         ];
     }
 }

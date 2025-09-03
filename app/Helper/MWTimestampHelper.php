@@ -7,21 +7,22 @@
 */
 
 namespace App\Helper;
+
 use Carbon\CarbonImmutable;
 
 class MWTimestampHelper {
-
     private const MWTimestampFormat = 'YmdHis';
 
-    static public function getCarbonFromMWTimestamp( string $MWTimestamp ): CarbonImmutable {
-        $carbon = CarbonImmutable::createFromFormat( self::MWTimestampFormat, $MWTimestamp );
+    public static function getCarbonFromMWTimestamp(string $MWTimestamp): CarbonImmutable {
+        $carbon = CarbonImmutable::createFromFormat(self::MWTimestampFormat, $MWTimestamp);
         if ($carbon === false) {
             throw new \Exception('Unable to create Carbon object');
         }
+
         return $carbon;
     }
 
-    static public function getMWTimestampFromCarbon(CarbonImmutable $carbonImmutable): string {
+    public static function getMWTimestampFromCarbon(CarbonImmutable $carbonImmutable): string {
         return $carbonImmutable->format(self::MWTimestampFormat);
     }
 }

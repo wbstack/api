@@ -7,9 +7,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
 
-class ResetPasswordNotification extends Notification
-{
-    use  HasFactory;
+class ResetPasswordNotification extends Notification {
+    use HasFactory;
 
     /**
      * The password reset token.
@@ -31,8 +30,7 @@ class ResetPasswordNotification extends Notification
      * @param  string  $token
      * @return void
      */
-    public function __construct($token)
-    {
+    public function __construct($token) {
         $this->token = $token;
     }
 
@@ -42,8 +40,7 @@ class ResetPasswordNotification extends Notification
      * @param  mixed  $notifiable
      * @return array|string
      */
-    public function via($notifiable)
-    {
+    public function via($notifiable) {
         return ['mail'];
     }
 
@@ -53,21 +50,20 @@ class ResetPasswordNotification extends Notification
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
-    {
+    public function toMail($notifiable) {
         if (static::$toMailCallback) {
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
         $encodedEmail = urlencode($notifiable->getEmailForPasswordReset());
         $queryPart = "?token=$this->token&email={$encodedEmail}";
-        $resetPasswordLink = config('wbstack.ui_url').'/reset-password'.$queryPart;
+        $resetPasswordLink = config('wbstack.ui_url') . '/reset-password' . $queryPart;
 
         return (new MailMessage)
             ->subject(Lang::get('Please reset your password'))
             ->line(Lang::get('You are receiving this email because we received a password reset request for your account.'))
             ->action(Lang::get('Reset Password'), $resetPasswordLink)
-            ->line(Lang::get('This password reset link will expire in :count minutes.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
+            ->line(Lang::get('This password reset link will expire in :count minutes.', ['count' => config('auth.passwords.' . config('auth.defaults.passwords') . '.expire')]))
             ->line(Lang::get('If you did not make this request, you can simply disregard this email.'));
     }
 
@@ -77,8 +73,7 @@ class ResetPasswordNotification extends Notification
      * @param  \Closure  $callback
      * @return void
      */
-    public static function toMailUsing($callback)
-    {
+    public static function toMailUsing($callback) {
         static::$toMailCallback = $callback;
     }
 }

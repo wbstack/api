@@ -2,10 +2,10 @@
 
 namespace App;
 
+use App\Helper\DomainHelper;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Helper\DomainHelper;
 
 /**
  * App\Wiki.
@@ -23,6 +23,7 @@ use App\Helper\DomainHelper;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\User[] $wikiManagers
  * @property-read int|null $wiki_managers_count
  * @property-read \App\QueryserviceNamespace|null $wikiQueryserviceNamespace
+ *
  * @method static \Database\Factories\WikiFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki newQuery()
@@ -36,11 +37,11 @@ use App\Helper\DomainHelper;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Wiki withTrashed()
  * @method static \Illuminate\Database\Query\Builder|\App\Wiki withoutTrashed()
+ *
  * @mixin \Eloquent
  */
-class Wiki extends Model
-{
-    use SoftDeletes, HasFactory;
+class Wiki extends Model {
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -68,8 +69,7 @@ class Wiki extends Model
         'deleted_at' => 'datetime',
     ];
 
-    public function wikiDbVersion()
-    {
+    public function wikiDbVersion() {
         /**
          * @psalm-suppress InvalidArgument
          */
@@ -79,79 +79,68 @@ class Wiki extends Model
     // TODO these should just be on the backend model? =] Or marked as a private relationship or something?
     // OR some sort of access control needs to be done..
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     *
      * @psalm-return \Illuminate\Database\Eloquent\Relations\HasOne<WikiDb>
      */
-    public function wikiDb(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
+    public function wikiDb(): \Illuminate\Database\Eloquent\Relations\HasOne {
         return $this->hasOne(WikiDb::class);
     }
 
-    public function wikiSiteStats(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
+    public function wikiSiteStats(): \Illuminate\Database\Eloquent\Relations\HasOne {
         return $this->hasOne(WikiSiteStats::class);
     }
 
-    public function wikiLifecycleEvents(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
+    public function wikiLifecycleEvents(): \Illuminate\Database\Eloquent\Relations\HasOne {
         return $this->hasOne(WikiLifecycleEvents::class);
     }
 
-    public function wikiNotificationSentRecords(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
+    public function wikiNotificationSentRecords(): \Illuminate\Database\Eloquent\Relations\HasMany {
         return $this->hasMany(WikiNotificationSentRecord::class);
     }
 
-    public function wikiEntityImports(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
+    public function wikiEntityImports(): \Illuminate\Database\Eloquent\Relations\HasMany {
         return $this->hasMany(WikiEntityImport::class);
     }
 
+    public function wikiManagers(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany(WikiManager::class);
+    }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     *
      * @psalm-return \Illuminate\Database\Eloquent\Relations\HasOne<QueryserviceNamespace>
      */
-    public function wikiQueryserviceNamespace(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
+    public function wikiQueryserviceNamespace(): \Illuminate\Database\Eloquent\Relations\HasOne {
         return $this->hasOne(QueryserviceNamespace::class);
     }
 
     // FIXME: rename to privateSettings / allSettings for clarity?
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     *
      * @psalm-return \Illuminate\Database\Eloquent\Relations\HasMany<WikiSetting>
      */
-    public function settings(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
+    public function settings(): \Illuminate\Database\Eloquent\Relations\HasMany {
         return $this->hasMany(WikiSetting::class);
     }
 
-    public function publicSettings()
-    {
+    public function publicSettings() {
         return $this->settings()->whereIn('name',
-        [
-            'wgLogo',
-            'wgReadOnly',
-            // FIXME: this list is evil and should be kept in sync with WikiSettingController?!
-            'wgDefaultSkin',
-            'wwExtEnableConfirmAccount',
-            'wwExtEnableWikibaseLexeme',
-            'wwWikibaseStringLengthString',
-            'wwWikibaseStringLengthMonolingualText',
-            'wwWikibaseStringLengthMultilang',
-            'wikibaseFedPropsEnable',
-            'wikibaseManifestEquivEntities',
-            'wwUseQuestyCaptcha',
-            'wwCaptchaQuestions',
-        ]
-    );
+            [
+                'wgLogo',
+                'wgReadOnly',
+                // FIXME: this list is evil and should be kept in sync with WikiSettingController?!
+                'wgDefaultSkin',
+                'wwExtEnableConfirmAccount',
+                'wwExtEnableWikibaseLexeme',
+                'wwWikibaseStringLengthString',
+                'wwWikibaseStringLengthMonolingualText',
+                'wwWikibaseStringLengthMultilang',
+                'wikibaseFedPropsEnable',
+                'wikibaseManifestEquivEntities',
+                'wwUseQuestyCaptcha',
+                'wwCaptchaQuestions',
+            ]
+        );
     }
 
-    public function wikiManagers()
-    {
+    public function wikiManagersWithEmail() {
         // TODO should this be hasMany ?
         /**
          * @psalm-suppress InvalidArgument
@@ -162,22 +151,21 @@ class Wiki extends Model
     /**
      * Get logo directory path
      */
-    public static function getLogosDirectory( int $wiki_id ): string {
-        return self::getSiteDirectory( $wiki_id ) . '/logos';
+    public static function getLogosDirectory(int $wiki_id): string {
+        return self::getSiteDirectory($wiki_id) . '/logos';
     }
 
     /**
      * Get site directory path
      */
-    public static function getSiteDirectory( int $wiki_id ): string {
-        $siteDir = md5($wiki_id.md5($wiki_id));
-        return 'sites/'.$siteDir;
+    public static function getSiteDirectory(int $wiki_id): string {
+        $siteDir = md5($wiki_id . md5($wiki_id));
+
+        return 'sites/' . $siteDir;
     }
 
     /**
      * Convert the IDN formatted domain name to it's Unicode representation.
-     *
-     * @return string
      */
     public function getDomainDecodedAttribute(): string {
         return DomainHelper::decode($this->domain);

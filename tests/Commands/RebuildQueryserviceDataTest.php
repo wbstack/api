@@ -3,38 +3,34 @@
 namespace Tests\Commands;
 
 use App\Constants\MediawikiNamespace;
-use App\Wiki;
-use App\QueryserviceNamespace;
-use App\WikiSetting;
 use App\Jobs\SpawnQueryserviceUpdaterJob;
-use Tests\TestCase;
+use App\QueryserviceNamespace;
+use App\Wiki;
+use App\WikiSetting;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Http\Client\Request;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
-class RebuildQueryserviceDataTest extends TestCase
-{
+class RebuildQueryserviceDataTest extends TestCase {
     use DatabaseTransactions;
 
-    public function setUp(): void
-    {
+    protected function setUp(): void {
         parent::setUp();
         Wiki::query()->delete();
         WikiSetting::query()->delete();
         QueryserviceNamespace::query()->delete();
     }
 
-    public function tearDown(): void
-    {
+    protected function tearDown(): void {
         Wiki::query()->delete();
         WikiSetting::query()->delete();
         QueryserviceNamespace::query()->delete();
         parent::tearDown();
     }
 
-    public function testEmpty()
-    {
+    public function testEmpty() {
         Bus::fake();
         Http::fake();
 
@@ -44,8 +40,7 @@ class RebuildQueryserviceDataTest extends TestCase
         Http::assertNothingSent();
     }
 
-    public function testWikiWithLexemes()
-    {
+    public function testWikiWithLexemes() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'rebuild.wikibase.cloud']);
         WikiSetting::factory()->create([
@@ -60,7 +55,7 @@ class RebuildQueryserviceDataTest extends TestCase
         ]);
 
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
@@ -78,7 +73,7 @@ class RebuildQueryserviceDataTest extends TestCase
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
                 'continue' => [
                     'apcontinue' => 'Q6',
                 ],
@@ -107,7 +102,7 @@ class RebuildQueryserviceDataTest extends TestCase
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=Q6&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=Q6&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
@@ -127,9 +122,9 @@ class RebuildQueryserviceDataTest extends TestCase
                             'namespace' => MediawikiNamespace::item,
                         ],
                     ],
-                ]
+                ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
@@ -152,34 +147,35 @@ class RebuildQueryserviceDataTest extends TestCase
         $this->artisan('wbs-qs:rebuild', ['--chunkSize' => 10])->assertExitCode(0);
         Bus::assertDispatchedTimes(SpawnQueryserviceUpdaterJob::class, 2);
         Bus::assertDispatched(SpawnQueryserviceUpdaterJob::class, function ($job) {
-            if ('rebuild.wikibase.cloud' !== $job->wikiDomain) {
+            if ($job->wikiDomain !== 'rebuild.wikibase.cloud') {
                 return false;
             }
-            if (10 !== count(explode(',', $job->entities))) {
+            if (count(explode(',', $job->entities)) !== 10) {
                 return false;
             }
-            if ('http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql' !== $job->sparqlUrl) {
+            if ($job->sparqlUrl !== 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql') {
                 return false;
             }
+
             return true;
         });
         Bus::assertDispatched(SpawnQueryserviceUpdaterJob::class, function ($job) {
-            if ('rebuild.wikibase.cloud' !== $job->wikiDomain) {
+            if ($job->wikiDomain !== 'rebuild.wikibase.cloud') {
                 return false;
             }
-            if (5 !== count(explode(',', $job->entities))) {
+            if (count(explode(',', $job->entities)) !== 5) {
                 return false;
             }
-            if ('http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql' !== $job->sparqlUrl) {
+            if ($job->sparqlUrl !== 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql') {
                 return false;
             }
+
             return true;
         });
         Http::assertSentCount(4);
     }
 
-    public function testWikiNoLexemes()
-    {
+    public function testWikiNoLexemes() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'rebuild.wikibase.cloud']);
         QueryserviceNamespace::factory()->create([
@@ -189,7 +185,7 @@ class RebuildQueryserviceDataTest extends TestCase
         ]);
 
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
@@ -207,7 +203,7 @@ class RebuildQueryserviceDataTest extends TestCase
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
@@ -233,29 +229,29 @@ class RebuildQueryserviceDataTest extends TestCase
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
                 'error' => 'Lexemes not enabled for this wiki',
             ], 400),
         ]);
 
         $this->artisan('wbs-qs:rebuild', ['--chunkSize' => 10])->assertExitCode(0);
         Bus::assertDispatched(SpawnQueryserviceUpdaterJob::class, function ($job) {
-            if ('rebuild.wikibase.cloud' !== $job->wikiDomain) {
+            if ($job->wikiDomain !== 'rebuild.wikibase.cloud') {
                 return false;
             }
-            if (8 !== count(explode(',', $job->entities))) {
+            if (count(explode(',', $job->entities)) !== 8) {
                 return false;
             }
-            if ('http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql' !== $job->sparqlUrl) {
+            if ($job->sparqlUrl !== 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql') {
                 return false;
             }
+
             return true;
         });
         Http::assertSentCount(2);
     }
 
-    public function testFailure()
-    {
+    public function testFailure() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'rebuild.wikibase.cloud']);
         QueryserviceNamespace::factory()->create([
@@ -265,7 +261,7 @@ class RebuildQueryserviceDataTest extends TestCase
         ]);
 
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
@@ -283,10 +279,10 @@ class RebuildQueryserviceDataTest extends TestCase
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'error' => 'THE DINOSAURS ESCAPED!',
             ], 500),
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
                 'error' => 'Lexemes not enabled for this wiki',
             ], 400),
         ]);
@@ -295,8 +291,7 @@ class RebuildQueryserviceDataTest extends TestCase
         Bus::assertNothingDispatched();
     }
 
-    public function testEmptyWiki()
-    {
+    public function testEmptyWiki() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'rebuild.wikibase.cloud']);
         QueryserviceNamespace::factory()->create([
@@ -306,17 +301,17 @@ class RebuildQueryserviceDataTest extends TestCase
         ]);
 
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
+            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
                 'error' => 'Lexemes not enabled for this wiki',
             ], 400),
         ]);
@@ -326,8 +321,7 @@ class RebuildQueryserviceDataTest extends TestCase
         Http::assertSentCount(2);
     }
 
-    public function testDomainArg()
-    {
+    public function testDomainArg() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'rebuild.wikibase.cloud']);
         QueryserviceNamespace::factory()->create([
@@ -348,6 +342,7 @@ class RebuildQueryserviceDataTest extends TestCase
             if ($hostHeader !== 'rebuild.wikibase.cloud') {
                 return Http::response('The dinosaurs escaped!!!', 500);
             }
+
             return Http::response([
                 'query' => [
                     'allpages' => [],

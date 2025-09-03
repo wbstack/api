@@ -6,15 +6,13 @@ use App\User;
 use App\Wiki;
 use App\WikiManager;
 use App\WikiSetting;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\Routes\Traits\PostRequestNeedAuthentication;
 use Tests\TestCase;
-use Database\Factories\UserFactory;
 
-class SettingUpdateTest extends TestCase
-{
+class SettingUpdateTest extends TestCase {
     use HasFactory;
 
     protected $route = 'wiki/setting/foo/update';
@@ -23,37 +21,37 @@ class SettingUpdateTest extends TestCase
     use OptionsRequestAllowed;
     use PostRequestNeedAuthentication;
 
-    public function testSetInvalidSetting()
-    {
+    public function testSetInvalidSetting() {
         $settingName = 'iDoNotExistAsASetting';
-
+        $wiki = Wiki::factory()->create();
         $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [
-            'wiki' => 1,
-            'setting' => $settingName,
-            'value' => '1',
-          ])
-          ->assertStatus(422)
-          ->assertJsonStructure(['errors' => ['setting']]);
+                'wiki' => $wiki->id,
+                'setting' => $settingName,
+                'value' => '1',
+            ])
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['setting']]);
     }
 
-    public function testValidSettingNoWiki()
-    {
+    public function testFailOnWrongWikiManager(): void {
         $settingName = 'wwExtEnableConfirmAccount';
-
+        $userWiki = Wiki::factory()->create();
+        $otherWiki = Wiki::factory()->create();
         $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
-            ->json('POST', str_replace('foo', $settingName, $this->route), [
-            'wiki' => 99856,
-            'setting' => $settingName,
-            'value' => '1',
-          ])
-          ->assertStatus(401);
+            ->postJson(str_replace('foo', $settingName, $this->route), [
+                'wiki' => $otherWiki->id,
+                'setting' => $settingName,
+                'value' => '1',
+            ])
+            ->assertStatus(403);
     }
 
-    static public function provideValidSettings()
-    {
+    public static function provideValidSettings() {
         yield ['wgDefaultSkin', 'vector', 'vector'];
         yield ['wwExtEnableConfirmAccount', '1', '1'];
         yield ['wwExtEnableConfirmAccount', '0', '0'];
@@ -63,7 +61,7 @@ class SettingUpdateTest extends TestCase
         yield ['wikibaseFedPropsEnable', '1', '1'];
         yield ['wikibaseFedPropsEnable', '0', '0'];
 
-        $emptyArrays = json_encode(['items' => [], 'properties'=> []]);
+        $emptyArrays = json_encode(['items' => [], 'properties' => []]);
         yield ['wikibaseManifestEquivEntities', $emptyArrays, $emptyArrays];
 
         $somePropsNoItems = json_encode(['properties' => ['P31' => 'P1'], 'items' => []]);
@@ -75,38 +73,36 @@ class SettingUpdateTest extends TestCase
         yield ['wwUseQuestyCaptcha', '1', '1'];
         yield ['wwUseQuestyCaptcha', '0', '0'];
         $validCaptchaQuestions = json_encode([
-            "How many vowels are in this question?" => ['12', 'twelve'],
-            "What is the chemical formula of water" => ['H2O'],
-            "2 + 4 = ?" => ['6', 'six']
+            'How many vowels are in this question?' => ['12', 'twelve'],
+            'What is the chemical formula of water' => ['H2O'],
+            '2 + 4 = ?' => ['6', 'six'],
         ]);
-        yield ['wwCaptchaQuestions', $validCaptchaQuestions, $validCaptchaQuestions ];
+        yield ['wwCaptchaQuestions', $validCaptchaQuestions, $validCaptchaQuestions];
     }
 
     /**
      * @dataProvider provideValidSettings
      */
-    public function testValidSetting($settingName, $settingValue, $expectedStored)
-    {
+    public function testValidSetting($settingName, $settingValue, $expectedStored) {
         $user = User::factory()->create(['verified' => true]);
         $wiki = Wiki::factory('nodb')->create();
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [
-            'wiki' => $wiki->id,
-            'setting' => $settingName,
-            'value' => $settingValue,
+                'wiki' => $wiki->id,
+                'setting' => $settingName,
+                'value' => $settingValue,
             ])
             ->assertStatus(200);
 
         $this->assertSame(
             $expectedStored,
-              WikiSetting::whereWikiId($wiki->id)->whereName($settingName)->first()->value
-          );
+            WikiSetting::whereWikiId($wiki->id)->whereName($settingName)->first()->value
+        );
     }
 
-    static public function provideValidSettingsBadValues()
-    {
+    public static function provideValidSettingsBadValues() {
         yield ['wgDefaultSkin', 'foo'];
         yield ['wwExtEnableConfirmAccount', 'foo'];
         yield ['wwWikibaseStringLengthString', 12];
@@ -129,38 +125,39 @@ class SettingUpdateTest extends TestCase
         yield ['wikibaseManifestEquivEntities', json_encode(['properties' => ['P1' => 'P2'], 'items' => ['Q2' => 'Q2', 'P2' => 'P2']])];
         // no answers
         yield ['wwCaptchaQuestions', json_encode([
-            "How many vowels are in this question?" => []
+            'How many vowels are in this question?' => [],
         ])];
         // Question too long
         yield ['wwCaptchaQuestions', json_encode([
-            "How many vowels are in this question?How many vowels are in this question?
+            'How many vowels are in this question?How many vowels are in this question?
             How many vowels are in this question?How many vowels are in this question?
             How many vowels are in this question?How many vowels are in this question?
-            How many vowels are in this question?How many vowels are in this question?" => ['12', 'twelve']
+            How many vowels are in this question?How many vowels are in this question?' => ['12', 'twelve'],
         ])];
         // Answer too long
         yield ['wwCaptchaQuestions', json_encode([
-            "Is this too long?" => [
-                "LongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswer
+            'Is this too long?' => [
+                'LongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswer
                 LongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswer
                 LongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswer
-                LongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswer"
-            ]
+                LongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswerLongAnswer',
+            ],
         ])];
     }
 
     /**
      * @dataProvider provideValidSettingsBadValues
      */
-    public function testValidSettingBadValues($settingName, $settingValue)
-    {
+    public function testValidSettingBadValues($settingName, $settingValue) {
+        $wiki = Wiki::factory()->create();
         $user = User::factory()->create(['verified' => true]);
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [
-            'wiki' => 1,
-            'setting' => $settingName,
-            'value' => $settingValue,
+                'wiki' => $wiki->id,
+                'setting' => $settingName,
+                'value' => $settingValue,
             ])
             ->assertStatus(422)
             ->assertJsonStructure(['errors' => ['value']]);

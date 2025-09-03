@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Wiki|null $wiki
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDomain newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDomain newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDomain query()
@@ -21,22 +22,19 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDomain whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDomain whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDomain whereWikiId($value)
+ *
  * @mixin \Eloquent
  */
-class WikiDomain extends Model
-{
+class WikiDomain extends Model {
     protected $fillable = [
         'domain',
         'wiki_id',
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     *
      * @psalm-return \Illuminate\Database\Eloquent\Relations\HasOne<Wiki>
      */
-    public function wiki(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
+    public function wiki(): \Illuminate\Database\Eloquent\Relations\HasOne {
         return $this->hasOne(Wiki::class);
     }
 }

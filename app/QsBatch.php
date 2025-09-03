@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Wiki $wiki
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch query()
@@ -26,10 +27,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereIn($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch whereWikiId($value)
+ *
  * @mixin \Eloquent
  */
-class QsBatch extends Model
-{
+class QsBatch extends Model {
     use HasFactory;
 
     protected $fillable = [
@@ -42,16 +43,13 @@ class QsBatch extends Model
     ];
 
     protected $casts = [
-        'pending_since'=> 'datetime',
+        'pending_since' => 'datetime',
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     *
      * @psalm-return \Illuminate\Database\Eloquent\Relations\BelongsTo<Wiki>
      */
-    public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
+    public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
         return $this->belongsTo(Wiki::class);
     }
 }

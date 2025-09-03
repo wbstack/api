@@ -1,18 +1,15 @@
 <?php
 
-
 namespace App\Metrics;
 
+use App\QsBatch;
 use LKDevelopment\HorizonPrometheusExporter\Contracts\Exporter;
 use Prometheus\CollectorRegistry;
-use App\QsBatch;
 
-class FailedQsBatches implements Exporter
-{
+class FailedQsBatches implements Exporter {
     protected $gauge;
 
-    public function metrics(CollectorRegistry $collectorRegistry)
-    {
+    public function metrics(CollectorRegistry $collectorRegistry) {
         $this->gauge = $collectorRegistry->getOrRegisterGauge(
             config('horizon-exporter.namespace'),
             'qs_batches_failed_batches',
@@ -20,8 +17,7 @@ class FailedQsBatches implements Exporter
         );
     }
 
-    public function collect()
-    {
+    public function collect() {
         $numBatches = QsBatch::has('wiki')->where([
             'failed' => 1,
         ])->count();

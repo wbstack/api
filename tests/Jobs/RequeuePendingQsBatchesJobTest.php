@@ -2,31 +2,29 @@
 
 namespace Tests\Jobs;
 
-use App\QsBatch;
 use App\Jobs\RequeuePendingQsBatchesJob;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Contracts\Queue\Job;
+use App\QsBatch;
 use Carbon\Carbon;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Queue\Job;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-class RequeuePendingQsBatchesJobTest extends TestCase
-{
-
+class RequeuePendingQsBatchesJobTest extends TestCase {
     use RefreshDatabase;
 
-    public function setUp(): void {
+    protected function setUp(): void {
         // Other tests leave dangling wikis around so we need to clean them up
         parent::setUp();
         QsBatch::query()->delete();
     }
 
-    public function tearDown(): void {
+    protected function tearDown(): void {
         QsBatch::query()->delete();
         parent::tearDown();
     }
 
-    public function testRequeue (): void {
+    public function testRequeue(): void {
         QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(200), 'id' => 1, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'a,b']);
         QsBatch::factory()->create(['pending_since' => Carbon::now()->subSeconds(400), 'id' => 2, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'a,b']);
         QsBatch::factory()->create(['processing_attempts' => 3, 'id' => 3, 'done' => 0, 'wiki_id' => 1, 'entityIds' => 'a,b']);
@@ -40,7 +38,7 @@ class RequeuePendingQsBatchesJobTest extends TestCase
         $this->app->instance(ExceptionHandler::class, $mockExceptionHandler);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new RequeuePendingQsBatchesJob();
+        $job = new RequeuePendingQsBatchesJob;
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');

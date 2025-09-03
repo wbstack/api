@@ -2,44 +2,43 @@
 
 namespace Tests\Jobs;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\TestCase;
-use App\QueryserviceNamespace;
-use Illuminate\Contracts\Queue\Job;
+use App\Jobs\DeleteQueryserviceNamespaceJob;
+use App\Jobs\DeleteWikiDbJob;
 use App\Jobs\DeleteWikiDispatcherJob;
+use App\Jobs\DeleteWikiFinalizeJob;
+use App\Jobs\ElasticSearchIndexDelete;
+use App\Jobs\KubernetesIngressDeleteJob;
+use App\Jobs\ProvisionWikiDbJob;
+use App\QueryserviceNamespace;
 use App\User;
 use App\Wiki;
+use App\WikiDb;
 use App\WikiManager;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Bus;
-use App\Jobs\KubernetesIngressDeleteJob;
-use App\Jobs\DeleteWikiDbJob;
-use App\Jobs\DeleteWikiFinalizeJob;
 use App\WikiSetting;
-use App\Jobs\ElasticSearchIndexDelete;
-use App\Jobs\DeleteQueryserviceNamespaceJob;
+use Carbon\Carbon;
+use Illuminate\Contracts\Queue\Job;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use TiMacDonald\Log\LogFake;
-use TiMacDonald\Log\LogEntry;
-use Illuminate\Support\Str;
-use App\Jobs\ProvisionWikiDbJob;
-use App\WikiDb;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Str;
+use Tests\TestCase;
+use TiMacDonald\Log\LogEntry;
+use TiMacDonald\Log\LogFake;
 
-class DeleteWikiDispatcherJobTest extends TestCase
-{
+class DeleteWikiDispatcherJobTest extends TestCase {
     use DatabaseTransactions;
 
-    public function setUp(): void {
+    protected function setUp(): void {
         parent::setUp();
         Log::swap(new LogFake);
         Storage::fake('static-assets');
         $this->wiki = $this->getWiki();
     }
 
-    private function getWiki( $daysSinceDelete = 30 ): Wiki {
+    private function getWiki($daysSinceDelete = 30): Wiki {
         $user = User::factory()->create(['verified' => true]);
         $wiki = Wiki::factory()->create(
             [
@@ -47,36 +46,35 @@ class DeleteWikiDispatcherJobTest extends TestCase
 
                 // new wikis are seeded as subdomains.
                 // changes this to test k8s ingress delete gets dispatched
-                'domain' => $user->id . '_DeleteWikiDispatcherJobTest.php'
+                'domain' => $user->id . '_DeleteWikiDispatcherJobTest.php',
 
-            ] );
+            ]);
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+
         return $wiki;
     }
 
-    public function testDeleteDispatcher()
-    {
+    public function testDeleteDispatcher() {
         $wikiDB = WikiDb::create([
             'name' => 'mwdb_asdasfasfasf',
             'user' => 'asdasd',
             'password' => 'asdasfasfasf',
             'version' => 'asdasdasdas',
             'prefix' => 'asdasd',
-            'wiki_id' => $this->wiki->id
+            'wiki_id' => $this->wiki->id,
         ]);
 
         Bus::fake();
 
         $mockJob = $this->createMock(Job::class);
-        $job = new DeleteWikiDispatcherJob();
+        $job = new DeleteWikiDispatcherJob;
         $job->setJob($mockJob);
         $job->handle();
 
-
         Bus::assertChained([
-            new KubernetesIngressDeleteJob( $this->wiki->id ),
+            new KubernetesIngressDeleteJob($this->wiki->id),
             new DeleteWikiDbJob($this->wiki->id),
-            new DeleteWikiFinalizeJob($this->wiki->id)
+            new DeleteWikiFinalizeJob($this->wiki->id),
         ]);
     }
 
@@ -90,7 +88,7 @@ class DeleteWikiDispatcherJobTest extends TestCase
         $existingWikiNotTimeYet = $this->getWiki(29);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new DeleteWikiDispatcherJob();
+        $job = new DeleteWikiDispatcherJob;
         $job->setJob($mockJob);
         $job->handle();
 
@@ -98,6 +96,7 @@ class DeleteWikiDispatcherJobTest extends TestCase
             if ($log->level !== 'info') {
                 return false;
             }
+
             return Str::contains($log->message, 'Found no soft deleted wikis over threshold. exiting.');
         });
 
@@ -109,30 +108,29 @@ class DeleteWikiDispatcherJobTest extends TestCase
 
     }
 
-    public function testDeleteWithOptionalResources()
-    {
+    public function testDeleteWithOptionalResources() {
         Bus::fake();
 
         $namespace = QueryserviceNamespace::create(
             [
                 'namespace' => 'derp',
-                'backend' => 'interwebs'
+                'backend' => 'interwebs',
             ]
         );
 
-        $nsAssignment = DB::table('queryservice_namespaces')->where(['id'=>$namespace->id])->limit(1)->update(['wiki_id' => $this->wiki->id]);
+        $nsAssignment = DB::table('queryservice_namespaces')->where(['id' => $namespace->id])->limit(1)->update(['wiki_id' => $this->wiki->id]);
         $this->assertNotNull($nsAssignment);
 
         WikiSetting::factory()->create(
             [
                 'wiki_id' => $this->wiki->id,
                 'name' => WikiSetting::wwExtEnableElasticSearch,
-                'value' => true
+                'value' => true,
             ]
         );
 
         $mockJob = $this->createMock(Job::class);
-        $job = new DeleteWikiDispatcherJob();
+        $job = new DeleteWikiDispatcherJob;
         $job->setJob($mockJob);
         $job->handle();
 
@@ -140,51 +138,51 @@ class DeleteWikiDispatcherJobTest extends TestCase
             if ($log->level !== 'info') {
                 return false;
             }
+
             return Str::contains($log->message, "Dispatching hard delete job chain for id: {$this->wiki->id}");
         });
 
         Bus::assertChained([
-            new DeleteQueryserviceNamespaceJob( $this->wiki->id ),
-            new ElasticSearchIndexDelete( $this->wiki->id ),
-            new KubernetesIngressDeleteJob( $this->wiki->id ),
-            new DeleteWikiFinalizeJob($this->wiki->id)
+            new DeleteQueryserviceNamespaceJob($this->wiki->id),
+            new ElasticSearchIndexDelete($this->wiki->id),
+            new KubernetesIngressDeleteJob($this->wiki->id),
+            new DeleteWikiFinalizeJob($this->wiki->id),
         ]);
     }
 
-    public function testActuallyRunningJobsThatDelete()
-    {
+    public function testActuallyRunningJobsThatDelete() {
         $this->wiki->update(['domain' => 'asdasdaf' . Config::get('wbstack.subdomain_suffix')]);
 
         // create db to be deleted
         $job = new ProvisionWikiDbJob('great_job', 'the_test_database', null);
-        $job->handle( $this->app->make('db') );
+        $job->handle($this->app->make('db'));
 
         $res = WikiDb::where([
             'name' => 'the_test_database',
             'prefix' => 'great_job',
         ])->first()->update(['wiki_id' => $this->wiki->id]);
 
-        $this->assertTrue( $res );
-        $this->assertNotNull( WikiDb::where([ 'wiki_id' => $this->wiki->id ])->first() );
+        $this->assertTrue($res);
+        $this->assertNotNull(WikiDb::where(['wiki_id' => $this->wiki->id])->first());
 
         $mockJob = $this->createMock(Job::class);
-        $job = new DeleteWikiDispatcherJob();
+        $job = new DeleteWikiDispatcherJob;
         $job->setJob($mockJob);
         $job->handle();
 
-        $this->assertNull( WikiSetting::whereWikiId($this->wiki->id)->first() );
-        $this->assertNull( WikiManager::whereWikiId($this->wiki->id)->first() );
-        $this->assertNull( Wiki::whereId($this->wiki->id)->first() );
-        $this->assertNull( WikiDb::where([ 'wiki_id' => $this->wiki->id ])->first() );
+        $this->assertNull(WikiSetting::whereWikiId($this->wiki->id)->first());
+        $this->assertNull(WikiManager::whereWikiId($this->wiki->id)->first());
+        $this->assertNull(Wiki::whereId($this->wiki->id)->first());
+        $this->assertNull(WikiDb::where(['wiki_id' => $this->wiki->id])->first());
 
         Log::assertLogged(function (LogEntry $log) {
             if ($log->level !== 'info') {
                 return false;
             }
+
             return Str::contains($log->message, "Dispatching hard delete job chain for id: {$this->wiki->id}");
         });
 
         $mockJob->expects($this->never())->method('fail');
     }
-
 }

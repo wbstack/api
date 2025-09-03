@@ -2,23 +2,26 @@
 
 namespace App\Jobs\CirrusSearch;
 
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use App\WikiSetting;
 use App\Http\Curl\HttpRequest;
-use App\Wiki;
 use App\Jobs\Job;
+use App\Wiki;
+use App\WikiSetting;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 
-abstract class CirrusSearchJob extends Job implements ShouldBeUnique
-{
+abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
     protected $wikiId;
+
     protected $setting;
+
     protected $wiki;
+
     protected $wikiDB;
 
-    abstract function apiModule(): string;
-    abstract function handleResponse( string $rawResponse, $error ): void;
+    abstract public function apiModule(): string;
 
-    public function __construct( $wikiId ) {
+    abstract public function handleResponse(string $rawResponse, $error): void;
+
+    public function __construct($wikiId) {
         $this->wikiId = $wikiId;
     }
 
@@ -28,7 +31,7 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
      * @return string
      */
     public function uniqueId() {
-        return strval( $this->wikiId );
+        return strval($this->wikiId);
     }
 
     public function wikiId(): int {
@@ -38,33 +41,35 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
     /**
      * @return void
      */
-    public function handle( HttpRequest $request )
-    {
-        $this->wiki = Wiki::whereId( $this->wikiId )->with('settings')->with('wikiDb')->first();
+    public function handle(HttpRequest $request) {
+        $this->wiki = Wiki::whereId($this->wikiId)->with('settings')->with('wikiDb')->first();
 
         // job got triggered but no wiki
-        if ( !$this->wiki ) {
-            $this->fail( new \RuntimeException( $this->apiModule() . ' call for '.$this->wikiId.' was triggered but not wiki available.') );
+        if (!$this->wiki) {
+            $this->fail(new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId . ' was triggered but not wiki available.'));
+
             return;
         }
 
-        $this->setting = $this->wiki->settings()->where([ 'name' => WikiSetting::wwExtEnableElasticSearch, ])->first();
+        $this->setting = $this->wiki->settings()->where(['name' => WikiSetting::wwExtEnableElasticSearch])->first();
         // job got triggered but no setting
-        if ( !$this->setting ) {
-            $this->fail( new \RuntimeException( $this->apiModule() . ' call for '.$this->wikiId.' was triggered but not setting available') );
+        if (!$this->setting) {
+            $this->fail(new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId . ' was triggered but not setting available'));
+
             return;
         }
 
         $this->wikiDB = $this->wiki->wikiDb()->first();
         // no wikiDB around
-        if ( !$this->wikiDB ) {
-            $this->fail( new \RuntimeException($this->apiModule() . ' call for '.$this->wikiId.' was triggered but not WikiDb available') );
+        if (!$this->wikiDB) {
+            $this->fail(new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId . ' was triggered but not WikiDb available'));
+
             return;
         }
 
         $request->setOptions(
             [
-                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST').'/w/api.php?action='. $this->apiModule() . $this->getQueryParams(),
+                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=' . $this->apiModule() . $this->getQueryParams(),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => $this->getRequestTimeout(),
@@ -72,8 +77,8 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_HTTPHEADER => [
                     'content-type: application/x-www-form-urlencoded',
-                    'host: '.$this->wiki->domain,
-                ]
+                    'host: ' . $this->wiki->domain,
+                ],
             ]
         );
 
@@ -81,30 +86,35 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
         $err = $request->error();
         $request->close();
 
-        $this->handleResponse( $rawResponse, $err );
+        $this->handleResponse($rawResponse, $err);
     }
 
-    protected function validateOrFailRequest( ?array $response, string $rawResponse, $error  ): bool {
-        if ( $error ) {
-            $this->fail( new \RuntimeException( $this->apiModule() . ' curl error for '.$this->wikiId.': '.$error) );
+    protected function validateOrFailRequest(?array $response, string $rawResponse, $error): bool {
+        if ($error) {
+            $this->fail(new \RuntimeException($this->apiModule() . ' curl error for ' . $this->wikiId . ': ' . $error));
+
             return false;
         }
 
-        if( $this->hasApiError( $response ) ) {
-            $this->fail( new \RuntimeException( $this->apiModule() . ' call failed with api error: '. $response['error']['info'] ) );
+        if ($this->hasApiError($response)) {
+            $this->fail(new \RuntimeException($this->apiModule() . ' call failed with api error: ' . $response['error']['info']));
+
             return false;
         }
 
-        if ( !$this->isValid( $response ) ) {
-            $this->fail( new \RuntimeException( $this->apiModule() . ' call for '.$this->wikiId.'. No ' . $this->apiModule() . ' key in response: '.$rawResponse) );
+        if (!$this->isValid($response)) {
+            $this->fail(new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId . '. No ' . $this->apiModule() . ' key in response: ' . $rawResponse));
+
             return false;
         }
 
         return true;
     }
-    protected function validateSuccess( array $response, string $rawResponse, $error ): bool {
-        if ( !$this->isSuccessful($response)) {
-            $this->fail( new \RuntimeException( $this->apiModule() . ' call for '.$this->wikiId.' was not successful:'.$rawResponse) );
+
+    protected function validateSuccess(array $response, string $rawResponse, $error): bool {
+        if (!$this->isSuccessful($response)) {
+            $this->fail(new \RuntimeException($this->apiModule() . ' call for ' . $this->wikiId . ' was not successful:' . $rawResponse));
+
             return false;
         }
 
@@ -117,15 +127,15 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
 
     // TODO Migrate this to some other baseclass for all internal api classes
     // This and some other stuff would be usedful there too
-    protected function hasApiError( ?array $response ): bool {
-        return is_array($response) && array_key_exists( 'error', $response);
+    protected function hasApiError(?array $response): bool {
+        return is_array($response) && array_key_exists('error', $response);
     }
 
-    protected function isValid( ?array $response ): bool {
-        return is_array($response) && array_key_exists( $this->apiModule(), $response);
+    protected function isValid(?array $response): bool {
+        return is_array($response) && array_key_exists($this->apiModule(), $response);
     }
 
-    protected function isSuccessful( array $response ): bool {
+    protected function isSuccessful(array $response): bool {
         return array_key_exists('return', $response[$this->apiModule()]) && $response[$this->apiModule()]['return'] == 0;
     }
 
@@ -135,5 +145,4 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique
     protected function getQueryParams() {
         return '&format=json';
     }
-
 }

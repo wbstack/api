@@ -2,6 +2,7 @@
 
 namespace Tests\Jobs;
 
+use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\UpdateWikiDailyMetricJob;
 use App\Wiki;
 use App\WikiDb;
@@ -9,16 +10,11 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
-use App\Jobs\ProvisionWikiDbJob;
 
-class UpdateWikiDailyMetricJobTest extends TestCase
-{
-
+class UpdateWikiDailyMetricJobTest extends TestCase {
     use RefreshDatabase;
 
-
-    public function testDispatchJob()
-    {
+    public function testDispatchJob() {
         Queue::fake();
 
         UpdateWikiDailyMetricJob::dispatch();
@@ -26,9 +22,7 @@ class UpdateWikiDailyMetricJobTest extends TestCase
         Queue::assertPushed(UpdateWikiDailyMetricJob::class);
     }
 
-
-    public function testRunJobForAllWikisIncludingDeletedWikis()
-    {
+    public function testRunJobForAllWikisIncludingDeletedWikis() {
         $activeWiki = Wiki::factory()->create([
             'domain' => 'example.wikibase.cloud',
         ]);
@@ -37,22 +31,20 @@ class UpdateWikiDailyMetricJobTest extends TestCase
         ]);
 
         $manager = $this->app->make('db');
-        $job = new ProvisionWikiDbJob();
-        $job2 = new ProvisionWikiDbJob();
+        $job = new ProvisionWikiDbJob;
+        $job2 = new ProvisionWikiDbJob;
         $job->handle($manager);
         $job2->handle($manager);
 
         $wikiDbActive = WikiDb::whereDoesntHave('wiki')->first();
-        $wikiDbActive->update( ['wiki_id' => $activeWiki->id] );
+        $wikiDbActive->update(['wiki_id' => $activeWiki->id]);
 
         $wikiDbDeleted = WikiDb::whereDoesntHave('wiki')->first();
-        $wikiDbDeleted->update( ['wiki_id' => $deletedWiki->id] );
+        $wikiDbDeleted->update(['wiki_id' => $deletedWiki->id]);
 
         $deletedWiki->delete();
 
-
-
-        (new UpdateWikiDailyMetricJob())->handle();
+        (new UpdateWikiDailyMetricJob)->handle();
 
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $activeWiki->id,
@@ -61,6 +53,10 @@ class UpdateWikiDailyMetricJobTest extends TestCase
             'weekly_actions' => null,
             'monthly_actions' => null,
             'quarterly_actions' => null,
+            'item_count' => 0,
+            'property_count' => 0,
+            'lexeme_count' => 0,
+            'entity_schema_count' => 0,
         ]);
 
         $this->assertDatabaseHas('wiki_daily_metrics', [
@@ -70,7 +66,10 @@ class UpdateWikiDailyMetricJobTest extends TestCase
             'weekly_actions' => null,
             'monthly_actions' => null,
             'quarterly_actions' => null,
+            'item_count' => 0,
+            'property_count' => 0,
+            'lexeme_count' => 0,
+            'entity_schema_count' => 0,
         ]);
     }
-
 }

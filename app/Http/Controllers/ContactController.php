@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 use App\Notifications\ContactNotification;
 use App\Rules\ReCaptchaValidation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-class ContactController extends Controller
-{
+class ContactController extends Controller {
     /**
      * @var \App\Rules\ReCaptchaValidation
      */
@@ -22,11 +21,8 @@ class ContactController extends Controller
 
     /**
      * Handle a contact page request for the application.
-     *
-     * @param \Illuminate\Http\Request  $request
      */
-    public function sendMessage(Request $request): \Illuminate\Http\JsonResponse
-    {
+    public function sendMessage(Request $request): \Illuminate\Http\JsonResponse {
         $validator = $this->validator($request->all());
 
         if ($validator->fails()) {
@@ -58,9 +54,8 @@ class ContactController extends Controller
     /**
      * Get a validator for an incoming contact page request.
      */
-    protected function validator(array $data): \Illuminate\Validation\Validator
-    {
-        if (! isset($data['contactDetails'])) {
+    protected function validator(array $data): \Illuminate\Validation\Validator {
+        if (!isset($data['contactDetails'])) {
             $data['contactDetails'] = ''; // could we skip this using some feature of the validator?
         }
 
@@ -73,10 +68,10 @@ class ContactController extends Controller
         ];
 
         $validation = [
-            'recaptcha'      => ['required', 'string', 'bail', $this->recaptchaValidation],
-            'subject'        => ['required', 'string', 'max:300', Rule::in($validSubjects)],
-            'name'           => ['required', 'string', 'max:300'],
-            'message'        => ['required', 'string', 'max:10000'],
+            'recaptcha' => ['required', 'string', 'bail', $this->recaptchaValidation],
+            'subject' => ['required', 'string', 'max:300', Rule::in($validSubjects)],
+            'name' => ['required', 'string', 'max:300'],
+            'message' => ['required', 'string', 'max:10000'],
             'contactDetails' => ['string', 'nullable', 'max:300'],
         ];
 

@@ -2,23 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\WikiEntityImportJob;
+use App\WikiEntityImport;
 use App\WikiEntityImportStatus;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Wiki;
-use App\WikiEntityImport;
-use App\Jobs\WikiEntityImportJob;
-use Carbon\Carbon;
 use Prometheus\CollectorRegistry;
 use Prometheus\Counter;
 
-class WikiEntityImportController extends Controller
-{
+class WikiEntityImportController extends Controller {
     private Counter $successfulCounter;
+
     private Counter $failedCounter;
 
-    public function __construct(CollectorRegistry $registry)
-    {
+    public function __construct(CollectorRegistry $registry) {
         $this->successfulCounter = $registry->getOrRegisterCounter(
             config('horizon-exporter.namespace'),
             'wiki_entity_imports_successful',
@@ -30,24 +28,16 @@ class WikiEntityImportController extends Controller
             'The number of failed Entity import records.',
         );
     }
-    public function get(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $validatedInput = $request->validate([
-            'wiki' => ['required', 'integer'],
-        ]);
-        $wiki = Wiki::find($validatedInput['wiki']);
-        if (!$wiki) {
-            abort(404, 'No such wiki');
-        }
 
+    public function get(Request $request): \Illuminate\Http\JsonResponse {
+        $wiki = $request->attributes->get('wiki');
         $imports = $wiki->wikiEntityImports()->get();
+
         return response()->json(['data' => $imports]);
     }
 
-    public function create(Request $request): \Illuminate\Http\JsonResponse
-    {
+    public function create(Request $request): \Illuminate\Http\JsonResponse {
         $validatedInput = $request->validate([
-            'wiki' => ['required', 'integer'],
             'source_wiki_url' => ['required', 'url'],
             'entity_ids' => ['required', 'string', function (string $attr, mixed $value, \Closure $fail) {
                 $chunks = explode(',', $value);
@@ -59,21 +49,17 @@ class WikiEntityImportController extends Controller
             }],
         ]);
 
-        $wiki = Wiki::find($validatedInput['wiki']);
-        if (!$wiki) {
-            abort(404, 'No such wiki');
-        }
-
+        $wiki = $request->attributes->get('wiki');
         $imports = $wiki->wikiEntityImports()->get();
         foreach ($imports as $import) {
             if ($import->status === WikiEntityImportStatus::Success) {
                 return response()
-                    ->json(['error' => 'Wiki "'.$wiki->domain.'" already has performed a successful entity import'])
+                    ->json(['error' => 'Wiki "' . $wiki->domain . '" already has performed a successful entity import'])
                     ->setStatusCode(400);
             }
             if ($import->status === WikiEntityImportStatus::Pending) {
                 return response()
-                    ->json(['error' => 'Wiki "'.$wiki->domain.'" currently has a pending entity import'])
+                    ->json(['error' => 'Wiki "' . $wiki->domain . '" currently has a pending entity import'])
                     ->setStatusCode(400);
             }
         }
@@ -94,8 +80,7 @@ class WikiEntityImportController extends Controller
         return response()->json(['data' => $import]);
     }
 
-    public function update(Request $request): \Illuminate\Http\JsonResponse
-    {
+    public function update(Request $request): \Illuminate\Http\JsonResponse {
         // This route is not supposed have ACL middlewares in front as it is expected
         // to be called from backend services that are implicitly allowed
         // access right.

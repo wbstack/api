@@ -5,8 +5,7 @@ namespace Database\Factories;
 use App\WikiSiteStats;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class WikiSiteStatsFactory extends Factory
-{
+class WikiSiteStatsFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,8 +18,7 @@ class WikiSiteStatsFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         return [];
     }
 }
