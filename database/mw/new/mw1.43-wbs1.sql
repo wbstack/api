@@ -317,7 +317,7 @@ CREATE TABLE `<<prefix>>_filearchive` (
   `fa_storage_group` varbinary(16) DEFAULT NULL,
   `fa_storage_key` varbinary(64) DEFAULT '',
   `fa_deleted_user` int(11) DEFAULT NULL,
-  `fa_deleted_timestamp` binary(14),
+  `fa_deleted_timestamp` binary(14) DEFAULT NULL,
   `fa_deleted_reason_id` bigint(20) unsigned NOT NULL,
   `fa_size` bigint(20) unsigned DEFAULT 0,
   `fa_width` int(11) DEFAULT 0,
@@ -329,7 +329,7 @@ CREATE TABLE `<<prefix>>_filearchive` (
   `fa_minor_mime` varbinary(100) DEFAULT 'unknown',
   `fa_description_id` bigint(20) unsigned NOT NULL,
   `fa_actor` bigint(20) unsigned NOT NULL,
-  `fa_timestamp` binary(14),
+  `fa_timestamp` binary(14) DEFAULT NULL,
   `fa_deleted` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `fa_sha1` varbinary(32) NOT NULL DEFAULT '',
   PRIMARY KEY (`fa_id`),
@@ -1181,4 +1181,4 @@ CREATE TABLE `<<prefix>>_wb_property_info` (
   PRIMARY KEY (`pi_property_id`),
   KEY `pi_type` (`pi_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=binary;
--- 2025-07-21 12:14:54
+-- 2025-09-02 09:54:08
