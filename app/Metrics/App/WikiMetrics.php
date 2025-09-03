@@ -183,8 +183,7 @@ class WikiMetrics {
         ];
     }
 
-    private function getNumberOfEntities() : array
-    {
+    private function getNumberOfEntities(): array {
         $wikiDb = $this->wiki->wikiDb;
         $tablePage = $wikiDb->name . '.' . $wikiDb->prefix . '_page';
         $query = "SELECT
@@ -200,9 +199,10 @@ class WikiMetrics {
         $conn = $manager->connection('mw');
         $pdo = $conn->getPdo();
         $result = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
-        if (count($result) === 0){
-            return [ 120 => 0, 122 => 0, 146 => 0, 640 => 0 ];
+        if (count($result) === 0) {
+            return [120 => 0, 122 => 0, 146 => 0, 640 => 0];
         }
+
         return array_column($result, 'count', 'namespace');
     }
 }
