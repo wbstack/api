@@ -53,6 +53,10 @@ class UpdateWikiDailyMetricJobTest extends TestCase {
             'weekly_actions' => null,
             'monthly_actions' => null,
             'quarterly_actions' => null,
+            'item_count' => 0,
+            'property_count' => 0,
+            'lexeme_count' => 0,
+            'entity_schema_count' => 0,
         ]);
 
         $this->assertDatabaseHas('wiki_daily_metrics', [
@@ -62,6 +66,10 @@ class UpdateWikiDailyMetricJobTest extends TestCase {
             'weekly_actions' => null,
             'monthly_actions' => null,
             'quarterly_actions' => null,
+            'item_count' => 0,
+            'property_count' => 0,
+            'lexeme_count' => 0,
+            'entity_schema_count' => 0,
         ]);
     }
 }

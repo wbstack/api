@@ -9,9 +9,11 @@ use App\Wiki;
 use App\WikiDailyMetrics;
 use App\WikiDb;
 use Carbon\Carbon;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class WikiMetricsTest extends TestCase {
@@ -163,6 +165,109 @@ class WikiMetricsTest extends TestCase {
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
             'number_of_triples' => null,
+        ]);
+    }
+
+    public function testSavesEntityCountsCorrectly()
+    {
+        $wiki = Wiki::factory()->create([
+            'domain' => 'entitycounttest.wikibase.cloud'
+        ]);
+
+        $wikiDb = WikiDb::first();
+        $wikiDb->update(['wiki_id' => $wiki->id]);
+
+        $tablePage = $wikiDb->name . '.' . $wikiDb->prefix . '_page';
+
+        Schema::dropIfExists($tablePage);
+        Schema::create($tablePage, function (Blueprint $table) {
+            $table->increments('page_id');
+            $table->integer('page_namespace');
+            $table->boolean('page_is_redirect')->default(0);
+            $table->string('page_title', 255);
+            $table->double('page_random');
+            $table->binary('page_touched');
+            $table->integer('page_latest');
+            $table->integer('page_len');
+        });
+
+        // Insert dummy data
+        DB::table($tablePage)->insert([
+            [
+                'page_namespace' => 120,
+                'page_is_redirect' => 0,
+                'page_title' => 'foo',
+                'page_random' => 0,
+                'page_touched' => random_bytes(10),
+                'page_latest' => 1,
+                'page_len' => 2
+            ], // item
+            [
+                'page_namespace' => 120,
+                'page_is_redirect' => 0,
+                'page_title' => 'bar',
+                'page_random' => 0,
+                'page_touched' => random_bytes(10),
+                'page_latest' => 0,
+                'page_len' => 2
+            ], // item
+            [
+                'page_namespace' => 122,
+                'page_is_redirect' => 0,
+                'page_title' => 'foo',
+                'page_random' => 0,
+                'page_touched' => random_bytes(10),
+                'page_latest' => 1,
+                'page_len' => 2]
+            , // property
+            [
+                'page_namespace' => 640,
+                'page_is_redirect' => 0,
+                'page_title' => 'bar',
+                'page_random' => 0,
+                'page_touched' => random_bytes(10),
+                'page_latest' => 1,
+                'page_len' => 2
+            ], // entity schema
+            [
+                'page_namespace' => 146,
+                'page_is_redirect' => 0,
+                'page_title' => 'foo',
+                'page_random' => 0,
+                'page_touched' => random_bytes(10),
+                'page_latest' => 1,
+                'page_len' => 2
+            ], // lexeme
+            [
+                'page_namespace' => 640,
+                'page_is_redirect' => 1,
+                'page_title' => 'foo',
+                'page_random' => 0,
+                'page_touched' => random_bytes(10),
+                'page_latest' => 1,
+                'page_len' => 2
+            ], // entity schema
+        ]);
+        WikiDailyMetrics::create([
+            'id' => $wiki->id . '_' . now()->subDay()->toDateString(),
+            'wiki_id' => $wiki->id,
+            'date' => now()->subDay()->toDateString(),
+            'pages' => 6,
+            'is_deleted' => 0
+        ]);
+
+        (new WikiMetrics())->saveMetrics($wiki);
+
+        //clean up after the test
+        $wiki->forceDelete();
+        Schema::dropIfExists($tablePage);
+
+        $this->assertDatabaseHas('wiki_daily_metrics', [
+            'wiki_id' => $wiki->id,
+            'item_count' => 2,
+            'property_count' => 1,
+            'lexeme_count' => 1,
+            'entity_schema_count' => 1 // the redirect should be ignored
         ]);
     }
 }
