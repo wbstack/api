@@ -188,7 +188,7 @@ class WikiMetricsTest extends TestCase {
             'page_latest' => 0,
             'page_len' => 2,
         ];
-            
+
         $property = [
             'page_namespace' => 122,
             'page_is_redirect' => 0,
@@ -245,14 +245,14 @@ class WikiMetricsTest extends TestCase {
                 $entitySchemaRedirect,
             ],
         ];
-        
+
         // zero items
         yield [
             'expectedItemCount' => 0,
             'expectedPropertyCount' => 1,
             'expectedLexemeCount' => 1,
             'expectedEntitySchemaCount' => 1,
-            
+
             'pageData' => [
                 // $item1,
                 // $item2,
@@ -269,7 +269,7 @@ class WikiMetricsTest extends TestCase {
             'expectedPropertyCount' => 0,
             'expectedLexemeCount' => 1,
             'expectedEntitySchemaCount' => 1,
-            
+
             'pageData' => [
                 $item1,
                 $item2,
@@ -286,7 +286,7 @@ class WikiMetricsTest extends TestCase {
             'expectedPropertyCount' => 1,
             'expectedLexemeCount' => 0,
             'expectedEntitySchemaCount' => 1,
-            
+
             'pageData' => [
                 $item1,
                 $item2,
@@ -303,7 +303,7 @@ class WikiMetricsTest extends TestCase {
             'expectedPropertyCount' => 1,
             'expectedLexemeCount' => 1,
             'expectedEntitySchemaCount' => 0,
-            
+
             'pageData' => [
                 $item1,
                 $item2,
