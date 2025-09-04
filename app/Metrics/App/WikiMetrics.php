@@ -199,10 +199,15 @@ class WikiMetrics {
         $conn = $manager->connection('mw');
         $pdo = $conn->getPdo();
         $result = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
-        if (count($result) === 0) {
-            return [120 => 0, 122 => 0, 146 => 0, 640 => 0];
-        }
 
-        return array_column($result, 'count', 'namespace');
+        $result = array_column($result, 'count', 'namespace');
+
+        // make sure the array keys are set
+        $result[120] ??= 0;
+        $result[122] ??= 0;
+        $result[146] ??= 0;
+        $result[640] ??= 0;
+
+        return $result;
     }
 }
