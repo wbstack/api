@@ -243,7 +243,7 @@ class WikiMetricsTest extends TestCase {
                 $lexeme,
                 $entitySchema,
                 $entitySchemaRedirect,
-            ]
+            ],
         ];
         
         // zero items
@@ -260,7 +260,7 @@ class WikiMetricsTest extends TestCase {
                 $lexeme,
                 $entitySchema,
                 $entitySchemaRedirect,
-            ]
+            ],
         ];
 
         // zero properties
@@ -277,7 +277,7 @@ class WikiMetricsTest extends TestCase {
                 $lexeme,
                 $entitySchema,
                 $entitySchemaRedirect,
-            ]
+            ],
         ];
 
         // zero Lexemes
@@ -294,7 +294,7 @@ class WikiMetricsTest extends TestCase {
                 // $lexeme,
                 $entitySchema,
                 $entitySchemaRedirect,
-            ]
+            ],
         ];
 
         // zero EntitySchemas
@@ -311,7 +311,7 @@ class WikiMetricsTest extends TestCase {
                 $lexeme,
                 // $entitySchema,
                 $entitySchemaRedirect, // should not count
-            ]
+            ],
         ];
     }
 
