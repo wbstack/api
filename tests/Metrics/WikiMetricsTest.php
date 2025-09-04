@@ -168,8 +168,7 @@ class WikiMetricsTest extends TestCase {
         ]);
     }
 
-    public static function dummyDataProvider()
-    {
+    public static function dummyDataProvider() {
         $item1 = [
             'page_namespace' => 120,
             'page_is_redirect' => 0,
@@ -197,7 +196,7 @@ class WikiMetricsTest extends TestCase {
             'page_random' => 0,
             'page_touched' => random_bytes(10),
             'page_latest' => 1,
-            'page_len' => 2
+            'page_len' => 2,
         ];
 
         $entitySchema = [
