@@ -168,7 +168,7 @@ class WikiMetricsTest extends TestCase {
         ]);
     }
 
-    static public function dummyDataProvider()
+    public static function dummyDataProvider()
     {
         $item1 = [
             'page_namespace' => 120,
