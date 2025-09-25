@@ -98,6 +98,10 @@ class User extends Authenticatable implements MustVerifyEmail {
         return $this->belongsToMany(Wiki::class, 'wiki_managers');
     }
 
+    public function touAcceptances(): \Illuminate\Database\Eloquent\Relations\BelongsToMany {
+        return $this->belongsToMany(UserTermOfUseAcceptance::class, 'tou_acceptances');
+    }
+
     public function hasVerifiedEmail() {
         return (bool) $this->verified;
     }

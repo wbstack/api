@@ -3,6 +3,8 @@
 namespace App\Jobs;
 
 use App\User;
+use App\UserTermOfUseAcceptance;
+use App\TermOfUseVersion;
 use Illuminate\Support\Facades\Hash;
 
 class UserCreateJob extends Job {
@@ -28,6 +30,13 @@ class UserCreateJob extends Job {
             'email' => $this->email,
             'password' => Hash::make($this->password),
             'verified' => $this->verified,
+
+        ]);
+
+        UserTermOfUseAcceptance::create([
+            'user_id' => $user->id,
+            'tou_version' => TermOfUseVersion::V0,
+            'tou_accepted_at' => now(),
         ]);
 
         return $user;
