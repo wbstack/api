@@ -30,7 +30,6 @@ class UserCreateJob extends Job {
             'email' => $this->email,
             'password' => Hash::make($this->password),
             'verified' => $this->verified,
-
         ]);
 
         UserTermOfUseAcceptance::create([

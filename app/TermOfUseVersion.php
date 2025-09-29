@@ -3,7 +3,7 @@
 namespace App;
 
 enum TermOfUseVersion: string {
-    case V0 = 'v0';
-    // case V1 = 'v1';
-    // case V2 = 'v2';
+    case V0 = '2025-08-21';
+    // case V1 = 'yyyy-mm-dd';
+    // case V2 = 'yyyy-mm-dd';
 }
