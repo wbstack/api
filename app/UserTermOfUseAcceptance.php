@@ -22,4 +22,6 @@ class UserTermOfUseAcceptance extends Model {
         'tou_version' => TermOfUseVersion::class,
         'tou_accepted_at' => 'datetime',
     ];
+
+    protected $table = 'tou_acceptances';
 }
