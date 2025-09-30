@@ -6,6 +6,7 @@ enum TermOfUseVersion: string {
     // case V2 = 'yyyy-mm-dd';
     // case V1 = 'yyyy-mm-dd';
     case v0 = '2025-08-21';
+
     public static function latest(): self {
         $latestVersion = self::v0;
         $latestNum = 0;
