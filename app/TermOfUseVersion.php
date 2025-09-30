@@ -3,9 +3,9 @@
 namespace App;
 
 enum TermOfUseVersion: string {
-    case v0 = '2025-08-21';
-    // case V1 = 'yyyy-mm-dd';
     // case V2 = 'yyyy-mm-dd';
+    // case V1 = 'yyyy-mm-dd';
+    case v0 = '2025-08-21';
     public static function latest(): self {
         $latestVersion = self::v0;
         $latestNum = 0;
@@ -19,6 +19,7 @@ enum TermOfUseVersion: string {
                 $latestVersion = $case;
             }
         }
+
         return $latestVersion;
     }
 }

@@ -8,16 +8,16 @@ use App\UserTermOfUseAcceptance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class UserTermOfUseAcceptanceTest extends TestCase{
+class UserTermOfUseAcceptanceTest extends TestCase {
     use RefreshDatabase;
 
-    public function test_creates_single_latest_terms_acceptance_row_on_user_creation(): void {
-        $email = 'test+'.uniqid('', true).'@example.com';
+    public function testUserCreationCreatesTouAcceptance(): void {
+        $email = 'test+' . uniqid('', true) . '@example.com';
         $user = (new UserCreateJob($email, 'thisisapassword123', true))->handle();
 
         $this->assertDatabaseHas('tou_acceptances', [
-            'user_id'    => $user->id,
-            'tou_version'=> TermOfUseVersion::latest()->value,
+            'user_id' => $user->id,
+            'tou_version' => TermOfUseVersion::latest()->value,
         ]);
 
         $rows = UserTermOfUseAcceptance::where('user_id', $user->id)->get();
