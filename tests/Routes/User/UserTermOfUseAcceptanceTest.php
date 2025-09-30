@@ -1,34 +1,31 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Routes\User;
 
 use App\Jobs\UserCreateJob;
 use App\TermOfUseVersion;
 use App\UserTermOfUseAcceptance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
-class UserCreateJobTest extends TestCase
-{
+class UserTermOfUseAcceptanceTest extends TestCase{
     use RefreshDatabase;
 
-    public function test_user_creation_creates_terms_of_use_acceptance_record(): void
-    {
-        $email = 'test+'.uniqid().'@example.com';
-        $password = 'secret123';
-
-        $user = (new UserCreateJob($email, $password, true))->handle();
+    public function test_creates_single_latest_terms_acceptance_row_on_user_creation(): void {
+        $email = 'test+'.uniqid('', true).'@example.com';
+        $user = (new UserCreateJob($email, 'thisisapassword123', true))->handle();
 
         $this->assertDatabaseHas('tou_acceptances', [
-            'user_id' => $user->id,
-            'tou_version' => TermOfUseVersion::latest()->value,
+            'user_id'    => $user->id,
+            'tou_version'=> TermOfUseVersion::latest()->value,
         ]);
 
-        $acceptance = UserTermOfUseAcceptance::where('user_id', $user->id)->first();
-        $this->assertNotNull($acceptance, 'Acceptance row missing');
-        $this->assertNotNull($acceptance->tou_accepted_at, 'tou_accepted_at should be set');
+        $rows = UserTermOfUseAcceptance::where('user_id', $user->id)->get();
+        $this->assertCount(1, $rows);
+        $acceptance = $rows->first();
 
-        $this->assertEquals(1, DB::table('tou_acceptances')->where('user_id', $user->id)->count());
+        $this->assertInstanceOf(TermOfUseVersion::class, $acceptance->tou_version);
+        $this->assertSame(TermOfUseVersion::latest(), $acceptance->tou_version);
+        $this->assertNotNull($acceptance->tou_accepted_at);
     }
 }
