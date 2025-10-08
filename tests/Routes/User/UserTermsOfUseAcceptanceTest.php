@@ -3,12 +3,12 @@
 namespace Tests\Routes\User;
 
 use App\Jobs\UserCreateJob;
-use App\TermOfUseVersion;
-use App\UserTermOfUseAcceptance;
+use App\TermsOfUseVersion;
+use App\UserTermsOfUseAcceptance;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class UserTermOfUseAcceptanceTest extends TestCase {
+class UserTermsOfUseAcceptanceTest extends TestCase {
     use RefreshDatabase;
 
     public function testUserCreationCreatesTouAcceptance(): void {
@@ -17,15 +17,15 @@ class UserTermOfUseAcceptanceTest extends TestCase {
 
         $this->assertDatabaseHas('tou_acceptances', [
             'user_id' => $user->id,
-            'tou_version' => TermOfUseVersion::latest()->value,
+            'tou_version' => TermsOfUseVersion::latest()->value,
         ]);
 
-        $rows = UserTermOfUseAcceptance::where('user_id', $user->id)->get();
+        $rows = UserTermsOfUseAcceptance::where('user_id', $user->id)->get();
         $this->assertCount(1, $rows);
         $acceptance = $rows->first();
 
-        $this->assertInstanceOf(TermOfUseVersion::class, $acceptance->tou_version);
-        $this->assertSame(TermOfUseVersion::latest(), $acceptance->tou_version);
+        $this->assertInstanceOf(TermsOfUseVersion::class, $acceptance->tou_version);
+        $this->assertSame(TermsOfUseVersion::latest(), $acceptance->tou_version);
         $this->assertNotNull($acceptance->tou_accepted_at);
     }
 }

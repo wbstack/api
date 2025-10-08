@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
-use App\TermOfUseVersion;
+use App\TermsOfUseVersion;
 use App\User;
-use App\UserTermOfUseAcceptance;
+use App\UserTermsOfUseAcceptance;
 use Illuminate\Support\Facades\Hash;
 
 class UserCreateJob extends Job {
@@ -32,9 +32,9 @@ class UserCreateJob extends Job {
             'verified' => $this->verified,
         ]);
 
-        UserTermOfUseAcceptance::create([
+        UserTermsOfUseAcceptance::create([
             'user_id' => $user->id,
-            'tou_version' => TermOfUseVersion::latest(),
+            'tou_version' => TermsOfUseVersion::latest(),
             'tou_accepted_at' => now(),
         ]);
 

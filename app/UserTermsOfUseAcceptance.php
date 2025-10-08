@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserTermOfUseAcceptance extends Model {
+class UserTermsOfUseAcceptance extends Model {
     use HasFactory;
 
     const FIELDS = [
@@ -19,7 +19,7 @@ class UserTermOfUseAcceptance extends Model {
     protected $visible = self::FIELDS;
 
     protected $casts = [
-        'tou_version' => TermOfUseVersion::class,
+        'tou_version' => TermsOfUseVersion::class,
         'tou_accepted_at' => 'datetime',
     ];
 

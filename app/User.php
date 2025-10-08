@@ -99,7 +99,7 @@ class User extends Authenticatable implements MustVerifyEmail {
     }
 
     public function touAcceptances(): \Illuminate\Database\Eloquent\Relations\BelongsToMany {
-        return $this->belongsToMany(UserTermOfUseAcceptance::class, 'tou_acceptances');
+        return $this->belongsToMany(UserTermsOfUseAcceptance::class, 'tou_acceptances');
     }
 
     public function hasVerifiedEmail() {
