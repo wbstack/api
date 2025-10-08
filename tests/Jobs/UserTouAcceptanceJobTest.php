@@ -10,10 +10,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
-class UserTouAcceptanceJobTest extends TestCase{
+class UserTouAcceptanceJobTest extends TestCase {
     use RefreshDatabase;
 
-    public function testTouAcceptanceJob(): void{
+    public function testTouAcceptanceJob(): void {
         $t1 = Carbon::parse('2025-01-01 10:00:00');
         $t2 = Carbon::parse('2025-01-02 11:00:00');
         $t3 = Carbon::parse('2025-01-03 12:00:00');

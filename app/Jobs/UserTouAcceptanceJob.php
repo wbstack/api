@@ -6,12 +6,7 @@ use App\TermsOfUseVersion;
 use App\User;
 use App\UserTermsOfUseAcceptance;
 use Illuminate\Bus\Batchable;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\WithoutOverlapping;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -24,6 +19,7 @@ class UserTouAcceptanceJob extends Job {
     public function __construct($users) {
         $this->users = $users;
     }
+
     public function handle(): void {
         $this->users = User::all();
         foreach ($this->users as $user) {
