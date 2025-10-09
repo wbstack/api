@@ -22,9 +22,9 @@ class UserTouAcceptanceJobTest extends TestCase {
         $u2 = User::factory()->create(['created_at' => $t2]);
         $u3 = User::factory()->create(['created_at' => $t3]);
 
-        (new UserTouAcceptanceJob())->handle();
+        (new UserTouAcceptanceJob)->handle();
 
-        $latest = TermsOfUseVersion::latest()->value;
+        $latest = TermsOfUseVersion::latest();
 
         $this->assertDatabaseHas('tou_acceptances', ['user_id' => $u1->id, 'tou_version' => $latest]);
         $this->assertDatabaseHas('tou_acceptances', ['user_id' => $u2->id, 'tou_version' => $latest]);
