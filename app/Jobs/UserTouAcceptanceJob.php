@@ -10,6 +10,14 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
+/**
+ * Bug: T401165 https://phabricator.wikimedia.org/T401165
+ * Job to record Terms of Use acceptance for all preexisting users.
+ *
+ * This job iterates through all users and creates a UserTermsOfUseAcceptance record
+ * for each, using the latest Terms of Use version and the user's creation date as ToU acceptance date.
+ * Errors during processing are logged and the job is marked as failed for that user.
+ */
 class UserTouAcceptanceJob extends Job {
     use Batchable;
     use Dispatchable;
@@ -20,11 +28,11 @@ class UserTouAcceptanceJob extends Job {
             try {
                 UserTermsOfUseAcceptance::create([
                     'user_id' => $user->id,
-                    'tou_version' => TermsOfUseVersion::latest()->version,
+                    'tou_version' => TermsOfUseVersion::latest(),
                     'tou_accepted_at' => $user->created_at,
                 ]);
             } catch (Throwable $exception) {
-                Log::error('Failure processing user ' . $user->getAttribute('email') . ' for UserTouAcceptanceJob: ' . $exception->getMessage());
+                Log::error("Failure processing user {$user->email} for UserTouAcceptanceJob: {$exception->getMessage()}");
                 $this->fail($exception);
             }
         }
