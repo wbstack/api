@@ -14,19 +14,13 @@ class UserTouAcceptanceJob extends Job {
     use Batchable;
     use Dispatchable;
 
-    private $users;
-
-    public function __construct($users) {
-        $this->users = $users;
-    }
-
     public function handle(): void {
-        $this->users = User::all();
-        foreach ($this->users as $user) {
+        $users = User::all();
+        foreach ($users as $user) {
             try {
                 UserTermsOfUseAcceptance::create([
                     'user_id' => $user->id,
-                    'tou_version' => TermsOfUseVersion::latest(),
+                    'tou_version' => TermsOfUseVersion::latest()->version,
                     'tou_accepted_at' => $user->created_at,
                 ]);
             } catch (Throwable $exception) {

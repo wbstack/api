@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Jobs;
+namespace Tests\Jobs;
 
 use App\Jobs\UserTouAcceptanceJob;
 use App\TermsOfUseVersion;
