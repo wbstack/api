@@ -6,6 +6,7 @@ use App\TermsOfUseVersion;
 use App\User;
 use App\UserTermsOfUseAcceptance;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class UserCreateJob extends Job {
     private $email;
@@ -32,11 +33,16 @@ class UserCreateJob extends Job {
             'verified' => $this->verified,
         ]);
 
-        UserTermsOfUseAcceptance::create([
-            'user_id' => $user->id,
-            'tou_version' => TermsOfUseVersion::latestVersion()->version,
-            'tou_accepted_at' => now(),
-        ]);
+        $latest = TermsOfUseVersion::latestVersion();
+        if ($latest) {
+            UserTermsOfUseAcceptance::create([
+                'user_id' => $user->id,
+                'tou_version' => $latest->version,
+                'tou_accepted_at' => now(),
+            ]);
+        } else {
+            Log::warning("No active Terms of Use version found when creating user {$user->email} (ID {$user->id}).");
+        }
 
         return $user;
     }
