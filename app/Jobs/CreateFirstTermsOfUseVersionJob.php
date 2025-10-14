@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class CreateFirstTermsOfUseVersionJob extends Job {
-
     use Batchable;
     use Dispatchable;
 
