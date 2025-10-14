@@ -3,14 +3,12 @@
 namespace App\Jobs;
 
 use App\TermsOfUseVersion;
-use App\User;
-use App\UserTermsOfUseAcceptance;
 use Illuminate\Bus\Batchable;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class CreateFirstTermsOfUseVersionJob extends Job{
+class CreateFirstTermsOfUseVersionJob extends Job {
 
     use Batchable;
     use Dispatchable;

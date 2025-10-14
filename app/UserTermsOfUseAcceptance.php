@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\TermsOfUseVersion;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +16,7 @@ class UserTermsOfUseAcceptance extends Model {
     ];
 
     protected $fillable = self::FIELDS;
+
     protected $visible = self::FIELDS;
 
     protected $casts = [
