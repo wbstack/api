@@ -2,25 +2,33 @@
 
 namespace App;
 
-enum TermsOfUseVersion: string {
-    // case v2 = 'yyyy-mm-dd';
-    // case v1 = 'yyyy-mm-dd';
-    case v0 = '2025-08-21';
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-    public static function latest(): self {
-        $latestVersion = self::v0;
-        $latestNum = 0;
-        foreach (self::cases() as $case) {
-            if (!str_starts_with($case->name, 'v')) {
-                continue;
-            }
-            $n = (int) substr($case->name, 1);
-            if ($n > $latestNum) {
-                $latestNum = $n;
-                $latestVersion = $case;
-            }
-        }
+class TermsOfUseVersion extends Model {
+    use HasFactory;
 
-        return $latestVersion;
+    protected $table = 'tou_versions';
+
+    const FIELDS = [
+        'version',
+        'active',
+        'acceptance_deadline',
+        'content',
+    ];
+
+    protected $fillable = self::FIELDS;
+
+    protected $visible = self::FIELDS;
+
+    protected $casts = [
+        'version' => 'string',
+        'active' => 'boolean',
+        'acceptance_deadline' => 'datetime',
+        'content' => 'string',
+    ];
+
+    public static function latestVersion(): ?self {
+        return self::query()->where('active', true)->first();
     }
 }

@@ -34,7 +34,7 @@ class UserCreateJob extends Job {
 
         UserTermsOfUseAcceptance::create([
             'user_id' => $user->id,
-            'tou_version' => TermsOfUseVersion::latest(),
+            'tou_version' => TermsOfUseVersion::latestVersion()->version,
             'tou_accepted_at' => now(),
         ]);
 

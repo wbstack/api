@@ -2,6 +2,7 @@
 
 namespace Tests\Jobs;
 
+use App\Jobs\CreateFirstTermsOfUseVersionJob;
 use App\Jobs\UserTouAcceptanceJob;
 use App\TermsOfUseVersion;
 use App\User;
@@ -22,9 +23,10 @@ class UserTouAcceptanceJobTest extends TestCase {
         $u2 = User::factory()->create(['created_at' => $t2]);
         $u3 = User::factory()->create(['created_at' => $t3]);
 
+        (new CreateFirstTermsOfUseVersionJob)->handle();
         (new UserTouAcceptanceJob)->handle();
 
-        $latest = TermsOfUseVersion::latest();
+        $latest = TermsOfUseVersion::latestVersion()->version;
 
         $this->assertDatabaseHas('tou_acceptances', ['user_id' => $u1->id, 'tou_version' => $latest]);
         $this->assertDatabaseHas('tou_acceptances', ['user_id' => $u2->id, 'tou_version' => $latest]);
