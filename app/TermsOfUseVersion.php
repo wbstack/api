@@ -29,7 +29,7 @@ class TermsOfUseVersion extends Model {
         'active' => 'boolean',
     ];
 
-    public static function activeVersion(): ?self {
+    public static function latestActiveVersion(): ?self {
         return self::query()->where('active', true)->latest()->first();
     }
 }

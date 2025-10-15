@@ -28,7 +28,7 @@ class UserTouAcceptanceJob extends Job {
             try {
                 UserTermsOfUseAcceptance::create([
                     'user_id' => $user->id,
-                    'tou_version' => TermsOfUseVersion::activeVersion()->version,
+                    'tou_version' => TermsOfUseVersion::latestActiveVersion()->version,
                     'tou_accepted_at' => $user->created_at,
                 ]);
             } catch (Throwable $exception) {

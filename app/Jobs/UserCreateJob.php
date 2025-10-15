@@ -33,7 +33,7 @@ class UserCreateJob extends Job {
             'verified' => $this->verified,
         ]);
 
-        $latest = TermsOfUseVersion::activeVersion();
+        $latest = TermsOfUseVersion::latestActiveVersion();
         if ($latest) {
             UserTermsOfUseAcceptance::create([
                 'user_id' => $user->id,
