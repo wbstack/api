@@ -29,13 +29,4 @@ class UserTermsOfUseAcceptance extends Model {
     public function user(): BelongsTo {
         return $this->belongsTo(User::class);
     }
-
-    // /**
-    //  * Defines the relationship to TermsOfUseVersion using a non-standard key mapping.
-    //  * Foreign key: 'tou_version' on this model.
-    //  * Owner key: 'version' on TermsOfUseVersion model.
-    //  */
-    // public function termsOfUseVersion(): BelongsTo {
-    //     return $this->belongsTo(TermsOfUseVersion::class, 'tou_version', 'version');
-    // }
 }

@@ -13,10 +13,10 @@ use Throwable;
 /**
  * Bug: T401165 https://phabricator.wikimedia.org/T401165
  * Job to record Terms of Use acceptance for all preexisting users.
- *
+ * This job should only be run ONCE to seed the data for terms of use users have agreed to before we started tracking it explicitly.
  * This job iterates through all users and creates a UserTermsOfUseAcceptance record
- * for each, using the latest Terms of Use version and the user's creation date as ToU acceptance date.
- * Errors during processing are logged and the job is marked as failed for that user.
+ *  for each, using the latest (only) Terms of Use version and the user's creation date as ToU acceptance date.
+ * Errors during processing are logged and the job is marked as failed if accepting the terms of use for any user fails.
  */
 class UserTouAcceptanceJob extends Job {
     use Batchable;
