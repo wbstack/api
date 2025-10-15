@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
  * Be mindful that multiple ToU versions may exist over time,
  * but only one should be active at a time.
  */
-
 class TermsOfUseVersion extends Model {
     use HasFactory;
 
