@@ -5,6 +5,12 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Bug: T401165 https://phabricator.wikimedia.org/T401165
+ * Be mindful that multiple ToU versions may exist over time,
+ * but only one should be active at a time.
+ */
+
 class TermsOfUseVersion extends Model {
     use HasFactory;
 
@@ -13,8 +19,6 @@ class TermsOfUseVersion extends Model {
     const FIELDS = [
         'version',
         'active',
-        'acceptance_deadline',
-        'content',
     ];
 
     protected $fillable = self::FIELDS;
@@ -24,11 +28,9 @@ class TermsOfUseVersion extends Model {
     protected $casts = [
         'version' => 'string',
         'active' => 'boolean',
-        'acceptance_deadline' => 'datetime',
-        'content' => 'string',
     ];
 
-    public static function latestVersion(): ?self {
-        return self::query()->where('active', true)->first();
+    public static function activeVersion(): ?self {
+        return self::query()->where('active', true)->latest()->first();
     }
 }

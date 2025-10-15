@@ -26,7 +26,7 @@ class UserTouAcceptanceJobTest extends TestCase {
         (new CreateFirstTermsOfUseVersionJob)->handle();
         (new UserTouAcceptanceJob)->handle();
 
-        $latest = TermsOfUseVersion::latestVersion()->version;
+        $latest = TermsOfUseVersion::activeVersion()->version;
 
         $this->assertDatabaseHas('tou_acceptances', ['user_id' => $u1->id, 'tou_version' => $latest]);
         $this->assertDatabaseHas('tou_acceptances', ['user_id' => $u2->id, 'tou_version' => $latest]);

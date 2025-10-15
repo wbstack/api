@@ -15,10 +15,8 @@ class CreateFirstTermsOfUseVersionJob extends Job {
     public function handle(): void {
         try {
             TermsOfUseVersion::create([
-                'version' => 'v0',
+                'version' => '2022-01-01',
                 'active' => true,
-                'acceptance_deadline' => null,
-                'content' => null,
             ]);
         } catch (Throwable $exception) {
             Log::error("Failure creating initial Terms of Use version: {$exception->getMessage()}");

@@ -13,8 +13,6 @@ return new class extends Migration {
             $table->id();
             $table->string('version')->unique();
             $table->boolean('active')->default(false);
-            $table->dateTime('acceptance_deadline')->nullable();
-            $table->text('content')->nullable();
             $table->timestamps();
         });
     }

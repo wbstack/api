@@ -17,8 +17,6 @@ class CreateFirstTermsOfUseVersionJobTest extends TestCase {
         $this->assertDatabaseHas('tou_versions', [
             'version' => 'v0',
             'active' => true,
-            'acceptance_deadline' => null,
-            'content' => null,
         ]);
     }
 }
