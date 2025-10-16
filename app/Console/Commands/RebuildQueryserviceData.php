@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Queue;
 class RebuildQueryserviceData extends Command {
     use Traits\PageFetcher;
 
-    protected $signature = 'wbs-qs:rebuild {--domain=*} {--chunkSize=50} {--queueName=manual-intervention} {--sparqlUrlFormat=http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql}';
+    protected $signature = 'wbs-qs:rebuild {--domain=*} {--chunkSize=50} {--queueName=default} {--sparqlUrlFormat=http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/%s/sparql}';
 
     protected $description = 'Rebuild the queryservice data for a certain wiki or all wikis';
 
