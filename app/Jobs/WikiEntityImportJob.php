@@ -21,6 +21,8 @@ use Maclof\Kubernetes\Models\Job as KubernetesJob;
 class WikiEntityImportJob implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private MediaWikiHostResolver $mwHostResolver
+
     /**
      * Create a new job instance.
      */
@@ -28,9 +30,10 @@ class WikiEntityImportJob implements ShouldQueue {
         public int $wikiId,
         public string $sourceWikiUrl,
         public array $entityIds,
-        public int $importId,
-        private MediaWikiHostResolver $mwHostResolver
-    ) {}
+        public int $importId
+    ) {
+        $this->mwHostResolver = new MediaWikiHostResolver;
+    }
 
     private string $targetWikiUrl;
 
