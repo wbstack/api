@@ -73,7 +73,7 @@ class Wiki extends Model {
         /**
          * @psalm-suppress InvalidArgument
          */
-        return $this->hasOne(WikiDb::class)->select(['id', 'wiki_id', 'version']);
+        return $this->hasOne(WikiDb::class)->version;
     }
 
     // TODO these should just be on the backend model? =] Or marked as a private relationship or something?

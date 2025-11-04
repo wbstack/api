@@ -4,13 +4,12 @@ namespace App\Services;
 
 use App\Wiki;
 
-class MediaWikiHostResolver
-{
+class MediaWikiHostResolver {
     // TODO: Move this mapping to a config file that doesn't require updating this code when doing a MW update?
     /** @var array<string, string> Map of DB version strings to MediaWiki backend version strings */
     private const DB_VERSION_TO_MW_VERSION = [
         'mw1.39-wbs1' => '139-app',
-        'mw1.43-wbs1' => '143-app'
+        'mw1.43-wbs1' => '143-app',
     ];
 
     // This service could have other methods in future, e.g. getBackendHostForWiki()
@@ -18,14 +17,12 @@ class MediaWikiHostResolver
     //     return $this->getBackendHostForDomain($wiki->domain);
     // }
 
-    public function getBackendHostForDomain(string $domain): string
-    {
+    public function getBackendHostForDomain(string $domain): string {
         // TODO: should 'backend.default.svc.cluster.local' be an env var e.g. PLATFORM_MW_BACKEND_HOST_SUFFIX?
         return sprintf('mediawiki-%s-backend.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
     }
 
-    public function getMwVersionForDomain(string $domain): string
-    {
+    public function getMwVersionForDomain(string $domain): string {
         $dbVersion = Wiki::where('domain', $domain)
             ->whereNull('deleted_at')
             ->leftJoin('wiki_dbs', 'wiki_id', '=', 'wikis.id')

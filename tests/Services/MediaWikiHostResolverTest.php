@@ -5,19 +5,16 @@ namespace Tests;
 use App\Services\MediaWikiHostResolver;
 use App\Wiki;
 use App\WikiDb;
-use App\WikiDomain;
 use Faker\Factory;
-use Faker\Generator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class MediaWikiHostResolverTest extends TestCase
-{
+class MediaWikiHostResolverTest extends TestCase {
     use RefreshDatabase;
-    public function testResolverRoutesToCorrectHost(): void
-    {
-        $domain = (new Factory())->create()->unique()->text(30);
+
+    public function testResolverRoutesToCorrectHost(): void {
+        $domain = (new Factory)->create()->unique()->text(30);
         $this->createWiki($domain, 'mw1.39-wbs1');
-        $resolver = new MediaWikiHostResolver();
+        $resolver = new MediaWikiHostResolver;
         $this->assertEquals(
             'mediawiki-139-app-backend.default.svc.cluster.local',
             $resolver->getBackendHostForDomain($domain)
@@ -36,8 +33,7 @@ class MediaWikiHostResolverTest extends TestCase
         ]);
     }
 
-    public function testResolverThrowsIfUnableToFindHostInMap(): void
-    {
+    public function testResolverThrowsIfUnableToFindHostInMap(): void {
         $this->assertTrue(true);
     }
 }
