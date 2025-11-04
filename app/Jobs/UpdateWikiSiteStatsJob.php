@@ -20,7 +20,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
 
     private MediaWikiHostResolver $mwHostResolver;
 
-    public __construct() {
+    public function __construct() {
         $this->mwHostResolver = new MediaWikiHostResolver;
     }
 
