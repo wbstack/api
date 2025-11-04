@@ -158,5 +158,5 @@ class Wiki extends Model {
 
     public function wikiLatestProfile() {
         return $this->hasOne(WikiProfile::class)->latestOfMany();
-    
+    }
 }
