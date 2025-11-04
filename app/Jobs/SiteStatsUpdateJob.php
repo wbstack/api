@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Http\Curl\HttpRequest;
 use App\Wiki;
+use App\Services\MediaWikiHostResolver;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -22,7 +23,7 @@ class SiteStatsUpdateJob extends Job {
         $this->wiki_id = $wiki_id;
     }
 
-    public function handle(HttpRequest $request): void {
+    public function handle(HttpRequest $request, MediaWikiHostResolver $mwHostResolver): void {
         $timeStart = microtime(true);
 
         $wiki = Wiki::where('id', $this->wiki_id)->first();
@@ -30,10 +31,12 @@ class SiteStatsUpdateJob extends Job {
             $this->fail(new \RuntimeException(" Could not find wiki with id: $this->wiki_id"));
         }
 
-        Log::info(__METHOD__ . ": Updating stats for or $wiki->domain");
+        Log::info(__METHOD__ . ": Updating stats for $wiki->domain");
+
+        $mwHost = $mwHostResolver->getMwVersionForDomain($wiki->domain);
 
         $request->setOptions([
-            CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=wbstackSiteStatsUpdate&format=json',
+            CURLOPT_URL => $mwHost . '/w/api.php?action=wbstackSiteStatsUpdate&format=json',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 60 * 5,
