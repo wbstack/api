@@ -30,7 +30,7 @@ class MediawikiInit extends Job {
             'email' => $this->email,
         ];
 
-        $mwHost = $mwHostResolver->getMwVersionForDomain($this->wikiDomain);
+        $mwHost = $mwHostResolver->getBackendHostForDomain($this->wikiDomain);
 
         $request->setOptions([
             CURLOPT_URL => $mwHost . '/w/api.php?action=wbstackInit&format=json',

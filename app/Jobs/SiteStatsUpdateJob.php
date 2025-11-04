@@ -33,7 +33,7 @@ class SiteStatsUpdateJob extends Job {
 
         Log::info(__METHOD__ . ": Updating stats for $wiki->domain");
 
-        $mwHost = $mwHostResolver->getMwVersionForDomain($wiki->domain);
+        $mwHost = $mwHostResolver->getBackendHostForDomain($wiki->domain);
 
         $request->setOptions([
             CURLOPT_URL => $mwHost . '/w/api.php?action=wbstackSiteStatsUpdate&format=json',

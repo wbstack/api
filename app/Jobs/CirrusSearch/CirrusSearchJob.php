@@ -68,7 +68,7 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
             return;
         }
 
-        $mwHost = $mwHostResolver->getMwVersionForDomain($this->wiki->domain);
+        $mwHost = $mwHostResolver->getBackendHostForDomain($this->wiki->domain);
 
         $request->setOptions(
             [

@@ -21,8 +21,6 @@ use Maclof\Kubernetes\Models\Job as KubernetesJob;
 class WikiEntityImportJob implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private MediaWikiHostResolver $mwHostResolver;
-
     /**
      * Create a new job instance.
      */
@@ -83,7 +81,7 @@ class WikiEntityImportJob implements ShouldQueue {
 
     private static function acquireCredentials(string $wikiDomain): OAuthCredentials {
         $response = Http::withHeaders(['host' => $wikiDomain])->asForm()->post(
-            $this->mwHostResolver->getMwVersionForDomain($wikiDomain) . '/w/api.php?action=wbstackPlatformOauthGet&format=json',
+            $this->mwHostResolver->getBackendHostForDomain($wikiDomain) . '/w/api.php?action=wbstackPlatformOauthGet&format=json',
             [
                 'consumerName' => 'WikiEntityImportJob',
                 'ownerOnly' => '1',

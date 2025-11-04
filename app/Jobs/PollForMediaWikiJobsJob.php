@@ -31,7 +31,7 @@ class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique, ShouldQueue
         $response = Http::withHeaders([
             'host' => $wikiDomain,
         ])->get(
-            $this->mwHostResolver->getMwVersionForDomain($wikiDomain) . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
+            $this->mwHostResolver->getBackendHostForDomain($wikiDomain) . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
         );
 
         if ($response->failed()) {

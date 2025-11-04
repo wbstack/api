@@ -25,7 +25,7 @@ class MediawikiSandboxLoadData extends Job {
             'dataSet' => $this->dataSet,
         ];
 
-        $mwHost = $mwHostResolver->getMwVersionForDomain($this->wikiDomain);
+        $mwHost = $mwHostResolver->getBackendHostForDomain($this->wikiDomain);
 
         $curl = curl_init();
         curl_setopt_array($curl, [
