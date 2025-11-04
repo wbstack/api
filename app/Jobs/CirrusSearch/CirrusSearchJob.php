@@ -6,7 +6,6 @@ use App\Http\Curl\HttpRequest;
 use App\Jobs\Job;
 use App\Wiki;
 use App\WikiSetting;
-use App\Services\MediaWikiHostResolver;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
@@ -42,7 +41,7 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
     /**
      * @return void
      */
-    public function handle(HttpRequest $request, MediaWikiHostResolver $mwHostResolver) {
+    public function handle(HttpRequest $request) {
         $this->wiki = Wiki::whereId($this->wikiId)->with('settings')->with('wikiDb')->first();
 
         // job got triggered but no wiki
@@ -68,11 +67,9 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
             return;
         }
 
-        $mwHost = $mwHostResolver->getBackendHostForDomain($this->wiki->domain);
-
         $request->setOptions(
             [
-                CURLOPT_URL => $mwHost . '/w/api.php?action=' . $this->apiModule() . $this->getQueryParams(),
+                CURLOPT_URL => $this->wiki->getBackendHost() . '/w/api.php?action=' . $this->apiModule() . $this->getQueryParams(),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => $this->getRequestTimeout(),
