@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Helper\DomainHelper;
+use App\Services\MediaWikiHostResolver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -158,5 +159,12 @@ class Wiki extends Model {
 
     public function wikiLatestProfile() {
         return $this->hasOne(WikiProfile::class)->latestOfMany();
+    }
+
+    /**
+     * Retrieve correct backend host for the mediawiki version of this wiki 
+     */
+    public function getBackendHost() {
+        return (new MediaWikiHostResolver)->getBackendHostForDomain($this->domain);
     }
 }
