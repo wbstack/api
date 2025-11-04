@@ -42,7 +42,6 @@ class PlatformStatsSummaryJob extends Job {
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
         $this->creationRateRanges = Config::get('wbstack.platform_summary_creation_rate_ranges');
-        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php';
     }
 
     private function isNullOrEmpty($value): bool {
