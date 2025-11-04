@@ -3,13 +3,20 @@
 namespace App\Jobs;
 
 use App\Wiki;
+use App\Services\MediaWikiHostResolver;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique, ShouldQueue {
+    private MediaWikiHostResolver $mwHostResolver;
+
     public $timeout = 1800;
+
+    public function __construct(MediaWikiHostResolver $mwHostResolver = null) {
+        $this->mwHostResolver = $mwHostResolver ?? new MediaWikiHostResolver();
+    }
 
     public function handle(): void {
         $allWikiDomains = Wiki::all()->pluck('domain');
@@ -24,7 +31,7 @@ class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique, ShouldQueue
         $response = Http::withHeaders([
             'host' => $wikiDomain,
         ])->get(
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
+            $this->mwHostResolver->getMwVersionForDomain($wikiDomain) . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
         );
 
         if ($response->failed()) {
