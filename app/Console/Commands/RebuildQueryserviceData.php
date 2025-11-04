@@ -29,6 +29,7 @@ class RebuildQueryserviceData extends Command {
         $this->chunkSize = intval($this->option('chunkSize'));
         $this->sparqlUrlFormat = $this->option('sparqlUrlFormat');
         $this->queueName = $this->option('queueName');
+        $this->apiUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php';
 
         $wikiDomains = $this->option('domain');
         $exitCode = 0;
