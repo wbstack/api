@@ -6,7 +6,7 @@ use App\Wiki;
 use Exception;
 
 class MediaWikiHostResolver {
-    // TODO: Move this mapping to a config file that doesn't require updating this code when doing a MW update?
+    // TODO: Move this mapping to a config file so that MW updates do not require code changes here.
     /** @var array<string, string> Map of DB version strings to MediaWiki backend version strings */
     private const DB_VERSION_TO_MW_VERSION = [
         'mw1.39-wbs1' => '139-app',
