@@ -37,6 +37,6 @@ class MediaWikiHostResolver {
 }
 
 /**
-* Exception thrown when a database version is not recognized in MediaWikiHostResolver.
-*/
+ * Exception thrown when a database version is not recognized in MediaWikiHostResolver.
+ */
 class UnknownDBVersionException extends Exception {}
