@@ -5,6 +5,11 @@ namespace App\Services;
 use App\Wiki;
 use Exception;
 
+/**
+ * Exception thrown when a database version is not recognized in MediaWikiHostResolver.
+ */
+class UnknownDBVersionException extends Exception {}
+
 class MediaWikiHostResolver {
     // TODO: Move this mapping to a config file so that MW updates do not require code changes here.
     /** @var array<string, string> Map of DB version strings to MediaWiki backend version strings */
@@ -35,8 +40,3 @@ class MediaWikiHostResolver {
         throw new UnknownDBVersionException("Unknown DB version '{$dbVersion}' for domain '{$domain}'.");
     }
 }
-
-/**
- * Exception thrown when a database version is not recognized in MediaWikiHostResolver.
- */
-class UnknownDBVersionException extends Exception {}
