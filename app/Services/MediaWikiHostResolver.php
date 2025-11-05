@@ -33,7 +33,7 @@ class MediaWikiHostResolver {
         if (array_key_exists($dbVersion, self::DB_VERSION_TO_MW_VERSION)) {
             return self::DB_VERSION_TO_MW_VERSION[$dbVersion];
         }
-        throw new UnknownDBVersionException;
+        throw new UnknownDBVersionException("Unknown DB version '{$dbVersion}' for domain '{$domain}'.");
     }
 }
 
