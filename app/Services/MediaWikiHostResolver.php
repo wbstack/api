@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Wiki;
+use Exception;
 
 class MediaWikiHostResolver {
     // TODO: Move this mapping to a config file that doesn't require updating this code when doing a MW update?
@@ -29,6 +30,11 @@ class MediaWikiHostResolver {
             ->pluck('version')
             ->first();
 
-        return self::DB_VERSION_TO_MW_VERSION[$dbVersion];
+        if (array_key_exists($dbVersion, self::DB_VERSION_TO_MW_VERSION)) {
+            return self::DB_VERSION_TO_MW_VERSION[$dbVersion];
+        }
+        throw new UnknownDBVersionException;
     }
 }
+
+class UnknownDBVersionException extends Exception {}
