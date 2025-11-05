@@ -25,10 +25,9 @@ class MediaWikiHostResolver {
 
     public function getMwVersionForDomain(string $domain): string {
         $dbVersion = Wiki::where('domain', $domain)
-            ->whereNull('deleted_at')
-            ->leftJoin('wiki_dbs', 'wiki_id', '=', 'wikis.id')
-            ->pluck('version')
-            ->first();
+            ->first()
+            ->wikiDb
+            ->version;
 
         if (array_key_exists($dbVersion, self::DB_VERSION_TO_MW_VERSION)) {
             return self::DB_VERSION_TO_MW_VERSION[$dbVersion];
