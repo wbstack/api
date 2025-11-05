@@ -24,7 +24,7 @@ class ProfileValidatorTest extends TestCase {
         $this->assertFalse($validator->passes());
     }
 
-    private function validProfileProvider() {
+    public static function validProfileProvider() {
         return [
             ['boring profile with no other' => [
                 'purpose' => 'data_hub',
@@ -41,7 +41,7 @@ class ProfileValidatorTest extends TestCase {
         ];
     }
 
-    private function invalidProfileProvider() {
+    public static function invalidProfileProvider() {
         return [
             ['missing other keys' => [
                 'purpose' => 'data_hub',

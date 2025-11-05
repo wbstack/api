@@ -142,7 +142,8 @@ class ElasticSearchIndexInitTest extends TestCase {
      *
      * @expectedException RuntimeException
      */
-    public function testFailure($request, string $expectedFailure, $mockResponse) {
+    public function testFailure(string $expectedFailure, $mockResponse) {
+        $request = $this->createMock(HttpRequest::class);
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())
             ->method('fail');
@@ -159,11 +160,32 @@ class ElasticSearchIndexInitTest extends TestCase {
         );
     }
 
-    public function failureProvider() {
+    public function testCurlFailure() {
+        $expectedFailure = 'wbstackElasticSearchInit curl error for <WIKI_ID>: Scary Error!';
+        $mockResponse = [];
+
+        $request = $this->createMock(HttpRequest::class);
+        $request->method('error')->willReturn('Scary Error!');
+        $mockJob = $this->createMock(Job::class);
+        $mockJob->expects($this->once())
+            ->method('fail');
+
+        $request->method('execute')->willReturn(json_encode($mockResponse));
+
+        $job = new ElasticSearchIndexInit($this->wiki->id);
+        $job->setJob($mockJob);
+        $job->handle($request);
+
+        $this->assertSame(
+            1,
+            WikiSetting::where(['wiki_id' => $this->wiki->id, 'name' => WikiSetting::wwExtEnableElasticSearch, 'value' => true])->count()
+        );
+    }
+
+    public static function failureProvider() {
 
         $mockResponse = [];
         yield [
-            $this->createMock(HttpRequest::class),
             'wbstackElasticSearchInit call for <WIKI_ID>. No wbstackElasticSearchInit key in response: []',
             $mockResponse,
         ];
@@ -177,22 +199,12 @@ class ElasticSearchIndexInitTest extends TestCase {
         ];
 
         yield [
-            $this->createMock(HttpRequest::class),
             'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"return":0,"output":[]}}',
-            $mockResponse,
-        ];
-
-        $curlError = $this->createMock(HttpRequest::class);
-        $curlError->method('error')->willReturn('Scary Error!');
-        yield [
-            $curlError,
-            'wbstackElasticSearchInit curl error for <WIKI_ID>: Scary Error!',
             $mockResponse,
         ];
 
         $mockResponse['wbstackElasticSearchInit']['return'] = 1;
         yield [
-            $this->createMock(HttpRequest::class),
             'wbstackElasticSearchInit call for <WIKI_ID> was not successful:{"warnings":[],"wbstackElasticSearchInit":{"return":1,"output":[]}}',
             $mockResponse,
         ];
