@@ -27,7 +27,7 @@ class DisableTest extends TestCase {
 
         $this->artisan('wbs-user:disable',
             [
-                '--email' => self::EMAIL
+                '--email' => self::EMAIL,
             ]
         )->assertExitCode(0);
 
@@ -41,7 +41,7 @@ class DisableTest extends TestCase {
     public function testUserNotFound() {
         $this->artisan('wbs-user:disable',
             [
-                '--email' => self::EMAIL
+                '--email' => self::EMAIL,
             ]
         )->assertExitCode(2);
     }
