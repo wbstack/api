@@ -9,7 +9,6 @@ namespace App\Console\Commands\User;
 
 use App\User;
 use App\WikiManager;
-use App\Wiki;
 use Illuminate\Console\Command;
 
 class Disable extends Command {
