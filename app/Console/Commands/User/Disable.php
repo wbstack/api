@@ -37,7 +37,7 @@ class Disable extends Command {
         $userWikiManagers = WikiManager::whereUserId($user->id)->with('wiki')->get();
         $undeletedWikis = [];
 
-        foreach($userWikiManagers as $userWikiManager) {
+        foreach ($userWikiManagers as $userWikiManager) {
             $userWiki = $userWikiManager->wiki;
 
             if ($userWiki !== null) {
@@ -45,8 +45,8 @@ class Disable extends Command {
             }
         }
 
-        if (! empty($undeletedWikis)) {
-            $this->error('Error: User still has wikis: '.print_r($undeletedWikis, true));
+        if (!empty($undeletedWikis)) {
+            $this->error('Error: User still has wikis: ' . print_r($undeletedWikis, true));
 
             return 3;
         }
@@ -58,7 +58,7 @@ class Disable extends Command {
 
         if ($user->save()) {
             $this->info("Successfully disabled user account with email '$email' (id: '$userId')");
-            $this->info("Information about email and password hash was deleted.");
+            $this->info('Information about email and password hash was deleted.');
 
             return 0;
         } else {
