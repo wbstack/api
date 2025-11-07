@@ -17,12 +17,19 @@ class MediawikiInitTest extends TestCase {
 
     private $mwBackendHost;
 
+    private $mockMwBackendHostResolver;
+
     protected function setUp(): void {
         parent::setUp();
         $this->wikiDomain = 'some.domain.com';
         $this->username = 'username';
         $this->email = 'some@email.com';
         $this->mwBackendHost = 'mediawiki.localhost';
+
+        $this->mockMwBackendHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwBackendHostResolver->method('getBackendHostForDomain')->willReturn(
+            $this->mwBackendHost
+        );
     }
 
     private function getMockRequest(string $mockResponse): HttpRequest {
@@ -53,18 +60,7 @@ class MediawikiInitTest extends TestCase {
         return $request;
     }
 
-    private function getMockMwHostResolver() {
-        $mwHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $mwHostResolver->method('getBackendHostForDomain')->willReturn(
-            $this->mwBackendHost
-        );
-
-        return $mwHostResolver;
-    }
-
     public function testSuccess() {
-        $mockHostResolver = $this->getMockMwHostResolver();
-
         $mockResponse = [
             'warnings' => [],
             'wbstackInit' => [
@@ -83,12 +79,10 @@ class MediawikiInitTest extends TestCase {
 
         $job = new MediawikiInit($this->wikiDomain, $this->username, $this->email);
         $job->setJob($mockJob);
-        $job->handle($request, $mockHostResolver);
+        $job->handle($request, $this->mockMwBackendHostResolver);
     }
 
     public function testFatalErrorIsHandled() {
-        $mockHostResolver = $this->getMockMwHostResolver();
-
         $mockResponse = 'oh no';
         $request = $this->getMockRequest($mockResponse);
 
@@ -101,6 +95,6 @@ class MediawikiInitTest extends TestCase {
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
-        $job->handle($request, $mockHostResolver);
+        $job->handle($request, $this->mockMwBackendHostResolver);
     }
 }
