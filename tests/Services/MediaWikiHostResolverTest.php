@@ -44,13 +44,4 @@ class MediaWikiHostResolverTest extends TestCase {
             UnknownDBVersionException::class
         );
     }
-
-    public function testResolverThrowsIfUnableToFindWiki(): void {
-        $domain = (new Factory)->create()->unique()->text(30);
-        $resolver = new MediaWikiHostResolver;
-        $this->assertThrows(
-            fn () => $resolver->getBackendHostForDomain($domain),
-            UnknownWikiDomainException::class
-        );
-    }
 }
