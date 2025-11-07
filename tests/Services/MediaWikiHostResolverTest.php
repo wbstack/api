@@ -4,7 +4,6 @@ namespace Tests;
 
 use App\Services\MediaWikiHostResolver;
 use App\Services\UnknownDBVersionException;
-use App\Services\UnknownWikiDomainException;
 use App\Wiki;
 use App\WikiDb;
 use Faker\Factory;
