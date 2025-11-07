@@ -37,12 +37,12 @@ class WikiEntityImportJob implements ShouldQueue {
     /**
      * Execute the job.
      */
-    public function handle(Client $kubernetesClient): void {
+    public function handle(Client $kubernetesClient, MediaWikiHostResolver $mwHostResolver): void {
         $import = null;
         try {
             $wiki = Wiki::findOrFail($this->wikiId);
             $import = WikiEntityImport::findOrFail($this->importId);
-            $creds = $this->acquireCredentials($wiki->domain);
+            $creds = $this->acquireCredentials($wiki->domain, $mwHostResolver);
 
             $this->targetWikiUrl = $this->domainToOrigin($wiki->domain);
 
@@ -79,9 +79,7 @@ class WikiEntityImportJob implements ShouldQueue {
             : 'https://' . $domain;
     }
 
-    private static function acquireCredentials(string $wikiDomain): OAuthCredentials {
-        $mwHostResolver = App::make(MediaWikiHostResolver::class);
-
+    private static function acquireCredentials(string $wikiDomain, MediaWikiHostResolver $mwHostResolver): OAuthCredentials {
         $response = Http::withHeaders(['host' => $wikiDomain])->asForm()->post(
             $mwHostResolver->getBackendHostForDomain($wikiDomain) . '/w/api.php?action=wbstackPlatformOauthGet&format=json',
             [
