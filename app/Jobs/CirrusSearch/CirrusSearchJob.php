@@ -70,7 +70,7 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
 
         $request->setOptions(
             [
-                CURLOPT_URL => $this->mwHostResolver->getBackendHostForDomain($this->wiki->domain) . '/w/api.php?action=' . $this->apiModule() . $this->getQueryParams(),
+                CURLOPT_URL => $mwHostResolver->getBackendHostForDomain($this->wiki->domain) . '/w/api.php?action=' . $this->apiModule() . $this->getQueryParams(),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => $this->getRequestTimeout(),
