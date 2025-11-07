@@ -15,6 +15,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\App;
 use Maclof\Kubernetes\Client;
 use Maclof\Kubernetes\Models\Job as KubernetesJob;
 
@@ -79,7 +80,7 @@ class WikiEntityImportJob implements ShouldQueue {
     }
 
     private static function acquireCredentials(string $wikiDomain): OAuthCredentials {
-        $mwHostResolver = app()->make(MediaWikiHostResolver::class);
+        $mwHostResolver = App::make(MediaWikiHostResolver::class);
 
         $response = Http::withHeaders(['host' => $wikiDomain])->asForm()->post(
             $mwHostResolver->getBackendHostForDomain($wikiDomain) . '/w/api.php?action=wbstackPlatformOauthGet&format=json',

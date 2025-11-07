@@ -5,11 +5,12 @@ namespace App\Traits;
 use App\Constants\MediawikiNamespace;
 use App\Services\MediaWikiHostResolver;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\App;
 
 trait PageFetcher {
     // this function is used to fetch pages on namespace
     public function fetchPagesInNamespace(string $wikiDomain, MediawikiNamespace $namespace): array {
-        $mwHostResolver = new MediaWikiHostResolver;
+        $mwHostResolver = App::make(MediaWikiHostResolver::class);
         $apiUrl = $mwHostResolver->getMwVersionForDomain($wikiDomain) . '/w/api.php';
 
         $titles = [];
