@@ -20,7 +20,7 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
     private $mwBackendHost;
 
-    private $mockMwBackendHostResolver;
+    private $mockMwHostResolver;
 
     protected function setUp(): void {
         parent::setUp();
@@ -28,8 +28,8 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         $this->mwBackendHost = 'mediawiki.localhost';
 
-        $this->mockMwBackendHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwBackendHostResolver->method('getBackendHostForDomain')->willReturn(
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
             $this->mwBackendHost
         );
     }
@@ -52,7 +52,7 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         $mockJob->expects($this->never())->method('fail');
         $mockJob->expects($this->never())->method('markAsFailed');
-        $job->handle($this->mockMwBackendHostResolver);
+        $job->handle($this->mockMwHostResolver);
         Bus::assertNothingDispatched();
     }
 
@@ -75,7 +75,7 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         $mockJob->expects($this->never())->method('fail');
         $mockJob->expects($this->never())->method('markAsFailed');
-        $job->handle($this->mockMwBackendHostResolver);
+        $job->handle($this->mockMwHostResolver);
         Bus::assertDispatched(ProcessMediaWikiJobsJob::class);
     }
 
@@ -94,7 +94,7 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         $mockJob->expects($this->once())->method('markAsFailed');
         $mockJob->expects($this->never())->method('fail');
-        $job->handle($this->mockMwBackendHostResolver);
+        $job->handle($this->mockMwHostResolver);
         Bus::assertNothingDispatched();
     }
 }

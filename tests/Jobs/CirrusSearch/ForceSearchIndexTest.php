@@ -28,7 +28,7 @@ class ForceSearchIndexTest extends TestCase {
 
     private $mwBackendHost;
 
-    private $mockMwBackendHostResolver;
+    private $mockMwHostResolver;
 
     protected function setUp(): void {
         parent::setUp();
@@ -50,8 +50,8 @@ class ForceSearchIndexTest extends TestCase {
 
         $this->mwBackendHost = 'mediawiki.localhost';
 
-        $this->mockMwBackendHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwBackendHostResolver->method('getBackendHostForDomain')->willReturn(
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
             $this->mwBackendHost
         );
     }
@@ -120,6 +120,6 @@ class ForceSearchIndexTest extends TestCase {
 
         $job = new ForceSearchIndex('id', $this->wiki->id, $fromId, $toId);
         $job->setJob($mockJob);
-        $job->handle($request, $this->mockMwBackendHostResolver);
+        $job->handle($request, $this->mockMwHostResolver);
     }
 }

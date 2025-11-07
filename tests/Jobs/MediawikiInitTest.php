@@ -17,7 +17,7 @@ class MediawikiInitTest extends TestCase {
 
     private $mwBackendHost;
 
-    private $mockMwBackendHostResolver;
+    private $mockMwHostResolver;
 
     protected function setUp(): void {
         parent::setUp();
@@ -26,8 +26,8 @@ class MediawikiInitTest extends TestCase {
         $this->email = 'some@email.com';
         $this->mwBackendHost = 'mediawiki.localhost';
 
-        $this->mockMwBackendHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwBackendHostResolver->method('getBackendHostForDomain')->willReturn(
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
             $this->mwBackendHost
         );
     }
@@ -79,7 +79,7 @@ class MediawikiInitTest extends TestCase {
 
         $job = new MediawikiInit($this->wikiDomain, $this->username, $this->email);
         $job->setJob($mockJob);
-        $job->handle($request, $this->mockMwBackendHostResolver);
+        $job->handle($request, $this->mockMwHostResolver);
     }
 
     public function testFatalErrorIsHandled() {
@@ -95,6 +95,6 @@ class MediawikiInitTest extends TestCase {
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
-        $job->handle($request, $this->mockMwBackendHostResolver);
+        $job->handle($request, $this->mockMwHostResolver);
     }
 }

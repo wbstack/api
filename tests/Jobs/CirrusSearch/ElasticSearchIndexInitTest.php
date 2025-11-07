@@ -28,7 +28,7 @@ class ElasticSearchIndexInitTest extends TestCase {
 
     private $mwBackendHost;
 
-    private $mockMwBackendHostResolver;
+    private $mockMwHostResolver;
 
     protected function setUp(): void {
         parent::setUp();
@@ -50,8 +50,8 @@ class ElasticSearchIndexInitTest extends TestCase {
 
         $this->mwBackendHost = 'mediawiki.localhost';
 
-        $this->mockMwBackendHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwBackendHostResolver->method('getBackendHostForDomain')->willReturn(
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
             $this->mwBackendHost
         );
     }
@@ -62,7 +62,7 @@ class ElasticSearchIndexInitTest extends TestCase {
         $job->setJob($mockJob);
         $mockJob->expects($this->once())
             ->method('fail');
-        $job->handle(new CurlRequest, $this->mockMwBackendHostResolver);
+        $job->handle(new CurlRequest, $this->mockMwHostResolver);
     }
 
     public function testSuccess() {
@@ -102,7 +102,7 @@ class ElasticSearchIndexInitTest extends TestCase {
 
         $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle($request, $this->mockMwBackendHostResolver);
+        $job->handle($request, $this->mockMwHostResolver);
 
         // feature should get enabled
         $this->assertSame(
@@ -131,7 +131,7 @@ class ElasticSearchIndexInitTest extends TestCase {
 
         $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle($request, $this->mockMwBackendHostResolver);
+        $job->handle($request, $this->mockMwHostResolver);
 
         // feature should get enabled
         $this->assertSame(
@@ -146,7 +146,7 @@ class ElasticSearchIndexInitTest extends TestCase {
         $request->expects($this->never())->method('execute');
 
         $job = new ElasticSearchIndexInit($this->wiki->id);
-        $job->handle($request, $this->mockMwBackendHostResolver);
+        $job->handle($request, $this->mockMwHostResolver);
     }
 
     /**
@@ -164,7 +164,7 @@ class ElasticSearchIndexInitTest extends TestCase {
 
         $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle($request, $this->mockMwBackendHostResolver);
+        $job->handle($request, $this->mockMwHostResolver);
 
         $this->assertSame(
             1,
@@ -186,7 +186,7 @@ class ElasticSearchIndexInitTest extends TestCase {
 
         $job = new ElasticSearchIndexInit($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle($request, $this->mockMwBackendHostResolver);
+        $job->handle($request, $this->mockMwHostResolver);
 
         $this->assertSame(
             1,

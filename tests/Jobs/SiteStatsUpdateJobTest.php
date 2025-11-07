@@ -19,7 +19,7 @@ class SiteStatsUpdateJobTest extends TestCase {
     private $wiki;
     private $manager;
     private $mwBackendHost;
-    private $mockMwBackendHostResolver;
+    private $mockMwHostResolver;
 
     protected function setUp(): void {
         parent::setUp();
@@ -28,8 +28,8 @@ class SiteStatsUpdateJobTest extends TestCase {
         $this->manager = WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
         $this->mwBackendHost = 'mediawiki.localhost';
 
-        $this->mockMwBackendHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwBackendHostResolver->method('getBackendHostForDomain')->willReturn(
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
             $this->mwBackendHost
         );
     }
@@ -76,7 +76,7 @@ class SiteStatsUpdateJobTest extends TestCase {
 
         $job = new SiteStatsUpdateJob($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle($request, $this->mockMwBackendHostResolver);
+        $job->handle($request, $this->mockMwHostResolver);
     }
 
     public function testFatalErrorIsHandled() {
@@ -96,6 +96,6 @@ class SiteStatsUpdateJobTest extends TestCase {
 
         $job = new SiteStatsUpdateJob($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle($request, $this->mockMwBackendHostResolver);
+        $job->handle($request, $this->mockMwHostResolver);
     }
 }

@@ -27,7 +27,7 @@ class QueueSearchIndexBatchesTest extends TestCase {
 
     private $user;
 
-    private $mockMwBackendHostResolver;
+    private $mockMwHostResolver;
 
     protected function setUp(): void {
         parent::setUp();
@@ -49,8 +49,8 @@ class QueueSearchIndexBatchesTest extends TestCase {
 
         $this->mwBackendHost = 'mediawiki.localhost';
 
-        $this->mockMwBackendHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwBackendHostResolver->method('getBackendHostForDomain')->willReturn(
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
             $this->mwBackendHost
         );
     }
@@ -94,7 +94,7 @@ class QueueSearchIndexBatchesTest extends TestCase {
 
         $job = new QueueSearchIndexBatches($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle($request, $this->mockMwBackendHostResolver);
+        $job->handle($request, $this->mockMwHostResolver);
 
         Queue::assertPushed(function (ForceSearchIndex $job) {
             return $job->wikiId() === $this->wiki->id
@@ -143,6 +143,6 @@ class QueueSearchIndexBatchesTest extends TestCase {
 
         $job = new QueueSearchIndexBatches($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle($request, $this->mockMwBackendHostResolver);
+        $job->handle($request, $this->mockMwHostResolver);
     }
 }
