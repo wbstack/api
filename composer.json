@@ -39,9 +39,7 @@
         "laravel/pint": "^1.22",
         "mockery/mockery": "^1.4",
         "phpunit/phpunit": "^10.5",
-        "psalm/plugin-laravel": "^2.8",
-        "timacdonald/log-fake": "^2.1",
-        "vimeo/psalm": "^5.19"
+        "timacdonald/log-fake": "^2.1"
     },
     "autoload": {
         "classmap": [
@@ -64,10 +62,9 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
         "test": [
-            "@psalm",
+            "@pint",
             "@phpunit"
         ],
-        "psalm": "vendor/bin/psalm",
         "phpunit": "vendor/bin/phpunit",
         "pint": "vendor/bin/pint"
     },
