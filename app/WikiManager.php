@@ -42,16 +42,10 @@ class WikiManager extends Model {
     ];
 
     // TODO remove these relationships if they are not used...
-    /**
-     * @psalm-return \Illuminate\Database\Eloquent\Relations\BelongsTo<Wiki>
-     */
     public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
         return $this->belongsTo(Wiki::class);
     }
 
-    /**
-     * @psalm-return \Illuminate\Database\Eloquent\Relations\BelongsTo<User>
-     */
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
         return $this->belongsTo(User::class);
     }
