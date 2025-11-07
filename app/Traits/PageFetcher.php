@@ -3,15 +3,16 @@
 namespace App\Traits;
 
 use App\Constants\MediawikiNamespace;
-use App\Services\MediaWikiHostResolver;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\App;
 
 trait PageFetcher {
+    private string $apiUrl;
+
     // this function is used to fetch pages on namespace
     public function fetchPagesInNamespace(string $wikiDomain, MediawikiNamespace $namespace): array {
-        $mwHostResolver = App::make(MediaWikiHostResolver::class);
-        $apiUrl = $mwHostResolver->getBackendHostForDomain($wikiDomain) . '/w/api.php';
+        if (empty($this->apiUrl)) {
+            throw new \RuntimeException('API URL has not been set.');
+        }
 
         $titles = [];
         $cursor = '';
@@ -19,7 +20,7 @@ trait PageFetcher {
             $response = Http::withHeaders([
                 'host' => $wikiDomain,
             ])->get(
-                $apiUrl,
+                $this->apiUrl,
                 [
                     'action' => 'query',
                     'list' => 'allpages',
