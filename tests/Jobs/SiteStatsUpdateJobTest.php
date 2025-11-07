@@ -7,6 +7,7 @@ use App\Jobs\SiteStatsUpdateJob;
 use App\User;
 use App\Wiki;
 use App\WikiManager;
+use App\Services\MediaWikiHostResolver;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -14,11 +15,23 @@ use Tests\TestCase;
 class SiteStatsUpdateJobTest extends TestCase {
     use RefreshDatabase;
 
+    private $user;
+    private $wiki;
+    private $manager;
+    private $mwBackendHost;
+    private $mockMwBackendHostResolver;
+
     protected function setUp(): void {
         parent::setUp();
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
         $this->manager = WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
+        $this->mwBackendHost = 'mediawiki.localhost';
+
+        $this->mockMwBackendHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwBackendHostResolver->method('getBackendHostForDomain')->willReturn(
+            $this->mwBackendHost
+        );
     }
 
     private function getMockRequest(string $mockResponse): HttpRequest {
@@ -29,7 +42,7 @@ class SiteStatsUpdateJobTest extends TestCase {
             ->method('setOptions')
             ->with(
                 [
-                    CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=wbstackSiteStatsUpdate&format=json',
+                    CURLOPT_URL => $this->mwBackendHost . '/w/api.php?action=wbstackSiteStatsUpdate&format=json',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_TIMEOUT => 60 * 5,
@@ -63,7 +76,7 @@ class SiteStatsUpdateJobTest extends TestCase {
 
         $job = new SiteStatsUpdateJob($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle($request);
+        $job->handle($request, $this->mockMwBackendHostResolver);
     }
 
     public function testFatalErrorIsHandled() {
@@ -83,6 +96,6 @@ class SiteStatsUpdateJobTest extends TestCase {
 
         $job = new SiteStatsUpdateJob($this->wiki->id);
         $job->setJob($mockJob);
-        $job->handle($request);
+        $job->handle($request, $this->mockMwBackendHostResolver);
     }
 }
