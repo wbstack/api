@@ -4,8 +4,8 @@ namespace Tests\Jobs;
 
 use App\Jobs\PollForMediaWikiJobsJob;
 use App\Jobs\ProcessMediaWikiJobsJob;
-use App\Wiki;
 use App\Services\MediaWikiHostResolver;
+use App\Wiki;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;

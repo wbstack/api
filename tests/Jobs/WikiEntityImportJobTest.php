@@ -3,10 +3,10 @@
 namespace Tests\Jobs;
 
 use App\Jobs\WikiEntityImportJob;
+use App\Services\MediaWikiHostResolver;
 use App\Wiki;
 use App\WikiEntityImport;
 use App\WikiEntityImportStatus;
-use App\Services\MediaWikiHostResolver;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
@@ -21,6 +21,7 @@ class WikiEntityImportJobTest extends TestCase {
     use RefreshDatabase;
 
     private $mwBackendHost;
+
     private $mockMwHostResolver;
 
     protected function setUp(): void {

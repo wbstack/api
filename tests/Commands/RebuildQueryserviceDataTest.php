@@ -4,8 +4,8 @@ namespace Tests\Commands;
 
 use App\Constants\MediawikiNamespace;
 use App\Jobs\SpawnQueryserviceUpdaterJob;
-use App\Services\MediaWikiHostResolver;
 use App\QueryserviceNamespace;
+use App\Services\MediaWikiHostResolver;
 use App\Wiki;
 use App\WikiSetting;
 use Illuminate\Foundation\Testing\DatabaseTransactions;

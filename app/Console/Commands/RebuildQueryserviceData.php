@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use App\Constants\MediawikiNamespace;
 use App\Jobs\SpawnQueryserviceUpdaterJob;
-use App\Services\MediaWikiHostResolver;
 use App\QueryserviceNamespace;
+use App\Services\MediaWikiHostResolver;
 use App\Traits;
 use App\Wiki;
 use App\WikiSetting;

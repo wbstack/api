@@ -4,12 +4,12 @@ namespace Tests\Jobs\CirrusSearch;
 
 use App\Http\Curl\HttpRequest;
 use App\Jobs\CirrusSearch\ForceSearchIndex;
+use App\Services\MediaWikiHostResolver;
 use App\User;
 use App\Wiki;
 use App\WikiDb;
 use App\WikiManager;
 use App\WikiSetting;
-use App\Services\MediaWikiHostResolver;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Testing\DatabaseTransactions;

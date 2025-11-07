@@ -4,10 +4,10 @@ namespace Tests\Jobs;
 
 use App\Http\Curl\HttpRequest;
 use App\Jobs\SiteStatsUpdateJob;
+use App\Services\MediaWikiHostResolver;
 use App\User;
 use App\Wiki;
 use App\WikiManager;
-use App\Services\MediaWikiHostResolver;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -16,9 +16,13 @@ class SiteStatsUpdateJobTest extends TestCase {
     use RefreshDatabase;
 
     private $user;
+
     private $wiki;
+
     private $manager;
+
     private $mwBackendHost;
+
     private $mockMwHostResolver;
 
     protected function setUp(): void {

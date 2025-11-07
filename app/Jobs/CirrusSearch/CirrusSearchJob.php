@@ -4,9 +4,9 @@ namespace App\Jobs\CirrusSearch;
 
 use App\Http\Curl\HttpRequest;
 use App\Jobs\Job;
+use App\Services\MediaWikiHostResolver;
 use App\Wiki;
 use App\WikiSetting;
-use App\Services\MediaWikiHostResolver;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 abstract class CirrusSearchJob extends Job implements ShouldBeUnique {

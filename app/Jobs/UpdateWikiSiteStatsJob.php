@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Services\MediaWikiHostResolver;
 use App\Wiki;
 use App\WikiSiteStats;
-use App\Services\MediaWikiHostResolver;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\Queue\ShouldBeUnique;

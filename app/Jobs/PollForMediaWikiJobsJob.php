@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Wiki;
 use App\Services\MediaWikiHostResolver;
+use App\Wiki;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Http;

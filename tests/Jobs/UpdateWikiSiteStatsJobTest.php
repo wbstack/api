@@ -2,9 +2,9 @@
 
 namespace Tests\Jobs;
 
-use App\Wiki;
 use App\Jobs\UpdateWikiSiteStatsJob;
 use App\Services\MediaWikiHostResolver;
+use App\Wiki;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;

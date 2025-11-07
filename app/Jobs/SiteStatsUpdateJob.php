@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Http\Curl\HttpRequest;
-use App\Wiki;
 use App\Services\MediaWikiHostResolver;
+use App\Wiki;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
