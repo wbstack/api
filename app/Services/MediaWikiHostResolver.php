@@ -10,6 +10,11 @@ use Exception;
  */
 class UnknownDBVersionException extends Exception {}
 
+/**
+ * Exception thrown when a wiki is not found by domain in MediaWikiHostResolver.
+ */
+class UnknownWikiDomainException extends Exception {}
+
 class MediaWikiHostResolver {
     // TODO: Move this mapping to a config file so that MW updates do not require code changes here.
     /** @var array<string, string> Map of DB version strings to MediaWiki backend version strings */
@@ -18,6 +23,7 @@ class MediaWikiHostResolver {
         'mw1.43-wbs1' => '143-app',
     ];
 
+    // https://phabricator.wikimedia.org/T409530
     // This service could have other methods in future, e.g. getBackendHostForWiki()
     // public function getBackendHostForWiki(Wiki $wiki): string {
     //     return $this->getBackendHostForDomain($wiki->domain);
@@ -29,10 +35,13 @@ class MediaWikiHostResolver {
     }
 
     public function getMwVersionForDomain(string $domain): string {
-        $dbVersion = Wiki::where('domain', $domain)
-            ->first()
-            ->wikiDb
-            ->version;
+        $wiki = Wiki::where('domain', $domain)->first();
+
+        if (!$wiki) {
+            throw new UnknownWikiDomainException("Unknown Wiki Domain '{$domain}'.");
+        }
+
+        $dbVersion = $wiki->wikiDb->version;
 
         if (array_key_exists($dbVersion, self::DB_VERSION_TO_MW_VERSION)) {
             return self::DB_VERSION_TO_MW_VERSION[$dbVersion];
