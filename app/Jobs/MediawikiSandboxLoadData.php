@@ -25,11 +25,9 @@ class MediawikiSandboxLoadData extends Job {
             'dataSet' => $this->dataSet,
         ];
 
-        $mwHost = $mwHostResolver->getBackendHostForDomain($this->wikiDomain);
-
         $curl = curl_init();
         curl_setopt_array($curl, [
-            CURLOPT_URL => $mwHost . '/w/rest.php/wikibase-exampledata/v0/load',
+            CURLOPT_URL => $mwHostResolver->getBackendHostForDomain($this->wikiDomain) . '/w/rest.php/wikibase-exampledata/v0/load',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 10 * 60, // TODO Long 10 mins (probably shouldn't keep the request open...)
