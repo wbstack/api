@@ -11,7 +11,7 @@ trait PageFetcher {
     // this function is used to fetch pages on namespace
     public function fetchPagesInNamespace(string $wikiDomain, MediawikiNamespace $namespace): array {
         $mwHostResolver = App::make(MediaWikiHostResolver::class);
-        $apiUrl = $mwHostResolver->getMwVersionForDomain($wikiDomain) . '/w/api.php';
+        $apiUrl = $mwHostResolver->getBackendHostForDomain($wikiDomain) . '/w/api.php';
 
         $titles = [];
         $cursor = '';
