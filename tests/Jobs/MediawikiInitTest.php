@@ -4,6 +4,7 @@ namespace Tests\Jobs;
 
 use App\Http\Curl\HttpRequest;
 use App\Jobs\MediawikiInit;
+use App\Services\MediaWikiHostResolver;
 use Illuminate\Contracts\Queue\Job;
 use Tests\TestCase;
 
@@ -14,11 +15,14 @@ class MediawikiInitTest extends TestCase {
 
     private $username;
 
+    private $mwBackendHost;
+
     protected function setUp(): void {
         parent::setUp();
         $this->wikiDomain = 'some.domain.com';
         $this->username = 'username';
         $this->email = 'some@email.com';
+        $this->mwBackendHost = 'mediawiki.localhost';
     }
 
     private function getMockRequest(string $mockResponse): HttpRequest {
@@ -29,7 +33,7 @@ class MediawikiInitTest extends TestCase {
             ->method('setOptions')
             ->with(
                 [
-                    CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=wbstackInit&format=json',
+                    CURLOPT_URL => $this->mwBackendHost . '/w/api.php?action=wbstackInit&format=json',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_TIMEOUT => 60,
@@ -49,7 +53,18 @@ class MediawikiInitTest extends TestCase {
         return $request;
     }
 
+    private function getMockMwHostResolver() {
+        $mwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $mwHostResolver->method('getBackendHostForDomain')->willReturn(
+            $this->mwBackendHost
+        );
+
+        return $mwHostResolver;
+    }
+
     public function testSuccess() {
+        $mockHostResolver = $this->getMockMwHostResolver();
+
         $mockResponse = [
             'warnings' => [],
             'wbstackInit' => [
@@ -68,10 +83,12 @@ class MediawikiInitTest extends TestCase {
 
         $job = new MediawikiInit($this->wikiDomain, $this->username, $this->email);
         $job->setJob($mockJob);
-        $job->handle($request);
+        $job->handle($request, $mockHostResolver);
     }
 
     public function testFatalErrorIsHandled() {
+        $mockHostResolver = $this->getMockMwHostResolver();
+
         $mockResponse = 'oh no';
         $request = $this->getMockRequest($mockResponse);
 
@@ -84,6 +101,6 @@ class MediawikiInitTest extends TestCase {
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
-        $job->handle($request);
+        $job->handle($request, $mockHostResolver);
     }
 }
