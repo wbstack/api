@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Constants\MediawikiNamespace;
 use App\Helper\MWTimestampHelper;
+use App\Services\MediaWikiHostResolver;
 use App\Traits;
 use App\User;
 use App\Wiki;
@@ -38,6 +39,8 @@ class PlatformStatsSummaryJob extends Job {
     private $creationRateRanges;
 
     private $platformSummaryStatsVersion = 'v1';
+
+    private MediaWikiHostResolver $mwHostResolver;
 
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
@@ -76,6 +79,7 @@ class PlatformStatsSummaryJob extends Job {
         $currentTime = CarbonImmutable::now();
 
         foreach ($wikis as $wiki) {
+            $this->apiUrl = $this->mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php'; // used in PageFetcher::fetchPagesInNamespace
 
             if (!is_null($wiki->deleted_at)) {
                 $deletedWikis[] = $wiki;
@@ -163,7 +167,8 @@ class PlatformStatsSummaryJob extends Job {
         ];
     }
 
-    public function handle(DatabaseManager $manager): void {
+    public function handle(DatabaseManager $manager, MediaWikiHostResolver $mwHostResolver): void {
+        $this->mwHostResolver = $mwHostResolver;
         $wikis = Wiki::withTrashed()->with('wikidb')->get();
 
         $conn = $manager->connection('mysql');
