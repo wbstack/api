@@ -11,7 +11,4 @@ init:
 test-fresh: init test
 
 lint:
-	docker compose exec -T api vendor/bin/pint --test -v
-
-lint-fix:
-	docker compose exec -T api vendor/bin/pint -v
+	docker compose exec -T api vendor/bin/psalm
