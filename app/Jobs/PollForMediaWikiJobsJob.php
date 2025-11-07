@@ -14,11 +14,8 @@ class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique, ShouldQueue
 
     public $timeout = 1800;
 
-    public function __construct(MediaWikiHostResolver $mwHostResolver = null) {
-        $this->mwHostResolver = $mwHostResolver ?? new MediaWikiHostResolver();
-    }
-
-    public function handle(): void {
+    public function handle(MediaWikiHostResolver $mwHostResolver): void {
+        $this->mwHostResolver = $mwHostResolver;
         $allWikiDomains = Wiki::all()->pluck('domain');
         foreach ($allWikiDomains as $wikiDomain) {
             if ($this->hasPendingJobs($wikiDomain)) {
