@@ -37,6 +37,10 @@ class MediaWikiHostResolver {
     public function getMwVersionForDomain(string $domain): string {
         $wiki = Wiki::where('domain', $domain)->first();
 
+        if (!$wiki) {
+            throw new UnknownWikiDomainException("Unknown Wiki Domain '{$domain}'.");
+        }
+
         $dbVersion = $wiki->wikiDb->version;
 
         if (array_key_exists($dbVersion, self::DB_VERSION_TO_MW_VERSION)) {
