@@ -4,6 +4,7 @@ namespace Tests;
 
 use App\Services\MediaWikiHostResolver;
 use App\Services\UnknownDBVersionException;
+use App\Services\UnknownWikiDomainException;
 use App\Wiki;
 use App\WikiDb;
 use Faker\Factory;
@@ -41,6 +42,15 @@ class MediaWikiHostResolverTest extends TestCase {
         $this->assertThrows(
             fn () => $resolver->getBackendHostForDomain($domain),
             UnknownDBVersionException::class
+        );
+    }
+
+    public function testResolverThrowsIfUnableToFindWiki(): void {
+        $domain = (new Factory)->create()->unique()->text(30);
+        $resolver = new MediaWikiHostResolver;
+        $this->assertThrows(
+            fn () => $resolver->getBackendHostForDomain($domain),
+            UnknownWikiDomainException::class
         );
     }
 }
