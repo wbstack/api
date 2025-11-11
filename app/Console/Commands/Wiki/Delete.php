@@ -57,13 +57,20 @@ class Delete extends Command {
         $wikiDb = $wiki->wikidb;
         $prefix = $wikiDb->prefix;
 
-        // Replaces current mw database connection config with scoped wiki credentials
-        app()->config->set('database.connections.mw.database', $wikiDb->name);
-        app()->config->set('database.connections.mw.username', $wikiDb->user);
-        app()->config->set('database.connections.mw.password', $wikiDb->password);
+        // Configure a DB connection with wiki credentials
+        $wikiDbConnectionConfig = array_replace(
+            config('database.connections.mw'),
+            [
+                'database' => $wikiDb->name,
+                'username' => $wikiDb->user,
+                'password' => $wikiDb->password,
+            ]
+        );
+
+        config('database.connections.singleWiki', $wikiDbConnectionConfig);
 
         $manager = App::make(DatabaseManager::class);
-        $mwConn = $manager->connection('mw');
+        $mwConn = $manager->connection('singleWiki');
 
         if (!$mwConn instanceof \Illuminate\Database\Connection) {
             throw new \RuntimeException('Must be run on a PDO based DB connection');
