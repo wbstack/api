@@ -122,7 +122,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
             ]);
             // Generate some items/properties for testing, each wiki will have 3 props and 9 items
             Http::fake([
-                getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+                $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                     'query' => [
                         'allpages' => [
                             ['title' => 'Property:P1', 'namespace' => MediawikiNamespace::property],
@@ -131,7 +131,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
                         ],
                     ],
                 ], 200),
-                getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+                $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
                     'continue' => [
                         'apcontinue' => 'Q6',
                     ],
@@ -145,7 +145,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
                         ],
                     ],
                 ], 200),
-                getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=Q6&aplimit=max&format=json' => Http::response([
+                $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=Q6&aplimit=max&format=json' => Http::response([
                     'query' => [
                         'allpages' => [
                             ['title' => 'Item:Q6', 'namespace' => MediawikiNamespace::item],
