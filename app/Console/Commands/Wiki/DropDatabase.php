@@ -4,16 +4,17 @@ namespace App\Console\Commands\Wiki;
 
 use App\Wiki;
 use App\WikiDb;
-use Illuminate\Support\Facades\App;
 use Illuminate\Console\Command;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Facades\App;
 
 class dropDatabase extends Command {
     protected $signature = 'wbs-wiki:dropDatabase {wikiDomain}';
+
     protected $description = 'Drops the MediaWiki database of a wiki and soft-deletes it.';
 
     public function handle(): int {
-        $wikiDomain  = trim($this->argument('wikiDomain'));
+        $wikiDomain = trim($this->argument('wikiDomain'));
         $wiki = Wiki::with('wikidb')->firstWhere('domain', $wikiDomain);
 
         if (!$wiki) {
