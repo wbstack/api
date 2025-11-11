@@ -31,9 +31,6 @@ class WikiDomain extends Model {
         'wiki_id',
     ];
 
-    /**
-     * @psalm-return \Illuminate\Database\Eloquent\Relations\HasOne<Wiki>
-     */
     public function wiki(): \Illuminate\Database\Eloquent\Relations\HasOne {
         return $this->hasOne(Wiki::class);
     }

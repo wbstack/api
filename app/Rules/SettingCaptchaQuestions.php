@@ -23,9 +23,6 @@ class SettingCaptchaQuestions implements Rule {
             if (!is_string($question)) {
                 return false;
             }
-            /**
-             * @psalm-suppress NoValue
-             */
             if (strlen($question) > 200) {
                 return false;
             }

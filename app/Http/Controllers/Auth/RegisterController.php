@@ -46,9 +46,6 @@ class RegisterController extends Controller {
 
         event(new Registered($user));
 
-        /**
-         * @psalm-suppress UndefinedInterfaceMethod
-         */
         Auth::guard()->login($user);
 
         // HTTP Response

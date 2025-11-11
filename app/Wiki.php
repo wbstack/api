@@ -70,17 +70,11 @@ class Wiki extends Model {
     ];
 
     public function wikiDbVersion() {
-        /**
-         * @psalm-suppress InvalidArgument
-         */
         return $this->hasOne(WikiDb::class)->select(['id', 'wiki_id', 'version']);
     }
 
     // TODO these should just be on the backend model? =] Or marked as a private relationship or something?
     // OR some sort of access control needs to be done..
-    /**
-     * @psalm-return \Illuminate\Database\Eloquent\Relations\HasOne<WikiDb>
-     */
     public function wikiDb(): \Illuminate\Database\Eloquent\Relations\HasOne {
         return $this->hasOne(WikiDb::class);
     }
@@ -105,17 +99,11 @@ class Wiki extends Model {
         return $this->hasMany(WikiManager::class);
     }
 
-    /**
-     * @psalm-return \Illuminate\Database\Eloquent\Relations\HasOne<QueryserviceNamespace>
-     */
     public function wikiQueryserviceNamespace(): \Illuminate\Database\Eloquent\Relations\HasOne {
         return $this->hasOne(QueryserviceNamespace::class);
     }
 
     // FIXME: rename to privateSettings / allSettings for clarity?
-    /**
-     * @psalm-return \Illuminate\Database\Eloquent\Relations\HasMany<WikiSetting>
-     */
     public function settings(): \Illuminate\Database\Eloquent\Relations\HasMany {
         return $this->hasMany(WikiSetting::class);
     }
@@ -142,9 +130,6 @@ class Wiki extends Model {
 
     public function wikiManagersWithEmail() {
         // TODO should this be hasMany ?
-        /**
-         * @psalm-suppress InvalidArgument
-         */
         return $this->belongsToMany(User::class, 'wiki_managers')->select(['email']);
     }
 

@@ -104,9 +104,6 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique {
                 $replacedCount = 0;
                 $tableWithoutPrefix = str_replace($wikiDB->prefix . '_', '', $table, $replacedCount);
                 if ($replacedCount !== 1) {
-                    /**
-                     * @psalm-suppress InvalidCast
-                     */
                     throw new \RuntimeException("Did not find prefix '{$wikiDB->prefix}' in tablename '{$table}' ");
                 }
                 $pdo->exec(sprintf('RENAME TABLE %s.%s TO %s.%s', $wikiDB->name, $table, $deletedDatabaseName, $tableWithoutPrefix));

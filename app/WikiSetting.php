@@ -57,9 +57,6 @@ class WikiSetting extends Model {
         'value',
     ];
 
-    /**
-     * @psalm-return \Illuminate\Database\Eloquent\Relations\BelongsTo<Wiki>
-     */
     public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
         return $this->belongsTo(Wiki::class);
     }
