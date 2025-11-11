@@ -39,6 +39,10 @@ class dropDatabase extends Command {
         return 0;
     }
 
+    // This is a rather ugly way to clean up some of the user data from a wiki that we are about to soft delete.
+    //
+    // This directly accesses the MW DB from the platform API which is a pattern we are generally trying to avoid but
+    // the database is likely never going to be read by MW every again since it's next step is hard deletion.
     private function dropWikiDb(WikiDb $wikiDb): bool {
         $connection = $this->getWikiDbConnection($wikiDb);
 
