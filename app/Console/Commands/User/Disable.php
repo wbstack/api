@@ -51,7 +51,7 @@ class Disable extends Command {
         }
 
         $userId = $user->id;
-        $user->email = '';
+        $user->email = random_bytes(10);
         $user->password = random_bytes(10);
         $user->verified = false;
 
