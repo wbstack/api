@@ -30,7 +30,7 @@ class ProcessMediaWikiJobsJob implements ShouldBeUnique, ShouldQueue {
 
     public function handle(Client $kubernetesClient, MediaWikiHostResolver $resolver): void {
         $FQDNOfService = $resolver->getBackendHostForDomain($this->wikiDomain);
-        $serviceName = explode(".", $FQDNOfService)[0];
+        $serviceName = explode('.', $FQDNOfService)[0];
         $kubernetesClient->setNamespace('default');
         $backendService = $kubernetesClient->services()->setFieldSelector([
             'metadata.name' => $serviceName,
