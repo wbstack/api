@@ -17,10 +17,10 @@ class UnknownWikiDomainException extends Exception {}
 
 class MediaWikiHostResolver {
     // TODO: Move this mapping to a config file so that MW updates do not require code changes here.
-    /** @var array<string, string> Map of DB version strings to MediaWiki backend version strings */
+    /** @var array<string, string> Map of DB version strings to MediaWiki version strings */
     private const DB_VERSION_TO_MW_VERSION = [
-        'mw1.39-wbs1' => '139-app',
-        'mw1.43-wbs1' => '143-app',
+        'mw1.39-wbs1' => '139',
+        'mw1.43-wbs1' => '143',
     ];
 
     // https://phabricator.wikimedia.org/T409530
@@ -31,7 +31,7 @@ class MediaWikiHostResolver {
 
     public function getBackendHostForDomain(string $domain): string {
         // TODO: Move 'backend.default.svc.cluster.local' to an env variable (e.g. PLATFORM_MW_BACKEND_HOST_SUFFIX) for flexibility.
-        return sprintf('mediawiki-%s-backend.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
+        return sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
     }
 
     public function getMwVersionForDomain(string $domain): string {
