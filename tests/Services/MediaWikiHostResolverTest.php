@@ -13,6 +13,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class MediaWikiHostResolverTest extends TestCase {
     use RefreshDatabase;
 
+    public function testGetMwVersionForDomain(): void {
+        $domain = (new Factory)->create()->unique()->text(30);
+        $this->createWiki($domain, 'mw1.43-wbs1');
+        $resolver = new MediaWikiHostResolver;
+        $this->assertSame('143', $resolver->getMwVersionForDomain($domain));
+    }
+
     public function testResolverRoutesToCorrectHost(): void {
         $domain = (new Factory)->create()->unique()->text(30);
         $this->createWiki($domain, 'mw1.39-wbs1');
