@@ -3,6 +3,7 @@
 namespace Tests\Jobs;
 
 use App\Jobs\UpdateWikiSiteStatsJob;
+use App\Services\MediaWikiHostResolver;
 use App\Wiki;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,12 +16,23 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
 
     private $fakeResponses;
 
+    private $mwBackendHost;
+
+    private $mockMwHostResolver;
+
     protected function setUp(): void {
         // Other tests leave dangling wikis around so we need to clean them up
         parent::setUp();
         Wiki::query()->delete();
         $this->fakeResponses = [];
         Http::preventStrayRequests();
+
+        $this->mwBackendHost = 'mediawiki.localhost';
+
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+            $this->mwBackendHost
+        );
     }
 
     protected function tearDown(): void {
@@ -29,12 +41,12 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
     }
 
     private function addFakeSiteStatsResponse($site, $response) {
-        $siteStatsUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json';
+        $siteStatsUrl = $this->mwBackendHost . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json';
         $this->fakeResponses[$siteStatsUrl][$site] = $response;
     }
 
     private function addFakeRevisionTimestamp($site, $revid, $timestamp) {
-        $revTimestampUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&format=json&prop=revisions&rvprop=timestamp&formatversion=2&revids=' . $revid;
+        $revTimestampUrl = $this->mwBackendHost . '/w/api.php?action=query&format=json&prop=revisions&rvprop=timestamp&formatversion=2&revids=' . $revid;
         $this->fakeResponses[$revTimestampUrl][$site] = Http::response([
             'query' => [
                 'pages' => [
@@ -51,13 +63,13 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
     }
 
     private function addFakeEmptyRevisionList($site) {
-        $firstRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer';
+        $firstRevisionIdUrl = $this->mwBackendHost . '/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer';
         $this->fakeResponses[$firstRevisionIdUrl][$site] = Http::response([
             'query' => [
                 'allrevisions' => [],
             ],
         ]);
-        $lastRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=older';
+        $lastRevisionIdUrl = $this->mwBackendHost . '/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=older';
         $this->fakeResponses[$lastRevisionIdUrl][$site] = Http::response([
             'query' => [
                 'allrevisions' => [],
@@ -66,7 +78,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
     }
 
     private function addFakeFirstRevisionId($site, $id) {
-        $firstRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer';
+        $firstRevisionIdUrl = $this->mwBackendHost . '/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=newer';
         $this->fakeResponses[$firstRevisionIdUrl][$site] = Http::response([
             'query' => [
                 'allrevisions' => [
@@ -83,7 +95,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
     }
 
     private function addFakeLastRevisionId($site, $id) {
-        $lastRevisionIdUrl = getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=older';
+        $lastRevisionIdUrl = $this->mwBackendHost . '/w/api.php?action=query&format=json&list=allrevisions&formatversion=2&arvlimit=1&arvprop=ids&arvexcludeuser=PlatformReservedUser&arvdir=older';
         $this->fakeResponses[$lastRevisionIdUrl][$site] = Http::response([
             'query' => [
                 'allrevisions' => [
@@ -148,7 +160,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
 
         $mockJob->expects($this->never())->method('fail');
         $mockJob->expects($this->never())->method('markAsFailed');
-        $job->handle();
+        $job->handle($this->mockMwHostResolver);
 
         $stats1 = Wiki::with('wikiSiteStats')->where(['domain' => 'this.wikibase.cloud'])->first()->wikiSiteStats()->first();
         $this->assertEquals($stats1['admins'], 7);
@@ -214,7 +226,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
 
         $mockJob->expects($this->never())->method('fail');
         $mockJob->expects($this->never())->method('markAsFailed');
-        $job->handle();
+        $job->handle($this->mockMwHostResolver);
 
         $stats1 = Wiki::with('wikiSiteStats')->where(['domain' => 'this.wikibase.cloud'])->first()->wikiSiteStats()->first();
         $this->assertEquals($stats1['admins'], 7);
@@ -247,7 +259,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
 
         $mockJob->expects($this->never())->method('fail');
         $mockJob->expects($this->once())->method('markAsFailed');
-        $job->handle();
+        $job->handle($this->mockMwHostResolver);
     }
 
     public function testIncompleteSiteStatsDoesNotCauseFailure() {
@@ -276,7 +288,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
 
         $mockJob->expects($this->never())->method('fail');
         $mockJob->expects($this->never())->method('markAsFailed');
-        $job->handle();
+        $job->handle($this->mockMwHostResolver);
 
         $stats2 = Wiki::with('wikiSiteStats')->where(['domain' => 'incomplete.wikibase.cloud'])->first()->wikiSiteStats()->first();
         $this->assertEquals($stats2['articles'], 99);
@@ -298,7 +310,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
 
         $mockJob->expects($this->never())->method('fail');
         $mockJob->expects($this->never())->method('markAsFailed');
-        $job->handle();
+        $job->handle($this->mockMwHostResolver);
 
         $events = Wiki::with('wikiLifecycleEvents')->where(['domain' => 'this.wikibase.cloud'])->first()->wikiLifecycleEvents()->first();
         $this->assertNull($events['first_edited']);

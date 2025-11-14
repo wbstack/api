@@ -5,6 +5,7 @@ namespace Tests\Commands;
 use App\Constants\MediawikiNamespace;
 use App\Jobs\SpawnQueryserviceUpdaterJob;
 use App\QueryserviceNamespace;
+use App\Services\MediaWikiHostResolver;
 use App\Wiki;
 use App\WikiSetting;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -16,11 +17,22 @@ use Tests\TestCase;
 class RebuildQueryserviceDataTest extends TestCase {
     use DatabaseTransactions;
 
+    private $mwBackendHost;
+
     protected function setUp(): void {
         parent::setUp();
         Wiki::query()->delete();
         WikiSetting::query()->delete();
         QueryserviceNamespace::query()->delete();
+
+        $this->mwBackendHost = 'mediawiki.localhost';
+
+        $mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+            $this->mwBackendHost
+        );
+
+        $this->app->instance(MediaWikiHostResolver::class, $mockMwHostResolver);
     }
 
     protected function tearDown(): void {
@@ -55,7 +67,7 @@ class RebuildQueryserviceDataTest extends TestCase {
         ]);
 
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
@@ -73,7 +85,7 @@ class RebuildQueryserviceDataTest extends TestCase {
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
                 'continue' => [
                     'apcontinue' => 'Q6',
                 ],
@@ -102,7 +114,7 @@ class RebuildQueryserviceDataTest extends TestCase {
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=Q6&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=Q6&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
@@ -124,7 +136,7 @@ class RebuildQueryserviceDataTest extends TestCase {
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
@@ -185,7 +197,7 @@ class RebuildQueryserviceDataTest extends TestCase {
         ]);
 
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
@@ -203,7 +215,7 @@ class RebuildQueryserviceDataTest extends TestCase {
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
@@ -229,7 +241,7 @@ class RebuildQueryserviceDataTest extends TestCase {
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
                 'error' => 'Lexemes not enabled for this wiki',
             ], 400),
         ]);
@@ -261,7 +273,7 @@ class RebuildQueryserviceDataTest extends TestCase {
         ]);
 
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [
                         [
@@ -279,10 +291,10 @@ class RebuildQueryserviceDataTest extends TestCase {
                     ],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'error' => 'THE DINOSAURS ESCAPED!',
             ], 500),
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
                 'error' => 'Lexemes not enabled for this wiki',
             ], 400),
         ]);
@@ -301,17 +313,17 @@ class RebuildQueryserviceDataTest extends TestCase {
         ]);
 
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                 'query' => [
                     'allpages' => [],
                 ],
             ], 200),
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=146&apcontinue=&aplimit=max&format=json' => Http::response([
                 'error' => 'Lexemes not enabled for this wiki',
             ], 400),
         ]);

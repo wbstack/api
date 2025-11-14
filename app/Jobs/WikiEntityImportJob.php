@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Services\MediaWikiHostResolver;
 use App\Wiki;
 use App\WikiEntityImport;
 use App\WikiEntityImportStatus;
@@ -27,7 +28,7 @@ class WikiEntityImportJob implements ShouldQueue {
         public int $wikiId,
         public string $sourceWikiUrl,
         public array $entityIds,
-        public int $importId,
+        public int $importId
     ) {}
 
     private string $targetWikiUrl;
@@ -35,12 +36,12 @@ class WikiEntityImportJob implements ShouldQueue {
     /**
      * Execute the job.
      */
-    public function handle(Client $kubernetesClient): void {
+    public function handle(Client $kubernetesClient, MediaWikiHostResolver $mwHostResolver): void {
         $import = null;
         try {
             $wiki = Wiki::findOrFail($this->wikiId);
             $import = WikiEntityImport::findOrFail($this->importId);
-            $creds = $this->acquireCredentials($wiki->domain);
+            $creds = $this->acquireCredentials($wiki->domain, $mwHostResolver);
 
             $this->targetWikiUrl = $this->domainToOrigin($wiki->domain);
 
@@ -77,9 +78,9 @@ class WikiEntityImportJob implements ShouldQueue {
             : 'https://' . $domain;
     }
 
-    private static function acquireCredentials(string $wikiDomain): OAuthCredentials {
+    private static function acquireCredentials(string $wikiDomain, MediaWikiHostResolver $mwHostResolver): OAuthCredentials {
         $response = Http::withHeaders(['host' => $wikiDomain])->asForm()->post(
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=wbstackPlatformOauthGet&format=json',
+            $mwHostResolver->getBackendHostForDomain($wikiDomain) . '/w/api.php?action=wbstackPlatformOauthGet&format=json',
             [
                 'consumerName' => 'WikiEntityImportJob',
                 'ownerOnly' => '1',

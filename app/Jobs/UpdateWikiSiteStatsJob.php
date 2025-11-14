@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Services\MediaWikiHostResolver;
 use App\Wiki;
 use App\WikiSiteStats;
 use Carbon\Carbon;
@@ -17,7 +18,11 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
 
     public $timeout = 3600;
 
-    public function handle(): void {
+    private MediaWikiHostResolver $mwHostResolver;
+
+    public function handle(MediaWikiHostResolver $mwHostResolver): void {
+        $this->mwHostResolver = $mwHostResolver;
+
         $allWikis = Wiki::all();
         foreach ($allWikis as $wiki) {
             try {
@@ -54,7 +59,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
         $response = Http::withHeaders([
             'host' => $wiki->getAttribute('domain'),
         ])->get(
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
+            $this->mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
         );
 
         if ($response->failed()) {
@@ -76,7 +81,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
 
     private function getFirstEditedDate(Wiki $wiki): ?CarbonInterface {
         $allRevisions = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php',
+            $this->mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php',
             [
                 'action' => 'query',
                 'format' => 'json',
@@ -94,7 +99,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
         }
 
         $revisionInfo = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php',
+            $this->mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php',
             [
                 'action' => 'query',
                 'format' => 'json',
@@ -114,7 +119,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
 
     private function getLastEditedDate(Wiki $wiki): ?CarbonInterface {
         $allRevisions = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php',
+            $this->mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php',
             [
                 'action' => 'query',
                 'format' => 'json',
@@ -132,7 +137,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
         }
 
         $revisionInfo = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php',
+            $this->mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php',
             [
                 'action' => 'query',
                 'format' => 'json',

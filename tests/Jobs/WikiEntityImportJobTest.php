@@ -3,6 +3,7 @@
 namespace Tests\Jobs;
 
 use App\Jobs\WikiEntityImportJob;
+use App\Services\MediaWikiHostResolver;
 use App\Wiki;
 use App\WikiEntityImport;
 use App\WikiEntityImportStatus;
@@ -19,10 +20,21 @@ use Tests\TestCase;
 class WikiEntityImportJobTest extends TestCase {
     use RefreshDatabase;
 
+    private $mwBackendHost;
+
+    private $mockMwHostResolver;
+
     protected function setUp(): void {
         parent::setUp();
         Wiki::query()->delete();
         WikiEntityImport::query()->delete();
+
+        $this->mwBackendHost = 'mediawiki.localhost';
+
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+            $this->mwBackendHost
+        );
     }
 
     protected function tearDown(): void {
@@ -34,7 +46,7 @@ class WikiEntityImportJobTest extends TestCase {
     public function testJobDoesNotFail() {
 
         Http::fake([
-            'mediawiki-139-app-backend.default.svc.cluster.default/w/api.php?action=wbstackPlatformOauthGet&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=wbstackPlatformOauthGet&format=json' => Http::response([
                 'wbstackPlatformOauthGet' => [
                     'success' => '1',
                     'data' => [
@@ -80,9 +92,11 @@ class WikiEntityImportJobTest extends TestCase {
             'verify' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
         ]);
 
-        $job->handle(new Client([
+        $k8sClient = new Client([
             'master' => 'https://kubernetes.default.svc',
             'token' => '/var/run/secrets/kubernetes.io/serviceaccount/token',
-        ], null, $mockGuzzle));
+        ], null, $mockGuzzle);
+
+        $job->handle($k8sClient, $this->mockMwHostResolver);
     }
 }

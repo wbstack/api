@@ -4,6 +4,7 @@ namespace Tests\Jobs\CirrusSearch;
 
 use App\Http\Curl\HttpRequest;
 use App\Jobs\CirrusSearch\ForceSearchIndex;
+use App\Services\MediaWikiHostResolver;
 use App\User;
 use App\Wiki;
 use App\WikiDb;
@@ -25,6 +26,10 @@ class ForceSearchIndexTest extends TestCase {
 
     private $user;
 
+    private $mwBackendHost;
+
+    private $mockMwHostResolver;
+
     protected function setUp(): void {
         parent::setUp();
 
@@ -42,6 +47,13 @@ class ForceSearchIndexTest extends TestCase {
         $this->wikiDb = WikiDb::factory()->create([
             'wiki_id' => $this->wiki->id,
         ]);
+
+        $this->mwBackendHost = 'mediawiki.localhost';
+
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+            $this->mwBackendHost
+        );
     }
 
     public function testSuccess() {
@@ -89,7 +101,7 @@ class ForceSearchIndexTest extends TestCase {
         $request->expects($this->once())
             ->method('setOptions')
             ->with([
-                CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=wbstackForceSearchIndex&format=json&fromId=' . $fromId . '&toId=' . $toId,
+                CURLOPT_URL => $this->mwBackendHost . '/w/api.php?action=wbstackForceSearchIndex&format=json&fromId=' . $fromId . '&toId=' . $toId,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_TIMEOUT => 1000,
@@ -108,6 +120,6 @@ class ForceSearchIndexTest extends TestCase {
 
         $job = new ForceSearchIndex('id', $this->wiki->id, $fromId, $toId);
         $job->setJob($mockJob);
-        $job->handle($request);
+        $job->handle($request, $this->mockMwHostResolver);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Http\Curl\HttpRequest;
+use App\Services\MediaWikiHostResolver;
 
 class MediawikiInit extends Job {
     private $wikiDomain;
@@ -23,14 +24,14 @@ class MediawikiInit extends Job {
     /**
      * @return void
      */
-    public function handle(HttpRequest $request) {
+    public function handle(HttpRequest $request, MediaWikiHostResolver $mwHostResolver) {
         $data = [
             'username' => $this->username,
             'email' => $this->email,
         ];
 
         $request->setOptions([
-            CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=wbstackInit&format=json',
+            CURLOPT_URL => $mwHostResolver->getBackendHostForDomain($this->wikiDomain) . '/w/api.php?action=wbstackInit&format=json',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 60,

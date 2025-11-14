@@ -6,6 +6,7 @@ use App\Constants\MediawikiNamespace;
 use App\Helper\MWTimestampHelper;
 use App\Jobs\PlatformStatsSummaryJob;
 use App\Jobs\ProvisionWikiDbJob;
+use App\Services\MediaWikiHostResolver;
 use App\User;
 use App\Wiki;
 use App\WikiDb;
@@ -31,6 +32,10 @@ class PlatformStatsSummaryJobTest extends TestCase {
 
     private $db_name = 'some_cool_db_name';
 
+    private $mwBackendHost;
+
+    private $mockMwHostResolver;
+
     protected function setUp(): void {
         parent::setUp();
         for ($n = 0; $n < $this->numWikis; $n++) {
@@ -38,6 +43,13 @@ class PlatformStatsSummaryJobTest extends TestCase {
         }
         $this->wikis = [];
         $this->users = [];
+
+        $this->mwBackendHost = 'mediawiki.localhost';
+
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+            $this->mwBackendHost
+        );
     }
 
     protected function tearDown(): void {
@@ -57,7 +69,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
             WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
             $job = new ProvisionWikiDbJob($this->db_prefix . $n, $this->db_name . $n, null);
-            $job->handle($manager);
+            $job->handle($manager, $this->mockMwHostResolver);
 
             $wikiDb = WikiDb::whereName($this->db_name . $n)->first();
             $wikiDb->update(['wiki_id' => $wiki->id]);
@@ -80,7 +92,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
         $job = new PlatformStatsSummaryJob;
         $job->setJob($mockJob);
 
-        $job->handle($manager);
+        $job->handle($manager, $this->mockMwHostResolver);
     }
 
     public function testGroupings() {
@@ -110,7 +122,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
             ]);
             // Generate some items/properties for testing, each wiki will have 3 props and 9 items
             Http::fake([
-                getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+                $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
                     'query' => [
                         'allpages' => [
                             ['title' => 'Property:P1', 'namespace' => MediawikiNamespace::property],
@@ -119,7 +131,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
                         ],
                     ],
                 ], 200),
-                getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+                $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
                     'continue' => [
                         'apcontinue' => 'Q6',
                     ],
@@ -133,7 +145,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
                         ],
                     ],
                 ], 200),
-                getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=Q6&aplimit=max&format=json' => Http::response([
+                $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=Q6&aplimit=max&format=json' => Http::response([
                     'query' => [
                         'allpages' => [
                             ['title' => 'Item:Q6', 'namespace' => MediawikiNamespace::item],

@@ -4,6 +4,7 @@ namespace Tests\Jobs;
 
 use App\Jobs\PollForMediaWikiJobsJob;
 use App\Jobs\ProcessMediaWikiJobsJob;
+use App\Services\MediaWikiHostResolver;
 use App\Wiki;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Database\Eloquent\Model;
@@ -17,14 +18,25 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
     private Model $wiki;
 
+    private $mwBackendHost;
+
+    private $mockMwHostResolver;
+
     protected function setUp(): void {
         parent::setUp();
         $this->wiki = Wiki::factory()->create();
+
+        $this->mwBackendHost = 'mediawiki.localhost';
+
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+            $this->mwBackendHost
+        );
     }
 
     public function testNoJobs() {
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => Http::response([
                 'query' => [
                     'statistics' => [
                         'jobs' => 0,
@@ -40,13 +52,13 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         $mockJob->expects($this->never())->method('fail');
         $mockJob->expects($this->never())->method('markAsFailed');
-        $job->handle();
+        $job->handle($this->mockMwHostResolver);
         Bus::assertNothingDispatched();
     }
 
     public function testWithJobs() {
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => Http::response([
                 'query' => [
                     'statistics' => [
                         'jobs' => 3,
@@ -63,13 +75,13 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         $mockJob->expects($this->never())->method('fail');
         $mockJob->expects($this->never())->method('markAsFailed');
-        $job->handle();
+        $job->handle($this->mockMwHostResolver);
         Bus::assertDispatched(ProcessMediaWikiJobsJob::class);
     }
 
     public function testWithFailure() {
         Http::fake([
-            getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => Http::response([
+            $this->mwBackendHost . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => Http::response([
                 'error' => 'Something went wrong',
             ], 500),
         ]);
@@ -82,7 +94,7 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         $mockJob->expects($this->once())->method('markAsFailed');
         $mockJob->expects($this->never())->method('fail');
-        $job->handle();
+        $job->handle($this->mockMwHostResolver);
         Bus::assertNothingDispatched();
     }
 }

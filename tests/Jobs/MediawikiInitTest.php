@@ -4,6 +4,7 @@ namespace Tests\Jobs;
 
 use App\Http\Curl\HttpRequest;
 use App\Jobs\MediawikiInit;
+use App\Services\MediaWikiHostResolver;
 use Illuminate\Contracts\Queue\Job;
 use Tests\TestCase;
 
@@ -14,11 +15,21 @@ class MediawikiInitTest extends TestCase {
 
     private $username;
 
+    private $mwBackendHost;
+
+    private $mockMwHostResolver;
+
     protected function setUp(): void {
         parent::setUp();
         $this->wikiDomain = 'some.domain.com';
         $this->username = 'username';
         $this->email = 'some@email.com';
+        $this->mwBackendHost = 'mediawiki.localhost';
+
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+            $this->mwBackendHost
+        );
     }
 
     private function getMockRequest(string $mockResponse): HttpRequest {
@@ -29,7 +40,7 @@ class MediawikiInitTest extends TestCase {
             ->method('setOptions')
             ->with(
                 [
-                    CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/api.php?action=wbstackInit&format=json',
+                    CURLOPT_URL => $this->mwBackendHost . '/w/api.php?action=wbstackInit&format=json',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_TIMEOUT => 60,
@@ -68,7 +79,7 @@ class MediawikiInitTest extends TestCase {
 
         $job = new MediawikiInit($this->wikiDomain, $this->username, $this->email);
         $job->setJob($mockJob);
-        $job->handle($request);
+        $job->handle($request, $this->mockMwHostResolver);
     }
 
     public function testFatalErrorIsHandled() {
@@ -84,6 +95,6 @@ class MediawikiInitTest extends TestCase {
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
-        $job->handle($request);
+        $job->handle($request, $this->mockMwHostResolver);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Services\MediaWikiHostResolver;
+
 class MediawikiSandboxLoadData extends Job {
     private $wikiDomain;
 
@@ -18,14 +20,14 @@ class MediawikiSandboxLoadData extends Job {
     /**
      * @return void
      */
-    public function handle() {
+    public function handle(MediaWikiHostResolver $mwHostResolver) {
         $data = [
             'dataSet' => $this->dataSet,
         ];
 
         $curl = curl_init();
         curl_setopt_array($curl, [
-            CURLOPT_URL => getenv('PLATFORM_MW_BACKEND_HOST') . '/w/rest.php/wikibase-exampledata/v0/load',
+            CURLOPT_URL => $mwHostResolver->getBackendHostForDomain($this->wikiDomain) . '/w/rest.php/wikibase-exampledata/v0/load',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 10 * 60, // TODO Long 10 mins (probably shouldn't keep the request open...)
