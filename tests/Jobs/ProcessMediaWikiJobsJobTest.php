@@ -3,6 +3,7 @@
 namespace Tests\Jobs;
 
 use App\Jobs\ProcessMediaWikiJobsJob;
+use App\Services\MediaWikiHostResolver;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
@@ -16,6 +17,9 @@ class ProcessMediaWikiJobsJobTest extends TestCase {
     use RefreshDatabase;
 
     public function testJobFailOnNoMediaWikiPod() {
+
+        $mockResolver = $this->createMock(MediaWikiHostResolver::class);
+
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->once())->method('fail');
 
@@ -23,6 +27,7 @@ class ProcessMediaWikiJobsJobTest extends TestCase {
         $job->setJob($mockJob);
 
         $mock = new MockHandler([
+            new Response(200, [], json_encode(['items' => []])),
             new Response(200, [], json_encode(['items' => []])),
         ]);
 
@@ -35,10 +40,11 @@ class ProcessMediaWikiJobsJobTest extends TestCase {
         $job->handle(new Client([
             'master' => 'https://kubernetes.default.svc',
             'token' => '/var/run/secrets/kubernetes.io/serviceaccount/token',
-        ], null, $mockGuzzle));
+        ], null, $mockGuzzle), $mockResolver);
     }
 
     public function testJobDoesNotFail() {
+        $mockResolver = $this->createMock(MediaWikiHostResolver::class);
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
@@ -46,6 +52,18 @@ class ProcessMediaWikiJobsJobTest extends TestCase {
         $job->setJob($mockJob);
 
         $mock = new MockHandler([
+            new Response(200, [], json_encode(['items' => [
+                [
+                    'kind' => 'Service',
+                    'spec' => [
+                        'selector' => [
+                            'app.kubernetes.io/component' => 'app-backend',
+                            'app.kubernetes.io/instance' => 'mediawiki-143',
+                            'app.kubernetes.io/name' => 'mediawiki',
+                        ],
+                    ],
+                ],
+            ]])),
             new Response(200, [], json_encode(['items' => [
                 [
                     'kind' => 'Pod',
@@ -75,9 +93,12 @@ class ProcessMediaWikiJobsJobTest extends TestCase {
             'verify' => '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
         ]);
 
-        $job->handle(new Client([
-            'master' => 'https://kubernetes.default.svc',
-            'token' => '/var/run/secrets/kubernetes.io/serviceaccount/token',
-        ], null, $mockGuzzle));
+        $job->handle(
+            new Client([
+                'master' => 'https://kubernetes.default.svc',
+                'token' => '/var/run/secrets/kubernetes.io/serviceaccount/token',
+            ], null, $mockGuzzle),
+            $mockResolver
+        );
     }
 }

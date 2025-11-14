@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Services\MediaWikiHostResolver;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,14 +28,28 @@ class ProcessMediaWikiJobsJob implements ShouldBeUnique, ShouldQueue {
         return $this->wikiDomain;
     }
 
-    public function handle(Client $kubernetesClient): void {
+    public function handle(Client $kubernetesClient, MediaWikiHostResolver $resolver): void {
+        $FQDNOfService = $resolver->getBackendHostForDomain($this->wikiDomain);
+        $serviceName = explode('.', $FQDNOfService)[0];
         $kubernetesClient->setNamespace('default');
+        $backendService = $kubernetesClient->services()->setFieldSelector([
+            'metadata.name' => $serviceName,
+        ])->first();
+
+        if ($backendService === null) {
+            $this->fail(
+                new \RuntimeException(
+                    'Unable to find a matching MediaWiki backend service in the cluster'
+                )
+            );
+
+            return;
+        }
+
+        $MWPodSelector = $backendService->toArray()['spec']['selector'];
         $mediawikiPod = $kubernetesClient->pods()->setFieldSelector([
             'status.phase' => 'Running',
-        ])->setLabelSelector([
-            'app.kubernetes.io/name' => 'mediawiki',
-            'app.kubernetes.io/component' => 'app-backend',
-        ])->first();
+        ])->setLabelSelector($MWPodSelector)->first();
 
         if ($mediawikiPod === null) {
             $this->fail(
