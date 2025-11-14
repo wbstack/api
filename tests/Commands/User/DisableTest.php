@@ -23,7 +23,6 @@ class DisableTest extends TestCase {
 
     public function testSuccess() {
         $oldUser = $this->createUser(self::EMAIL);
-        $oldUserId = $oldUser->id;
 
         $this->artisan('wbs-user:disable',
             [
@@ -31,11 +30,15 @@ class DisableTest extends TestCase {
             ]
         )->assertExitCode(0);
 
-        $newUser = User::firstWhere('id', $oldUserId);
+        $newUser = User::firstWhere('id', $oldUser->id);
 
         $this->assertSame($oldUser->id, $newUser->id);
-        $this->assertSame($newUser->email, '');
+        $this->assertMatchesRegularExpression(
+            '/^[0-9A-Za-z]+@disabled-user.wikibase.cloud$/',
+            $newUser->email
+        );
         $this->assertFalse($newUser->hasVerifiedEmail());
+        $this->assertNotSame($oldUser->password, $newUser->password);
     }
 
     public function testUserNotFound() {
