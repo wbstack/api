@@ -10,28 +10,27 @@ class MediawikiHostMapController extends Controller {
     public function getWikiVersionToHostMapForDomain(Request $request): \Illuminate\Http\JsonResponse
     {
         $domain = $request->query('domain');
-        $version = Wiki::where('domain', $domain)
+        $wikiDbVersion = Wiki::where('domain', $domain)
             ->whereNull('deleted_at')
             ->leftJoin('wiki_dbs', 'wiki_id', '=', 'wikis.id')
             ->pluck('version')
             ->first();
 
-        if (is_null($version)) {
+        if (is_null($wikiDbVersion)) {
             abort(401);
         }
-        $mapPath = "";
-        if (!file_exists($mapPath)) {
-            throw new \Exception("MW host mapping file not found at {$mapPath}");
-        }
-        $host = "something from $mapPath";
+        $mwDbToHostMap = [
+            'mw1.39-wbs1' => '139-app',
+            'mw1.43-wbs1' => '143-app'
+        ];
 
         return response()
             ->json([
                 'domain'  => $domain,
-                'version' => $version,
-                'host'    => $host
+                'version' => $wikiDbVersion,
+                'host'    => $mwDbToHostMap[$wikiDbVersion],
             ])
-            ->header('x-host', $host)
-            ->header('x-version', $version);
+            ->header('x-host', $mwDbToHostMap[$wikiDbVersion])
+            ->header('x-version', $wikiDbVersion);
     }
 }
