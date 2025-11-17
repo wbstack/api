@@ -34,6 +34,16 @@ class MediaWikiHostResolver {
         return sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
     }
 
+    public function getWebHostForDomain(string $domain): string {
+        // TODO: Move 'web.default.svc.cluster.local' to an env variable (e.g. PLATFORM_MW_WEB_HOST_SUFFIX) for flexibility.
+        return sprintf('mediawiki-%s-app-web.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
+    }
+
+    public function getApiHostForDomain(string $domain): string {
+        // TODO: Move 'api.default.svc.cluster.local' to an env variable (e.g. PLATFORM_MW_API_HOST_SUFFIX) for flexibility.
+        return sprintf('mediawiki-%s-app-api.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
+    }
+
     public function getMwVersionForDomain(string $domain): string {
         $wiki = Wiki::where('domain', $domain)->first();
 
