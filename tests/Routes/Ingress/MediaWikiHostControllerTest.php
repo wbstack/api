@@ -8,7 +8,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class MediaWikiHostControllerTest extends TestCase {
-
     use RefreshDatabase;
 
     private function createWiki(string $domain, string $version) {
@@ -42,7 +41,7 @@ class MediaWikiHostControllerTest extends TestCase {
         ];
         $this->createWiki('found.wikibase.cloud', 'mw1.43-wbs1');
         $this->createWiki('other.wikibase.cloud', 'otherVersion');
-        $this->getJson( '/backend/ingress/getWikiHostForDomain?domain=found.wikibase.cloud')
+        $this->getJson('/backend/ingress/getWikiHostForDomain?domain=found.wikibase.cloud')
             ->assertStatus(200)
             ->assertHeader('x-backend-host', $expectedHosts['backend'])
             ->assertHeader('x-web-host', $expectedHosts['web'])
@@ -51,8 +50,7 @@ class MediaWikiHostControllerTest extends TestCase {
                 'backend-host' => $expectedHosts['backend'],
                 'web-host' => $expectedHosts['web'],
                 'api-host' => $expectedHosts['api'],
-                'domain' => 'found.wikibase.cloud'
+                'domain' => 'found.wikibase.cloud',
             ]);
     }
-
 }
