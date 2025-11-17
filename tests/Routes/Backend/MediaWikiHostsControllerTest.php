@@ -25,37 +25,40 @@ class MediaWikiHostsControllerTest extends TestCase {
     }
 
     public function testDomainNotfound() {
-        $this->getJson($this->route . '?domain=notfound.wikibase.cloud')
+        $this->getJson("$this->route?domain=notfound.wikibase.cloud")
             ->assertStatus(404);
     }
 
     public function testDbVersionNotfound() {
-        $this->createWiki('noversion.wikibase.cloud', 'unknownVersion');
-        $this->getJson($this->route . '?domain=noversion.wikibase.cloud')
+        $this->createWiki('test.wikibase.cloud', 'unknownVersion');
+
+        $this->getJson("$this->route?domain=test.wikibase.cloud")
             ->assertStatus(500);
     }
 
-    public function testFoundHost() {
+    public function testSuccess() {
         $expectedHosts = [
             'backend' => 'mediawiki-143-app-backend.default.svc.cluster.local',
             'web' => 'mediawiki-143-app-web.default.svc.cluster.local',
             'api' => 'mediawiki-143-app-api.default.svc.cluster.local',
             'alpha' => 'mediawiki-143-app-alpha.default.svc.cluster.local',
         ];
-        $this->createWiki('found.wikibase.cloud', 'mw1.43-wbs1');
-        $this->createWiki('other.wikibase.cloud', 'otherVersion');
-        $this->getJson($this->route . '?domain=found.wikibase.cloud')
+
+        $this->createWiki('test139.wikibase.cloud', 'mw1.39-wbs1');
+        $this->createWiki('test143.wikibase.cloud', 'mw1.43-wbs1');
+
+        $this->getJson("$this->route?domain=test143.wikibase.cloud")
             ->assertStatus(200)
             ->assertHeader('x-backend-host', $expectedHosts['backend'])
             ->assertHeader('x-web-host', $expectedHosts['web'])
             ->assertHeader('x-api-host', $expectedHosts['api'])
             ->assertHeader('x-alpha-host', $expectedHosts['alpha'])
             ->assertJson([
+                'domain' => 'test143.wikibase.cloud',
                 'backend-host' => $expectedHosts['backend'],
                 'web-host' => $expectedHosts['web'],
                 'api-host' => $expectedHosts['api'],
                 'alpha-host' => $expectedHosts['alpha'],
-                'domain' => 'found.wikibase.cloud',
             ]);
     }
 }
