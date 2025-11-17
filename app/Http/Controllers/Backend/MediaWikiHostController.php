@@ -16,6 +16,7 @@ class MediaWikiHostController extends Controller {
             $backendHost = $mediawikiHostResolver->getBackendHostForDomain($domain);
             $webHost = $mediawikiHostResolver->getWebHostForDomain($domain);
             $apiHost = $mediawikiHostResolver->getApiHostForDomain($domain);
+            $alphaHost = $mediawikiHostResolver->getAlphaHostForDomain($domain);
         } catch (UnknownWikiDomainException $e) {
             return response()->json(['error' => 'Domain not found.'], 404);
         } catch (UnknownDBVersionException $e) {
@@ -28,9 +29,11 @@ class MediaWikiHostController extends Controller {
                 'backend-host' => $backendHost,
                 'web-host' => $webHost,
                 'api-host' => $apiHost,
+                'alpha-host' => $alphaHost,
             ])
             ->header('x-backend-host', $backendHost)
             ->header('x-web-host', $webHost)
-            ->header('x-api-host', $apiHost);
+            ->header('x-api-host', $apiHost)
+            ->header('x-alpha-host', $alphaHost);
     }
 }

@@ -38,6 +38,7 @@ class MediaWikiHostControllerTest extends TestCase {
             'backend' => 'mediawiki-143-app-backend.default.svc.cluster.local',
             'web' => 'mediawiki-143-app-web.default.svc.cluster.local',
             'api' => 'mediawiki-143-app-api.default.svc.cluster.local',
+            'alpha' => 'mediawiki-143-app-alpha.default.svc.cluster.local',
         ];
         $this->createWiki('found.wikibase.cloud', 'mw1.43-wbs1');
         $this->createWiki('other.wikibase.cloud', 'otherVersion');
@@ -46,10 +47,12 @@ class MediaWikiHostControllerTest extends TestCase {
             ->assertHeader('x-backend-host', $expectedHosts['backend'])
             ->assertHeader('x-web-host', $expectedHosts['web'])
             ->assertHeader('x-api-host', $expectedHosts['api'])
+            ->assertHeader('x-alpha-host', $expectedHosts['alpha'])
             ->assertJson([
                 'backend-host' => $expectedHosts['backend'],
                 'web-host' => $expectedHosts['web'],
                 'api-host' => $expectedHosts['api'],
+                'alpha-host' => $expectedHosts['alpha'],
                 'domain' => 'found.wikibase.cloud',
             ]);
     }

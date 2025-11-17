@@ -44,6 +44,11 @@ class MediaWikiHostResolver {
         return sprintf('mediawiki-%s-app-api.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
     }
 
+    public function getAlphaHostForDomain(string $domain): string {
+        // TODO: Move 'alpha.default.svc.cluster.local' to an env variable (e.g. PLATFORM_MW_ALPHA_HOST_SUFFIX) for flexibility.
+        return sprintf('mediawiki-%s-app-alpha.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
+    }
+
     public function getMwVersionForDomain(string $domain): string {
         $wiki = Wiki::where('domain', $domain)->first();
 
