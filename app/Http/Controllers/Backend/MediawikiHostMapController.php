@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 class MediawikiHostMapController extends Controller {
     public function getWikiVersionToHostMapForDomain(Request $request): \Illuminate\Http\JsonResponse
     {
+
         $domain = $request->query('domain');
         $wikiDbVersion = Wiki::where('domain', $domain)
             ->whereNull('deleted_at')
@@ -19,10 +20,7 @@ class MediawikiHostMapController extends Controller {
         if (is_null($wikiDbVersion)) {
             abort(401);
         }
-        $mwDbToHostMap = [
-            'mw1.39-wbs1' => '139-app',
-            'mw1.43-wbs1' => '143-app'
-        ];
+        $mwDbToHostMap = require ('../../../../config/mediawiki-host.php');
 
         return response()
             ->json([
