@@ -8,13 +8,12 @@ use App\Services\UnknownDBVersionException;
 use App\Services\UnknownWikiDomainException;
 use Illuminate\Http\Request;
 
-
 class MediaWikiHostController extends Controller {
     public function getWikiHostForDomain(Request $request): \Illuminate\Http\JsonResponse {
-        $mediawikiHostResolver = new MediaWikiHostResolver();
+        $mediawikiHostResolver = new MediaWikiHostResolver;
         $domain = $request->query('domain');
         try {
-            $backendHost =  $mediawikiHostResolver->getBackendHostForDomain($domain);
+            $backendHost = $mediawikiHostResolver->getBackendHostForDomain($domain);
             $webHost = $mediawikiHostResolver->getWebHostForDomain($domain);
             $apiHost = $mediawikiHostResolver->getApiHostForDomain($domain);
         } catch (UnknownWikiDomainException $e) {
@@ -22,8 +21,6 @@ class MediaWikiHostController extends Controller {
         } catch (UnknownDBVersionException $e) {
             return response()->json(['error' => 'Unknown database version.'], 500);
         }
-
-
 
         return response()
             ->json([
