@@ -18,8 +18,9 @@ $router->get(
 $router->group(['prefix' => 'ingress'], function () use ($router) {
     // GET
     $router->get('getWikiVersionForDomain', ['uses' => 'IngressController@getWikiVersionForDomain']);
-    $router->get('getWikiHostForDomain', ['uses' => 'MediaWikiHostController@getWikiHostForDomain']);
 });
+
+    $router->get('getWikiHostForDomain', ['uses' => 'MediaWikiHostController@getWikiHostForDomain']);
 
 $router->group(['prefix' => 'wiki'], function () use ($router) {
     $router->get('getWikiForDomain', ['uses' => 'WikiController@getWikiForDomain']);

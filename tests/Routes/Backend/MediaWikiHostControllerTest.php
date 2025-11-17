@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Routes\Ingress;
+namespace Routes\Backend;
 
 use App\Wiki;
 use App\WikiDb;
@@ -23,13 +23,13 @@ class MediaWikiHostControllerTest extends TestCase {
     }
 
     public function testDomainNotfound() {
-        $this->getJson('/backend/ingress/getWikiHostForDomain?domain=notfound.wikibase.cloud')
+        $this->getJson('/backend/getWikiHostForDomain?domain=notfound.wikibase.cloud')
             ->assertStatus(404);
     }
 
     public function testDbVersionNotfound() {
         $this->createWiki('noversion.wikibase.cloud', 'unknownVersion');
-        $this->getJson('/backend/ingress/getWikiHostForDomain?domain=noversion.wikibase.cloud')
+        $this->getJson('/backend/getWikiHostForDomain?domain=noversion.wikibase.cloud')
             ->assertStatus(500);
     }
 
@@ -41,7 +41,7 @@ class MediaWikiHostControllerTest extends TestCase {
         ];
         $this->createWiki('found.wikibase.cloud', 'mw1.43-wbs1');
         $this->createWiki('other.wikibase.cloud', 'otherVersion');
-        $this->getJson('/backend/ingress/getWikiHostForDomain?domain=found.wikibase.cloud')
+        $this->getJson('/backend/getWikiHostForDomain?domain=found.wikibase.cloud')
             ->assertStatus(200)
             ->assertHeader('x-backend-host', $expectedHosts['backend'])
             ->assertHeader('x-web-host', $expectedHosts['web'])
