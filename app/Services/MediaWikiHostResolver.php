@@ -33,14 +33,15 @@ class MediaWikiHostResolver {
      * @throws UnknownDBVersionException
      * @throws UnknownWikiDomainException
      */
-    public function getHostsForDomain(String $domain ): array {
+    public function getHostsForDomain(string $domain): array {
         $mwVersionForDomain = $this->getMwVersionForDomain($domain);
+
         // TODO: Move host to an env variable (e.g. PLATFORM_MW_BACKEND_HOST_SUFFIX) for flexibility.
         return [
             'web' => sprintf('mediawiki-%s-app-web.default.svc.cluster.local', $mwVersionForDomain),
             'backend' => sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $mwVersionForDomain),
             'api' => sprintf('mediawiki-%s-app-api.default.svc.cluster.local', $mwVersionForDomain),
-            'alpha' => sprintf('mediawiki-%s-app-alpha.default.svc.cluster.local', $mwVersionForDomain)
+            'alpha' => sprintf('mediawiki-%s-app-alpha.default.svc.cluster.local', $mwVersionForDomain),
         ];
     }
 
