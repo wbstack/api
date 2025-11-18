@@ -43,7 +43,7 @@ class MediaWikiHostsControllerTest extends TestCase {
             ->assertStatus(404);
     }
 
-    public function testDbVersionNotfound() {
+    public function testUnknownDbVersion() {
         $this->createWiki('test.wikibase.cloud', 'unknownVersion');
 
         $this->getJson("$this->route?domain=test.wikibase.cloud")
