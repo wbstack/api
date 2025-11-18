@@ -12,30 +12,6 @@ class MediaWikiHostsControllerTest extends TestCase {
 
     protected $route = '/backend/getWikiHostsForDomain';
 
-    private function createWiki(string $domain, string $version) {
-        $wiki = Wiki::factory()->create(['domain' => $domain]);
-        WikiDb::create([
-            'name' => $domain,
-            'user' => 'someUser',
-            'password' => 'somePassword',
-            'version' => $version,
-            'prefix' => 'somePrefix',
-            'wiki_id' => $wiki->id,
-        ]);
-    }
-
-    public function testDomainNotfound() {
-        $this->getJson("$this->route?domain=notfound.wikibase.cloud")
-            ->assertStatus(404);
-    }
-
-    public function testDbVersionNotfound() {
-        $this->createWiki('test.wikibase.cloud', 'unknownVersion');
-
-        $this->getJson("$this->route?domain=test.wikibase.cloud")
-            ->assertStatus(500);
-    }
-
     public function testSuccess() {
         $expectedHosts = [
             'backend' => 'mediawiki-143-app-backend.default.svc.cluster.local',
@@ -60,5 +36,29 @@ class MediaWikiHostsControllerTest extends TestCase {
                 'api-host' => $expectedHosts['api'],
                 'alpha-host' => $expectedHosts['alpha'],
             ]);
+    }
+
+    public function testDomainNotfound() {
+        $this->getJson("$this->route?domain=notfound.wikibase.cloud")
+            ->assertStatus(404);
+    }
+
+    public function testDbVersionNotfound() {
+        $this->createWiki('test.wikibase.cloud', 'unknownVersion');
+
+        $this->getJson("$this->route?domain=test.wikibase.cloud")
+            ->assertStatus(500);
+    }
+
+    private function createWiki(string $domain, string $version) {
+        $wiki = Wiki::factory()->create(['domain' => $domain]);
+        WikiDb::create([
+            'name' => $domain,
+            'user' => 'someUser',
+            'password' => 'somePassword',
+            'version' => $version,
+            'prefix' => 'somePrefix',
+            'wiki_id' => $wiki->id,
+        ]);
     }
 }
