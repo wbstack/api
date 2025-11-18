@@ -1,13 +1,13 @@
 <?php
 
-namespace Routes\Backend;
+namespace Tests\Routes\Backend;
 
 use App\Wiki;
 use App\WikiDb;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class MediaWikiHostsControllersTest extends TestCase {
+class MediaWikiHostsControllerTest extends TestCase {
     use RefreshDatabase;
 
     protected $route = '/backend/getWikiHostsForDomain';
