@@ -29,24 +29,24 @@ class MediaWikiHostResolver {
     //     return $this->getBackendHostForDomain($wiki->domain);
     // }
 
+    /**
+     * @throws UnknownDBVersionException
+     * @throws UnknownWikiDomainException
+     */
+    public function getHostsForDomain(String $domain ): array {
+        $mwVersionForDomain = $this->getMwVersionForDomain($domain);
+        // TODO: Move host to an env variable (e.g. PLATFORM_MW_BACKEND_HOST_SUFFIX) for flexibility.
+        return [
+            'web' => sprintf('mediawiki-%s-app-web.default.svc.cluster.local', $mwVersionForDomain),
+            'backend' => sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $mwVersionForDomain),
+            'api' => sprintf('mediawiki-%s-app-api.default.svc.cluster.local', $mwVersionForDomain),
+            'alpha' => sprintf('mediawiki-%s-app-alpha.default.svc.cluster.local', $mwVersionForDomain)
+        ];
+    }
+
     public function getBackendHostForDomain(string $domain): string {
         // TODO: Move 'backend.default.svc.cluster.local' to an env variable (e.g. PLATFORM_MW_BACKEND_HOST_SUFFIX) for flexibility.
         return sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
-    }
-
-    public function getWebHostForDomain(string $domain): string {
-        // TODO: Move 'web.default.svc.cluster.local' to an env variable (e.g. PLATFORM_MW_WEB_HOST_SUFFIX) for flexibility.
-        return sprintf('mediawiki-%s-app-web.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
-    }
-
-    public function getApiHostForDomain(string $domain): string {
-        // TODO: Move 'api.default.svc.cluster.local' to an env variable (e.g. PLATFORM_MW_API_HOST_SUFFIX) for flexibility.
-        return sprintf('mediawiki-%s-app-api.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
-    }
-
-    public function getAlphaHostForDomain(string $domain): string {
-        // TODO: Move 'alpha.default.svc.cluster.local' to an env variable (e.g. PLATFORM_MW_ALPHA_HOST_SUFFIX) for flexibility.
-        return sprintf('mediawiki-%s-app-alpha.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
     }
 
     public function getMwVersionForDomain(string $domain): string {

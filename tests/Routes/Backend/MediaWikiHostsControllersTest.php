@@ -7,8 +7,10 @@ use App\WikiDb;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class MediaWikiHostControllerTest extends TestCase {
+class MediaWikiHostsControllersTest extends TestCase {
     use RefreshDatabase;
+
+    protected $route = '/backend/getWikiHostsForDomain';
 
     private function createWiki(string $domain, string $version) {
         $wiki = Wiki::factory()->create(['domain' => $domain]);
@@ -23,13 +25,13 @@ class MediaWikiHostControllerTest extends TestCase {
     }
 
     public function testDomainNotfound() {
-        $this->getJson('/backend/getWikiHostForDomain?domain=notfound.wikibase.cloud')
+        $this->getJson($this->route . '?domain=notfound.wikibase.cloud')
             ->assertStatus(404);
     }
 
     public function testDbVersionNotfound() {
         $this->createWiki('noversion.wikibase.cloud', 'unknownVersion');
-        $this->getJson('/backend/getWikiHostForDomain?domain=noversion.wikibase.cloud')
+        $this->getJson($this->route . '?domain=noversion.wikibase.cloud')
             ->assertStatus(500);
     }
 
@@ -42,7 +44,7 @@ class MediaWikiHostControllerTest extends TestCase {
         ];
         $this->createWiki('found.wikibase.cloud', 'mw1.43-wbs1');
         $this->createWiki('other.wikibase.cloud', 'otherVersion');
-        $this->getJson('/backend/getWikiHostForDomain?domain=found.wikibase.cloud')
+        $this->getJson($this->route . '?domain=found.wikibase.cloud')
             ->assertStatus(200)
             ->assertHeader('x-backend-host', $expectedHosts['backend'])
             ->assertHeader('x-web-host', $expectedHosts['web'])
