@@ -8,22 +8,18 @@
  */
 
 // GET
-$router->get(
-    'healthz',
-    function () {
-        return 'It\'s Alive';
-    }
-);
+$router->get('healthz', fn () => "It's Alive");
+$router->get('getWikiHostsForDomain', ['uses' => 'MediaWikiHostsController@getWikiHostsForDomain']);
 
 $router->group(['prefix' => 'ingress'], function () use ($router) {
     // GET
     $router->get('getWikiVersionForDomain', ['uses' => 'IngressController@getWikiVersionForDomain']);
 });
 
-$router->get('getWikiHostsForDomain', ['uses' => 'MediaWikiHostsController@getWikiHostsForDomain']);
-
 $router->group(['prefix' => 'wiki'], function () use ($router) {
+    // GET
     $router->get('getWikiForDomain', ['uses' => 'WikiController@getWikiForDomain']);
+    // PATCH
     $router->patch('updateEntityImport', ['uses' => '\App\Http\Controllers\WikiEntityImportController@update']);
 });
 
