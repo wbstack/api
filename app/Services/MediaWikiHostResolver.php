@@ -36,7 +36,7 @@ class MediaWikiHostResolver {
     public function getHostsForDomain(string $domain): array {
         $mwVersionForDomain = $this->getMwVersionForDomain($domain);
 
-        // TODO: Move host to an env variable (e.g. PLATFORM_MW_BACKEND_HOST_SUFFIX) for flexibility.
+        // TODO: Make hosts format configurable for flexibility
         return [
             'web' => sprintf('mediawiki-%s-app-web.default.svc.cluster.local', $mwVersionForDomain),
             'backend' => sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $mwVersionForDomain),
@@ -46,7 +46,7 @@ class MediaWikiHostResolver {
     }
 
     public function getBackendHostForDomain(string $domain): string {
-        // TODO: Move 'backend.default.svc.cluster.local' to an env variable (e.g. PLATFORM_MW_BACKEND_HOST_SUFFIX) for flexibility.
+        // TODO: Make host format configurable for flexibility
         return sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
     }
 
