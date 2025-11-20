@@ -23,12 +23,6 @@ class MediaWikiHostResolver {
         'mw1.43-wbs1' => '143',
     ];
 
-    // https://phabricator.wikimedia.org/T409530
-    // This service could have other methods in future, e.g. getBackendHostForWiki()
-    // public function getBackendHostForWiki(Wiki $wiki): string {
-    //     return $this->getBackendHostForDomain($wiki->domain);
-    // }
-
     /**
      * @throws UnknownDBVersionException
      * @throws UnknownWikiDomainException
