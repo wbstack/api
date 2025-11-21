@@ -71,7 +71,7 @@ class WikiController extends Controller {
         $dbAssignment = null;
 
         // TODO create with some sort of owner etc?
-        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $isSubdomain, $submittedDomain, $rawProfile) {
+        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $submittedDomain, $rawProfile) {
             $dbVersion = Config::get('wbstack.wiki_db_use_version');
             $wikiDbCondition = ['wiki_id' => null, 'version' => $dbVersion];
 
@@ -161,14 +161,14 @@ class WikiController extends Controller {
             if ($rawProfile) {
                 WikiProfile::create(['wiki_id' => $wiki->id, ...$rawProfile]);
             }
-
-            // TODO maybe always make these run in a certain order..?
-            dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
-            // Only dispatch a job to add a k8s ingress IF we are using a custom domain...
-            if (!$isSubdomain) {
-                dispatch(new KubernetesIngressCreate($wiki->id, $wiki->domain));
-            }
         });
+
+        // TODO maybe always make these run in a certain order..?
+        dispatch(new MediawikiInit($wiki->domain, $request->input('username'), $user->email));
+        // Only dispatch a job to add a k8s ingress IF we are using a custom domain...
+        if (!$isSubdomain) {
+            dispatch(new KubernetesIngressCreate($wiki->id, $wiki->domain));
+        }
 
         // dispatch elasticsearch init job to enable the feature
         if (Config::get('wbstack.elasticsearch_enabled_by_default')) {
