@@ -159,4 +159,11 @@ class Wiki extends Model {
     public function wikiLatestProfile() {
         return $this->hasOne(WikiProfile::class)->latestOfMany();
     }
+
+    public function setSetting(string $name, string $value): void {
+        $this->settings()->updateOrCreate(
+            ['name' => $name],
+            ['value' => $value]
+        );
+    }
 }
