@@ -67,7 +67,7 @@ class SpawnQueryserviceUpdaterJob implements ShouldBeUnique, ShouldQueue {
                 ],
             ],
             'spec' => [
-                'ttlSecondsAfterFinished' => 14 * 24 * 60 * 60, // 2 weeks
+                'ttlSecondsAfterFinished' => 172800, // 1 week
                 'template' => [
                     'metadata' => [
                         'name' => 'run-qs-updater',
