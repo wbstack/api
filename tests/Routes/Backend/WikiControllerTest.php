@@ -36,7 +36,7 @@ class WikiControllerTest extends TestCase {
 
         $this->createWiki($wikiDomain, self::VALID_WIKI_DB_VERSION_STRING_139);
 
-        $this->patchJson("{$this->routeSetDbVersion}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
+        $this->postJson("{$this->routeSetDbVersion}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
             ->assertStatus(200)
             ->assertJson([
                 'result' => 'success',
@@ -47,7 +47,7 @@ class WikiControllerTest extends TestCase {
         $targetDbVersion = self::VALID_WIKI_DB_VERSION_STRING_143;
         $wikiDomain = 'notFound.wikibase.cloud';
 
-        $this->patchJson("{$this->routeSetDbVersion}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
+        $this->postJson("{$this->routeSetDbVersion}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
             ->assertStatus(404);
     }
 
@@ -57,7 +57,7 @@ class WikiControllerTest extends TestCase {
 
         $this->createWiki($wikiDomain, self::VALID_WIKI_DB_VERSION_STRING_139);
 
-        $this->patchJson("{$this->routeSetDbVersion}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
+        $this->postJson("{$this->routeSetDbVersion}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
             ->assertStatus(400);
     }
 
@@ -66,7 +66,7 @@ class WikiControllerTest extends TestCase {
 
         $this->createWiki($wikiDomain, self::VALID_WIKI_DB_VERSION_STRING_139);
 
-        $this->patchJson("{$this->routeSetDbVersion}?domain={$wikiDomain}")
+        $this->postJson("{$this->routeSetDbVersion}?domain={$wikiDomain}")
             ->assertStatus(422);
     }
 
@@ -76,7 +76,7 @@ class WikiControllerTest extends TestCase {
 
         $this->createWiki($wikiDomain, self::VALID_WIKI_DB_VERSION_STRING_139);
 
-        $this->patchJson("{$this->routeSetDbVersion}?dbVersion={$targetDbVersion}")
+        $this->postJson("{$this->routeSetDbVersion}?dbVersion={$targetDbVersion}")
             ->assertStatus(422);
     }
 
