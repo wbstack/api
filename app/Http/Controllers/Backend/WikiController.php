@@ -48,7 +48,7 @@ class WikiController extends Controller {
             }
 
             if (!WikiDbVersionHelper::isValidDbVersion($targetDbVersion)) {
-                return response()->json(['error' => "Unknown database version string: '{$targetDbVersion}'"], 400);
+                return response()->json(['error' => "Invalid database version string: '{$targetDbVersion}'"], 400);
             }
 
             $wiki->wikiDb->version = $targetDbVersion;
