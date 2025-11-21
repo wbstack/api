@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use App\Wiki;
-use App\Helper;
 use App\Helper\WikiDbVersionHelper;
+use App\Wiki;
 use Exception;
 
 /**

@@ -10,38 +10,13 @@ use Tests\TestCase;
 class WikiControllerTest extends TestCase {
     use RefreshDatabase;
 
-    protected $route = '/backend/wiki/setDbVersion';
+    const VALID_WIKI_DB_VERSION_STRING_139 = 'mw1.39-wbs1';
 
-    public function testSuccess() {
-        $targetDbVersion = 'mw1.43-wbs1';
-        $wikiDomain = 'coffeebase.wikibase.cloud';
+    const VALID_WIKI_DB_VERSION_STRING_143 = 'mw1.43-wbs1';
 
-        $this->createWiki($wikiDomain, $targetDbVersion);
+    protected $routeSetDbVersion = '/backend/wiki/setDbVersion';
 
-        $this->patchJson("{$this->route}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
-            ->assertStatus(200)
-            ->assertJson([
-                'result' => 'success',
-            ]);
-    }
-
-    public function testDomainNotfound() {
-        $targetDbVersion = 'mw1.43-wbs1';
-        $wikiDomain = 'notFound.wikibase.cloud';
-
-        $this->patchJson("{$this->route}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
-            ->assertStatus(404);
-    }
-
-    public function testUnknownDbVersion() {
-        $targetDbVersion = 'unknownVersion';
-        $wikiDomain = 'coffeebase.wikibase.cloud';
-
-        $this->createWiki($wikiDomain, $targetDbVersion);
-
-        $this->patchJson("{$this->route}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
-            ->assertStatus(500);
-    }
+    protected $routeGetWikiForDomain = '/backend/wiki/getWikiForDomain';
 
     private function createWiki(string $domain, string $version) {
         $wiki = Wiki::factory()->create(['domain' => $domain]);
@@ -53,5 +28,65 @@ class WikiControllerTest extends TestCase {
             'prefix' => 'somePrefix',
             'wiki_id' => $wiki->id,
         ]);
+    }
+
+    public function testSetWikiDbVersionForDomainSuccess() {
+        $targetDbVersion = self::VALID_WIKI_DB_VERSION_STRING_143;
+        $wikiDomain = 'coffeebase.wikibase.cloud';
+
+        $this->createWiki($wikiDomain, self::VALID_WIKI_DB_VERSION_STRING_139);
+
+        $this->patchJson("{$this->routeSetDbVersion}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
+            ->assertStatus(200)
+            ->assertJson([
+                'result' => 'success',
+            ]);
+    }
+
+    public function testSetWikiDbVersionForDomainWikiNotfound() {
+        $targetDbVersion = self::VALID_WIKI_DB_VERSION_STRING_143;
+        $wikiDomain = 'notFound.wikibase.cloud';
+
+        $this->patchJson("{$this->routeSetDbVersion}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
+            ->assertStatus(404);
+    }
+
+    public function testSetWikiDbVersionForDomainUnknownDbVersion() {
+        $targetDbVersion = 'unknownVersion';
+        $wikiDomain = 'coffeebase.wikibase.cloud';
+
+        $this->createWiki($wikiDomain, self::VALID_WIKI_DB_VERSION_STRING_139);
+
+        $this->patchJson("{$this->routeSetDbVersion}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
+            ->assertStatus(400);
+    }
+
+    public function testSetWikiDbVersionForDomainMissingDbVersion() {
+        $wikiDomain = 'coffeebase.wikibase.cloud';
+
+        $this->createWiki($wikiDomain, self::VALID_WIKI_DB_VERSION_STRING_139);
+
+        $this->patchJson("{$this->routeSetDbVersion}?domain={$wikiDomain}")
+            ->assertStatus(422);
+    }
+
+    public function testSetWikiDbVersionForDomainMissingWikiDomain() {
+        $targetDbVersion = self::VALID_WIKI_DB_VERSION_STRING_143;
+        $wikiDomain = 'coffeebase.wikibase.cloud';
+
+        $this->createWiki($wikiDomain, self::VALID_WIKI_DB_VERSION_STRING_139);
+
+        $this->patchJson("{$this->routeSetDbVersion}?dbVersion={$targetDbVersion}")
+            ->assertStatus(422);
+    }
+
+    public function testGetWikiForDomainMissingWikiDomain() {
+        $this->getJson("{$this->routeGetWikiForDomain}")
+            ->assertStatus(422);
+    }
+
+    public function testGetWikiForDomainWikiNotFound() {
+        $this->getJson("{$this->routeGetWikiForDomain}?domain=somewiki")
+            ->assertStatus(404);
     }
 }

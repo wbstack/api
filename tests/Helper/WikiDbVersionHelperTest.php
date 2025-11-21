@@ -2,9 +2,9 @@
 
 namespace Tests\Jobs;
 
-use App\Helper\WikiDbVersionHelper;
-use App\Helper\UnknownMwVersionException;
 use App\Helper\UnknownDbVersionException;
+use App\Helper\UnknownMwVersionException;
+use App\Helper\WikiDbVersionHelper;
 use Tests\TestCase;
 
 class WikiDbVersionHelperTest extends TestCase {
