@@ -23,14 +23,14 @@ class WikiDbVersionHelper {
         'mw1.43-wbs1' => '143',
     ];
 
-    static public function isValidDbVersion(string $dbVersionString): bool {
+    public static function isValidDbVersion(string $dbVersionString): bool {
         return array_key_exists(
             $dbVersionString,
             self::DB_VERSION_TO_MW_VERSION
         );
     }
 
-    static public function isValidMwVersion(string $mwVersionString): bool {
+    public static function isValidMwVersion(string $mwVersionString): bool {
         return array_key_exists(
             $mwVersionString,
             array_flip(self::DB_VERSION_TO_MW_VERSION)
@@ -40,22 +40,22 @@ class WikiDbVersionHelper {
     /**
      * @throws UnknownMwVersionException
      */
-    static public function getDbVersion(string $mwVersionString): string {
+    public static function getDbVersion(string $mwVersionString): string {
         if (self::isValidMwVersion($mwVersionString)) {
             return array_flip(self::DB_VERSION_TO_MW_VERSION)[$mwVersionString];
         }
-        
+
         throw new UnknownMwVersionException("Unknown MediaWiki version string: '{$mwVersionString}'");
     }
 
     /**
      * @throws UnknownDbVersionException
      */
-    static public function getMwVersion(string $dbVersionString): string {
+    public static function getMwVersion(string $dbVersionString): string {
         if (self::isValidDbVersion($dbVersionString)) {
             return self::DB_VERSION_TO_MW_VERSION[$dbVersionString];
         }
-        
+
         throw new UnknownDbVersionException("Unknown database version string: '{$dbVersionString}'");
     }
 }
