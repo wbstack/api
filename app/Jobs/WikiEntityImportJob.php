@@ -142,7 +142,7 @@ class TransferBotKubernetesJob {
         return $jobName;
     }
 
-    private function constructSpec(): array {g ad
+    private function constructSpec(): array {
         return [
             'metadata' => [
                 'generateName' => 'run-transferbot-',
