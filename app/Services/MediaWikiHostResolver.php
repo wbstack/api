@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Wiki;
+use App\Helper;
+use App\Helper\WikiDbVersionHelper;
 use Exception;
 
 /**
@@ -16,17 +18,6 @@ class UnknownDBVersionException extends Exception {}
 class UnknownWikiDomainException extends Exception {}
 
 class MediaWikiHostResolver {
-    // TODO: Move this mapping to a config file so that MW updates do not require code changes here.
-    /** @var array<string, string> Map of DB version strings to MediaWiki version strings */
-    private const DB_VERSION_TO_MW_VERSION = [
-        'mw1.39-wbs1' => '139',
-        'mw1.43-wbs1' => '143',
-    ];
-
-    /**
-     * @throws UnknownDBVersionException
-     * @throws UnknownWikiDomainException
-     */
     public function getHostsForDomain(string $domain): array {
         $mwVersionForDomain = $this->getMwVersionForDomain($domain);
 
@@ -44,6 +35,10 @@ class MediaWikiHostResolver {
         return sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
     }
 
+    /**
+     * @throws UnknownDBVersionException
+     * @throws UnknownWikiDomainException
+     */
     private function getMwVersionForDomain(string $domain): string {
         $wiki = Wiki::where('domain', $domain)->first();
 
@@ -53,8 +48,8 @@ class MediaWikiHostResolver {
 
         $dbVersion = $wiki->wikiDb->version;
 
-        if (array_key_exists($dbVersion, self::DB_VERSION_TO_MW_VERSION)) {
-            return self::DB_VERSION_TO_MW_VERSION[$dbVersion];
+        if (WikiDbVersionHelper::isValidDbVersion($dbVersion)) {
+            return WikiDbVersionHelper::getMwVersion($dbVersion);
         }
         throw new UnknownDBVersionException("Unknown DB version '{$dbVersion}' for domain '{$domain}'.");
     }
