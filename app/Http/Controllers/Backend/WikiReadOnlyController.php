@@ -7,9 +7,13 @@ use App\Wiki;
 use Illuminate\Http\Request;
 
 class WikiReadOnlyController extends Controller {
-    public function setWikiReadonly(Request $request) {
+    public function setWikiReadOnly(Request $request) {
 
-        $domain = $request->input('domain');
+        $validated = $request->validate([
+            'domain' => 'required|string',
+        ]);
+
+        $domain = $validated['domain'];
         $wiki = Wiki::where('domain', $domain)->first();
 
         if (!$wiki) {
