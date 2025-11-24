@@ -10,7 +10,7 @@
 // GET
 $router->get('healthz', fn () => "It's Alive");
 $router->get('getWikiHostsForDomain', ['uses' => 'MediaWikiHostsController@getWikiHostsForDomain']);
-$router->post('setWikiReadOnly', ['uses' => 'WikiReadOnlyController@setWikiReadOnly']);
+$router->put('setWikiReadOnly', ['uses' => 'WikiReadOnlyController@setWikiReadOnly']);
 
 $router->group(['prefix' => 'ingress'], function () use ($router) {
     // GET
