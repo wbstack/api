@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class WikiDbVersionController extends Controller {
     // TODO Deduplicate Version Mapping https://phabricator.wikimedia.org/T409078
+    // https://github.com/wbstack/api/blob/bcbea7ccdd78708e36b0da3e627e00003da9932d/app/Services/MediaWikiHostResolver.php#L21
     private const DB_VERSION_TO_MW_VERSION = [
         'mw1.39-wbs1' => '139',
         'mw1.43-wbs1' => '143',
