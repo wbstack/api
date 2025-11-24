@@ -11,11 +11,6 @@ namespace App\Helper;
  */
 class UnknownDbVersionException extends \Exception {}
 
-/**
- * Exception thrown when a mediawiki version is not mapped in WikiDbVersionHelper.
- */
-class UnknownMwVersionException extends \Exception {}
-
 class WikiDbVersionHelper {
     /** @var array<string, string> Map of DB version strings to MediaWiki version strings */
     private const DB_VERSION_TO_MW_VERSION = [
@@ -35,17 +30,6 @@ class WikiDbVersionHelper {
             $mwVersionString,
             array_flip(self::DB_VERSION_TO_MW_VERSION)
         );
-    }
-
-    /**
-     * @throws UnknownMwVersionException
-     */
-    public static function getDbVersion(string $mwVersionString): string {
-        if (self::isValidMwVersion($mwVersionString)) {
-            return array_flip(self::DB_VERSION_TO_MW_VERSION)[$mwVersionString];
-        }
-
-        throw new UnknownMwVersionException("Unknown MediaWiki version string: '{$mwVersionString}'");
     }
 
     /**

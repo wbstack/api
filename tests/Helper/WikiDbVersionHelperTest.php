@@ -3,7 +3,6 @@
 namespace Tests\Jobs;
 
 use App\Helper\UnknownDbVersionException;
-use App\Helper\UnknownMwVersionException;
 use App\Helper\WikiDbVersionHelper;
 use Tests\TestCase;
 
@@ -12,19 +11,6 @@ class WikiDbVersionHelperTest extends TestCase {
         $this->expectException(UnknownDbVersionException::class);
 
         WikiDbVersionHelper::getMwVersion('invalidDbVersion');
-    }
-
-    public function testUnknownMwVersion() {
-        $this->expectException(UnknownMwVersionException::class);
-
-        WikiDbVersionHelper::getDbVersion('invalidMwVersion');
-    }
-
-    public function testKnownDbVersion() {
-        $this->assertSame(
-            WikiDbVersionHelper::getDbVersion('143'),
-            'mw1.43-wbs1'
-        );
     }
 
     public function testKnownMwVersion() {
