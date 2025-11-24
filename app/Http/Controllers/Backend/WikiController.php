@@ -8,7 +8,6 @@ use App\Wiki;
 use Illuminate\Http\Request;
 
 class WikiController extends Controller {
-
     public function getWikiForDomain(Request $request): \Illuminate\Http\JsonResponse {
         $validated = $request->validate([
             'domain' => 'required|string',
