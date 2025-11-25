@@ -52,7 +52,7 @@ class Disable extends Command {
 
         $userId = $user->id;
         $user->email = uniqid() . '@disabled-user.wikibase.cloud';
-        $user->password = random_bytes(10);
+        $user->password = sha1(random_bytes(10));
         $user->verified = false;
 
         if ($user->save()) {
