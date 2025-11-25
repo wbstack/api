@@ -16,14 +16,6 @@ class UnknownDBVersionException extends Exception {}
 class UnknownWikiDomainException extends Exception {}
 
 class MediaWikiHostResolver {
-    // TODO: Move this mapping to a config file so that MW updates do not require code changes here.
-    // keep in sync with App\Http\Controllers\Backend\WikiDbVersionController
-    /** @var array<string, string> Map of DB version strings to MediaWiki version strings */
-    private const DB_VERSION_TO_MW_VERSION = [
-        'mw1.39-wbs1' => '139',
-        'mw1.43-wbs1' => '143',
-    ];
-
     /**
      * @throws UnknownDBVersionException
      * @throws UnknownWikiDomainException
@@ -54,8 +46,9 @@ class MediaWikiHostResolver {
 
         $dbVersion = $wiki->wikiDb->version;
 
-        if (array_key_exists($dbVersion, self::DB_VERSION_TO_MW_VERSION)) {
-            return self::DB_VERSION_TO_MW_VERSION[$dbVersion];
+        $versionMap = config('mw-db-version-map');
+        if (array_key_exists($dbVersion, $versionMap)) {
+            return $versionMap[$dbVersion];
         }
         throw new UnknownDBVersionException("Unknown DB version '{$dbVersion}' for domain '{$domain}'.");
     }
