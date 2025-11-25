@@ -15,6 +15,7 @@ class WikiReadOnlyControllerTest extends TestCase {
     public function testItReturns404WhenWikiNotFound() {
         $response = $this->putJson($this->route, [
             'domain' => 'nonexistent.wikibase.cloud',
+            'readOnly' => true,
         ]);
 
         $response->assertStatus(404)
@@ -30,6 +31,7 @@ class WikiReadOnlyControllerTest extends TestCase {
 
         $response = $this->putJson($this->route, [
             'domain' => 'somewiki.wikibase.cloud',
+            'readOnly' => true,
         ]);
 
         $response->assertStatus(200)
@@ -44,5 +46,25 @@ class WikiReadOnlyControllerTest extends TestCase {
             WikiSetting::whereWikiId($wiki->id)->whereName('wgReadOnly')->first()->value
         );
 
+    }
+
+    public function testDeleteSettingForReadOnlyFalse() {
+        $wiki = Wiki::factory()->create([
+            'domain' => 'somewiki.wikibase.cloud',
+        ]);
+        $wiki->setSetting('wgReadOnly', 'test');
+
+        $this->putJson($this->route, [
+            'domain' => $wiki->domain,
+            'readOnly' => false,
+        ])
+            ->assertStatus(200)
+            ->assertJson(['message' => 'Read-only setting successfully removed for wiki.']);
+
+        $this->assertNull(
+            WikiSetting::whereWikiId($wiki->id)
+                ->whereName('wgReadOnly')
+                ->first(),
+        );
     }
 }

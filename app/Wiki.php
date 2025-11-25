@@ -166,4 +166,8 @@ class Wiki extends Model {
             ['value' => $value]
         );
     }
+
+    public function deleteSetting(string $name): ?string {
+        return $this->settings()->where('name', $name)->delete();
+    }
 }
