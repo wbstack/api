@@ -17,6 +17,7 @@ class UnknownWikiDomainException extends Exception {}
 
 class MediaWikiHostResolver {
     // TODO: Move this mapping to a config file so that MW updates do not require code changes here.
+    // keep in sync with App\Http\Controllers\Backend\WikiDbVersionController
     /** @var array<string, string> Map of DB version strings to MediaWiki version strings */
     private const DB_VERSION_TO_MW_VERSION = [
         'mw1.39-wbs1' => '139',
