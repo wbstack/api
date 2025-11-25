@@ -13,7 +13,6 @@ class WikiController extends Controller {
         ]);
 
         $domain = $validated['domain'];
-        // XXX: this same logic is in quickstatements.php and platform api WikiController backend
         try {
             $wiki = Wiki::with(['wikiDb', 'wikiQueryserviceNamespace', 'settings'])->firstWhere('domain', $domain);
         } catch (\Exception $e) {
