@@ -26,19 +26,25 @@ class WikiDbVersionControllerTest extends TestCase {
             'prefix' => 'somePrefix',
             'wiki_id' => $wiki->id,
         ]);
+
+        return $wiki;
     }
 
     public function testSetWikiDbVersionSuccess() {
         $targetDbVersion = self::VALID_WIKI_DB_VERSION_STRING_143;
         $wikiDomain = 'coffeebase.wikibase.cloud';
 
-        $this->createWiki($wikiDomain, self::VALID_WIKI_DB_VERSION_STRING_139);
+        $wiki = $this->createWiki($wikiDomain, self::VALID_WIKI_DB_VERSION_STRING_139);
 
         $this->putJson("{$this->route}?domain={$wikiDomain}&dbVersion={$targetDbVersion}")
             ->assertStatus(200)
             ->assertJson([
                 'result' => 'success',
             ]);
+
+        $newDbVersion = Wiki::with('wikiDb')->firstWhere('id', $wiki->id)->wikiDb->version;
+
+        $this->assertSame($targetDbVersion, $newDbVersion);
     }
 
     public function testSetWikiDbVersionWikiNotfound() {
