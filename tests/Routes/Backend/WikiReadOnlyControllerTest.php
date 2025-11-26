@@ -20,7 +20,7 @@ class WikiReadOnlyControllerTest extends TestCase {
 
         $response->assertStatus(404)
             ->assertJson([
-                'error' => 'Wiki not found for domain: nonexistent.wikibase.cloud',
+                'error' => "Wiki not found for domain 'nonexistent.wikibase.cloud'",
             ]);
     }
 

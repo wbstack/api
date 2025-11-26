@@ -16,11 +16,11 @@ class WikiReadOnlyController extends Controller {
 
         $domain = $validated['domain'];
         $readOnly = $validated['readOnly'];
-        $wiki = Wiki::where('domain', $domain)->first();
 
+        $wiki = Wiki::where('domain', $domain)->first();
         if (!$wiki) {
             return response()->json([
-                'error' => "Wiki not found for domain: $domain",
+                'error' => "Wiki not found for domain '$domain'",
             ], 404);
         }
 
