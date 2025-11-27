@@ -15,7 +15,7 @@ class WikiReadOnlyControllerTest extends TestCase {
     public function testItReturns404WhenWikiNotFound() {
         $response = $this->putJson($this->route, [
             'domain' => 'nonexistent.wikibase.cloud',
-            'readOnly' => true,
+            'readOnly' => 1,
         ]);
 
         $response->assertStatus(404)
@@ -31,7 +31,7 @@ class WikiReadOnlyControllerTest extends TestCase {
 
         $response = $this->putJson($this->route, [
             'domain' => 'somewiki.wikibase.cloud',
-            'readOnly' => true,
+            'readOnly' => 1,
         ]);
 
         $response->assertStatus(200)
@@ -56,7 +56,7 @@ class WikiReadOnlyControllerTest extends TestCase {
 
         $this->putJson($this->route, [
             'domain' => $wiki->domain,
-            'readOnly' => false,
+            'readOnly' => 0,
         ])
             ->assertStatus(200)
             ->assertJson(['message' => 'Read-only setting successfully removed for wiki.']);
