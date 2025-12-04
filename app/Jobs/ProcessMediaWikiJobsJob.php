@@ -74,7 +74,7 @@ class ProcessMediaWikiJobsJob implements ShouldBeUnique, ShouldQueue {
                 ],
             ],
             'spec' => [
-                'ttlSecondsAfterFinished' => 172800, // 1 week
+                'ttlSecondsAfterFinished' => 24 * 60 * 60 * 7, // 1 week
                 'template' => [
                     'metadata' => [
                         'name' => 'run-all-mw-jobs',
