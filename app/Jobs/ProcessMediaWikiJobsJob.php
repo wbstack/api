@@ -74,6 +74,7 @@ class ProcessMediaWikiJobsJob implements ShouldBeUnique, ShouldQueue {
                 ],
             ],
             'spec' => [
+                // This is set to immediately expire since the name of the job is used as the lock to prevent creating duplicates of this Kubernetes Job for any given Wiki.
                 'ttlSecondsAfterFinished' => 0,
                 'template' => [
                     'metadata' => [
