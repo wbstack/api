@@ -36,6 +36,7 @@ class WikiMetrics {
         $quarterlyActions = $this->getNumberOfActions(self::INTERVAL_QUARTERLY);
         $numberOfEntities = $this->getNumberOfEntities();
         $monthlyNumberOfUsersPerActivityType = $this->getNumberOfUsersPerActivityType();
+        $numberOfUsersPerWiki = $this->getTotalUserCount();
 
         $dailyMetrics = new WikiDailyMetrics([
             'id' => $wiki->id . '_' . date('Y-m-d'),
@@ -54,6 +55,7 @@ class WikiMetrics {
             'entity_schema_count' => $numberOfEntities['640'],
             'monthly_casual_users' => $monthlyNumberOfUsersPerActivityType[0],
             'monthly_active_users' => $monthlyNumberOfUsersPerActivityType[1],
+            'total_user_count' => $numberOfUsersPerWiki,
         ]);
 
         // compare current record to old record and only save if there is a change
@@ -209,5 +211,18 @@ class WikiMetrics {
         $result[640] ??= 0;
 
         return $result;
+    }
+
+    protected function getTotalUserCount() {
+        $wikiDb = $this->wiki->wikiDb;
+        $tableUser = $wikiDb->name . '.' . $wikiDb->prefix . '_user';
+        $query = "SELECT COUNT(*) AS total_users FROM $tableUser";
+        $manager = app()->db;
+        $manager->purge('mw');
+        $conn = $manager->connection('mw');
+        $pdo = $conn->getPdo();
+        $result = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
+
+        return $result[0]['total_users'] ?? null;
     }
 }

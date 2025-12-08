@@ -33,6 +33,7 @@ class WikiDailyMetrics extends Model {
         'entity_schema_count',
         'monthly_casual_users',
         'monthly_active_users',
+        'total_user_count',
 
     ];
 
@@ -51,6 +52,7 @@ class WikiDailyMetrics extends Model {
         'entity_schema_count',
         'monthly_casual_users',
         'monthly_active_users',
+        'total_user_count',
     ];
 
     public function areMetricsEqual(WikiDailyMetrics $wikiDailyMetrics): bool {
