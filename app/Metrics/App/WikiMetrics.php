@@ -221,8 +221,8 @@ class WikiMetrics {
         $manager->purge('mw');
         $conn = $manager->connection('mw');
         $pdo = $conn->getPdo();
-        $result = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        $result = $pdo->query($query)->fetch(PDO::FETCH_ASSOC);
 
-        return $result[0]['total_users'] ?? null;
+        return $result['total_users'] ?? null;
     }
 }
