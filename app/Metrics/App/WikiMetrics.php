@@ -213,9 +213,9 @@ class WikiMetrics {
         return $result;
     }
 
-    protected function getTotalUserCount() {
+    private function getTotalUserCount() {
         $wikiDb = $this->wiki->wikiDb;
-        $tableUser = $wikiDb->name . '.' . $wikiDb->prefix . '_user';
+        $tableUser = "{$wikiDb->name}.{$wikiDb->prefix}_user";
         $query = "SELECT COUNT(*) AS total_users FROM $tableUser";
         $manager = app()->db;
         $manager->purge('mw');

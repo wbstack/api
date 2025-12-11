@@ -364,7 +364,7 @@ class WikiMetricsTest extends TestCase {
         ]);
     }
 
-    public function testSavestotalUserCountCorrectly() {
+    public function testSavesTotalUserCountCorrectly() {
         $wiki = Wiki::factory()->create([
             'domain' => 'usercounttest.wikibase.cloud',
         ]);
