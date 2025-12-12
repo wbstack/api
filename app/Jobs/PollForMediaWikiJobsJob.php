@@ -18,8 +18,15 @@ class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique, ShouldQueue
         $this->mwHostResolver = $mwHostResolver;
         $allWikiDomains = Wiki::all()->pluck('domain');
         foreach ($allWikiDomains as $wikiDomain) {
-            if ($this->hasPendingJobs($wikiDomain)) {
-                $this->enqueueWiki($wikiDomain);
+            $wiki = Wiki::firstWhere('domain', $wikiDomain);
+
+            // checking for read-only status first
+            // to prevent querying the action API
+            // from a wiki that is potentially being updated right now
+            if (!$wiki->isReadOnly()) {
+                if ($this->hasPendingJobs($wikiDomain)) {
+                    $this->enqueueWiki($wikiDomain);
+                }
             }
         }
     }

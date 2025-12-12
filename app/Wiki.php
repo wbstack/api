@@ -170,4 +170,16 @@ class Wiki extends Model {
     public function deleteSetting(string $name): ?string {
         return $this->settings()->where('name', $name)->delete();
     }
+
+    public function getSetting(string $name): ?string {
+        return $this->settings()->where('name', $name)->first();
+    }
+
+    public function hasSetting(string $name): bool {
+        return $this->getSetting($name) !== null;
+    }
+
+    public function isReadOnly(): bool {
+        return $this->hasSetting('wgReadOnly');
+    }
 }
