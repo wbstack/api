@@ -354,7 +354,6 @@ class WikiMetricsTest extends TestCase {
 
         // clean up after the test
         $wiki->forceDelete();
-        Schema::dropIfExists($tablePage);
 
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
@@ -362,6 +361,65 @@ class WikiMetricsTest extends TestCase {
             'property_count' => $expectedPropertyCount,
             'lexeme_count' => $expectedLexemeCount,
             'entity_schema_count' => $expectedEntitySchemaCount, // redirects should be ignored
+        ]);
+    }
+
+    public function testSavesTotalUserCountCorrectly() {
+        $wiki = Wiki::factory()->create([
+            'domain' => 'usercounttest.wikibase.cloud',
+        ]);
+
+        $users = [
+            [
+                'user_name' => 'user1',
+                'user_real_name' => 'user1',
+                'user_password' => 'user1',
+                'user_new_password' => 'user1',
+                'user_email' => 'user1@email.com',
+                'user_touched' => random_bytes(10),
+            ],
+            [
+                'user_name' => 'user2',
+                'user_real_name' => 'user2',
+                'user_password' => 'user2',
+                'user_new_password' => 'user2',
+                'user_email' => 'user2@email.com',
+                'user_touched' => random_bytes(10),
+            ],
+        ];
+        $wikiDb = WikiDb::first();
+        $wikiDb->update(['wiki_id' => $wiki->id]);
+
+        $tableUser = $wikiDb->name . '.' . $wikiDb->prefix . '_user';
+        Schema::dropIfExists($tableUser);
+        Schema::create($tableUser, function (Blueprint $table) {
+            $table->increments('user_id');
+            $table->string('user_name');
+            $table->string('user_real_name')->default(0);
+            $table->string('user_password', 255);
+            $table->string('user_new_password');
+            $table->string('user_email');
+            $table->binary('user_touched');
+        });
+
+        // Insert dummy data
+        DB::table($tableUser)->insert($users);
+        WikiDailyMetrics::create([
+            'id' => $wiki->id . '_' . now()->subDay()->toDateString(),
+            'wiki_id' => $wiki->id,
+            'date' => now()->subDay()->toDateString(),
+            'pages' => 0,
+            'is_deleted' => 0,
+        ]);
+
+        (new WikiMetrics)->saveMetrics($wiki);
+
+        // clean up after the test
+        $wiki->forceDelete();
+
+        $this->assertDatabaseHas('wiki_daily_metrics', [
+            'wiki_id' => $wiki->id,
+            'total_user_count' => count($users),
         ]);
     }
 }
