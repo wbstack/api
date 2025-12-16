@@ -6,7 +6,7 @@
 
 // TODO allow passing in file? or run for all files?
 $placeholder = '<<prefix>>_';
-$filename = __DIR__ . '/new/mw1.43-wbs2.sql';
+$filename = __DIR__ . '/new/mw1.43-wbs1.sql';
 
 // Get the file
 $text = file_get_contents($filename);
