@@ -31,7 +31,7 @@ jobs:
           helm-plugins: >
             https://github.com/databus23/helm-diff@v3.12.5
       - name: Cache Docker layers
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
