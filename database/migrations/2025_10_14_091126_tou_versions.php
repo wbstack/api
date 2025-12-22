@@ -10,7 +10,6 @@ return new class extends Migration {
      */
     public function up(): void {
         Schema::create('tou_versions', function (Blueprint $table) {
-            $table->id();
             $table->string('version')->unique();
             $table->boolean('active')->default(false);
             $table->timestamps();
