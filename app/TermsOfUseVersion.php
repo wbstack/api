@@ -36,7 +36,11 @@ class TermsOfUseVersion extends Model {
         return self::query()->where('active', true)->latest()->first();
     }
 
+    /**
+     * Ensure only one ToU version remains active after any save operation.
+     */
     protected static function booted(): void {
+
         static::saving(function (self $model): void {
             if (! $model->active) {
                 return;
