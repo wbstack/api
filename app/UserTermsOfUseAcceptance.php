@@ -9,12 +9,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class UserTermsOfUseAcceptance extends Model {
     use HasFactory;
 
-    public $incrementing = false;
-
-    protected $primaryKey = null;
-
-    protected $keyType = 'string';
-
     public const FIELDS = [
         'user_id',
         'tou_version',
@@ -34,11 +28,5 @@ class UserTermsOfUseAcceptance extends Model {
 
     public function user(): BelongsTo {
         return $this->belongsTo(User::class);
-    }
-
-    protected function setKeysForSaveQuery($query) {
-        return $query
-            ->where('user_id', $this->getAttribute('user_id'))
-            ->where('tou_version', $this->getAttribute('tou_version'));
     }
 }

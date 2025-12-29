@@ -10,12 +10,18 @@ return new class extends Migration {
      */
     public function up(): void {
         Schema::create('tou_acceptances', function (Blueprint $table) {
+            $table->id();
             $table->unsignedInteger('user_id');
             $table->string('tou_version');
             $table->timestamp('tou_accepted_at');
             $table->timestamps();
             $table->unique(['user_id', 'tou_version']);
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreign('tou_version')
+                ->references('version')
+                ->on('tou_versions')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
         });
     }
 
