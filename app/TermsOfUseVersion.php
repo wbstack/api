@@ -13,7 +13,10 @@ use Illuminate\Database\Eloquent\Model;
 class TermsOfUseVersion extends Model {
     use HasFactory;
 
+    protected $primaryKey = 'version';
+    protected $keyType = 'string';
     protected $table = 'tou_versions';
+    public $incrementing = false;
 
     const FIELDS = [
         'version',
@@ -31,5 +34,18 @@ class TermsOfUseVersion extends Model {
 
     public static function latestActiveVersion(): ?self {
         return self::query()->where('active', true)->latest()->first();
+    }
+
+    protected static function booted(): void {
+        static::saving(function (self $model): void {
+            if (! $model->active) {
+                return;
+            }
+
+            self::query()
+                ->where('version', '!=', $model->version)
+                ->where('active', true)
+                ->update(['active' => false]);
+        });
     }
 }
