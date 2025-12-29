@@ -10,7 +10,9 @@ class UserTermsOfUseAcceptance extends Model {
     use HasFactory;
 
     public $incrementing = false;
+
     protected $primaryKey = null;
+
     protected $keyType = 'string';
 
     public const FIELDS = [

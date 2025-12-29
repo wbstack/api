@@ -14,8 +14,11 @@ class TermsOfUseVersion extends Model {
     use HasFactory;
 
     protected $primaryKey = 'version';
+
     protected $keyType = 'string';
+
     protected $table = 'tou_versions';
+
     public $incrementing = false;
 
     const FIELDS = [
@@ -42,7 +45,7 @@ class TermsOfUseVersion extends Model {
     protected static function booted(): void {
 
         static::saving(function (self $model): void {
-            if (! $model->active) {
+            if (!$model->active) {
                 return;
             }
 
