@@ -32,7 +32,7 @@ class TermsOfUseVersion extends Model {
     /**
      * Get the active ToU version.
      */
-    public static function latestActiveVersion(): ?self {
+    public static function getActiveVersion(): ?self {
         return self::query()->where('active', true)->first();
     }
 
