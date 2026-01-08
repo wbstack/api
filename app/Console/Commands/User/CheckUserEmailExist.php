@@ -6,9 +6,9 @@ use App\User;
 use Illuminate\Console\Command;
 use PDO;
 
-class CheckUserEmailExist extends Command{
-
+class CheckUserEmailExist extends Command {
     protected $signature = 'wbs-user:check-email {emails*}';
+
     protected $description = 'Check if emails exist in apidb.users or any MediaWiki user table';
 
     public function handle(): int {
@@ -25,15 +25,15 @@ class CheckUserEmailExist extends Command{
         foreach ($emails as $email) {
             $found = false;
 
-            //Check apidb.users
+            // Check apidb.users
             if (User::whereEmail($email)->exists()) {
                 $this->line("FOUND: {$email} in apidb.users");
                 $found = true;
             }
 
-            //Check MediaWiki databases
+            // Check MediaWiki databases
             foreach ($mwDatabases as $dbName) {
-                //fetch user table name
+                // fetch user table name
                 $tableStmt = $pdo->prepare("
                     SELECT TABLE_NAME
                     FROM INFORMATION_SCHEMA.TABLES
@@ -72,5 +72,4 @@ class CheckUserEmailExist extends Command{
 
         return 0;
     }
-
 }
