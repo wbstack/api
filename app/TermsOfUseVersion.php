@@ -13,6 +13,12 @@ use Illuminate\Database\Eloquent\Model;
 class TermsOfUseVersion extends Model {
     use HasFactory;
 
+    protected $primaryKey = 'version';
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
     protected $table = 'tou_versions';
 
     const FIELDS = [
