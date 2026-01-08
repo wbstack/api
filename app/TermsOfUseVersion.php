@@ -30,11 +30,6 @@ class TermsOfUseVersion extends Model {
 
     protected $visible = self::FIELDS;
 
-    protected $casts = [
-        'version' => 'string',
-        'active' => 'boolean',
-    ];
-
     public static function latestActiveVersion(): ?self {
         return self::query()->where('active', true)->latest()->first();
     }
