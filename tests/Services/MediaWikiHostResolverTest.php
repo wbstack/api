@@ -15,7 +15,7 @@ class MediaWikiHostResolverTest extends TestCase {
 
     public function testResolverRoutesToCorrectHost(): void {
         $domain = (new Factory)->create()->unique()->text(30);
-        $this->createWiki($domain, 'mw1.43-wbs1');
+        $this->createWiki($domain, 'mw1.43-wbs2');
         $resolver = new MediaWikiHostResolver;
         $this->assertEquals(
             'mediawiki-143-app-backend.default.svc.cluster.local',
