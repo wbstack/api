@@ -19,14 +19,14 @@ class UserTermsOfUseAcceptanceTest extends TestCase {
 
         $this->assertDatabaseHas('tou_acceptances', [
             'user_id' => $user->id,
-            'tou_version' => TermsOfUseVersion::latestActiveVersion()->version,
+            'tou_version' => TermsOfUseVersion::getActiveVersion()->version,
         ]);
 
         $rows = UserTermsOfUseAcceptance::where('user_id', $user->id)->get();
         $this->assertCount(1, $rows);
         $acceptance = $rows->first();
 
-        $this->assertSame(TermsOfUseVersion::latestActiveVersion()->version, $acceptance->tou_version);
+        $this->assertSame(TermsOfUseVersion::getActiveVersion()->version, $acceptance->tou_version);
         $this->assertNotNull($acceptance->tou_accepted_at);
     }
 }
