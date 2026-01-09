@@ -2,7 +2,9 @@
 
 namespace Tests\Commands;
 
+use App\Services\WikiUserEmailChecker;
 use App\User;
+use Mockery;
 use Tests\TestCase;
 
 class CheckUserEmailExistTest extends TestCase {
@@ -31,6 +33,22 @@ class CheckUserEmailExistTest extends TestCase {
         $this->artisan('wbs-user:check-email', ['emails' => $emails])
             ->expectsOutput('FOUND: user1@example.com in apidb.users')
             ->expectsOutput('NOT FOUND: other@example.com')
+            ->assertExitCode(0);
+    }
+
+    public function testEmailFoundInWikiDb() {
+        $checker = Mockery::mock(WikiUserEmailChecker::class);
+
+        $checker->shouldReceive('findEmail')
+            ->with('test@example.com')
+            ->andReturn(['mwdb_test.mwdb_test_user']);
+
+        $this->app->instance(WikiUserEmailChecker::class, $checker);
+
+        $this->artisan('wbs-user:check-email', [
+            'emails' => ['test@example.com'],
+        ])
+            ->expectsOutput('FOUND: test@example.com in mwdb_test.mwdb_test_user')
             ->assertExitCode(0);
     }
 }
