@@ -11,6 +11,7 @@ This directory contains the SQL needed to create and wiki DBs.
 
 **Versions**
 
+- mw1.43-wbs2 - fix missing `rebuildItemTerms` in MediaWiki updatelog
 - mw1.43-wbs1 - First 1.43 install
 - mw1.39-wbs1 - First 1.39 install
 - mw1.38-wbs1 - First 1.38 install
