@@ -95,7 +95,7 @@ jobs:
           MSG=$(git log -1 --pretty=format:%s)
           echo "msg=$MSG" >> $GITHUB_OUTPUT
       - name: Create Staging+Local Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         if: github.event_name != 'pull_request'
         with:
           path: ./repos/wbaas-deploy-staging
@@ -111,7 +111,7 @@ jobs:
 
             **Changes**: [${{ steps.truncate-commit-message.outputs.msg }}](https://github.com/wbstack/api/commit/${{ github.sha }})
       - name: Create Production Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         if: github.event_name != 'pull_request'
         with:
           path: ./repos/wbaas-deploy-production
