@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Docker meta
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v5.7.0
@@ -57,13 +57,13 @@ jobs:
           labels: ${{ steps.docker_meta.outputs.labels }}
       - name: Check out `wmde/wbaas-deploy` repository in staging child directory
         if: github.event_name != 'pull_request'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: wmde/wbaas-deploy
           path: ./repos/wbaas-deploy-staging
       - name: Check out `wmde/wbaas-deploy` repository in production child directory
         if: github.event_name != 'pull_request'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: wmde/wbaas-deploy
           path: ./repos/wbaas-deploy-production
