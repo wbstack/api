@@ -12,7 +12,7 @@ class WikiDbVersionControllerTest extends TestCase {
 
     const VALID_WIKI_DB_VERSION_STRING_139 = 'mw1.39-wbs1';
 
-    const VALID_WIKI_DB_VERSION_STRING_143 = 'mw1.43-wbs1';
+    const VALID_WIKI_DB_VERSION_STRING_143 = 'mw1.43-wbs2';
 
     protected $route = '/backend/setWikiDbVersion';
 

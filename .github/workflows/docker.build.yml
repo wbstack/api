@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Docker meta
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v5.7.0
+        uses: crazy-max/ghaction-docker-meta@v5.10.0
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
@@ -24,28 +24,28 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.11.1
       - name: Set up helmfile
-        uses: helmfile/helmfile-action@v2.0.5
+        uses: helmfile/helmfile-action@v2.1.0
         with:
           helmfile-version: 'v0.162.0'
           helm-version: 'v3.12.2'
           helm-plugins: >
             https://github.com/databus23/helm-diff@v3.12.5
       - name: Cache Docker layers
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3.1.0
+        uses: docker/login-action@v3.6.0
         if: github.event_name != 'pull_request'
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v6.15.0
+        uses: docker/build-push-action@v6.18.0
         with:
           context: .
           file: ./Dockerfile
@@ -57,13 +57,13 @@ jobs:
           labels: ${{ steps.docker_meta.outputs.labels }}
       - name: Check out `wmde/wbaas-deploy` repository in staging child directory
         if: github.event_name != 'pull_request'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: wmde/wbaas-deploy
           path: ./repos/wbaas-deploy-staging
       - name: Check out `wmde/wbaas-deploy` repository in production child directory
         if: github.event_name != 'pull_request'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: wmde/wbaas-deploy
           path: ./repos/wbaas-deploy-production
@@ -95,7 +95,7 @@ jobs:
           MSG=$(git log -1 --pretty=format:%s)
           echo "msg=$MSG" >> $GITHUB_OUTPUT
       - name: Create Staging+Local Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         if: github.event_name != 'pull_request'
         with:
           path: ./repos/wbaas-deploy-staging
@@ -111,7 +111,7 @@ jobs:
 
             **Changes**: [${{ steps.truncate-commit-message.outputs.msg }}](https://github.com/wbstack/api/commit/${{ github.sha }})
       - name: Create Production Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         if: github.event_name != 'pull_request'
         with:
           path: ./repos/wbaas-deploy-production
