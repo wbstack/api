@@ -41,7 +41,7 @@ class WikiMetricsTest extends TestCase {
         ]);
     }
 
-    public function testDoesNotAddDuplicateRecordsWithOnlyDateChange() {
+    public function testNoDuplicateRecordsWithOnlyDateChange() {
         $wiki = Wiki::factory()->create([
             'domain' => 'thisfake.wikibase.cloud',
         ]);
@@ -57,16 +57,18 @@ class WikiMetricsTest extends TestCase {
             'pages' => 0,
             'is_deleted' => 0,
         ]);
+
+        // Run saveMetrics()
         (new WikiMetrics)->saveMetrics($wiki);
 
-        // Assert No new record was created for today
+        // Assert no new record was created for today
         $this->assertDatabaseMissing('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
             'date' => Carbon::today()->toDateString(),
         ]);
     }
 
-    public function testAddRecordsWikiIsDeleted() {
+    public function testRecordCreatedWhenWikiFirstDeleted() {
         $wiki = Wiki::factory()->create([
             'domain' => 'thisfake.wikibase.cloud',
         ]);
@@ -74,7 +76,50 @@ class WikiMetricsTest extends TestCase {
         $wikiDb = WikiDb::first();
         $wikiDb->update(['wiki_id' => $wiki->id]);
 
+        $wikiSiteStats = $wiki->wikiSiteStats()->create();
+        $wikiSiteStats->update([
+            'pages' => 10,
+            'users' => 5,
+        ]);
+
         // Insert an old metric value for a wiki
+        WikiDailyMetrics::create([
+            'id' => $wiki->id . '_' . Carbon::yesterday()->toDateString(),
+            'wiki_id' => $wiki->id,
+            'date' => Carbon::yesterday()->toDateString(),
+            'pages' => 0,
+            'is_deleted' => 0,
+            'total_user_count' => null,
+        ]);
+
+        // Delete the wiki
+        $wiki->delete();
+        $wiki->save();
+
+        // Run saveMetrics()
+        (new WikiMetrics)->saveMetrics($wiki);
+
+        // Assert new record was created for newly deleted wiki
+        $this->assertDatabaseHas('wiki_daily_metrics', [
+            'wiki_id' => $wiki->id,
+            'is_deleted' => 1,
+            'total_user_count' => 5,
+            'date' => now()->toDateString(),
+        ]);
+    }
+
+    public function testNoDuplicateRecordsForDeletedWiki() {
+        $wiki = Wiki::factory()->create([
+            'domain' => 'thisfake.wikibase.cloud',
+        ]);
+        $wikiDb = WikiDb::first();
+        $wikiDb->update(['wiki_id' => $wiki->id]);
+
+        // Delete the wiki
+        $wiki->delete();
+        $wiki->save();
+
+        // Create an old metric record for the wiki
         WikiDailyMetrics::create([
             'id' => $wiki->id . '_' . Carbon::yesterday()->toDateString(),
             'wiki_id' => $wiki->id,
@@ -82,13 +127,11 @@ class WikiMetricsTest extends TestCase {
             'pages' => 0,
             'is_deleted' => 1,
         ]);
-        // delete the wiki
-        $wiki->delete();
-        $wiki->save();
 
+        // Run saveMetrics()
         (new WikiMetrics)->saveMetrics($wiki);
 
-        // Assert No new record was created for today
+        // Assert no new record was created for previously deleted wiki
         $this->assertDatabaseMissing('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
             'is_deleted' => 1,
