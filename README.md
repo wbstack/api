@@ -1,6 +1,6 @@
 > ℹ️ Issues for this repository are tracked on [Phabricator](https://phabricator.wikimedia.org/project/board/5563/) - ([Click here to open a new one](https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?tags=wikibase_cloud,wbstack_api
 ))
-> 
+
 # WBStack Platform API
 ## Configuration
 The platform API comes in a few different flavours that can be toggled using environment variables:
@@ -9,14 +9,11 @@ The platform API comes in a few different flavours that can be toggled using env
 - `ROUTES_LOAD_SANDBOX` - web routes for the public facing sandbox usecase
 - `ROUTES_LOAD_BACKEND` - internal only API endpoints (non public) for all usecases
 
-This single application could likely be split up at some point.
-Everything is currently together to make use of the shared wiki management code
-and query service management code.
+This single application could likely be split up at some point. Everything is currently together to make use of the shared wiki management code and query service management code.
 
 ## Additional environment variables
 ### Contact page settings
-- `WBSTACK_CONTACT_MAIL_SENDER` - The mail address of the sender address of the contact page mails.
-If the address includes the placeholder `<subject>`, it gets replaced with a shorthand for the actual selected subject (`give-feedback`, `report-a-problem`, etc)
+- `WBSTACK_CONTACT_MAIL_SENDER` - The mail address of the sender address of the contact page mails. If the address includes the placeholder `<subject>`, it gets replaced with a shorthand for the actual selected subject (`give-feedback`, `report-a-problem`, etc)
 
 - `WBSTACK_CONTACT_MAIL_RECIPIENT` - The receiver address of the contact page mails
 
@@ -24,7 +21,7 @@ If the address includes the placeholder `<subject>`, it gets replaced with a sho
 
 ### Install dependencies
 
-It is recommened to install the php dependencies via a composer docker container as that contains the required php extensions: 
+It is recommended to install the php dependencies via a composer docker container as that contains the required php extensions:
 ```
 docker run --rm -it -v $PWD:/app -u $(id -u):$(id -g) composer install --ignore-platform-reqs
 ```
@@ -85,7 +82,7 @@ If you want to develop with the UI then simply point the UI docker compose setup
 
 ### Seeded data
 
-Some data is added to the database via the laraval seeders.
+Some data is added to the database via the Laravel seeders.
 
 You can log in with these details for example.
 
@@ -99,7 +96,17 @@ And create a wiki.
 Currently most of the tests require the DB connection to exist.
 
 ```sh
+# run the whole test suite
 docker compose exec api vendor/bin/phpunit
+
+# run a single file
+docker compose exec api vendor/bin/phpunit tests/Jobs/DeleteWikiJobTest.php
+
+# run a single class
+docker compose exec api vendor/bin/phpunit --filter DeleteWikiJobTest
+
+# run a single method
+docker compose exec api vendor/bin/phpunit --filter DeleteWikiJobTest::testDeletesWiki
 ```
 
 ### Linting
