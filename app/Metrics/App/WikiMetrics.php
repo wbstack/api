@@ -36,7 +36,7 @@ class WikiMetrics {
         $quarterlyActions = $this->getNumberOfActions(self::INTERVAL_QUARTERLY);
         $numberOfEntities = $this->getNumberOfEntities();
         $monthlyNumberOfUsersPerActivityType = $this->getNumberOfUsersPerActivityType();
-        $numberOfUsersPerWiki = $wiki->wikiSiteStats()->first()->users ?? 0;
+        $numberOfUsers = $wiki->wikiSiteStats()->first()->users ?? 0;
 
         $dailyMetrics = new WikiDailyMetrics([
             'id' => $wiki->id . '_' . date('Y-m-d'),
@@ -55,7 +55,7 @@ class WikiMetrics {
             'entity_schema_count' => $numberOfEntities['640'],
             'monthly_casual_users' => $monthlyNumberOfUsersPerActivityType[0],
             'monthly_active_users' => $monthlyNumberOfUsersPerActivityType[1],
-            'total_user_count' => $numberOfUsersPerWiki,
+            'total_user_count' => $numberOfUsers,
         ]);
 
         // compare current record to old record and only save if there is a change

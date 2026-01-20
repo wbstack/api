@@ -35,7 +35,8 @@ class WikiMetricsTest extends TestCase {
         $wikiDb->update(['wiki_id' => $wiki->id]);
 
         (new WikiMetrics)->saveMetrics($wiki);
-        // Assert the metric is updated in the database
+
+        // Assert new record is added to the database
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'date' => now()->toDateString(),
         ]);
@@ -96,7 +97,7 @@ class WikiMetricsTest extends TestCase {
         ]);
     }
 
-    public function testItSaveTripleCountSuccessfully() {
+    public function testTripleCountSavedSuccessfully() {
         $wiki = Wiki::factory()->create([
             'domain' => 'somewikiforunittest.wikibase.cloud',
         ]);
