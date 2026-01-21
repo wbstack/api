@@ -51,13 +51,13 @@ docker compose down --volumes
 
 ### Migrations  
 
-Run everything in one go ...
+Run everything in one go:
 
 ```sh
 docker compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install && php artisan db:seed && php artisan key:generate && php artisan storage:link'
 ```
 
-Or each command separately ...
+Or each command separately:
 
 ```sh
 # Create the SQL tables needed
