@@ -10,4 +10,4 @@ jobs:
       - uses: mattermost/action-mattermost-notify@2.0.0
         with:
           MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
-          TEXT: Pull request opened: [${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})
+          TEXT: "Pull request opened: [${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})"
