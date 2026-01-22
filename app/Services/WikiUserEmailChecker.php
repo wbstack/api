@@ -14,7 +14,7 @@ class WikiUserEmailChecker {
 
         $foundIn = [];
 
-        $userTables = $this->loadAllUserTables($pdo);
+        $userTables = $this->getAllMediaWikiUserTables($pdo);
 
         foreach ($userTables as $dbName => $userTable) {
             if ($this->emailExists($pdo, $dbName, $userTable, $email)) {
