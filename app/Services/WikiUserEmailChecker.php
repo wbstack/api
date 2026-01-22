@@ -25,11 +25,10 @@ class WikiUserEmailChecker {
         return $foundIn;
     }
 
-    private function loadAllUserTables(PDO $pdo): array {
+    private function getAllMediaWikiUserTables(PDO $pdo): array {
         $stmt = $pdo->query("
         SELECT TABLE_SCHEMA, TABLE_NAME
         FROM INFORMATION_SCHEMA.TABLES
-        WHERE TABLE_SCHEMA LIKE 'mwdb\_%'
         WHERE TABLE_SCHEMA LIKE 'mwdb_%'
           AND TABLE_NAME LIKE '%_user'
     ");
