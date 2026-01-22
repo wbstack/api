@@ -16,6 +16,7 @@ class WikiUserEmailCheckerTest extends TestCase {
         ['prefix' => 'db_1', 'name' => 'mwdb_1', 'emails' => ['user1@email.localhost', 'user2@email.localhost']],
         ['prefix' => 'db_2', 'name' => 'mwdb_2', 'emails' => ['user1@email.localhost']],
         ['prefix' => 'db_3', 'name' => 'mwdb_3', 'emails' => []],
+        ['prefix' => 'db_4', 'name' => 'mwdb_4', 'emails' => ['User4@Email.localhost']],
     ];
 
     protected function setUp(): void {
