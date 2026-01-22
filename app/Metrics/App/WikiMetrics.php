@@ -25,7 +25,6 @@ class WikiMetrics {
         $this->wiki = $wiki;
 
         $today = now()->format('Y-m-d');
-        $oldRecord = WikiDailyMetrics::where('wiki_id', $wiki->id)->latest('date')->first();
         $tripleCount = $this->getNumOfTriples();
         $todayPageCount = $wiki->wikiSiteStats()->first()->pages ?? 0;
         $isDeleted = (bool) $wiki->deleted_at;
@@ -58,20 +57,12 @@ class WikiMetrics {
             'total_user_count' => $numberOfUsers,
         ]);
 
-        // compare current record to old record and only save if there is a change
-        if ($oldRecord) {
-            if ($oldRecord->is_deleted) {
-                Log::info("Wiki is deleted, no new record for Wiki ID {$wiki->id}.");
+        // compare current record to previous record and only save if there is a change
+        $previousRecord = WikiDailyMetrics::where('wiki_id', $wiki->id)->latest('date')->first();
+        if ($previousRecord?->areMetricsEqual($dailyMetrics)) {
+            Log::info("Record unchanged for Wiki ID {$wiki->id}, no new record added.");
 
-                return;
-            }
-            if (!$isDeleted) {
-                if ($oldRecord->areMetricsEqual($dailyMetrics)) {
-                    Log::info("Record unchanged for Wiki ID {$wiki->id}, no new record added.");
-
-                    return;
-                }
-            }
+            return;
         }
 
         $dailyMetrics->save();
