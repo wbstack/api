@@ -121,4 +121,8 @@ class User extends Authenticatable implements MustVerifyEmail {
     public function getEmailForVerification() {
         return $this->email;
     }
+
+    public function scopeWhereEmailInsensitive($query, string $email) {
+        return $query->whereRaw('LOWER(email) = ?', [strtolower($email)]);
+    }
 }

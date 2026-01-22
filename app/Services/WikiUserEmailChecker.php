@@ -51,7 +51,7 @@ class WikiUserEmailChecker {
         $stmt = $pdo->prepare("
             SELECT 1
             FROM {$dbName}.{$table}
-            WHERE user_email = :email
+            WHERE LOWER(user_email) = LOWER(:email)
             LIMIT 1
         ");
 

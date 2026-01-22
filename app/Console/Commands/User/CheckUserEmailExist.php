@@ -16,7 +16,7 @@ class CheckUserEmailExist extends Command {
         foreach ($emails as $email) {
             $found = false;
 
-            if (User::whereEmail($email)->exists()) {
+            if (User::whereEmailInsensitive($email)->exists()) {
                 $this->line("FOUND: {$email} in apidb.users");
                 $found = true;
             }

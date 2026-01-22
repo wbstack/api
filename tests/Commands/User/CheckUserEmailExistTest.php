@@ -51,4 +51,13 @@ class CheckUserEmailExistTest extends TestCase {
             ->expectsOutput('FOUND: test@example.com in mwdb_test.mwdb_test_user')
             ->assertExitCode(0);
     }
+
+    public function testCaseInsensitive() {
+        User::factory()->create([
+            'email' => 'Test@Example.com',
+        ]);
+        $exists = User::whereEmailInsensitive('test@example.com')->exists();
+
+        $this->assertTrue($exists);
+    }
 }

@@ -62,4 +62,12 @@ class WikiUserEmailCheckerTest extends TestCase {
             $checker->findEmail('user1@email.localhost')
         );
     }
+
+    public function testWikiUserEmailCheckerIsCaseInsensitive(): void {
+        $checker = new WikiUserEmailChecker($this->db);
+        $this->assertEquals(
+            ['mwdb_1.db_1_user'],
+            $checker->findEmail('uSer2@eMAil.localhost')
+        );
+    }
 }
