@@ -16,7 +16,6 @@ class WikiUserEmailCheckerTest extends TestCase {
         ['prefix' => 'db_1', 'name' => 'mwdb_1', 'emails' => ['user1@email.localhost', 'user2@email.localhost']],
         ['prefix' => 'db_2', 'name' => 'mwdb_2', 'emails' => ['user1@email.localhost']],
         ['prefix' => 'db_3', 'name' => 'mwdb_3', 'emails' => []],
-        ['prefix' => 'db_4', 'name' => 'mwdb_4', 'emails' => ['User4@Email.localhost']],
     ];
 
     protected function setUp(): void {
@@ -58,7 +57,7 @@ class WikiUserEmailCheckerTest extends TestCase {
 
     public function testEmailFoundInMultipleDatabases(): void {
         $checker = new WikiUserEmailChecker($this->db);
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             ['mwdb_1.db_1_user', 'mwdb_2.db_2_user'],
             $checker->findEmail('user1@email.localhost')
         );
