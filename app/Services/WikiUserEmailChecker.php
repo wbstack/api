@@ -47,6 +47,7 @@ class WikiUserEmailChecker {
             SELECT 1
             FROM {$dbName}.{$table}
             WHERE LOWER(user_email) = LOWER(:email)
+            WHERE LOWER(CONVERT(user_email USING utf8mb4)) = LOWER(:email)
             LIMIT 1
         ");
 

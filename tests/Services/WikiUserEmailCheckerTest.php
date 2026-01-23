@@ -16,6 +16,7 @@ class WikiUserEmailCheckerTest extends TestCase {
         ['prefix' => 'db_1', 'name' => 'mwdb_1', 'emails' => ['user1@email.localhost', 'user2@email.localhost']],
         ['prefix' => 'db_2', 'name' => 'mwdb_2', 'emails' => ['user1@email.localhost']],
         ['prefix' => 'db_3', 'name' => 'mwdb_3', 'emails' => []],
+        ['prefix' => 'db_4', 'name' => 'mwdb_4', 'emails' => ['UsEr4@EmAiL.lOcAlHoSt']],
     ];
 
     protected function setUp(): void {
@@ -66,8 +67,8 @@ class WikiUserEmailCheckerTest extends TestCase {
     public function testWikiUserEmailCheckerIsCaseInsensitive(): void {
         $checker = new WikiUserEmailChecker($this->db);
         $this->assertEquals(
-            ['mwdb_1.db_1_user'],
-            $checker->findEmail('uSer2@eMAil.localhost')
+            ['mwdb_4.db_4_user'],
+            $checker->findEmail('uSer4@eMAil.localhost')
         );
     }
 }
