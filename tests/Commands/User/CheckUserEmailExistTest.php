@@ -60,6 +60,7 @@ class CheckUserEmailExistTest extends TestCase {
         User::factory()->create([
             'email' => 'Test@Example.com',
         ]);
+
         $exists = User::whereEmailInsensitive('tEsT@eXaMpLe.CoM')->exists();
 
         $this->assertTrue($exists);

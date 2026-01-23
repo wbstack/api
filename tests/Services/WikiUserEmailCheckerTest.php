@@ -58,7 +58,7 @@ class WikiUserEmailCheckerTest extends TestCase {
 
     public function testEmailFoundInMultipleDatabases(): void {
         $checker = new WikiUserEmailChecker($this->db);
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             ['mwdb_1.db_1_user', 'mwdb_2.db_2_user'],
             $checker->findEmail('user1@email.localhost')
         );

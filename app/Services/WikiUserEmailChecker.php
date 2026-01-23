@@ -12,19 +12,11 @@ class WikiUserEmailChecker {
         $this->db->purge('mw');
         $pdo = $this->db->connection('mw')->getPdo();
 
-        $mwDatabases = $pdo
-            ->query("SHOW DATABASES LIKE 'mwdb_%'")
-            ->fetchAll(PDO::FETCH_COLUMN);
-
         $foundIn = [];
 
-        foreach ($mwDatabases as $dbName) {
-            $userTable = $this->findUserTable($pdo, $dbName);
+        $userTables = $this->getAllMediaWikiUserTables($pdo);
 
-            if (!$userTable) {
-                continue;
-            }
-
+        foreach ($userTables as $dbName => $userTable) {
             if ($this->emailExists($pdo, $dbName, $userTable, $email)) {
                 $foundIn[] = "{$dbName}.{$userTable}";
             }
@@ -33,18 +25,21 @@ class WikiUserEmailChecker {
         return $foundIn;
     }
 
-    private function findUserTable(PDO $pdo, string $dbName): ?string {
-        $stmt = $pdo->prepare("
-            SELECT TABLE_NAME
+    private function getAllMediaWikiUserTables(PDO $pdo): array {
+        $stmt = $pdo->query("
+            SELECT TABLE_SCHEMA, TABLE_NAME
             FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_SCHEMA = :db
-              AND TABLE_NAME LIKE '%\_user'
-            LIMIT 1
+            WHERE TABLE_SCHEMA LIKE 'mwdb_%'
+            AND TABLE_NAME LIKE '%_user'
         ");
 
-        $stmt->execute(['db' => $dbName]);
+        $tablesByDb = [];
 
-        return $stmt->fetchColumn() ?: null;
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $tablesByDb[$row['TABLE_SCHEMA']] = $row['TABLE_NAME'];
+        }
+
+        return $tablesByDb;
     }
 
     private function emailExists(PDO $pdo, string $dbName, string $table, string $email): bool {
