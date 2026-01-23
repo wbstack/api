@@ -8,6 +8,10 @@ use Mockery;
 use Tests\TestCase;
 
 class CheckUserEmailExistTest extends TestCase {
+    protected function tearDown(): void {
+        User::query()->delete();
+    }
+
     public function testItFindsEmailInApiUsersTable() {
         User::factory()->create([
             'email' => 'user@example.com',
@@ -50,5 +54,14 @@ class CheckUserEmailExistTest extends TestCase {
         ])
             ->expectsOutput('FOUND: test@example.com in mwdb_test.mwdb_test_user')
             ->assertExitCode(0);
+    }
+
+    public function testCaseInsensitive() {
+        User::factory()->create([
+            'email' => 'Test@Example.com',
+        ]);
+        $exists = User::whereEmailInsensitive('tEsT@eXaMpLe.CoM')->exists();
+
+        $this->assertTrue($exists);
     }
 }
