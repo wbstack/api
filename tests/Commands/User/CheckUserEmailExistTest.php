@@ -61,7 +61,7 @@ class CheckUserEmailExistTest extends TestCase {
             'email' => 'Test@Example.com',
         ]);
 
-        $exists = User::whereEmailInsensitive('tEsT@eXaMpLe.CoM')->exists();
+        $exists = User::whereEmail('tEsT@eXaMpLe.CoM')->exists();
 
         $this->assertTrue($exists);
     }
