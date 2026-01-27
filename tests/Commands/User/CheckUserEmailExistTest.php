@@ -4,14 +4,12 @@ namespace Tests\Commands;
 
 use App\Services\WikiUserEmailChecker;
 use App\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Mockery;
 use Tests\TestCase;
 
 class CheckUserEmailExistTest extends TestCase {
-    protected function tearDown(): void {
-        // delete all users
-        User::query()->delete();
-    }
+    use DatabaseTransactions;
 
     public function testItFindsEmailInApiUsersTable() {
         User::factory()->create([
