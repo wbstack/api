@@ -46,7 +46,10 @@ class WikiUserEmailChecker {
         $stmt = $pdo->prepare("
             SELECT 1
             FROM {$dbName}.{$table}
+
+            -- converting from tinyblob data type, see https://github.com/wbstack/api/blob/main/database/mw/new/mw1.43-wbs2.sql#L1006
             WHERE LOWER(CONVERT(user_email USING utf8mb4)) = LOWER(:email)
+
             LIMIT 1
         ");
 

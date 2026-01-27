@@ -9,6 +9,7 @@ use Tests\TestCase;
 
 class CheckUserEmailExistTest extends TestCase {
     protected function tearDown(): void {
+        // delete all users
         User::query()->delete();
     }
 
