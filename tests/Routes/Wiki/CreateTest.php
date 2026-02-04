@@ -2,7 +2,6 @@
 
 namespace Tests\Routes\Wiki\Managers;
 
-use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Jobs\ElasticSearchAliasInit;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionWikiDbJob;
@@ -41,12 +40,10 @@ class CreateTest extends TestCase {
      */
     public function testWikiCreateDispatchesSomeJobs($elasticSearchConfig) {
         $enabledForNewWikis = $elasticSearchConfig['enabledForNewWikis'];
-        $clusterWithoutSharedIndex = $elasticSearchConfig['clusterWithoutSharedIndex'] ?? null;
         $sharedIndexHost = $elasticSearchConfig['sharedIndexHost'] ?? null;
         $sharedIndexPrefix = $elasticSearchConfig['sharedIndexPrefix'] ?? null;
 
         Config::set('wbstack.elasticsearch_enabled_by_default', $enabledForNewWikis);
-        Config::set('wbstack.elasticsearch_cluster_without_shared_index', $clusterWithoutSharedIndex);
         Config::set('wbstack.elasticsearch_shared_index_host', $sharedIndexHost);
         Config::set('wbstack.elasticsearch_shared_index_prefix', $sharedIndexPrefix);
 
@@ -73,21 +70,13 @@ class CreateTest extends TestCase {
                 ]
             );
 
-        if ($enabledForNewWikis && $clusterWithoutSharedIndex) {
-            Queue::assertPushed(function (ElasticSearchIndexInit $job) use ($clusterWithoutSharedIndex) {
-                return $job->cluster() === $clusterWithoutSharedIndex;
-            });
-        } else {
-            Queue::assertNotPushed(ElasticSearchIndexInit::class);
-        }
-
         if ($enabledForNewWikis && $sharedIndexHost && $sharedIndexPrefix) {
             Queue::assertPushed(ElasticSearchAliasInit::class, 1);
         } else {
             Queue::assertNotPushed(ElasticSearchAliasInit::class);
         }
 
-        if ($enabledForNewWikis && !$clusterWithoutSharedIndex && !($sharedIndexHost && $sharedIndexPrefix)) {
+        if ($enabledForNewWikis && !($sharedIndexHost && $sharedIndexPrefix)) {
             $response->assertStatus(503)
                 ->assertJsonPath('message', 'Search enabled, but its configuration is invalid');
 
@@ -117,18 +106,6 @@ class CreateTest extends TestCase {
     }
 
     public static function createDispatchesSomeJobsProvider() {
-        yield [[
-            'enabledForNewWikis' => true,
-            'clusterWithoutSharedIndex' => 'all',
-            'sharedIndexHost' => 'somehost',
-            'sharedIndexPrefix' => 'testing_1',
-        ]];
-
-        yield [[
-            'enabledForNewWikis' => true,
-            'clusterWithoutSharedIndex' => 'default',
-        ]];
-
         yield [[
             'enabledForNewWikis' => true,
             'sharedIndexHost' => 'somehost',
