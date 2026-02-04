@@ -40,12 +40,12 @@ class CreateTest extends TestCase {
      */
     public function testWikiCreateDispatchesSomeJobs($elasticSearchConfig) {
         $enabledForNewWikis = $elasticSearchConfig['enabledForNewWikis'];
-        $sharedIndexHost = $elasticSearchConfig['sharedIndexHost'] ?? null;
         $sharedIndexPrefix = $elasticSearchConfig['sharedIndexPrefix'] ?? null;
+        $esHosts = $elasticSearchConfig['esHosts'] ?? null;
 
         Config::set('wbstack.elasticsearch_enabled_by_default', $enabledForNewWikis);
-        Config::set('wbstack.elasticsearch_shared_index_host', $sharedIndexHost);
         Config::set('wbstack.elasticsearch_shared_index_prefix', $sharedIndexPrefix);
+        Config::set('wbstack.elasticsearch_hosts', $esHosts);
 
         $this->createSQLandQSDBs();
 
@@ -70,13 +70,13 @@ class CreateTest extends TestCase {
                 ]
             );
 
-        if ($enabledForNewWikis && $sharedIndexHost && $sharedIndexPrefix) {
-            Queue::assertPushed(ElasticSearchAliasInit::class, 1);
+        if ($enabledForNewWikis && $esHosts && $sharedIndexPrefix) {
+            Queue::assertPushed(ElasticSearchAliasInit::class, count($esHosts));
         } else {
             Queue::assertNotPushed(ElasticSearchAliasInit::class);
         }
 
-        if ($enabledForNewWikis && !($sharedIndexHost && $sharedIndexPrefix)) {
+        if ($enabledForNewWikis && !($esHosts && $sharedIndexPrefix)) {
             $response->assertStatus(503)
                 ->assertJsonPath('message', 'Search enabled, but its configuration is invalid');
 
@@ -108,8 +108,26 @@ class CreateTest extends TestCase {
     public static function createDispatchesSomeJobsProvider() {
         yield [[
             'enabledForNewWikis' => true,
-            'sharedIndexHost' => 'somehost',
             'sharedIndexPrefix' => 'testing_1',
+            'esHosts' => ['elasticsearch-1.localhost'],
+        ]];
+
+        yield [[
+            'enabledForNewWikis' => true,
+            'sharedIndexPrefix' => 'testing_1',
+            'esHosts' => ['elasticsearch-1.localhost', 'elasticsearch-2.localhost'],
+        ]];
+
+        yield [[
+            'enabledForNewWikis' => false,
+            'sharedIndexPrefix' => 'testing_1',
+            'esHosts' => ['elasticsearch-1.localhost'],
+        ]];
+
+        yield [[
+            'enabledForNewWikis' => true,
+            'sharedIndexPrefix' => 'testing_1',
+            'esHosts' => [],
         ]];
 
         yield [[

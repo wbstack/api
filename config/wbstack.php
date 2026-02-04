@@ -21,7 +21,6 @@ return [
 
     'elasticsearch_hosts' => array_filter(explode(',', env('ELASTICSEARCH_HOST', ''))),
     'elasticsearch_enabled_by_default' => env('WBSTACK_ELASTICSEARCH_ENABLED_BY_DEFAULT', false),
-    'elasticsearch_shared_index_host' => env('ELASTICSEARCH_SHARED_INDEX_HOST', null),
     'elasticsearch_shared_index_prefix' => env('ELASTICSEARCH_SHARED_INDEX_PREFIX', null),
 
     'signup_throttling_limit' => env('WBSTACK_SIGNUP_THROTTLING_LIMIT', ''),

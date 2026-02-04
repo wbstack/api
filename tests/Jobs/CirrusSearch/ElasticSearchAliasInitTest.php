@@ -12,6 +12,8 @@ use Tests\TestCase;
 class ElasticSearchAliasInitTest extends TestCase {
     private $wikiId;
 
+    private $esHost;
+
     private $prefix;
 
     private $dbName;
@@ -19,6 +21,7 @@ class ElasticSearchAliasInitTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         $this->wikiId = Wiki::factory()->create()->id;
+        $this->esHost = 'elasticsearch-1.localhost';
         $this->dbName = WikiDb::factory()->create(['wiki_id' => $this->wikiId])->name;
         $this->prefix = 'testing_1';
         putenv('ELASTICSEARCH_SHARED_INDEX_PREFIX');
@@ -48,7 +51,7 @@ class ElasticSearchAliasInitTest extends TestCase {
             ->method('setOptions')
             ->with(
                 [
-                    CURLOPT_URL => getenv('ELASTICSEARCH_SHARED_INDEX_HOST') . '/_aliases',
+                    CURLOPT_URL => $this->esHost . '/_aliases',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_TIMEOUT => 60 * 15,
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
@@ -80,7 +83,7 @@ class ElasticSearchAliasInitTest extends TestCase {
             ->method('fail')
             ->withAnyParameters();
 
-        $job = new ElasticSearchAliasInit($this->wikiId, $this->prefix);
+        $job = new ElasticSearchAliasInit($this->wikiId, $this->esHost, $this->prefix);
         $job->setJob($mockJob);
         $job->handle($request);
     }
@@ -95,7 +98,7 @@ class ElasticSearchAliasInitTest extends TestCase {
             ->method('fail')
             ->with(new \RuntimeException("Updating Elasticsearch aliases failed for $this->wikiId with {\"acknowledged\":false}"));
 
-        $job = new ElasticSearchAliasInit($this->wikiId, $this->prefix);
+        $job = new ElasticSearchAliasInit($this->wikiId, $this->esHost, $this->prefix);
         $job->setJob($mockJob);
         $job->handle($request);
     }
@@ -109,7 +112,7 @@ class ElasticSearchAliasInitTest extends TestCase {
             ->method('fail')
             ->with(new \RuntimeException("Failed to get database name for $this->wikiId"));
 
-        $job = new ElasticSearchAliasInit($this->wikiId, $this->prefix);
+        $job = new ElasticSearchAliasInit($this->wikiId, $this->esHost, $this->prefix);
         $job->setJob($mockJob);
         $job->handle($request);
     }
@@ -127,7 +130,7 @@ class ElasticSearchAliasInitTest extends TestCase {
             ->method('fail')
             ->withAnyParameters();
 
-        $job = new ElasticSearchAliasInit($this->wikiId);
+        $job = new ElasticSearchAliasInit($this->wikiId, $this->esHost);
         $job->setJob($mockJob);
         $job->handle($request);
     }
@@ -140,7 +143,7 @@ class ElasticSearchAliasInitTest extends TestCase {
             ->method('fail')
             ->with(new \RuntimeException("Missing shared index prefix for $this->wikiId"));
 
-        $job = new ElasticSearchAliasInit($this->wikiId);
+        $job = new ElasticSearchAliasInit($this->wikiId, $this->esHost);
         $job->setJob($mockJob);
         $job->handle($request);
     }

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Log;
 class ElasticSearchAliasInit extends Job {
     private $wikiId;
 
+    private $esHost;
+
     private $dbName;
 
     private $sharedPrefix;
@@ -16,8 +18,9 @@ class ElasticSearchAliasInit extends Job {
     /**
      * @param  string  $dbName
      */
-    public function __construct(int $wikiId, ?string $sharedPrefix = null) {
+    public function __construct(int $wikiId, string $esHost, ?string $sharedPrefix = null) {
         $this->wikiId = $wikiId;
+        $this->esHost = $esHost;
         $this->sharedPrefix = $sharedPrefix ?? getenv('ELASTICSEARCH_SHARED_INDEX_PREFIX');
     }
 
@@ -68,7 +71,7 @@ class ElasticSearchAliasInit extends Job {
         }
 
         $request->setOptions([
-            CURLOPT_URL => getenv('ELASTICSEARCH_SHARED_INDEX_HOST') . '/_aliases',
+            CURLOPT_URL => $this->esHost . '/_aliases',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 60 * 15,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
