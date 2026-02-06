@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Helper\DomainHelper;
 use App\Helper\DomainValidator;
 use App\Helper\ProfileValidator;
-use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Jobs\ElasticSearchAliasInit;
 use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiInit;
@@ -34,14 +33,12 @@ class WikiController extends Controller {
     }
 
     public function create(Request $request): \Illuminate\Http\Response {
-        $clusterWithoutSharedIndex = Config::get('wbstack.elasticsearch_cluster_without_shared_index');
-        $sharedIndexHost = Config::get('wbstack.elasticsearch_shared_index_host');
         $sharedIndexPrefix = Config::get('wbstack.elasticsearch_shared_index_prefix');
+        $esHosts = Config::get('wbstack.elasticsearch_hosts');
+        $isSearchConfigValid = $esHosts && $sharedIndexPrefix;
 
-        if (Config::get('wbstack.elasticsearch_enabled_by_default')) {
-            if (!$clusterWithoutSharedIndex && !($sharedIndexHost && $sharedIndexPrefix)) {
-                abort(503, 'Search enabled, but its configuration is invalid');
-            }
+        if (Config::get('wbstack.elasticsearch_enabled_by_default') && !$isSearchConfigValid) {
+            abort(503, 'Search enabled, but its configuration is invalid');
         }
         $user = $request->user();
 
@@ -171,12 +168,9 @@ class WikiController extends Controller {
         }
 
         // dispatch elasticsearch init job to enable the feature
-        if (Config::get('wbstack.elasticsearch_enabled_by_default')) {
-            if ($clusterWithoutSharedIndex) {
-                dispatch(new ElasticSearchIndexInit($wiki->id, $clusterWithoutSharedIndex));
-            }
-            if ($sharedIndexHost && $sharedIndexPrefix) {
-                dispatch(new ElasticSearchAliasInit($wiki->id));
+        if (Config::get('wbstack.elasticsearch_enabled_by_default') && $isSearchConfigValid) {
+            foreach ($esHosts as $esHost) {
+                dispatch(new ElasticSearchAliasInit($wiki->id, $esHost));
             }
         }
 
