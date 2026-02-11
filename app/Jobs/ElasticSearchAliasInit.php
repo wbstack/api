@@ -4,20 +4,20 @@ namespace App\Jobs;
 
 use App\Http\Curl\HttpRequest;
 use App\WikiDb;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
 
 class ElasticSearchAliasInit extends Job {
-    private $wikiId;
+    use Dispatchable;
 
-    private $esHost;
+    public readonly int $wikiId;
+
+    public readonly string $esHost;
 
     private $dbName;
 
-    private $sharedPrefix;
+    public readonly string $sharedPrefix;
 
-    /**
-     * @param  string  $dbName
-     */
     public function __construct(int $wikiId, string $esHost, ?string $sharedPrefix = null) {
         $this->wikiId = $wikiId;
         $this->esHost = $esHost;
