@@ -9,17 +9,15 @@ use Illuminate\Support\Facades\Log;
 
 class ElasticSearchAliasInit extends Job {
     use Dispatchable;
-    private $wikiId;
 
-    private $esHost;
+    public readonly int $wikiId;
+
+    public readonly string $esHost;
 
     private $dbName;
 
-    private $sharedPrefix;
+    public readonly string $sharedPrefix;
 
-    /**
-     * @param  string  $dbName
-     */
     public function __construct(int $wikiId, string $esHost, ?string $sharedPrefix = null) {
         $this->wikiId = $wikiId;
         $this->esHost = $esHost;
