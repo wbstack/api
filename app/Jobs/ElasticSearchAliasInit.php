@@ -4,9 +4,11 @@ namespace App\Jobs;
 
 use App\Http\Curl\HttpRequest;
 use App\WikiDb;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
 
 class ElasticSearchAliasInit extends Job {
+    use Dispatchable;
     private $wikiId;
 
     private $esHost;
