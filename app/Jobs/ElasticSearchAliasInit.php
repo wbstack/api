@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Http\Curl\HttpRequest;
 use App\WikiDb;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Facades\Log;
 
 class ElasticSearchAliasInit extends Job {
@@ -22,6 +23,15 @@ class ElasticSearchAliasInit extends Job {
         $this->wikiId = $wikiId;
         $this->esHost = $esHost;
         $this->sharedPrefix = $sharedPrefix ?? getenv('ELASTICSEARCH_SHARED_INDEX_PREFIX');
+    }
+
+    /**
+     * Get the middleware the job should pass through.
+     *
+     * @return array<int, object>
+     */
+    public function middleware(): array {
+        return [new WithoutOverlapping('elasticsearch-alias-init')];
     }
 
     public function handle(HttpRequest $request) {
