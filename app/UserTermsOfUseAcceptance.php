@@ -20,7 +20,6 @@ class UserTermsOfUseAcceptance extends Model {
     protected $visible = self::FIELDS;
 
     protected $casts = [
-        'tou_version' => 'string',
         'tou_accepted_at' => 'datetime',
     ];
 
