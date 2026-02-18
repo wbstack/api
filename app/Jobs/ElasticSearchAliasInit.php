@@ -19,6 +19,10 @@ class ElasticSearchAliasInit extends Job {
 
     public readonly string $sharedPrefix;
 
+    // Set $tries to 0 to enable unlimited retries for this job
+    // https://laravel.com/docs/10.x/queues#max-attempts
+    public int $tries = 0;
+
     public function __construct(int $wikiId, string $esHost, ?string $sharedPrefix = null) {
         $this->wikiId = $wikiId;
         $this->esHost = $esHost;
@@ -32,8 +36,9 @@ class ElasticSearchAliasInit extends Job {
      */
     public function middleware(): array {
         return [
-            // Only allow one job per ES host to run at a time to avoid DoSing the ES cluster with alias updates
-            new WithoutOverlapping("elasticsearch-alias-init-{$this->esHost}"),
+            // Only allow one job per ES host to run at a time to avoid DoSing the ES cluster with alias updates.
+            // This job will only be retried after 15 seconds if another job for the same ES host is currently running.
+            (new WithoutOverlapping("elasticsearch-alias-init-{$this->esHost}"))->releaseAfter(15),
         ];
     }
 
