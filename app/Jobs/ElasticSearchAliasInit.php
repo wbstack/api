@@ -112,6 +112,14 @@ class ElasticSearchAliasInit extends Job {
         }
 
         $json = json_decode($rawResponse, true);
+        if (!array_key_exists('acknowledged', $json)) {
+            Log::error("Missing 'acknowledged' key. Are the shared indices set up properly?");
+            $this->fail(
+                new \RuntimeException("Updating Elasticsearch aliases failed for $this->wikiId with $rawResponse")
+            );
+
+            return;
+        }
         if ($json['acknowledged'] !== true) {
             Log::error(__METHOD__ . ": Updating Elasticsearch aliases failed for $this->wikiId with $rawResponse");
             $this->fail(
