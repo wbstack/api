@@ -103,6 +103,8 @@ return [
     'manage',
     'mattermost',
     'mediawiki',
+    'meta',
+    'metawiki',
     'mx',
     'my',
     'network',
