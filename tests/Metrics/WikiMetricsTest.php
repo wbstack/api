@@ -429,4 +429,32 @@ class WikiMetricsTest extends TestCase {
             'entity_schema_count' => $expectedEntitySchemaCount, // redirects should be ignored
         ]);
     }
+
+    public function testSavesCorrectUserCountAndPagesForDeletedWikis() {
+        $this->markTestSkipped(); // https://phabricator.wikimedia.org/T402189 should be resolved for this test to pass.
+        $wiki = Wiki::factory()->create([
+            'domain' => 'somedomain.wikibase.cloud',
+        ]);
+        $wikiDb = WikiDb::first();
+        $wikiDb->update(['wiki_id' => $wiki->id]);
+        Http::fake([
+            'somedomain.wikibase.cloud' => Http::response([
+                'query' => [
+                    'statistics' => [
+                        'users' => 5,
+                        'pages' => 10,
+                    ],
+                ],
+            ], 200),
+        ]);
+        $wiki->delete();
+        (new WikiMetrics)->saveMetrics($wiki);
+
+        $this->assertDatabaseHas('wiki_daily_metrics', [
+            'wiki_id' => $wiki->id,
+            'pages' => 10,
+            'total_user_count' => 5,
+            'is_deleted' => 1,
+        ]);
+    }
 }
