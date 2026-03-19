@@ -5,6 +5,7 @@ namespace Tests\Routes\Wiki\Managers;
 use App\Jobs\ElasticSearchAliasInit;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionWikiDbJob;
+use App\KnowledgeEquityResponse;
 use App\QueryserviceNamespace;
 use App\User;
 use App\Wiki;
@@ -309,5 +310,83 @@ class CreateTest extends TestCase {
         $this->assertEquals(1,
             WikiProfile::where(['wiki_id' => $id])->count()
         );
+    }
+
+    public function testCreateWithKERCreatesProfiles(): void {
+        $this->createSQLandQSDBs();
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $response = $this->actingAs($user, 'api')
+            ->json(
+                'POST',
+                $this->route,
+                [...self::defaultData, 'knowledgeEquityResponse' => [
+                    // This only tests the selectedOption since in the future this will become required while
+                    // the freeTextResponse will not.
+                    'selectedOption' => 'yes',
+                ]]
+            );
+        $id = $response->decodeResponseJson()['data']['id'];
+        $this->assertEquals(1,
+            KnowledgeEquityResponse::where(['wiki_id' => $id])->count()
+        );
+    }
+
+    public function testCreateWithKERRejectsIfSelectedOptionIsInvalid(): void {
+        $this->createSQLandQSDBs();
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $response = $this->actingAs($user, 'api')
+            ->json(
+                'POST',
+                $this->route,
+                [...self::defaultData, 'knowledgeEquityResponse' => [
+                    'selectedOption' => 'yeeeeeah',
+                ]]
+            );
+        $response->assertStatus(422);
+        // This only tests for the existance of an error key.
+        // Using JSON path to check the specific errors message
+        // binds very tightly to the laravel implemention of validation and was hard to make work.
+        $response->assertJsonStructure(['errors']);
+    }
+
+    public function testCreateWithKERCreatesIf3000FreeTextResponse(): void {
+        $this->createSQLandQSDBs();
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $response = $this->actingAs($user, 'api')
+            ->json(
+                'POST',
+                $this->route,
+                [...self::defaultData, 'knowledgeEquityResponse' => [
+                    'selectedOption' => 'yes',
+                    'freeTextResponse' => str_repeat('a', 3000),
+                ]]
+            );
+        $id = $response->decodeResponseJson()['data']['id'];
+        $this->assertEquals(1,
+            KnowledgeEquityResponse::where(['wiki_id' => $id])->count()
+        );
+    }
+
+    public function testCreateWithKERErrorsIf3001FreeTextResponse(): void {
+        $this->createSQLandQSDBs();
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $response = $this->actingAs($user, 'api')
+            ->json(
+                'POST',
+                $this->route,
+                [...self::defaultData, 'knowledgeEquityResponse' => [
+                    'selectedOption' => 'yes',
+                    'freeTextResponse' => str_repeat('a', 3001),
+                ]]
+            );
+        $response->assertStatus(422);
+        // This only tests for the existance of an error key.
+        // Using JSON path to check the specific errors message
+        // binds very tightly to the laravel implemention of validation and was hard to make work.
+        $response->assertJsonStructure(['errors']);
     }
 }
