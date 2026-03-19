@@ -10,6 +10,7 @@ use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ProvisionWikiDbJob;
+use App\KnowledgeEquityResponse;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
@@ -21,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class WikiController extends Controller {
     private $domainValidator;
@@ -55,6 +57,14 @@ class WikiController extends Controller {
             'sitename' => 'required|min:3',
             'username' => 'required',
             'profile' => 'nullable|json',
+            'knowledgeEquityResponse.selectedOption' => [
+                'nullable',
+                Rule::in('yes', 'no', 'unsure', 'unsaid'),
+            ],
+            'knowledgeEquityResponse.freeTextResponse' => [
+                'nullable',
+                'max:3000',
+            ],
         ]);
 
         $rawProfile = false;
@@ -64,11 +74,13 @@ class WikiController extends Controller {
             $profileValidator->validateWithBag('post');
         }
 
+        $rawKnowledgeEquityResponse = $request->input('knowledgeEquityResponse');
+
         $wiki = null;
         $dbAssignment = null;
 
         // TODO create with some sort of owner etc?
-        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $submittedDomain, $rawProfile) {
+        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $submittedDomain, $rawProfile, $rawKnowledgeEquityResponse) {
             $dbVersion = Config::get('wbstack.wiki_db_use_version');
             $wikiDbCondition = ['wiki_id' => null, 'version' => $dbVersion];
 
@@ -157,6 +169,10 @@ class WikiController extends Controller {
             // Create WikiProfile
             if ($rawProfile) {
                 WikiProfile::create(['wiki_id' => $wiki->id, ...$rawProfile]);
+            }
+
+            if ($rawKnowledgeEquityResponse) {
+                KnowledgeEquityResponse::create(['wiki_id' => $wiki->id, ...$rawKnowledgeEquityResponse]);
             }
         });
 
