@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helper\DomainHelper;
 use App\Helper\DomainValidator;
+use App\Helper\KnowledgeEquityResponseValidator;
 use App\Helper\ProfileValidator;
 use App\Jobs\ElasticSearchAliasInit;
 use App\Jobs\KubernetesIngressCreate;
@@ -29,9 +30,12 @@ class WikiController extends Controller {
 
     private $profileValidator;
 
-    public function __construct(DomainValidator $domainValidator, ProfileValidator $profileValidator) {
+    private $knowledgeEquityResponseValidator;
+
+    public function __construct(DomainValidator $domainValidator, ProfileValidator $profileValidator, KnowledgeEquityResponseValidator $knowledgeEquityResponseValidator) {
         $this->profileValidator = $profileValidator;
         $this->domainValidator = $domainValidator;
+        $this->knowledgeEquityResponseValidator = $knowledgeEquityResponseValidator;
     }
 
     public function create(Request $request): \Illuminate\Http\Response {
@@ -75,6 +79,10 @@ class WikiController extends Controller {
         }
 
         $rawKnowledgeEquityResponse = $request->input('knowledgeEquityResponse');
+        if ($request->filled('knowledgeEquityResponse')) {
+            $knowledgeEquityResponseValidator = $this->knowledgeEquityResponseValidator->validate($rawKnowledgeEquityResponse);
+            $knowledgeEquityResponseValidator->validateWithBag('post');
+        }
 
         $wiki = null;
         $dbAssignment = null;
