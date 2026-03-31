@@ -61,14 +61,6 @@ class WikiController extends Controller {
             'sitename' => 'required|min:3',
             'username' => 'required',
             'profile' => 'nullable|json',
-            'knowledgeEquityResponse.selectedOption' => [
-                'nullable',
-                Rule::in('yes', 'no', 'unsure', 'unsaid'),
-            ],
-            'knowledgeEquityResponse.freeTextResponse' => [
-                'nullable',
-                'max:3000',
-            ],
         ]);
 
         $rawProfile = false;
@@ -78,11 +70,14 @@ class WikiController extends Controller {
             $profileValidator->validateWithBag('post');
         }
 
-        $rawKnowledgeEquityResponse = $request->input('knowledgeEquityResponse');
-        if ($request->filled('knowledgeEquityResponse')) {
-            $knowledgeEquityResponseValidator = $this->knowledgeEquityResponseValidator->validate($rawKnowledgeEquityResponse);
-            $knowledgeEquityResponseValidator->validateWithBag('post');
-        }
+        // TODO:
+        // put knowlegdeEquityResponse everywhere
+        // basically fix all the failed tests
+        // Add more tests in KnowledgeEquityResponseValidatorTest because there is no tests case for freeTextResponse
+        // Consider removing the tests from the WikiController that duplicate the Validator tests
+        $rawKnowledgeEquityResponse = $request->input()['knowledgeEquityResponse'] ?? [];
+        $knowledgeEquityResponseValidator = $this->knowledgeEquityResponseValidator->validate($rawKnowledgeEquityResponse);
+        $knowledgeEquityResponseValidator->validateWithBag('post');
 
         $wiki = null;
         $dbAssignment = null;
