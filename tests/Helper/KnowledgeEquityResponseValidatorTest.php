@@ -8,17 +8,12 @@ use Tests\TestCase;
 class KnowledgeEquityResponseValidatorTest extends TestCase {
     private KnowledgeEquityResponseValidator $validator;
 
-    protected function setUp(): void
-    {
+    protected function setUp(): void {
         parent::setUp();
-        $this->validator = new KnowledgeEquityResponseValidator();
+        $this->validator = new KnowledgeEquityResponseValidator;
     }
 
-    /**
-     *
-     */
-    public function testValidatePassesWithValidKnowledgeEquityResponse(): void
-    {
+    public function testValidatePassesWithValidKnowledgeEquityResponse(): void {
         $knowledgeEquityResponse = [
             'selectedOption' => 'yes',
         ];
@@ -28,16 +23,15 @@ class KnowledgeEquityResponseValidatorTest extends TestCase {
         $this->assertTrue($validator->passes());
     }
 
-    public function testValidateFailsWhenSelectedOptionIsMissing(): void
-    {
+    public function testValidateFailsWhenSelectedOptionIsMissing(): void {
         $knowledgeEquityResponse = [];
 
         $validator = $this->validator->validate($knowledgeEquityResponse);
 
         $this->assertTrue($validator->fails());
     }
-    public function testValidateFailsWhenSelectedOptionIsInvalid(): void
-    {
+
+    public function testValidateFailsWhenSelectedOptionIsInvalid(): void {
         $knowledgeEquityResponse = [
             'selectedOption' => 'invalid',
         ];
