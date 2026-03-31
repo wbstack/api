@@ -13,31 +13,40 @@ class KnowledgeEquityResponseValidatorTest extends TestCase {
         $this->validator = new KnowledgeEquityResponseValidator;
     }
 
-    public function testValidatePassesWithValidKnowledgeEquityResponse(): void {
-        $knowledgeEquityResponse = [
-            'selectedOption' => 'yes',
-        ];
-
+    /**
+     * @dataProvider validKnowledgeEquityResponsesProvider
+     */
+    public function testValidatePassesWithValidKnowledgeEquityResponse(array $knowledgeEquityResponse): void {
         $validator = $this->validator->validate($knowledgeEquityResponse);
 
         $this->assertTrue($validator->passes());
     }
 
-    public function testValidateFailsWhenSelectedOptionIsMissing(): void {
-        $knowledgeEquityResponse = [];
-
+    /**
+     * @dataProvider invalidKnowledgeEquityResponsesProvider
+     */
+    public function testValidateFailsWithInvalidKnowledgeEquityResponse(array $knowledgeEquityResponse): void {
         $validator = $this->validator->validate($knowledgeEquityResponse);
 
         $this->assertTrue($validator->fails());
     }
 
-    public function testValidateFailsWhenSelectedOptionIsInvalid(): void {
-        $knowledgeEquityResponse = [
-            'selectedOption' => 'invalid',
+    public static function validKnowledgeEquityResponsesProvider(): array {
+        return [
+            'yes' => [['selectedOption' => 'yes']],
+            'no' => [['selectedOption' => 'no']],
+            'unsure' => [['selectedOption' => 'unsure']],
+            'unsaid' => [['selectedOption' => 'unsaid']],
         ];
+    }
 
-        $validator = $this->validator->validate($knowledgeEquityResponse);
-
-        $this->assertTrue($validator->fails());
+    public static function invalidKnowledgeEquityResponsesProvider(): array {
+        return [
+            'no selectedOption' => [[]],
+            'invalid' => [['selectedOption' => 'invalid']],
+            'empty' => [['selectedOption' => '']],
+            'null' => [['selectedOption' => null]],
+            'random string' => [['selectedOption' => 'random string']],
+        ];
     }
 }
