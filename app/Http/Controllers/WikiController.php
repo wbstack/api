@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helper\DomainHelper;
 use App\Helper\DomainValidator;
+use App\Helper\KnowledgeEquityResponseValidator;
 use App\Helper\ProfileValidator;
 use App\Jobs\ElasticSearchAliasInit;
 use App\Jobs\KubernetesIngressCreate;
@@ -22,16 +23,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class WikiController extends Controller {
     private $domainValidator;
 
     private $profileValidator;
 
-    public function __construct(DomainValidator $domainValidator, ProfileValidator $profileValidator) {
+    private $knowledgeEquityResponseValidator;
+
+    public function __construct(DomainValidator $domainValidator, ProfileValidator $profileValidator, KnowledgeEquityResponseValidator $knowledgeEquityResponseValidator) {
         $this->profileValidator = $profileValidator;
         $this->domainValidator = $domainValidator;
+        $this->knowledgeEquityResponseValidator = $knowledgeEquityResponseValidator;
     }
 
     public function create(Request $request): \Illuminate\Http\Response {
@@ -57,14 +60,7 @@ class WikiController extends Controller {
             'sitename' => 'required|min:3',
             'username' => 'required',
             'profile' => 'nullable|json',
-            'knowledgeEquityResponse.selectedOption' => [
-                'nullable',
-                Rule::in('yes', 'no', 'unsure', 'unsaid'),
-            ],
-            'knowledgeEquityResponse.freeTextResponse' => [
-                'nullable',
-                'max:3000',
-            ],
+            'knowledgeEquityResponse' => 'required|array',
         ]);
 
         $rawProfile = false;
@@ -75,6 +71,8 @@ class WikiController extends Controller {
         }
 
         $rawKnowledgeEquityResponse = $request->input('knowledgeEquityResponse');
+        $knowledgeEquityResponseValidator = $this->knowledgeEquityResponseValidator->validate($rawKnowledgeEquityResponse);
+        $knowledgeEquityResponseValidator->validateWithBag('post');
 
         $wiki = null;
         $dbAssignment = null;
@@ -171,9 +169,7 @@ class WikiController extends Controller {
                 WikiProfile::create(['wiki_id' => $wiki->id, ...$rawProfile]);
             }
 
-            if ($rawKnowledgeEquityResponse) {
-                KnowledgeEquityResponse::create(['wiki_id' => $wiki->id, ...$rawKnowledgeEquityResponse]);
-            }
+            KnowledgeEquityResponse::create(['wiki_id' => $wiki->id, ...$rawKnowledgeEquityResponse]);
         });
 
         // TODO maybe always make these run in a certain order..?
