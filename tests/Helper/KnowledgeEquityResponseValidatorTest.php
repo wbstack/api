@@ -37,6 +37,9 @@ class KnowledgeEquityResponseValidatorTest extends TestCase {
             'no' => [['selectedOption' => 'no']],
             'unsure' => [['selectedOption' => 'unsure']],
             'unsaid' => [['selectedOption' => 'unsaid']],
+            'null freeTextResponse' => [['selectedOption' => 'yes', 'freeTextResponse' => null]],
+            'empty freeTextResponse' => [['selectedOption' => 'no', 'freeTextResponse' => '']],
+            'short freeTextResponse' => [['selectedOption' => 'unsure', 'freeTextResponse' => 'I like to move it move it']],
         ];
     }
 
@@ -47,6 +50,7 @@ class KnowledgeEquityResponseValidatorTest extends TestCase {
             'empty' => [['selectedOption' => '']],
             'null' => [['selectedOption' => null]],
             'random string' => [['selectedOption' => 'random string']],
+            'freeTextResponse exceeds max length' => [['selectedOption' => 'yes', 'freeTextResponse' => str_repeat('I like to move it move it ', 200)]],
         ];
     }
 }
