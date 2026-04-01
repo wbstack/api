@@ -23,7 +23,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class WikiController extends Controller {
     private $domainValidator;
@@ -61,6 +60,7 @@ class WikiController extends Controller {
             'sitename' => 'required|min:3',
             'username' => 'required',
             'profile' => 'nullable|json',
+            'knowledgeEquityResponse' => 'required|array',
         ]);
 
         $rawProfile = false;
@@ -70,12 +70,7 @@ class WikiController extends Controller {
             $profileValidator->validateWithBag('post');
         }
 
-        // TODO:
-        // put knowlegdeEquityResponse everywhere
-        // basically fix all the failed tests
-        // Add more tests in KnowledgeEquityResponseValidatorTest because there is no tests case for freeTextResponse
-        // Consider removing the tests from the WikiController that duplicate the Validator tests
-        $rawKnowledgeEquityResponse = $request->input()['knowledgeEquityResponse'] ?? [];
+        $rawKnowledgeEquityResponse = $request->input('knowledgeEquityResponse');
         $knowledgeEquityResponseValidator = $this->knowledgeEquityResponseValidator->validate($rawKnowledgeEquityResponse);
         $knowledgeEquityResponseValidator->validateWithBag('post');
 
@@ -174,9 +169,7 @@ class WikiController extends Controller {
                 WikiProfile::create(['wiki_id' => $wiki->id, ...$rawProfile]);
             }
 
-            if ($rawKnowledgeEquityResponse) {
-                KnowledgeEquityResponse::create(['wiki_id' => $wiki->id, ...$rawKnowledgeEquityResponse]);
-            }
+            KnowledgeEquityResponse::create(['wiki_id' => $wiki->id, ...$rawKnowledgeEquityResponse]);
         });
 
         // TODO maybe always make these run in a certain order..?
