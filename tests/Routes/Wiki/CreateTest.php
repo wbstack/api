@@ -31,6 +31,10 @@ class CreateTest extends TestCase {
                         "temporality": "permanent",
                         "purpose": "data_hub"
                       }',
+        'knowledgeEquityResponse' => [
+            'selectedOption' => 'yes',
+            'freeTextResponse' => 'I like to move it move it',
+        ],
     ];
 
     use DatabaseTransactions;
@@ -68,6 +72,9 @@ class CreateTest extends TestCase {
                                 "temporality": "permanent",
                                 "purpose": "data_hub"
                               }',
+                    'knowledgeEquityResponse' => [
+                        'selectedOption' => 'yes',
+                    ],
                 ]
             );
 
@@ -182,6 +189,9 @@ class CreateTest extends TestCase {
                     'domain' => 'mywikidomain.com',
                     'sitename' => 'merp',
                     'username' => 'AdminBoss',
+                    'knowledgeEquityResponse' => [
+                        'selectedOption' => 'yes',
+                    ],
                 ]
             );
 
@@ -197,6 +207,9 @@ class CreateTest extends TestCase {
                     'domain' => 'mywikidomain-2.com',
                     'sitename' => 'merp',
                     'username' => 'AdminBoss',
+                    'knowledgeEquityResponse' => [
+                        'selectedOption' => 'yes',
+                    ],
                 ]
             );
         $response->assertStatus(403)
@@ -213,6 +226,9 @@ class CreateTest extends TestCase {
                     'domain' => 'mywikidomain-2.com',
                     'sitename' => 'merp',
                     'username' => 'AdminBoss',
+                    'knowledgeEquityResponse' => [
+                        'selectedOption' => 'yes',
+                    ],
                 ]
             );
 
@@ -282,6 +298,8 @@ class CreateTest extends TestCase {
                         "temporality": "permanent",
                         "purpose": "data_hub"
                     }';
+        $noKnowledgeEquityResponse = self::defaultData;
+        unset($noKnowledgeEquityResponse['knowledgeEquityResponse']);
 
         return [
             'all params present' => [self::defaultData, 200],
@@ -289,6 +307,7 @@ class CreateTest extends TestCase {
             'missing sitename' => [$noSitename, 422],
             'missing username' => [$noUsername, 422],
             'missing profile' => [$noprofile, 200],
+            'missing knowledgeEquityResponse' => [$noKnowledgeEquityResponse, 422],
             'profile with other' => [$profileWithOther, 200],
             'profile with other string missing' => [$profileWithOtherStringMissing, 422],
             'profile with extraneous other' => [$profileWithExtraneousOther, 422],
