@@ -37,6 +37,17 @@ class CreateTest extends TestCase {
         ],
     ];
 
+    const defaultDataWithoutKER = [
+        'domain' => 'dErP.com',
+        'sitename' => 'merp',
+        'username' => 'AdminBoss',
+        'profile' => '{
+                        "audience": "narrow",
+                        "temporality": "permanent",
+                        "purpose": "data_hub"
+                      }',
+    ];
+
     use DatabaseTransactions;
     use OptionsRequestAllowed;
 
@@ -339,9 +350,8 @@ class CreateTest extends TestCase {
             ->json(
                 'POST',
                 $this->route,
-                [...self::defaultData, 'knowledgeEquityResponse' => [
-                    // This only tests the selectedOption since in the future this will become required while
-                    // the freeTextResponse will not.
+                [...self::defaultDataWithoutKER, 'knowledgeEquityResponse' => [
+                    // This only tests the selectedOption since this is required while the freeTextResponse is not.
                     'selectedOption' => 'yes',
                 ]]
             );
@@ -359,7 +369,7 @@ class CreateTest extends TestCase {
             ->json(
                 'POST',
                 $this->route,
-                [...self::defaultData, 'knowledgeEquityResponse' => [
+                [...self::defaultDataWithoutKER, 'knowledgeEquityResponse' => [
                     'selectedOption' => 'yeeeeeah',
                 ]]
             );
@@ -378,7 +388,7 @@ class CreateTest extends TestCase {
             ->json(
                 'POST',
                 $this->route,
-                [...self::defaultData, 'knowledgeEquityResponse' => [
+                [...self::defaultDataWithoutKER, 'knowledgeEquityResponse' => [
                     'selectedOption' => 'yes',
                     'freeTextResponse' => str_repeat('a', 3000),
                 ]]
@@ -397,7 +407,7 @@ class CreateTest extends TestCase {
             ->json(
                 'POST',
                 $this->route,
-                [...self::defaultData, 'knowledgeEquityResponse' => [
+                [...self::defaultDataWithoutKER, 'knowledgeEquityResponse' => [
                     'selectedOption' => 'yes',
                     'freeTextResponse' => str_repeat('a', 3001),
                 ]]
