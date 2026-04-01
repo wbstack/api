@@ -40,6 +40,7 @@ class KnowledgeEquityResponseValidatorTest extends TestCase {
             'null freeTextResponse' => [['selectedOption' => 'yes', 'freeTextResponse' => null]],
             'empty freeTextResponse' => [['selectedOption' => 'no', 'freeTextResponse' => '']],
             'short freeTextResponse' => [['selectedOption' => 'unsure', 'freeTextResponse' => 'I like to move it move it']],
+            'freeTextResponse at max length' => [['selectedOption' => 'unsaid', 'freeTextResponse' => str_repeat('x', 3000)]],
         ];
     }
 
