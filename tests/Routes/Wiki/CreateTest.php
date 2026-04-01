@@ -389,4 +389,27 @@ class CreateTest extends TestCase {
         // binds very tightly to the laravel implemention of validation and was hard to make work.
         $response->assertJsonStructure(['errors']);
     }
+
+    public function testCreateWikiErrorsIfKerIsInvalid(): void {
+        $this->createSQLandQSDBs();
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+
+        $response = $this->actingAs($user, 'api')->json(
+            'POST',
+            $this->route,
+            [
+                ...self::defaultData,
+                'knowledgeEquityResponse' => [
+                    'freeTextResponse' => 'valid free text response',
+                ],
+            ]
+        );
+
+        $response->assertStatus(422);
+        // This only tests for the existence of an error key.
+        // Using JSON path to check the specific errors message
+        // binds very tightly to the laravel implementation of validation and was hard to make work.
+        $response->assertJsonStructure(['errors']);
+    }
 }

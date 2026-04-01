@@ -57,8 +57,9 @@ class WikiController extends Controller {
             'sitename' => 'required|min:3',
             'username' => 'required',
             'profile' => 'nullable|json',
+            'knowledgeEquityResponse' => 'nullable|array',
             'knowledgeEquityResponse.selectedOption' => [
-                'nullable',
+                'required_with:knowledgeEquityResponse',
                 Rule::in('yes', 'no', 'unsure', 'unsaid'),
             ],
             'knowledgeEquityResponse.freeTextResponse' => [
