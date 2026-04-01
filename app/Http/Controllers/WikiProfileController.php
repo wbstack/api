@@ -21,7 +21,7 @@ class WikiProfileController extends Controller {
         ]);
 
         $rawProfile = json_decode($validatedInput['profile'], true);
-        $profileValidator = $this->profileValidator->validate($rawProfile);
+        $profileValidator = $this->profileValidator->getValidator($rawProfile);
         $profileValidator->validateWithBag('post');
 
         $profile = WikiProfile::create(['wiki_id' => $wiki->id, ...$rawProfile]);
