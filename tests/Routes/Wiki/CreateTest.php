@@ -255,8 +255,8 @@ class CreateTest extends TestCase {
         unset($noSitename['sitename']);
         $noUsername = self::defaultData;
         unset($noUsername['username']);
-        $noprofile = self::defaultData;
-        unset($noprofile['profile']);
+        $noProfile = self::defaultData;
+        unset($noProfile['profile']);
         $profileWithOther = self::defaultData;
         $profileWithOther['profile'] = '{
                         "audience": "other",
@@ -288,7 +288,7 @@ class CreateTest extends TestCase {
             'missing domain' => [$noDomain, 422],
             'missing sitename' => [$noSitename, 422],
             'missing username' => [$noUsername, 422],
-            'missing profile' => [$noprofile, 200],
+            'missing profile' => [$noProfile, 200],
             'profile with other' => [$profileWithOther, 200],
             'profile with other string missing' => [$profileWithOtherStringMissing, 422],
             'profile with extraneous other' => [$profileWithExtraneousOther, 422],
@@ -306,10 +306,9 @@ class CreateTest extends TestCase {
                 $this->route,
                 self::defaultData
             );
+        $response->assertStatus(200);
         $id = $response->decodeResponseJson()['data']['id'];
-        $this->assertEquals(1,
-            WikiProfile::where(['wiki_id' => $id])->count()
-        );
+        $this->assertEquals(1, WikiProfile::where(['wiki_id' => $id])->count());
     }
 
     public function testCreateWithKERCreatesProfiles(): void {
@@ -321,15 +320,13 @@ class CreateTest extends TestCase {
                 'POST',
                 $this->route,
                 [...self::defaultData, 'knowledgeEquityResponse' => [
-                    // This only tests the selectedOption since in the future this will become required while
-                    // the freeTextResponse will not.
+                    // This only tests the selectedOption since the freeTextResponse is optional.
                     'selectedOption' => 'yes',
                 ]]
             );
+        $response->assertStatus(200);
         $id = $response->decodeResponseJson()['data']['id'];
-        $this->assertEquals(1,
-            KnowledgeEquityResponse::where(['wiki_id' => $id])->count()
-        );
+        $this->assertEquals(1, KnowledgeEquityResponse::where(['wiki_id' => $id])->count());
     }
 
     public function testCreateWithKERRejectsIfSelectedOptionIsInvalid(): void {
@@ -345,9 +342,9 @@ class CreateTest extends TestCase {
                 ]]
             );
         $response->assertStatus(422);
-        // This only tests for the existance of an error key.
+        // This only tests for the existence of an error key.
         // Using JSON path to check the specific errors message
-        // binds very tightly to the laravel implemention of validation and was hard to make work.
+        // binds very tightly to the laravel implementation of validation and was hard to make work.
         $response->assertJsonStructure(['errors']);
     }
 
@@ -364,10 +361,9 @@ class CreateTest extends TestCase {
                     'freeTextResponse' => str_repeat('a', 3000),
                 ]]
             );
+        $response->assertStatus(200);
         $id = $response->decodeResponseJson()['data']['id'];
-        $this->assertEquals(1,
-            KnowledgeEquityResponse::where(['wiki_id' => $id])->count()
-        );
+        $this->assertEquals(1, KnowledgeEquityResponse::where(['wiki_id' => $id])->count());
     }
 
     public function testCreateWithKERErrorsIf3001FreeTextResponse(): void {
@@ -384,9 +380,9 @@ class CreateTest extends TestCase {
                 ]]
             );
         $response->assertStatus(422);
-        // This only tests for the existance of an error key.
+        // This only tests for the existence of an error key.
         // Using JSON path to check the specific errors message
-        // binds very tightly to the laravel implemention of validation and was hard to make work.
+        // binds very tightly to the laravel implementation of validation and was hard to make work.
         $response->assertJsonStructure(['errors']);
     }
 
