@@ -11,7 +11,7 @@ class ProfileValidatorTest extends TestCase {
      */
     public function testProfileValidatorWorksWithValidProfile($profile): void {
         $validatorFactory = new ProfileValidator;
-        $validator = $validatorFactory->validate($profile);
+        $validator = $validatorFactory->getValidator($profile);
         $this->assertTrue($validator->passes());
     }
 
@@ -20,7 +20,7 @@ class ProfileValidatorTest extends TestCase {
      */
     public function testProfileValidatorWorksWithInvalidProfile($profile): void {
         $validatorFactory = new ProfileValidator;
-        $validator = $validatorFactory->validate($profile);
+        $validator = $validatorFactory->getValidator($profile);
         $this->assertFalse($validator->passes());
     }
 

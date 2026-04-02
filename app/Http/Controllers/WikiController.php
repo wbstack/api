@@ -47,7 +47,7 @@ class WikiController extends Controller {
         $submittedDomain = strtolower($request->input('domain'));
         $submittedDomain = DomainHelper::encode($submittedDomain);
 
-        $domainValidator = $this->domainValidator->validate($submittedDomain);
+        $domainValidator = $this->domainValidator->getValidator($submittedDomain);
         $isSubdomain = $this->isSubDomain($submittedDomain);
 
         $domainValidator->validateWithBag('post');
@@ -70,7 +70,7 @@ class WikiController extends Controller {
         $rawProfile = false;
         if ($request->filled('profile')) {
             $rawProfile = json_decode($request->input('profile'), true);
-            $profileValidator = $this->profileValidator->validate($rawProfile);
+            $profileValidator = $this->profileValidator->getValidator($rawProfile);
             $profileValidator->validateWithBag('post');
         }
 

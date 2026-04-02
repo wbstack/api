@@ -15,7 +15,7 @@ class DomainValidator {
         $this->subdomainRules = $subdomainRules;
     }
 
-    public function validate($domain): \Illuminate\Validation\Validator {
+    public function getValidator($domain): \Illuminate\Validation\Validator {
 
         $isSubdomain = WikiController::isSubDomain($domain, $this->subDomainSuffix);
 
