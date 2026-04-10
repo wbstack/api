@@ -29,7 +29,7 @@ class PublicWikiController extends Controller {
         ]);
 
         $params = array_merge(self::$defaultParams, $request->input());
-        $query = Wiki::query();
+        $query = Wiki::query()->with('wikiLatestProfile');
 
         if (array_key_exists('is_featured', $params)) {
             $query = $query->where([

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Http\Curl\CurlRequest;
 use App\Http\Curl\HttpRequest;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
@@ -25,5 +26,16 @@ class AppServiceProvider extends ServiceProvider {
             $wrappedException = new \Exception("Executing Job '$name' failed.", 1, $event->exception);
             report($wrappedException);
         });
+
+        // TODO: delete this listener before merging or is it useful to keep in the local environment?
+        if ($this->app->environment('local')) {
+            \Event::listen(QueryExecuted::class, function (QueryExecuted $query) {
+                \Log::debug('Query Executed: ', [
+                    'sql' => $query->sql,
+                    'bindings' => $query->bindings,
+                    'connection' => $query->connectionName,
+                ]);
+            });
+        }
     }
 }
