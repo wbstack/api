@@ -39,7 +39,7 @@
         "laravel/pint": "^1.22",
         "mockery/mockery": "^1.4",
         "phpunit/phpunit": "^10.5",
-        "timacdonald/log-fake": "^2.1"
+        "timacdonald/log-fake": "^2.3"
     },
     "autoload": {
         "classmap": [
