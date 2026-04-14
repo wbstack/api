@@ -34,7 +34,7 @@
         "predis/predis": "^1.1"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "2.13",
+        "barryvdh/laravel-ide-helper": "^3",
         "fakerphp/faker": "^1.17",
         "laravel/pint": "^1.22",
         "mockery/mockery": "^1.4",
