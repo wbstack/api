@@ -12,6 +12,7 @@ updates:
   open-pull-requests-limit: 50
   allow:
    - dependency-type: direct
+   - dependency-type: development
   ignore:
   - dependency-name: lcobucci/jwt
     versions:
