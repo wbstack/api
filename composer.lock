@@ -4548,24 +4548,24 @@
         },
         {
             "name": "mxl/laravel-job",
-            "version": "v1.5.0",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mxl/laravel-job.git",
-                "reference": "fbead0adb6c420396473a08582cbc1959d981ae7"
+                "reference": "1736d333c75dfc97fcb4ba52b9fb0c2c59773884"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mxl/laravel-job/zipball/fbead0adb6c420396473a08582cbc1959d981ae7",
-                "reference": "fbead0adb6c420396473a08582cbc1959d981ae7",
+                "url": "https://api.github.com/repos/mxl/laravel-job/zipball/1736d333c75dfc97fcb4ba52b9fb0c2c59773884",
+                "reference": "1736d333c75dfc97fcb4ba52b9fb0c2c59773884",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "5.5.*|5.6.*|5.7.*|5.8.*|^6.0|^7.0|^8.0|^9.0|^10.0",
+                "laravel/framework": "5.5.*|5.6.*|5.7.*|5.8.*|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
                 "php": ">=7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.2"
+                "phpunit/phpunit": "^9.2|^10.5"
             },
             "type": "library",
             "extra": {
@@ -4603,7 +4603,7 @@
                 "issues": "https://github.com/mxl/laravel-job/issues",
                 "source": "https://github.com/mxl/laravel-job"
             },
-            "time": "2023-09-27T08:19:29+00:00"
+            "time": "2025-02-25T11:37:40+00:00"
         },
         {
             "name": "nesbot/carbon",
