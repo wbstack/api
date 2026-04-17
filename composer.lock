@@ -2160,22 +2160,22 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "7.8.1",
+            "version": "7.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "41042bc7ab002487b876a0683fc8dce04ddce104"
+                "reference": "7b2f29fe81dc4da0ca0ea7d42107a0845946ea77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/41042bc7ab002487b876a0683fc8dce04ddce104",
-                "reference": "41042bc7ab002487b876a0683fc8dce04ddce104",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/7b2f29fe81dc4da0ca0ea7d42107a0845946ea77",
+                "reference": "7b2f29fe81dc4da0ca0ea7d42107a0845946ea77",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "guzzlehttp/promises": "^1.5.3 || ^2.0.1",
-                "guzzlehttp/psr7": "^1.9.1 || ^2.5.1",
+                "guzzlehttp/promises": "^1.5.3 || ^2.0.3",
+                "guzzlehttp/psr7": "^2.7.0",
                 "php": "^7.2.5 || ^8.0",
                 "psr/http-client": "^1.0",
                 "symfony/deprecation-contracts": "^2.2 || ^3.0"
@@ -2186,9 +2186,9 @@
             "require-dev": {
                 "bamarni/composer-bin-plugin": "^1.8.2",
                 "ext-curl": "*",
-                "php-http/client-integration-tests": "dev-master#2c025848417c1135031fdf9c728ee53d0a7ceaee as 3.0.999",
+                "guzzle/client-integration-tests": "3.0.2",
                 "php-http/message-factory": "^1.1",
-                "phpunit/phpunit": "^8.5.36 || ^9.6.15",
+                "phpunit/phpunit": "^8.5.39 || ^9.6.20",
                 "psr/log": "^1.1 || ^2.0 || ^3.0"
             },
             "suggest": {
@@ -2266,7 +2266,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.8.1"
+                "source": "https://github.com/guzzle/guzzle/tree/7.9.3"
             },
             "funding": [
                 {
@@ -2282,7 +2282,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-12-03T20:35:24+00:00"
+            "time": "2025-03-27T13:37:11+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -4265,30 +4265,30 @@
         },
         {
             "name": "lkaemmerling/laravel-horizon-prometheus-exporter",
-            "version": "v1.7.0",
+            "version": "v1.8.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/LKaemmerling/laravel-horizon-prometheus-exporter.git",
-                "reference": "caedfcdbda7c3d1bb9a29f4b9517d80a33bb3fa7"
+                "reference": "9574e946bb41483b9d3eec2f57abcfc29c812ef0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/LKaemmerling/laravel-horizon-prometheus-exporter/zipball/caedfcdbda7c3d1bb9a29f4b9517d80a33bb3fa7",
-                "reference": "caedfcdbda7c3d1bb9a29f4b9517d80a33bb3fa7",
+                "url": "https://api.github.com/repos/LKaemmerling/laravel-horizon-prometheus-exporter/zipball/9574e946bb41483b9d3eec2f57abcfc29c812ef0",
+                "reference": "9574e946bb41483b9d3eec2f57abcfc29c812ef0",
                 "shasum": ""
             },
             "require": {
-                "illuminate/config": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/routing": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0",
+                "illuminate/config": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/routing": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
                 "laravel/horizon": "^4.0|^5.0",
                 "php": "^7.1|^8.0",
                 "promphp/prometheus_client_php": "^1.0.3|^2.0.0"
             },
             "require-dev": {
-                "orchestra/testbench": "^v4.9|^5.3|^6.3|^7.0|^8.0",
-                "phpunit/phpunit": "^8.2|^9.0",
-                "symfony/var-dumper": "^4.3|^5.1"
+                "orchestra/testbench": "^v4.9|^5.3|^6.3|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "phpunit/phpunit": "^8.2|^9.0|^10.5|^11.5.3|^12.5.12",
+                "symfony/var-dumper": "^4.3|^5.1|^7.2"
             },
             "type": "library",
             "extra": {
@@ -4326,9 +4326,9 @@
             ],
             "support": {
                 "issues": "https://github.com/LKaemmerling/laravel-horizon-prometheus-exporter/issues",
-                "source": "https://github.com/LKaemmerling/laravel-horizon-prometheus-exporter/tree/v1.7.0"
+                "source": "https://github.com/LKaemmerling/laravel-horizon-prometheus-exporter/tree/v1.8.3"
             },
-            "time": "2023-01-31T07:32:39+00:00"
+            "time": "2026-03-08T23:37:26+00:00"
         },
         {
             "name": "maclof/kubernetes-client",
@@ -5966,21 +5966,21 @@
         },
         {
             "name": "promphp/prometheus_client_php",
-            "version": "v2.10.0",
+            "version": "v2.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PromPHP/prometheus_client_php.git",
-                "reference": "a09ea80ec1ec26dd1d4853e9af2a811e898dbfeb"
+                "reference": "da86f1507b04dc44dc37ffb766d7d3a1d42c3050"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PromPHP/prometheus_client_php/zipball/a09ea80ec1ec26dd1d4853e9af2a811e898dbfeb",
-                "reference": "a09ea80ec1ec26dd1d4853e9af2a811e898dbfeb",
+                "url": "https://api.github.com/repos/PromPHP/prometheus_client_php/zipball/da86f1507b04dc44dc37ffb766d7d3a1d42c3050",
+                "reference": "da86f1507b04dc44dc37ffb766d7d3a1d42c3050",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": "^7.2|^8.0"
+                "php": "^8.2"
             },
             "replace": {
                 "endclothing/prometheus_client_php": "*",
@@ -5994,14 +5994,17 @@
                 "phpstan/phpstan-phpunit": "^1.1.0",
                 "phpstan/phpstan-strict-rules": "^1.1.0",
                 "phpunit/phpunit": "^9.4",
+                "predis/predis": "^2.3",
                 "squizlabs/php_codesniffer": "^3.6",
                 "symfony/polyfill-apcu": "^1.6"
             },
             "suggest": {
                 "ext-apc": "Required if using APCu.",
+                "ext-pdo": "Required if using PDO.",
                 "ext-redis": "Required if using Redis.",
+                "predis/predis": "Required if using Predis.",
                 "promphp/prometheus_push_gateway_php": "An easy client for using Prometheus PushGateway.",
-                "symfony/polyfill-apcu": "Required if you use APCu on PHP8.0+"
+                "symfony/polyfill-apcu": "Required if you use APCu."
             },
             "type": "library",
             "extra": {
@@ -6027,9 +6030,9 @@
             "description": "Prometheus instrumentation library for PHP applications.",
             "support": {
                 "issues": "https://github.com/PromPHP/prometheus_client_php/issues",
-                "source": "https://github.com/PromPHP/prometheus_client_php/tree/v2.10.0"
+                "source": "https://github.com/PromPHP/prometheus_client_php/tree/v2.15.0"
             },
-            "time": "2024-02-01T13:28:34+00:00"
+            "time": "2026-03-24T22:44:50+00:00"
         },
         {
             "name": "psr/cache",
