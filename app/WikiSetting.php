@@ -16,7 +16,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $wiki_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read \App\Wiki|null $wiki
+ * @property-read Wiki|null $wiki
  *
  * @method static \Database\Factories\WikiSettingFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiSetting newModelQuery()

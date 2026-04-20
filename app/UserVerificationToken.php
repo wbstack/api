@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
  * @property string $token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read \App\User $user
+ * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\UserVerificationToken newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\UserVerificationToken newQuery()
