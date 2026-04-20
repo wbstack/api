@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\JsonResponse;
 
 class ResetPasswordController extends Controller {
     /*
@@ -35,11 +36,11 @@ class ResetPasswordController extends Controller {
         $this->middleware('guest');
     }
 
-    protected function sendResetResponse(): \Illuminate\Http\JsonResponse {
+    protected function sendResetResponse(): JsonResponse {
         return response()->json('Success', 200);
     }
 
-    protected function sendResetFailedResponse(): \Illuminate\Http\JsonResponse {
+    protected function sendResetFailedResponse(): JsonResponse {
         return response()->json('Unauthorized', 401);
     }
 }

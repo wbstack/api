@@ -3,8 +3,9 @@
 namespace App\Jobs;
 
 use App\WikiDb;
+use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 
 /**
  * Example usage that will always provision a new DB:
@@ -81,7 +82,7 @@ class ProvisionWikiDbJob extends Job {
 
         $manager->purge('mw');
         $conn = $manager->connection('mw');
-        if (!$conn instanceof \Illuminate\Database\Connection) {
+        if (!$conn instanceof Connection) {
             $this->fail(new \RuntimeException('Must be run on a PDO based DB connection'));
 
             return; // safegaurd
@@ -99,7 +100,7 @@ class ProvisionWikiDbJob extends Job {
         // So, catch this exception and check the error state ourselves, and allow us to continue past this?
         try {
             $conn->statement("CREATE USER '" . $this->dbUser . "'@'%' IDENTIFIED BY '" . $this->dbPassword . "'");
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (QueryException $e) {
             // Probably fine, and if not fine then the ALTER will fail below? :)
             $conn->statement("ALTER USER '" . $this->dbUser . "'@'%' IDENTIFIED BY '" . $this->dbPassword . "'");
         }

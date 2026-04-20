@@ -22,6 +22,6 @@ class UsersSeeder extends Seeder {
             'verified' => false,
         ]);
         // create 10 users using the user factory
-        App\User::factory()->create();
+        User::factory()->create();
     }
 }

@@ -4,10 +4,12 @@
  * This route file is loaded in the RouteServiceProvider optionally when an env var is set.
  * You'll find that service in the Providers directory.
  *
- * @var Illuminate\Routing\Router $router
+ * @var Router $router
  */
 
 // GET
+use Illuminate\Routing\Router;
+
 $router->get('healthz', fn () => "It's Alive");
 $router->get('getWikiHostsForDomain', ['uses' => 'MediaWikiHostsController@getWikiHostsForDomain']);
 // PUT

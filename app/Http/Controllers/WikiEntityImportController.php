@@ -6,6 +6,7 @@ use App\Jobs\WikiEntityImportJob;
 use App\WikiEntityImport;
 use App\WikiEntityImportStatus;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Prometheus\CollectorRegistry;
@@ -29,14 +30,14 @@ class WikiEntityImportController extends Controller {
         );
     }
 
-    public function get(Request $request): \Illuminate\Http\JsonResponse {
+    public function get(Request $request): JsonResponse {
         $wiki = $request->attributes->get('wiki');
         $imports = $wiki->wikiEntityImports()->get();
 
         return response()->json(['data' => $imports]);
     }
 
-    public function create(Request $request): \Illuminate\Http\JsonResponse {
+    public function create(Request $request): JsonResponse {
         $validatedInput = $request->validate([
             'source_wiki_url' => ['required', 'url'],
             'entity_ids' => ['required', 'string', function (string $attr, mixed $value, \Closure $fail) {
@@ -80,7 +81,7 @@ class WikiEntityImportController extends Controller {
         return response()->json(['data' => $import]);
     }
 
-    public function update(Request $request): \Illuminate\Http\JsonResponse {
+    public function update(Request $request): JsonResponse {
         // This route is not supposed have ACL middlewares in front as it is expected
         // to be called from backend services that are implicitly allowed
         // access right.

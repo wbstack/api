@@ -6,6 +6,7 @@ use App\ComplaintRecord;
 use App\Notifications\ComplaintNotification;
 use App\Notifications\ComplaintNotificationExternal;
 use App\Rules\ReCaptchaValidation;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
@@ -13,7 +14,7 @@ use Illuminate\Validation\Rule;
 
 class ComplaintController extends Controller {
     /**
-     * @var \App\Rules\ReCaptchaValidation
+     * @var ReCaptchaValidation
      */
     protected $recaptchaValidation;
 
@@ -24,7 +25,7 @@ class ComplaintController extends Controller {
     /**
      * Handle a complaint report page request for the application.
      */
-    public function sendMessage(Request $request): \Illuminate\Http\JsonResponse {
+    public function sendMessage(Request $request): JsonResponse {
         $validator = $this->validator($request->all());
 
         if ($validator->fails()) {

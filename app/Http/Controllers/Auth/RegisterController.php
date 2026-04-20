@@ -8,13 +8,14 @@ use App\Jobs\UserVerificationCreateTokenAndSendJob;
 use App\Rules\ReCaptchaValidation;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller {
     /**
-     * @var \App\Rules\ReCaptchaValidation
+     * @var ReCaptchaValidation
      */
     protected $recaptchaValidation;
 
@@ -25,7 +26,7 @@ class RegisterController extends Controller {
     /**
      * Handle a registration request for the application.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function register(Request $request) {
         $this->validator($request->all())->validate();

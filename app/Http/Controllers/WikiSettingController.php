@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Rules\SettingCaptchaQuestions;
 use App\Rules\SettingWikibaseManifestEquivEntities;
 use App\WikiSetting;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class WikiSettingController extends Controller {
     /**
@@ -28,7 +30,7 @@ class WikiSettingController extends Controller {
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return JsonResponse|Response
      */
     public function update($setting, Request $request) {
         $settingValidations = $this->getSettingValidations();

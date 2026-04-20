@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * App\WikiSetting.
@@ -12,8 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property string $value
  * @property int|null $wiki_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read \App\Wiki|null $wiki
  *
  * @method static \Database\Factories\WikiSettingFactory factory(...$parameters)
@@ -57,7 +59,7 @@ class WikiSetting extends Model {
         'value',
     ];
 
-    public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+    public function wiki(): BelongsTo {
         return $this->belongsTo(Wiki::class);
     }
 }

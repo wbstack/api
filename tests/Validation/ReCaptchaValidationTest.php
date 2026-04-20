@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Rules\ReCaptchaValidation;
 use ReCaptcha\ReCaptcha;
+use ReCaptcha\Response;
 use Tests\TestCase;
 
 class ReCaptchaValidationTest extends TestCase {
@@ -19,7 +20,7 @@ class ReCaptchaValidationTest extends TestCase {
         $mockRule = $mockRuleBuilder->getMock();
         $mockRule->method('verify')
             ->willReturn(
-                \ReCaptcha\Response::fromJson(
+                Response::fromJson(
                     json_encode($fakeResponse)
                 )
             );
