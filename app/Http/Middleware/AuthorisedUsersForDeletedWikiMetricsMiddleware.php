@@ -7,11 +7,6 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthorisedUsersForDeletedWikiMetricsMiddleware {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Request): (Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response {
         $user = $request->user();
         if (!is_null($user) && $user->is_admin === 1) {
