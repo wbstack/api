@@ -30,7 +30,7 @@ return [
         CurrentMasterSupervisors::class,
         JobsPerMinute::class,
         CurrentWorkload::class,
-        CurrentProccesesPerQueue::class,
+        CurrentProcessesPerQueue::class,
         FailedJobsPerHour::class,
         HorizonStatus::class,
         RecentJobs::class,
