@@ -9,10 +9,8 @@ use Illuminate\Http\Request;
 class BackendAuth {
     /**
      * The authentication guard factory instance.
-     *
-     * @var Auth
      */
-    protected $auth;
+    protected Auth $auth;
 
     /**
      * Create a new middleware instance.
