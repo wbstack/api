@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helper\ProfileValidator;
 use App\Rules\NonEmptyJsonRule;
 use App\WikiProfile;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class WikiProfileController extends Controller {
@@ -14,7 +15,7 @@ class WikiProfileController extends Controller {
         $this->profileValidator = $profileValidator;
     }
 
-    public function create(Request $request): \Illuminate\Http\JsonResponse {
+    public function create(Request $request): JsonResponse {
         $wiki = $request->attributes->get('wiki');
         $validatedInput = $request->validate([
             'profile' => ['required', 'json', new NonEmptyJsonRule],

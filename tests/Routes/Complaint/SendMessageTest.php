@@ -8,6 +8,7 @@ use App\Rules\ReCaptchaValidation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Tests\TestCase;
 
 class SendMessageTest extends TestCase {
@@ -69,7 +70,7 @@ class SendMessageTest extends TestCase {
 
         try {
             $response = $this->json('POST', $this->route, $data);
-        } catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
+        } catch (TransportException $e) {
             return;
         }
 

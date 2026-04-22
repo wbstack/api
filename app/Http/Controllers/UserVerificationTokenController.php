@@ -6,12 +6,13 @@ use App\Jobs\UserVerificationCreateTokenAndSendJob;
 use App\User;
 use App\UserVerificationToken;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 /**
  * Verification of user emails.
  */
 class UserVerificationTokenController extends Controller {
-    public function verify(Request $request): \Illuminate\Http\Response {
+    public function verify(Request $request): Response {
         $request->validate([
             'token' => 'required|exists:user_verification_tokens,token',
         ]);
@@ -37,7 +38,7 @@ class UserVerificationTokenController extends Controller {
         return response($res);
     }
 
-    public function createAndSendForUser(Request $request): \Illuminate\Http\Response {
+    public function createAndSendForUser(Request $request): Response {
         $user = $request->user();
 
         if ($user->verified) {

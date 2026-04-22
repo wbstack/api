@@ -9,6 +9,7 @@ use App\Traits;
 use App\User;
 use App\Wiki;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
@@ -174,7 +175,7 @@ class PlatformStatsSummaryJob extends Job {
         $conn = $manager->connection('mysql');
         $mwConn = $manager->connection('mw');
 
-        if (!$conn instanceof \Illuminate\Database\Connection || !$mwConn instanceof \Illuminate\Database\Connection) {
+        if (!$conn instanceof Connection || !$mwConn instanceof Connection) {
             throw new \RuntimeException('Must be run on a PDO based DB connection');
         }
 

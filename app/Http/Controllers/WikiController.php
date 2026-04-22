@@ -18,7 +18,9 @@ use App\WikiDomain;
 use App\WikiManager;
 use App\WikiProfile;
 use App\WikiSetting;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -34,7 +36,7 @@ class WikiController extends Controller {
         $this->domainValidator = $domainValidator;
     }
 
-    public function create(Request $request): \Illuminate\Http\Response {
+    public function create(Request $request): Response {
         $sharedIndexPrefix = Config::get('wbstack.elasticsearch_shared_index_prefix');
         $esHosts = Config::get('wbstack.elasticsearch_hosts');
         $isSearchConfigValid = $esHosts && $sharedIndexPrefix;
@@ -206,7 +208,7 @@ class WikiController extends Controller {
         return response($res);
     }
 
-    public function delete(Request $request): \Illuminate\Http\JsonResponse {
+    public function delete(Request $request): JsonResponse {
         $wikiDeletionReason = $request->input('deletionReasons');
         $wiki = $request->attributes->get('wiki');
 
@@ -222,7 +224,7 @@ class WikiController extends Controller {
     }
 
     // TODO should this just be get wiki?
-    public function getWikiDetailsForIdForOwner(Request $request): \Illuminate\Http\Response {
+    public function getWikiDetailsForIdForOwner(Request $request): Response {
         $wiki = $request->attributes->get('wiki')
             ->load('wikiManagers')
             ->load('wikiDbVersion')

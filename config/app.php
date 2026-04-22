@@ -1,7 +1,18 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\AuthServiceProvider;
+use App\Providers\CollectorRegistryProvider;
+use App\Providers\DomainValidatorServiceProvider;
+use App\Providers\EventServiceProvider;
+use App\Providers\HorizonServiceProvider;
+use App\Providers\KubernetesClientServiceProvider;
+use App\Providers\ReCaptchaServiceProvider;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
+use Intervention\Image\ImageServiceProvider;
+use Laravel\Tinker\TinkerServiceProvider;
 
 return [
 
@@ -167,22 +178,22 @@ return [
         /*
          * Package Service Providers...
          */
-        Intervention\Image\ImageServiceProvider::class,
-        Laravel\Tinker\TinkerServiceProvider::class,
-        App\Providers\DomainValidatorServiceProvider::class,
+        ImageServiceProvider::class,
+        TinkerServiceProvider::class,
+        DomainValidatorServiceProvider::class,
 
         /*
          * Application Service Providers...
          */
-        App\Providers\AppServiceProvider::class,
-        App\Providers\AuthServiceProvider::class,
+        AppServiceProvider::class,
+        AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
-        App\Providers\EventServiceProvider::class,
-        App\Providers\HorizonServiceProvider::class,
-        App\Providers\KubernetesClientServiceProvider::class,
-        App\Providers\RouteServiceProvider::class,
-        App\Providers\ReCaptchaServiceProvider::class,
-        App\Providers\CollectorRegistryProvider::class,
+        EventServiceProvider::class,
+        HorizonServiceProvider::class,
+        KubernetesClientServiceProvider::class,
+        RouteServiceProvider::class,
+        ReCaptchaServiceProvider::class,
+        CollectorRegistryProvider::class,
 
         /*
          * Imported from LUMEN

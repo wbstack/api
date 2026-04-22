@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * App\EventPageUpdate.
@@ -12,9 +14,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $wiki_id
  * @property string $title
  * @property int $namespace
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Wiki $wiki
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Wiki $wiki
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\EventPageUpdate newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\EventPageUpdate newQuery()
@@ -37,7 +39,7 @@ class EventPageUpdate extends Model {
         'namespace',
     ];
 
-    public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+    public function wiki(): BelongsTo {
         return $this->belongsTo(Wiki::class);
     }
 }

@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 
 class WikisSeeder extends Seeder {
     /**
-     * @param  \App\User  $user
+     * @param  User  $user
      * @param  string  $name
      * @param  array  $stats
      */

@@ -6,6 +6,7 @@ use App\Wiki;
 use App\WikiDb;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 
 /**
@@ -61,7 +62,7 @@ class DeleteWikiDbJob extends Job implements ShouldBeUnique {
             $manager->purge('mw');
             $conn = $manager->connection('mw');
 
-            if (!$conn instanceof \Illuminate\Database\Connection) {
+            if (!$conn instanceof Connection) {
                 throw new \RuntimeException('Must be run on a PDO based DB connection');
             }
 

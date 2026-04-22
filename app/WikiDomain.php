@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
 /**
  * App\WikiDomain.
@@ -10,9 +12,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $domain
  * @property int|null $wiki_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Wiki|null $wiki
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Wiki|null $wiki
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDomain newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiDomain newQuery()
@@ -31,7 +33,7 @@ class WikiDomain extends Model {
         'wiki_id',
     ];
 
-    public function wiki(): \Illuminate\Database\Eloquent\Relations\HasOne {
+    public function wiki(): HasOne {
         return $this->hasOne(Wiki::class);
     }
 }

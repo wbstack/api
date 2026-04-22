@@ -5,10 +5,18 @@ namespace App;
 use App\Notifications\ResetPasswordNotification;
 use http\Exception\RuntimeException;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
+use Laravel\Passport\Client;
 use Laravel\Passport\HasApiTokens;
+use Laravel\Passport\Token;
 
 /**
  * App\User.
@@ -18,19 +26,19 @@ use Laravel\Passport\HasApiTokens;
  * @property string $password
  * @property string|null $remember_token
  * @property int $verified
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property string|null $stripe_id
  * @property string|null $card_brand
  * @property string|null $card_last_four
  * @property string|null $trial_ends_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Client[] $clients
+ * @property-read Collection|Client[] $clients
  * @property-read int|null $clients_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Wiki[] $managesWikis
+ * @property-read Collection|Wiki[] $managesWikis
  * @property-read int|null $manages_wikis_count
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read DatabaseNotificationCollection|DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Passport\Token[] $tokens
+ * @property-read Collection|Token[] $tokens
  * @property-read int|null $tokens_count
  *
  * @method static \Database\Factories\UserFactory factory(...$parameters)
@@ -91,11 +99,11 @@ class User extends Authenticatable implements MustVerifyEmail {
         $this->notify(new ResetPasswordNotification($token));
     }
 
-    public function managesWikis(): \Illuminate\Database\Eloquent\Relations\BelongsToMany {
+    public function managesWikis(): BelongsToMany {
         return $this->belongsToMany(Wiki::class, 'wiki_managers');
     }
 
-    public function touAcceptances(): \Illuminate\Database\Eloquent\Relations\HasMany {
+    public function touAcceptances(): HasMany {
         return $this->hasMany(UserTermsOfUseAcceptance::class, 'user_id');
     }
 
