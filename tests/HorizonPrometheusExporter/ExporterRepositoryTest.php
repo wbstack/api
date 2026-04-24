@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class ExporterRepositoryTest extends TestCase {
     public function testCanBeCreated() {
-        // if nothing is passed to load it reads the config
+        // if nothing is passed to load(), exporters are read from the config at config/horizon-exporter.php
         ExporterRepository::load();
         $registry = ExporterRepository::getRegistry();
         $this->assertInstanceOf(CollectorRegistry::class, $registry);
