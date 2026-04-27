@@ -21,14 +21,10 @@ This single application could likely be split up at some point. Everything is cu
 
 ### Install dependencies
 
-It is recommended to install the php dependencies via a composer docker container as that contains the required php extensions:
-```
-docker run --rm -it -v $PWD:/app -u $(id -u):$(id -g) composer install --ignore-platform-reqs
-```
+It is recommended to install the php dependencies via a composer docker container as that contains the required php extensions. Everyone using the same composer version also reduces the amount of changes in `composer.lock` (and thus the potential for git conflicts).
 
-Alternatively, you can run `composer` on your local machine (ignoring platform requirements):
 ```
-composer install --ignore-platform-reqs
+docker run --rm -it -v $PWD:/app -u $(id -u):$(id -g) composer:2.9.2 --ignore-platform-reqs=ext-pcntl install
 ```
 
 ### Initial setup
