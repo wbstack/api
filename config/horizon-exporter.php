@@ -4,7 +4,7 @@ use App\Metrics\FailedQsBatches;
 use App\Metrics\PendingQsBatches;
 use App\Metrics\WikiEntityImports;
 use LKDevelopment\HorizonPrometheusExporter\Exporter\CurrentMasterSupervisors;
-use LKDevelopment\HorizonPrometheusExporter\Exporter\CurrentProccesesPerQueue;
+use LKDevelopment\HorizonPrometheusExporter\Exporter\CurrentProcessesPerQueue;
 use LKDevelopment\HorizonPrometheusExporter\Exporter\CurrentWorkload;
 use LKDevelopment\HorizonPrometheusExporter\Exporter\FailedJobsPerHour;
 use LKDevelopment\HorizonPrometheusExporter\Exporter\HorizonStatus;
