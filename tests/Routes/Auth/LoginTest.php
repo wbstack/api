@@ -16,11 +16,7 @@ class LoginTest extends TestCase {
 
     protected function setUp(): void {
         parent::setUp();
-        Artisan::call('passport:keys', ['--force' => true]);
-        Artisan::call('passport:client', [
-            '--personal' => true,
-            '--name' => 'Personal access client test',
-        ]);
+        Artisan::call('passport:install', ['--no-interaction' => true]);
     }
 
     public function testLoginFailNoExistingUser() {
