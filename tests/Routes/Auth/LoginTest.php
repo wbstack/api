@@ -5,7 +5,6 @@ namespace Tests\Routes\Auth;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Artisan;
-use Laravel\Passport\ClientRepository;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
 
