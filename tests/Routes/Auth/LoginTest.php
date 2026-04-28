@@ -4,6 +4,8 @@ namespace Tests\Routes\Auth;
 
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Artisan;
+use Laravel\Passport\ClientRepository;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
 
@@ -15,7 +17,11 @@ class LoginTest extends TestCase {
 
     protected function setUp(): void {
         parent::setUp();
-        $this->artisan('passport:install', ['--no-interaction' => true]);
+        Artisan::call('passport:keys', ['--force' => true]);
+        Artisan::call('passport:client', [
+            '--personal' => true,
+            '--name' => 'Personal access client test',
+        ]);
     }
 
     public function testLoginFailNoExistingUser() {
