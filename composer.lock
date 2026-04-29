@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8896289da4e5668f1dad905cd7df27dc",
+    "content-hash": "918fdf0eb4a0726a4367d6f32e7a9803",
     "packages": [
         {
             "name": "absszero/laravel-stackdriver-error-reporting",
@@ -5103,64 +5103,6 @@
                 "source": "https://github.com/paragonie/random_compat"
             },
             "time": "2020-10-15T08:29:30+00:00"
-        },
-        {
-            "name": "percymamedy/laravel-dev-booter",
-            "version": "v4.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/percymamedy/laravel-dev-booter.git",
-                "reference": "2013de7060a73ae1a410484d1442c0e191dfc25c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/percymamedy/laravel-dev-booter/zipball/2013de7060a73ae1a410484d1442c0e191dfc25c",
-                "reference": "2013de7060a73ae1a410484d1442c0e191dfc25c",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/support": "^10.20.0",
-                "php": "^8.1|^8.2"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^8.9.0",
-                "phpunit/phpunit": "^10.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": [],
-                "laravel": {
-                    "providers": [
-                        "PercyMamedy\\LaravelDevBooter\\ServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "PercyMamedy\\LaravelDevBooter\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Percy Mamedy",
-                    "email": "percymamedy@gmail.com"
-                }
-            ],
-            "description": "Boost your Laravel app by registering Prod services only on Prod.",
-            "keywords": [
-                "dev-tools",
-                "laravel",
-                "php"
-            ],
-            "support": {
-                "issues": "https://github.com/percymamedy/laravel-dev-booter/issues",
-                "source": "https://github.com/percymamedy/laravel-dev-booter/tree/v4.0.0"
-            },
-            "time": "2023-08-28T20:44:19+00:00"
         },
         {
             "name": "php-http/client-common",
