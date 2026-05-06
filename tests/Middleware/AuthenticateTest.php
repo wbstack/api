@@ -49,6 +49,16 @@ class AuthenticateTest extends TestCase {
             ->assertJson(['email' => $user->email]);
     }
 
+    public function testAuthenticatesUsingPassportTokenFromAuthorizationHeader(): void {
+        $user = User::factory()->create();
+
+        $this->withCredentials()
+            ->withHeader('Authorization', 'Bearer ' . $this->issueTokenFor($user))
+            ->json('GET', self::ENDPOINT)
+            ->assertStatus(200)
+            ->assertJson(['email' => $user->email]);
+    }
+
     private function issueTokenFor(User $user): string {
         return $user->createToken('authenticate-middleware-test')->accessToken;
     }
