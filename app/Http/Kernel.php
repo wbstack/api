@@ -44,20 +44,16 @@ class Kernel extends HttpKernel {
      * @var array
      */
     protected $middlewareAliases = [
-        // Came with Laravel
-        'auth' => Authenticate::class,
+        // Middleware from laravel upstream
         'verified' => EnsureEmailIsVerified::class,
 
+        // Custom Middleware
         'guest' => RedirectIfAuthenticated::class,
         'limit_wiki_access' => LimitWikiAccess::class,
-
-        // https://laravel-news.com/signed-routes
-        // 'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
-
         'backend.auth' => BackendAuth::class,
         'throttle.signup' => ThrottleSignup::class,
         'throttle' => Throttle::class,
-        // 'auth' => App\Http\Middleware\Authenticate::class,
+        'auth' => Authenticate::class,
     ];
 
     /**
