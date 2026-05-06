@@ -25,6 +25,7 @@ class AuthenticateTest extends TestCase {
             '--no-interaction' => true,
         ]);
 
+        // Register new test route with Authenticate middleware. This also tests the config in Kernel.php and auth.php.
         Route::middleware('auth:api')->get(self::ENDPOINT, function (Request $request) {
             return response()->json([
                 'email' => $request->user()->email,
