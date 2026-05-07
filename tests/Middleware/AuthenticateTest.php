@@ -18,12 +18,7 @@ class AuthenticateTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
 
-        Artisan::call('passport:keys', ['--force' => true]);
-        Artisan::call('passport:client', [
-            '--personal' => true,
-            '--name' => 'Authenticate middleware test',
-            '--no-interaction' => true,
-        ]);
+        Artisan::call('passport:install', ['--no-interaction' => true]);
 
         // Register new test route with Authenticate middleware. This also tests the config in Kernel.php and auth.php.
         Route::middleware('auth:api')->get(self::ENDPOINT, function (Request $request) {
@@ -49,6 +44,14 @@ class AuthenticateTest extends TestCase {
             ->assertJson(['email' => $user->email]);
     }
 
+    public function testFailsUsingInvalidPassportTokenFromCookie(): void {
+        $this->withCredentials()
+            ->withUnencryptedCookie(Config::get('auth.cookies.key'), 'this is an invalid token')
+            ->json('GET', self::ENDPOINT)
+            ->assertStatus(401)
+            ->assertJson(['error' => 'Unauthenticated.']);
+    }
+
     public function testAuthenticatesUsingPassportTokenFromAuthorizationHeader(): void {
         $user = User::factory()->create();
 
@@ -57,6 +60,14 @@ class AuthenticateTest extends TestCase {
             ->json('GET', self::ENDPOINT)
             ->assertStatus(200)
             ->assertJson(['email' => $user->email]);
+    }
+
+    public function testFailsUsingInvalidPassportTokenFromAuthorizationHeader(): void {
+        $this->withCredentials()
+            ->withHeader('Authorization', 'Bearer ' . 'this is an invalid token')
+            ->json('GET', self::ENDPOINT)
+            ->assertStatus(401)
+            ->assertJson(['error' => 'Unauthenticated.']);
     }
 
     private function issueTokenFor(User $user): string {
