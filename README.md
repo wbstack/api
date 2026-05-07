@@ -50,7 +50,7 @@ docker compose down --volumes
 Run everything in one go:
 
 ```sh
-docker compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install && php artisan db:seed && php artisan key:generate && php artisan storage:link'
+docker compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install --no-interaction && php artisan db:seed && php artisan key:generate && php artisan storage:link'
 ```
 
 Or each command separately:
@@ -60,7 +60,7 @@ Or each command separately:
 docker compose exec api php artisan migrate:fresh
 
 # Create some certs needed for authentication (passport is a laravel plugin)
-docker compose exec api php artisan passport:install
+docker compose exec api php artisan passport:install --no-interaction
 
 # Seed some useful development data
 docker compose exec api php artisan db:seed
