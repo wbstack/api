@@ -194,12 +194,6 @@ return [
         RouteServiceProvider::class,
         ReCaptchaServiceProvider::class,
         CollectorRegistryProvider::class,
-
-        /*
-         * Imported from LUMEN
-         */
-
-        PercyMamedy\LaravelDevBooter\ServiceProvider::class,
     ])->toArray(),
 
     /*

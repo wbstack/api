@@ -21,14 +21,10 @@ This single application could likely be split up at some point. Everything is cu
 
 ### Install dependencies
 
-It is recommended to install the php dependencies via a composer docker container as that contains the required php extensions:
-```
-docker run --rm -it -v $PWD:/app -u $(id -u):$(id -g) composer install --ignore-platform-reqs
-```
+It is recommended to install the php dependencies via a composer docker container as that contains the required php extensions. Everyone using the same composer version also reduces the amount of changes in `composer.lock` (and thus the potential for git conflicts).
 
-Alternatively, you can run `composer` on your local machine (ignoring platform requirements):
 ```
-composer install --ignore-platform-reqs
+docker run --rm -it -v $PWD:/app -u $(id -u):$(id -g) composer:2.9.2 --ignore-platform-req=ext-pcntl install
 ```
 
 ### Initial setup
@@ -54,7 +50,7 @@ docker compose down --volumes
 Run everything in one go:
 
 ```sh
-docker compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install && php artisan db:seed && php artisan key:generate && php artisan storage:link'
+docker compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install --no-interaction && php artisan db:seed && php artisan key:generate && php artisan storage:link'
 ```
 
 Or each command separately:
@@ -64,7 +60,7 @@ Or each command separately:
 docker compose exec api php artisan migrate:fresh
 
 # Create some certs needed for authentication (passport is a laravel plugin)
-docker compose exec api php artisan passport:install
+docker compose exec api php artisan passport:install --no-interaction
 
 # Seed some useful development data
 docker compose exec api php artisan db:seed
