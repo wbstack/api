@@ -26,7 +26,6 @@
         "lkaemmerling/laravel-horizon-prometheus-exporter": "^1.7",
         "maclof/kubernetes-client": "^0.31.0",
         "mxl/laravel-job": "^1.5",
-        "percymamedy/laravel-dev-booter": "^4.0",
         "php-http/guzzle7-adapter": "^1.0",
         "php-http/message": "^1.16",
         "php-http/message-factory": "^1.1",
