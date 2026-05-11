@@ -16,7 +16,7 @@ FROM php:8.2-apache
 
 RUN apt-get update \
 	# Needed for the imagick php extension install
-	&& apt-get install -y --no-install-recommends libmagickwand-dev libpq-dev \
+	&& apt-get install -y --no-install-recommends libmagickwand-dev libpq-dev mariadb-client\
 	&& echo "" | pecl install imagick redis \
 	&& docker-php-ext-enable imagick \
 	&& docker-php-ext-enable redis \
