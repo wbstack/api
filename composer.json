@@ -16,7 +16,7 @@
         "guzzlehttp/psr7": "^2.9",
         "hackzilla/password-generator": "^1.6",
         "intervention/image": "^2.5",
-        "laravel/framework": "^10.10",
+        "laravel/framework": "^11.51",
         "laravel/horizon": "^5.23",
         "laravel/passport": "^12.4",
         "laravel/tinker": "^3.0",
