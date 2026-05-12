@@ -55,7 +55,7 @@ return [
             // against the database during the current request cycle,
             // any further "read" operations will use the "write" connection.
             'sticky' => true,
-            'driver' => 'mysql',
+            'driver' => 'mariadb',
             'url' => env('DATABASE_URL'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE'),
@@ -89,7 +89,7 @@ return [
             // against the database during the current request cycle,
             // any further "read" operations will use the "write" connection.
             'sticky' => true,
-            'driver' => 'mysql',
+            'driver' => 'mariadb',
             'url' => env('MW_DATABASE_URL'),
             'port' => env('MW_DB_PORT', '3306'),
             'database' => env('MW_DB_DATABASE'),
