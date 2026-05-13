@@ -307,7 +307,7 @@ class CreateTest extends TestCase {
                 self::defaultData
             );
         $response->assertStatus(200);
-        $id = $response->decodeResponseJson()['data']['id'];
+        $id = $response->json()['data']['id'];
         $this->assertEquals(1, WikiProfile::where(['wiki_id' => $id])->count());
     }
 
@@ -325,7 +325,7 @@ class CreateTest extends TestCase {
                 ]]
             );
         $response->assertStatus(200);
-        $id = $response->decodeResponseJson()['data']['id'];
+        $id = $response->json()['data']['id'];
         $this->assertEquals(1, KnowledgeEquityResponse::where(['wiki_id' => $id])->count());
     }
 
@@ -362,7 +362,7 @@ class CreateTest extends TestCase {
                 ]]
             );
         $response->assertStatus(200);
-        $id = $response->decodeResponseJson()['data']['id'];
+        $id = $response->json()['data']['id'];
         $this->assertEquals(1, KnowledgeEquityResponse::where(['wiki_id' => $id])->count());
     }
 

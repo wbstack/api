@@ -40,7 +40,7 @@ class WikiEntityImportController extends Controller {
     public function create(Request $request): JsonResponse {
         $validatedInput = $request->validate([
             'source_wiki_url' => ['required', 'url'],
-            'entity_ids' => ['required', 'string', function (string $attr, mixed $value, \Closure $fail) {
+            'entity_ids' => ['required', 'string', function (string $attr, mixed $value, \Closure $fail): void {
                 $chunks = explode(',', $value);
                 foreach ($chunks as $chunk) {
                     if (!preg_match("/^[A-Z]\d+(@\d+)?$/", $chunk)) {

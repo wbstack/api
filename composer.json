@@ -30,10 +30,12 @@
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3",
+        "driftingly/rector-laravel": "^2.3",
         "fakerphp/faker": "^1.17",
         "laravel/pint": "^1.22",
         "mockery/mockery": "^1.4",
         "phpunit/phpunit": "^10.5",
+        "rector/rector": "^2.4",
         "timacdonald/log-fake": "^2.3"
     },
     "autoload": {

@@ -50,7 +50,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
             $update['last_edited'] = Carbon::parse($lastEdited);
         }
 
-        DB::transaction(function () use ($wiki, $update) {
+        DB::transaction(function () use ($wiki, $update): void {
             $wiki->wikiLifecycleEvents()->lockForUpdate()->updateOrCreate(['wiki_id' => $wiki->id], $update);
         });
     }
@@ -74,7 +74,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
                 $update[$field] = $value;
             }
         }
-        DB::transaction(function () use ($wiki, $update) {
+        DB::transaction(function () use ($wiki, $update): void {
             $wiki->wikiSiteStats()->lockForUpdate()->updateOrCreate(['wiki_id' => $wiki->id], $update);
         });
     }

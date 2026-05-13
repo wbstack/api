@@ -32,7 +32,7 @@ class RegisterController extends Controller {
         $this->validator($request->all())->validate();
 
         $user = null;
-        DB::transaction(function () use (&$user, $request) {
+        DB::transaction(function () use (&$user, $request): void {
             $user = (new UserCreateJob(
                 $request->input('email'),
                 $request->input('password')
