@@ -13,6 +13,12 @@ use Illuminate\Database\Eloquent\Model;
 class TermsOfUseVersion extends Model {
     use HasFactory;
 
+    protected $primaryKey = 'version';
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
     protected $table = 'tou_versions';
 
     const FIELDS = [
@@ -23,11 +29,6 @@ class TermsOfUseVersion extends Model {
     protected $fillable = self::FIELDS;
 
     protected $visible = self::FIELDS;
-
-    protected $casts = [
-        'version' => 'string',
-        'active' => 'boolean',
-    ];
 
     public static function latestActiveVersion(): ?self {
         return self::query()->where('active', true)->latest()->first();
