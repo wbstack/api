@@ -18,25 +18,25 @@ $router->put('setWikiReadOnly', ['uses' => 'WikiReadOnlyController@setWikiReadOn
 // PUT
 $router->put('setWikiDbVersion', ['uses' => 'WikiDbVersionController@updateWikiDbVersion']);
 
-$router->group(['prefix' => 'ingress'], function () use ($router) {
+$router->group(['prefix' => 'ingress'], function () use ($router): void {
     // GET
     $router->get('getWikiVersionForDomain', ['uses' => 'IngressController@getWikiVersionForDomain']);
 });
 
-$router->group(['prefix' => 'wiki'], function () use ($router) {
+$router->group(['prefix' => 'wiki'], function () use ($router): void {
     // GET
     $router->get('getWikiForDomain', ['uses' => 'WikiController@getWikiForDomain']);
     // PATCH
     $router->patch('updateEntityImport', ['uses' => '\App\Http\Controllers\WikiEntityImportController@update']);
 });
 
-$router->group(['prefix' => 'event'], function () use ($router) {
+$router->group(['prefix' => 'event'], function () use ($router): void {
     // POST
     $router->post('pageUpdate', ['uses' => 'EventController@pageUpdate']);
     $router->post('pageUpdateBatch', ['uses' => 'EventController@pageUpdateBatch']);
 });
 
-$router->group(['prefix' => 'qs'], function () use ($router) {
+$router->group(['prefix' => 'qs'], function () use ($router): void {
     // GET
     $router->get('getBatches', ['uses' => 'QsController@getBatches']);
     // POST

@@ -85,16 +85,6 @@ class User extends Authenticatable implements MustVerifyEmail {
         'card_last_four',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
-
     public function sendPasswordResetNotification($token) {
         $this->notify(new ResetPasswordNotification($token));
     }
@@ -128,5 +118,17 @@ class User extends Authenticatable implements MustVerifyEmail {
 
     public function getEmailForVerification() {
         return $this->email;
+    }
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
     }
 }

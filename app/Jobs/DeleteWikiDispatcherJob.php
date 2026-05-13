@@ -72,7 +72,7 @@ class DeleteWikiDispatcherJob extends Job {
 
             Bus::chain([
                 ...$jobs,
-            ])->catch(function (Throwable $e) use ($wiki) {
+            ])->catch(function (Throwable $e) use ($wiki): void {
                 Log::error(__METHOD__ . "An error occured when deleting {$wiki->id}: " . $e->getMessage());
             })->dispatch();
 

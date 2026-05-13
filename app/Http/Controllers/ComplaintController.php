@@ -80,7 +80,7 @@ class ComplaintController extends Controller {
     /**
      * Get a validator for an incoming complaint report page request.
      */
-    protected function validator(array $data): \Illuminate\Validation\Validator {
+    protected function validator(array $data): \Illuminate\Contracts\Validation\Validator {
         $data['name'] = $data['name'] ?? '';
         $data['email'] = $data['email'] ?? '';
 

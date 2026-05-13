@@ -395,7 +395,7 @@ class WikiMetricsTest extends TestCase {
         $tablePage = $wikiDb->name . '.' . $wikiDb->prefix . '_page';
 
         Schema::dropIfExists($tablePage);
-        Schema::create($tablePage, function (Blueprint $table) {
+        Schema::create($tablePage, function (Blueprint $table): void {
             $table->increments('page_id');
             $table->integer('page_namespace');
             $table->boolean('page_is_redirect')->default(0);

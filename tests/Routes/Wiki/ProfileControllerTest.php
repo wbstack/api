@@ -156,11 +156,11 @@ class ProfileControllerTest extends TestCase {
         );
         $this->assertEquals(
             'permanent',
-            WikiProfile::find($versionA->decodeResponseJson()['data']['id'])['temporality']
+            WikiProfile::find($versionA->json()['data']['id'])['temporality']
         );
         $this->assertEquals(
             'temporary',
-            WikiProfile::find($versionB->decodeResponseJson()['data']['id'])['temporality']
+            WikiProfile::find($versionB->json()['data']['id'])['temporality']
         );
     }
 }

@@ -44,11 +44,13 @@ class QsBatch extends Model {
         'processing_attempts',
     ];
 
-    protected $casts = [
-        'pending_since' => 'datetime',
-    ];
-
     public function wiki(): BelongsTo {
         return $this->belongsTo(Wiki::class);
+    }
+
+    protected function casts(): array {
+        return [
+            'pending_since' => 'datetime',
+        ];
     }
 }

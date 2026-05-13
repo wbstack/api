@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Helper\DomainHelper;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -67,10 +68,6 @@ class Wiki extends Model {
      */
     protected $appends = [
         'domain_decoded',
-    ];
-
-    protected $casts = [
-        'deleted_at' => 'datetime',
     ];
 
     public function wikiDbVersion() {
@@ -156,8 +153,10 @@ class Wiki extends Model {
     /**
      * Convert the IDN formatted domain name to it's Unicode representation.
      */
-    public function getDomainDecodedAttribute(): string {
-        return DomainHelper::decode($this->domain);
+    protected function domainDecoded(): Attribute {
+        return Attribute::make(get: function () {
+            return DomainHelper::decode($this->domain);
+        });
     }
 
     public function wikiLatestProfile() {
@@ -173,5 +172,11 @@ class Wiki extends Model {
 
     public function deleteSetting(string $name): ?string {
         return $this->settings()->where('name', $name)->delete();
+    }
+
+    protected function casts(): array {
+        return [
+            'deleted_at' => 'datetime',
+        ];
     }
 }
