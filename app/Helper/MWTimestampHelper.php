@@ -15,8 +15,13 @@ class MWTimestampHelper {
     private const MWTimestampFormat = 'YmdHis';
 
     public static function getCarbonFromMWTimestamp(string $MWTimestamp): CarbonImmutable {
-        $carbon = CarbonImmutable::createFromFormat(self::MWTimestampFormat, $MWTimestamp);
-        if ($carbon === null) {
+        try {
+            $carbon = CarbonImmutable::createFromFormat(self::MWTimestampFormat, $MWTimestamp);
+        } catch (InvalidFormatException $exception) {
+            throw new InvalidFormatException('Unable to create Carbon object', 0, $exception);
+        }
+
+        if (!$carbon instanceof CarbonImmutable) {
             throw new InvalidFormatException('Unable to create Carbon object');
         }
 
