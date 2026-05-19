@@ -20,6 +20,7 @@ class Throttle extends ThrottleRequests {
      *
      * @throws ThrottleRequestsException
      */
+    #[\Override]
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $prefix = '') {
         if (config('app.env') === 'local') {
             return $next($request);

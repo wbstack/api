@@ -107,7 +107,7 @@ class UpdateQueryserviceAllowListTest extends TestCase {
                     ]),
                 ],
             ],
-            json_decode($requests[1]['request']->getBody(), true)
+            json_decode((string) $requests[1]['request']->getBody(), true)
         );
     }
 }

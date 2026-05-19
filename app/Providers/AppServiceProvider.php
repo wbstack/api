@@ -12,6 +12,7 @@ class AppServiceProvider extends ServiceProvider {
     /**
      * Register any application services.
      */
+    #[\Override]
     public function register(): void {
         $this->app->bind(HttpRequest::class, CurlRequest::class);
     }

@@ -13,18 +13,12 @@ use Illuminate\Support\Facades\Log;
  * php artisan job:dispatch CirrusSearch\\ForceSearchIndex id 1 0 1000
  */
 class ForceSearchIndex extends CirrusSearchJob {
-    private $fromId;
-
-    private $toId;
-
-    public function __construct(string $selectCol, $selectValue, int $fromId, int $toId) {
+    public function __construct(string $selectCol, $selectValue, private readonly int $fromId, private readonly int $toId) {
         $wiki = Wiki::where($selectCol, $selectValue)->firstOrFail();
-
-        $this->fromId = $fromId;
-        $this->toId = $toId;
         parent::__construct($wiki->id);
     }
 
+    #[\Override]
     public function uniqueId() {
         return parent::uniqueId() . '_'
             . $this->fromId . '_'
@@ -43,6 +37,7 @@ class ForceSearchIndex extends CirrusSearchJob {
         return 'wbstackForceSearchIndex';
     }
 
+    #[\Override]
     protected function getRequestTimeout(): int {
         return 1000;
     }
@@ -62,7 +57,7 @@ class ForceSearchIndex extends CirrusSearchJob {
 
         $successMatches = [];
         $lastElement = end($output);
-        preg_match('/Indexed a total of (\d+) pages/', $lastElement, $successMatches, PREG_OFFSET_CAPTURE);
+        preg_match('/Indexed a total of (\d+) pages/', (string) $lastElement, $successMatches, PREG_OFFSET_CAPTURE);
 
         if (count($successMatches) === 2 && is_numeric($successMatches[1][0])) {
             $numIndexedPages = intval($successMatches[1][0]);
@@ -77,6 +72,7 @@ class ForceSearchIndex extends CirrusSearchJob {
     /**
      * @return string
      */
+    #[\Override]
     protected function getQueryParams() {
         return parent::getQueryParams() . '&fromId=' . $this->fromId . '&toId=' . $this->toId;
     }

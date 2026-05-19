@@ -16,10 +16,10 @@ return [
 
     'platform_summary_inactive_threshold' => env('WBSTACK_SUMMARY_INACTIVE_THRESHOLD', 60 * 60 * 24 * 90),
     'platform_summary_creation_rate_ranges' => array_filter(
-        explode(',', env('WBSTACK_SUMMARY_CREATION_RATE_RANGES', ''))
+        explode(',', (string) env('WBSTACK_SUMMARY_CREATION_RATE_RANGES', ''))
     ),
 
-    'elasticsearch_hosts' => array_filter(explode(',', env('ELASTICSEARCH_HOST', ''))),
+    'elasticsearch_hosts' => array_filter(explode(',', (string) env('ELASTICSEARCH_HOST', ''))),
     'elasticsearch_enabled_by_default' => env('WBSTACK_ELASTICSEARCH_ENABLED_BY_DEFAULT', false),
     'elasticsearch_shared_index_prefix' => env('ELASTICSEARCH_SHARED_INDEX_PREFIX', null),
 

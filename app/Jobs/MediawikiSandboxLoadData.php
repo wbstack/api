@@ -5,16 +5,11 @@ namespace App\Jobs;
 use App\Services\MediaWikiHostResolver;
 
 class MediawikiSandboxLoadData extends Job {
-    private $wikiDomain;
-
-    private $dataSet;
-
     /**
      * @return void
      */
-    public function __construct($wikiDomain, $dataSet) {
-        $this->wikiDomain = $wikiDomain;
-        $this->dataSet = $dataSet;
+    public function __construct(private $wikiDomain, private $dataSet)
+    {
     }
 
     /**

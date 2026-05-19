@@ -15,6 +15,7 @@ class ComplaintNotificationExternal extends ComplaintNotification {
      * @param  mixed  $notifiable
      * @return MailMessage
      */
+    #[\Override]
     public function toMail($notifiable) {
         $name = $this->name;
 

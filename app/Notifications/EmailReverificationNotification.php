@@ -12,13 +12,6 @@ use Illuminate\Support\Facades\Lang;
  */
 class EmailReverificationNotification extends Notification {
     /**
-     * The email verification token.
-     *
-     * @var string
-     */
-    public $token;
-
-    /**
      * The callback that should be used to build the mail message.
      *
      * @var \Closure|null
@@ -31,8 +24,13 @@ class EmailReverificationNotification extends Notification {
      * @param  string  $token
      * @return void
      */
-    public function __construct($token) {
-        $this->token = $token;
+    public function __construct(
+        /**
+         * The email verification token.
+         */
+        public $token
+    )
+    {
     }
 
     /**

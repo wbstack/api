@@ -8,16 +8,6 @@ use App\User;
 use App\UserVerificationToken;
 
 class UserVerificationCreateTokenAndSendJob extends Job {
-    /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var string
-     */
-    private $notificationClass;
-
     public static function newForAccountCreation(User $user): self {
         return new self($user, UserCreationNotification::class);
     }
@@ -29,11 +19,9 @@ class UserVerificationCreateTokenAndSendJob extends Job {
     /**
      * @return void
      */
-    public function __construct(User $user, string $notificationClass) {
-        $this->user = $user;
-        $this->notificationClass = $notificationClass;
-        if (!class_exists($notificationClass)) {
-            throw new \InvalidArgumentException("$notificationClass not found for notification");
+    public function __construct(private readonly User $user, private readonly string $notificationClass) {
+        if (!class_exists($this->notificationClass)) {
+            throw new \InvalidArgumentException("{$this->notificationClass} not found for notification");
         }
     }
 

@@ -13,7 +13,7 @@ use Tests\TestCase;
 class AuthenticateTest extends TestCase {
     use RefreshDatabase;
 
-    private const ENDPOINT = '/api/test/authenticate-middleware';
+    private const string ENDPOINT = '/api/test/authenticate-middleware';
 
     protected function setUp(): void {
         parent::setUp();
@@ -21,11 +21,9 @@ class AuthenticateTest extends TestCase {
         Artisan::call('passport:install', ['--no-interaction' => true]);
 
         // Register new test route with Authenticate middleware. This also tests the config in Kernel.php and auth.php.
-        Route::middleware('auth:api')->get(self::ENDPOINT, function (Request $request) {
-            return response()->json([
-                'email' => $request->user()->email,
-            ]);
-        });
+        Route::middleware('auth:api')->get(self::ENDPOINT, fn(Request $request) => response()->json([
+            'email' => $request->user()->email,
+        ]));
     }
 
     public function testReturnsCustomJsonWhenUnauthenticated(): void {

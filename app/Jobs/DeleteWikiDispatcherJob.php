@@ -67,7 +67,7 @@ class DeleteWikiDispatcherJob extends Job {
             // deletes any settings, managers and the wiki itself
             $jobs[] = new DeleteWikiFinalizeJob($wiki->id);
 
-            $logMessage = implode(',', array_map('get_class', $jobs));
+            $logMessage = implode(',', array_map(get_class(...), $jobs));
             Log::info(__METHOD__ . ": Dispatching hard delete job chain for id: {$wiki->id}, jobs: {$logMessage}.");
 
             Bus::chain([

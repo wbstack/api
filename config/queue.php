@@ -100,5 +100,5 @@ return [
         'table' => 'failed_jobs',
     ],
 
-    'backoff' => explode(',', env('QUEUE_BACKOFF', '')),
+    'backoff' => explode(',', (string) env('QUEUE_BACKOFF', '')),
 ];

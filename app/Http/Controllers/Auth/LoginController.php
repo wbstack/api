@@ -50,7 +50,7 @@ class LoginController extends Controller {
         return response()
             ->json()
             ->setStatusCode(204)
-            ->withCookie($this->deleteCookie());
+            ->withCookie(self::deleteCookie());
     }
 
     public function postLogin(Request $request): ?JsonResponse {
@@ -84,7 +84,7 @@ class LoginController extends Controller {
             return response()->json([
                 'user' => $user, // <- we're sending the user info for frontend usage
             ])->withCookie(
-                $this->getCookie($user->createToken('yourAppName')->accessToken)
+                self::getCookie($user->createToken('yourAppName')->accessToken)
             );
         } else {
             $this->incrementLoginAttempts($request);

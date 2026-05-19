@@ -5,10 +5,6 @@ namespace App\Rules;
 use Illuminate\Contracts\Validation\Rule;
 
 class ForbiddenSubdomainRule implements Rule {
-    private $badWords;
-
-    private $subdomainSuffix;
-
     const ERROR_MESSAGE = 'The subdomain contains a forbidden word.';
 
     /**
@@ -16,9 +12,8 @@ class ForbiddenSubdomainRule implements Rule {
      *
      * @return void
      */
-    public function __construct(array $badWords, string $subdomainSuffix) {
-        $this->badWords = $badWords;
-        $this->subdomainSuffix = $subdomainSuffix;
+    public function __construct(private readonly array $badWords, private readonly string $subdomainSuffix)
+    {
     }
 
     /**
@@ -31,7 +26,7 @@ class ForbiddenSubdomainRule implements Rule {
     public function passes($attribute, $value) {
         $matches = [];
         $regexp = '/^([a-z0-9-]+)' . preg_quote($this->subdomainSuffix) . '$/';
-        preg_match($regexp, $value, $matches, PREG_OFFSET_CAPTURE);
+        preg_match($regexp, (string) $value, $matches, PREG_OFFSET_CAPTURE);
 
         if (count($matches) !== 2) {
             return false;

@@ -48,6 +48,7 @@ class QsBatch extends Model {
         return $this->belongsTo(Wiki::class);
     }
 
+    #[\Override]
     protected function casts(): array {
         return [
             'pending_since' => 'datetime',

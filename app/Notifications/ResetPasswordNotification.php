@@ -11,13 +11,6 @@ class ResetPasswordNotification extends Notification {
     use HasFactory;
 
     /**
-     * The password reset token.
-     *
-     * @var string
-     */
-    public $token;
-
-    /**
      * The callback that should be used to build the mail message.
      *
      * @var \Closure|null
@@ -30,8 +23,13 @@ class ResetPasswordNotification extends Notification {
      * @param  string  $token
      * @return void
      */
-    public function __construct($token) {
-        $this->token = $token;
+    public function __construct(
+        /**
+         * The password reset token.
+         */
+        public $token
+    )
+    {
     }
 
     /**
@@ -55,7 +53,7 @@ class ResetPasswordNotification extends Notification {
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        $encodedEmail = urlencode($notifiable->getEmailForPasswordReset());
+        $encodedEmail = urlencode((string) $notifiable->getEmailForPasswordReset());
         $queryPart = "?token=$this->token&email={$encodedEmail}";
         $resetPasswordLink = config('wbstack.ui_url') . '/reset-password' . $queryPart;
 

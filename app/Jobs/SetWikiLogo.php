@@ -18,16 +18,8 @@ use Intervention\Image\Facades\Image;
  * NOTE: This job needs to be run as the correct user if run via artisan (instead of via the UI)
  */
 class SetWikiLogo extends Job {
-    private $wikiKey;
-
-    private $wikiValue;
-
-    private $logoPath;
-
-    public function __construct(string $wikiKey, string $wikiValue, string $logoPath) {
-        $this->wikiKey = $wikiKey;
-        $this->wikiValue = $wikiValue;
-        $this->logoPath = $logoPath;
+    public function __construct(private readonly string $wikiKey, private readonly string $wikiValue, private readonly string $logoPath)
+    {
     }
 
     public function handle(): void {
@@ -48,7 +40,7 @@ class SetWikiLogo extends Job {
 
                 return;  // safeguard
             }
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             $this->fail(new \InvalidArgumentException("Invalid key ({$this->wikiKey}) or value ({$this->wikiValue})"));
 
             return;  // safeguard

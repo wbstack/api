@@ -65,13 +65,13 @@ class SetWikiLogoTest extends TestCase {
 
         // get the previous logo and favicon settings
         try {
-            $previousLogoSettingURL = parse_url($wiki->settings()->firstWhere(['name' => WikiSetting::wgLogo])->value);
+            $previousLogoSettingURL = parse_url((string) $wiki->settings()->firstWhere(['name' => WikiSetting::wgLogo])->value);
         } catch (ErrorException $e) {
             $previousLogoSettingURL = null;
         }
         try {
-            $previousFaviconSettingURL = parse_url($wiki->settings()->firstWhere(['name' => WikiSetting::wgFavicon])->value);
-        } catch (ErrorException $e) {
+            $previousFaviconSettingURL = parse_url((string) $wiki->settings()->firstWhere(['name' => WikiSetting::wgFavicon])->value);
+        } catch (ErrorException) {
             $previousFaviconSettingURL = null;
         }
 
@@ -90,8 +90,8 @@ class SetWikiLogoTest extends TestCase {
         $this->assertSame(64, $logo->width());
 
         // get the current logo and favicon settings
-        $currentLogoSettingURL = parse_url($wiki->settings()->firstWhere(['name' => WikiSetting::wgLogo])->value);
-        $currentFaviconSettingURL = parse_url($wiki->settings()->firstWhere(['name' => WikiSetting::wgFavicon])->value);
+        $currentLogoSettingURL = parse_url((string) $wiki->settings()->firstWhere(['name' => WikiSetting::wgLogo])->value);
+        $currentFaviconSettingURL = parse_url((string) $wiki->settings()->firstWhere(['name' => WikiSetting::wgFavicon])->value);
 
         // check the settings have been updated
         $this->assertNotEquals($previousLogoSettingURL, $currentLogoSettingURL);

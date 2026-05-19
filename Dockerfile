@@ -1,4 +1,4 @@
-FROM composer:2.3 as composer
+FROM composer:2.9 as composer
 
 COPY ./composer.json /tmp/src1/composer.json
 COPY ./composer.lock /tmp/src1/composer.lock
@@ -12,7 +12,7 @@ WORKDIR /tmp/src2
 RUN composer install --no-dev --no-progress --optimize-autoloader --ignore-platform-req=ext-pcntl
 
 
-FROM php:8.2-apache
+FROM php:8.4-apache
 
 RUN apt-get update \
 	# Needed for the imagick php extension install
@@ -27,9 +27,6 @@ RUN apt-get update \
 	&& docker-php-ext-install pdo pdo_mysql \
 	# For rewrite rules
 	&& a2enmod rewrite \
-	# Needed for gluedev/laravel-stackdriver
-	&& pecl install opencensus-alpha \
-	&& docker-php-ext-enable opencensus \
 	&& rm -rf /var/lib/apt/lists/*
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public

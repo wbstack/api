@@ -10,13 +10,11 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Facades\Config;
 
 class ElasticSearchIndexDelete extends Job implements ShouldBeUnique {
-    private $wikiId;
-
     /**
      * @return void
      */
-    public function __construct(int $wikiId) {
-        $this->wikiId = $wikiId;
+    public function __construct(private readonly int $wikiId)
+    {
     }
 
     /**
@@ -115,7 +113,7 @@ class ElasticSearchIndexDelete extends Job implements ShouldBeUnique {
                 continue;
             }
 
-            $response = json_decode($rawResponse, true);
+            $response = json_decode((string) $rawResponse, true);
 
             if (!is_array($response) || !array_key_exists('acknowledged', $response) || $response['acknowledged'] !== true) {
                 $this->fail(new \RuntimeException('ElasticSearchIndexDelete job for ' . $this->wikiId . ' was not successful: ' . $rawResponse));

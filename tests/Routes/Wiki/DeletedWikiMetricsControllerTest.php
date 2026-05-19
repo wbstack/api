@@ -72,7 +72,7 @@ class DeletedWikiMetricsControllerTest extends TestCase {
         $response = $this->get($this->route);
 
         $rawCsv = $response->getContent();
-        $output = array_map('str_getcsv', explode("\n", $rawCsv));
+        $output = array_map(str_getcsv(...), explode("\n", $rawCsv));
         $this->assertSame('one.wikibase.cloud', $output[1][0]);
         $this->assertSame('two.wikibase.cloud', $output[2][0]);
         $this->assertSame('Some Reason', $output[2][1]);

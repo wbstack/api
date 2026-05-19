@@ -85,6 +85,7 @@ class User extends Authenticatable implements MustVerifyEmail {
         'card_last_four',
     ];
 
+    #[\Override]
     public function sendPasswordResetNotification($token) {
         $this->notify(new ResetPasswordNotification($token));
     }
@@ -97,16 +98,19 @@ class User extends Authenticatable implements MustVerifyEmail {
         return $this->hasMany(UserTermsOfUseAcceptance::class, 'user_id');
     }
 
+    #[\Override]
     public function hasVerifiedEmail() {
         return (bool) $this->verified;
     }
 
+    #[\Override]
     public function markEmailAsVerified() {
         $this->verified = 1;
 
         return true;
     }
 
+    #[\Override]
     public function sendEmailVerificationNotification() {
         // This is required by the MustVerifyEmail interface that we use for middle ware.
         // But we currently send our emails via a different means, so we havn't implemented this..
@@ -116,6 +120,7 @@ class User extends Authenticatable implements MustVerifyEmail {
         // throw new RuntimeException('Not yet implemented');
     }
 
+    #[\Override]
     public function getEmailForVerification() {
         return $this->email;
     }
@@ -125,6 +130,7 @@ class User extends Authenticatable implements MustVerifyEmail {
      *
      * @return array<string, string>
      */
+    #[\Override]
     protected function casts(): array {
         return [
             'email_verified_at' => 'datetime',

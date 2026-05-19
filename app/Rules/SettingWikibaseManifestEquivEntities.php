@@ -20,7 +20,7 @@ class SettingWikibaseManifestEquivEntities implements Rule {
      * @return bool
      */
     public function passes($attribute, $value) {
-        $value = json_decode($value, true);
+        $value = json_decode((string) $value, true);
 
         if ($value === null) {
             return false;
@@ -35,7 +35,7 @@ class SettingWikibaseManifestEquivEntities implements Rule {
 
             foreach ($value[$entityType] as $local => $wikidata) {
                 // Make sure that we have a single array mapping some property to some value
-                if (!preg_match($validationRule, $local) || !is_string($wikidata) || !preg_match($validationRule, $wikidata)) {
+                if (!preg_match($validationRule, (string) $local) || !is_string($wikidata) || !preg_match($validationRule, $wikidata)) {
                     return false;
                 }
             }

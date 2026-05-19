@@ -13,6 +13,7 @@ class DomainValidatorServiceProvider extends ServiceProvider {
      *
      * @return void
      */
+    #[\Override]
     public function register() {
         $this->app->singleton(DomainValidator::class, function ($app) {
             $suffix = Config::get('wbstack.subdomain_suffix');

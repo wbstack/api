@@ -10,8 +10,6 @@ use App\WikiSetting;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
-    protected $wikiId;
-
     protected $setting;
 
     protected $wiki;
@@ -22,8 +20,8 @@ abstract class CirrusSearchJob extends Job implements ShouldBeUnique {
 
     abstract public function handleResponse(string $rawResponse, $error): void;
 
-    public function __construct($wikiId) {
-        $this->wikiId = $wikiId;
+    public function __construct(protected $wikiId)
+    {
     }
 
     /**

@@ -28,6 +28,7 @@ class TermsOfUseVersion extends Model {
         return self::query()->where('active', true)->latest()->first();
     }
 
+    #[\Override]
     protected function casts(): array {
         return [
             'version' => 'string',

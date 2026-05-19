@@ -93,7 +93,7 @@ class RebuildQueryserviceData extends Command {
             : [];
 
         $merged = array_merge($items, $properties, $lexemes);
-        $this->stripPrefixes($merged);
+        self::stripPrefixes($merged);
 
         return $merged;
     }
@@ -111,7 +111,7 @@ class RebuildQueryserviceData extends Command {
 
     private static function stripPrefixes(array &$items): void {
         foreach ($items as &$item) {
-            $e = explode(':', $item);
+            $e = explode(':', (string) $item);
             $item = end($e);
         }
     }

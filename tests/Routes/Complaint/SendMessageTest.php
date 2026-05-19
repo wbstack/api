@@ -70,7 +70,7 @@ class SendMessageTest extends TestCase {
 
         try {
             $response = $this->json('POST', $this->route, $data);
-        } catch (TransportException $e) {
+        } catch (TransportException) {
             return;
         }
 

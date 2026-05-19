@@ -17,10 +17,8 @@ use Illuminate\Support\Facades\Log;
 class SiteStatsUpdateJob extends Job {
     use Batchable;
 
-    private $wiki_id;
-
-    public function __construct($wiki_id) {
-        $this->wiki_id = $wiki_id;
+    public function __construct(private $wiki_id)
+    {
     }
 
     public function handle(HttpRequest $request, MediaWikiHostResolver $mwHostResolver): void {
@@ -59,7 +57,7 @@ class SiteStatsUpdateJob extends Job {
             return; // safegaurd
         }
 
-        $response = json_decode($rawResponse, true);
+        $response = json_decode((string) $rawResponse, true);
 
         if (!is_array($response) || !array_key_exists('wbstackSiteStatsUpdate', $response)) {
             $this->fail(

@@ -15,7 +15,7 @@ class UserTermsOfUseAcceptanceTest extends TestCase {
     public function testUserCreationCreatesTouAcceptance(): void {
         (new CreateFirstTermsOfUseVersionJob)->handle();
         $email = 'test+' . uniqid('', true) . '@example.com';
-        $user = (new UserCreateJob($email, 'thisisapassword123', true))->handle();
+        $user = new UserCreateJob($email, 'thisisapassword123', true)->handle();
 
         $this->assertDatabaseHas('tou_acceptances', [
             'user_id' => $user->id,

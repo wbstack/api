@@ -46,9 +46,7 @@ trait PageFetcher {
             }
 
             $pages = data_get($jsonResponse, 'query.allpages', []);
-            $titles = array_merge($titles, array_map(function (array $page) {
-                return $page['title'];
-            }, $pages));
+            $titles = array_merge($titles, array_map(fn(array $page) => $page['title'], $pages));
 
             $nextCursor = data_get($jsonResponse, 'continue.apcontinue');
             if ($nextCursor === null) {

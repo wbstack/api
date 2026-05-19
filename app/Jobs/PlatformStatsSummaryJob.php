@@ -98,7 +98,7 @@ class PlatformStatsSummaryJob extends Job {
             try {
                 $nextPropertyCount = count($this->fetchPagesInNamespace($wiki->domain, MediawikiNamespace::property));
                 array_push($propertiesCount, $nextPropertyCount);
-            } catch (\Exception $ex) {
+            } catch (\Exception) {
                 Log::warning('Failed to fetch property count for wiki ' . $wiki->domain . ', will use 0 instead.');
             }
 

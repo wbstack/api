@@ -20,6 +20,7 @@ class WikiLifecycleEvents extends Model {
 
     protected $visible = self::FIELDS;
 
+    #[\Override]
     protected function casts(): array {
         return [
             'first_edited' => 'datetime',

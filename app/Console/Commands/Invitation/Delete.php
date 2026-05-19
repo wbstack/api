@@ -17,7 +17,7 @@ class Delete extends Command {
      */
     public function handle() {
         $code = trim($this->argument('code'));
-        (new InvitationDeleteJob($code))->handle();
+        new InvitationDeleteJob($code)->handle();
 
         return 0;
     }

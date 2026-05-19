@@ -8,17 +8,17 @@ use Illuminate\Http\Request;
 
 class BackendAuth {
     /**
-     * The authentication guard factory instance.
-     */
-    protected Auth $auth;
-
-    /**
      * Create a new middleware instance.
      *
      * @return void
      */
-    public function __construct(Auth $auth) {
-        $this->auth = $auth;
+    public function __construct(
+        /**
+         * The authentication guard factory instance.
+         */
+        protected Auth $auth
+    )
+    {
     }
 
     /**

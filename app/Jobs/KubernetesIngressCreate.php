@@ -13,17 +13,12 @@ use Maclof\Kubernetes\Models\Ingress;
  * If you need to cleanup a test run of this you need to remove the ingress and the related secret
  */
 class KubernetesIngressCreate extends Job {
-    private $id;
-
-    private $wikiDomain;
-
     /**
-     * @param  int|string  $wikiId
+     * @param int|string $id
      * @param  string  $wikiDomain
      */
-    public function __construct($wikiId, $wikiDomain) {
-        $this->id = $wikiId;
-        $this->wikiDomain = $wikiDomain;
+    public function __construct(private $id, private $wikiDomain)
+    {
     }
 
     public static function getKubernetesIngressName($wikiId): string {

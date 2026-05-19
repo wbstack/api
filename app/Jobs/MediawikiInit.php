@@ -6,19 +6,11 @@ use App\Http\Curl\HttpRequest;
 use App\Services\MediaWikiHostResolver;
 
 class MediawikiInit extends Job {
-    private $wikiDomain;
-
-    private $username;
-
-    private $email;
-
     /**
      * @return void
      */
-    public function __construct($wikiDomain, $username, $email) {
-        $this->wikiDomain = $wikiDomain;
-        $this->username = $username;
-        $this->email = $email;
+    public function __construct(private $wikiDomain, private $username, private $email)
+    {
     }
 
     /**
@@ -52,7 +44,7 @@ class MediawikiInit extends Job {
             throw new \RuntimeException('curl error for ' . $this->wikiDomain . ': ' . $err);
         }
 
-        $response = json_decode($rawResponse, true);
+        $response = json_decode((string) $rawResponse, true);
 
         if (!is_array($response) || !array_key_exists('wbstackInit', $response)) {
             throw new \RuntimeException('wbstackInit call for ' . $this->wikiDomain . '. No wbstackInit key in response: ' . $rawResponse);

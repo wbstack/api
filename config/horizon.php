@@ -182,7 +182,7 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'redis',
-            'queue' => explode(',', env('QUEUE_NAMES', 'default')),
+            'queue' => explode(',', (string) env('QUEUE_NAMES', 'default')),
             'balance' => env('HORIZON_BALANCING_STRATEGY', 'auto'),
             'autoScalingStrategy' => env('HORIZON_AUTO_SCALING_STRATEGY', 'time'),
             'maxProcesses' => intval(env('HORIZON_MAX_PROCESSES', 1)),

@@ -37,7 +37,7 @@ class UpdateQueryserviceAllowList extends Job {
 
         $config = $config->toArray();
         if (array_key_exists($allowListStaticKey, $config['data'])) {
-            $allowList .= PHP_EOL . trim($config['data'][$allowListStaticKey]);
+            $allowList .= PHP_EOL . trim((string) $config['data'][$allowListStaticKey]);
         }
         $config['data'][$allowListKey] = trim($allowList);
         $k8s->configMaps()->update(new ConfigMap($config));

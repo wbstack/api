@@ -13,12 +13,10 @@ use Illuminate\Support\Facades\Log;
 class ProvisionQueryserviceNamespaceJob extends Job {
     private $namespace;
 
-    private $maxFree;
-
     /**
      * @return void
      */
-    public function __construct($namespace = null, $maxFree = null) {
+    public function __construct($namespace = null, private $maxFree = null) {
         if ($namespace !== null && preg_match('/[^A-Za-z0-9]/', $namespace)) {
             throw new \InvalidArgumentException('$namespace must only contain [^A-Za-z0-9] or null, got ' . $namespace);
         }
@@ -30,7 +28,6 @@ class ProvisionQueryserviceNamespaceJob extends Job {
         }
 
         $this->namespace = $namespace;
-        $this->maxFree = $maxFree;
     }
 
     private function doesMaxFreeSayWeShouldStop(): bool {

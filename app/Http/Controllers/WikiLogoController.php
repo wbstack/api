@@ -24,7 +24,7 @@ class WikiLogoController extends Controller {
         $wiki = $request->attributes->get('wiki');
 
         // run the job to set the wiki logo
-        (new SetWikiLogo('id', $wiki->id, $request->file('logo')->getRealPath()))->handle();
+        new SetWikiLogo('id', $wiki->id, $request->file('logo')->getRealPath())->handle();
 
         // get the logo URL from the settings
         $wgLogoSetting = $wiki->settings()->firstWhere(['name' => WikiSetting::wgLogo])->value;

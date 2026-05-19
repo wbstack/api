@@ -6,7 +6,7 @@ use Illuminate\Database\DatabaseManager;
 use PDO;
 
 class WikiUserEmailChecker {
-    public function __construct(private DatabaseManager $db) {}
+    public function __construct(private readonly DatabaseManager $db) {}
 
     public function findEmail(string $email): array {
         $this->db->purge('mw');

@@ -5,13 +5,8 @@ namespace App\Helper;
 use App\Http\Curl\HttpRequest;
 
 class ElasticSearchHelper {
-    private $elasticSearchHost;
-
-    private $elasticSearchBaseName;
-
-    public function __construct(string $elasticSearchHost, string $elasticSearchBaseName) {
-        $this->elasticSearchHost = $elasticSearchHost;
-        $this->elasticSearchBaseName = $elasticSearchBaseName;
+    public function __construct(private readonly string $elasticSearchHost, private readonly string $elasticSearchBaseName)
+    {
     }
 
     public function hasIndices(HttpRequest $request): bool {
@@ -44,7 +39,7 @@ class ElasticSearchHelper {
         // index\n
         // site1.localhost_content_blabla\n
         // site1.localhost_general_bla\n
-        $wikiIndices = array_filter(explode("\n", $rawResponse));
+        $wikiIndices = array_filter(explode("\n", (string) $rawResponse));
 
         // no indices to delete only index header
         if (count($wikiIndices) <= 1) {

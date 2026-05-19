@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CreateQueryserviceBatchesJob extends Job {
-    private int $entityLimit;
+    private readonly int $entityLimit;
 
     public $timeout = 3600;
 
@@ -80,7 +80,7 @@ class CreateQueryserviceBatchesJob extends Job {
             ->get();
 
         foreach ($notDoneBatches as $qsBatch) {
-            $entitiesOnBatch = explode(',', $qsBatch->entityIds);
+            $entitiesOnBatch = explode(',', (string) $qsBatch->entityIds);
             $tentativeMerge = array_unique(array_merge($entityIdsFromEvents, $entitiesOnBatch));
 
             if (count($tentativeMerge) > $this->entityLimit) {

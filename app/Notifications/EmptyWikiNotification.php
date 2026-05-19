@@ -14,15 +14,13 @@ use Illuminate\Support\HtmlString;
 class EmptyWikiNotification extends Notification {
     const TYPE = 'empty_wiki_notification';
 
-    private string $sitename;
-
     /**
      * Create a notification instance.
      *
      * @return void
      */
-    public function __construct(string $sitename) {
-        $this->sitename = $sitename;
+    public function __construct(private readonly string $sitename)
+    {
     }
 
     /**

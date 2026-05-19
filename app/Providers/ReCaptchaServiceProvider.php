@@ -12,6 +12,7 @@ class ReCaptchaServiceProvider extends ServiceProvider {
      *
      * @return void
      */
+    #[\Override]
     public function register() {
         $this->app->bind(ReCaptchaValidation::class, function ($app) {
             $recaptcha = new ReCaptcha(
@@ -31,6 +32,7 @@ class ReCaptchaServiceProvider extends ServiceProvider {
      *
      * @return array
      */
+    #[\Override]
     public function provides() {
         return [ReCaptchaValidation::class];
     }

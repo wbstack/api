@@ -68,9 +68,9 @@ class ConversionMetricController extends Controller {
     private function returnCsv($output) {
         ob_start();
         $handle = fopen('php://output', 'r+');
-        fputcsv($handle, ['domain_name', 'time_to_engage_days', 'time_before_wiki_abandoned_days', 'number_of_active_editors', 'wiki_creation_time', 'first_edited_time', 'last_edited_time']);
+        fputcsv($handle, ['domain_name', 'time_to_engage_days', 'time_before_wiki_abandoned_days', 'number_of_active_editors', 'wiki_creation_time', 'first_edited_time', 'last_edited_time'], escape: '\\');
         foreach ($output as $wikiMetrics) {
-            fputcsv($handle, array_values($wikiMetrics));
+            fputcsv($handle, array_values($wikiMetrics), escape: '\\');
         }
         $csv = ob_get_clean();
 
