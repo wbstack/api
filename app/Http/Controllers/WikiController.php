@@ -51,6 +51,7 @@ class WikiController extends Controller {
 
         // TODO extra validation that username is correct?
         $request->validate([
+            'domain' => 'required',
             'sitename' => 'required|min:3',
             'username' => 'required',
             'profile' => 'nullable|json',
