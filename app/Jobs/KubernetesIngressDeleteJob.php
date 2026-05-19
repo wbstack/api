@@ -9,15 +9,13 @@ use Maclof\Kubernetes\Client;
  * Job for deleting a wikis kubernetes ingress
  */
 class KubernetesIngressDeleteJob extends Job {
-    private $id;
-
     private $wikiDomain;
 
     /**
-     * @param  int|string  $wikiId
+     * @param int|string $id
      */
-    public function __construct($wikiId) {
-        $this->id = $wikiId;
+    public function __construct(private $id)
+    {
     }
 
     /**

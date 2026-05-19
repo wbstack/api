@@ -15,19 +15,17 @@ class ReCaptchaValidation implements ImplicitRule {
     protected $recaptcha;
 
     /**
+     * @param string $minScore
+     * @param string $appUrl
+     */
+    public function __construct(ReCaptcha $recaptcha, /**
      * @var string Lowest score to pass (0.0 - 1.0)
      */
-    protected $minScore;
-
-    /**
+    protected $minScore, /**
      * @var string App URL of client request
      */
-    protected $appUrl;
-
-    public function __construct(ReCaptcha $recaptcha, $minScore, $appUrl) {
+    protected $appUrl) {
         $this->recaptcha = $recaptcha;
-        $this->minScore = $minScore;
-        $this->appUrl = $appUrl;
     }
 
     /**

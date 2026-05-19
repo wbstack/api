@@ -30,9 +30,10 @@ class DeletedWikiMetricsController extends Controller {
             'number_of_users_for_wiki',
             'wiki_creation_time',
             'wiki_deletion_time',
-        ]);
+        ],
+        escape: '\\');
         foreach ($output as $deletedWikiMetrics) {
-            fputcsv($handle, array_values($deletedWikiMetrics));
+            fputcsv($handle, array_values($deletedWikiMetrics), escape: '\\');
         }
         $csv = ob_get_clean();
 

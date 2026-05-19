@@ -19,6 +19,7 @@ class QueueSearchIndexBatches extends CirrusSearchJob {
         return 'wbstackQueueSearchIndexBatches';
     }
 
+    #[\Override]
     protected function getRequestTimeout(): int {
         return 1000;
     }
@@ -29,7 +30,7 @@ class QueueSearchIndexBatches extends CirrusSearchJob {
 
         foreach ($output as $command) {
             $matches = [];
-            preg_match('/--fromId (\d+) --toId (\d+)/', $command, $matches, PREG_OFFSET_CAPTURE);
+            preg_match('/--fromId (\d+) --toId (\d+)/', (string) $command, $matches, PREG_OFFSET_CAPTURE);
 
             if (count($matches) !== 3) {
                 throw new \RuntimeException('Got some weird output from the script: ' . $command);

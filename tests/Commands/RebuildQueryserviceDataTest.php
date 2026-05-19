@@ -162,7 +162,7 @@ class RebuildQueryserviceDataTest extends TestCase {
             if ($job->wikiDomain !== 'rebuild.wikibase.cloud') {
                 return false;
             }
-            if (count(explode(',', $job->entities)) !== 10) {
+            if (count(explode(',', (string) $job->entities)) !== 10) {
                 return false;
             }
             if ($job->sparqlUrl !== 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql') {
@@ -175,7 +175,7 @@ class RebuildQueryserviceDataTest extends TestCase {
             if ($job->wikiDomain !== 'rebuild.wikibase.cloud') {
                 return false;
             }
-            if (count(explode(',', $job->entities)) !== 5) {
+            if (count(explode(',', (string) $job->entities)) !== 5) {
                 return false;
             }
             if ($job->sparqlUrl !== 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql') {
@@ -251,7 +251,7 @@ class RebuildQueryserviceDataTest extends TestCase {
             if ($job->wikiDomain !== 'rebuild.wikibase.cloud') {
                 return false;
             }
-            if (count(explode(',', $job->entities)) !== 8) {
+            if (count(explode(',', (string) $job->entities)) !== 8) {
                 return false;
             }
             if ($job->sparqlUrl !== 'http://queryservice.default.svc.cluster.local:9999/bigdata/namespace/test_ns_12345/sparql') {

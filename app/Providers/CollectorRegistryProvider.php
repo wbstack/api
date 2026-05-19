@@ -13,17 +13,16 @@ class CollectorRegistryProvider extends ServiceProvider {
     /**
      * Register services.
      */
+    #[\Override]
     public function register(): void {
-        $this->app->bind(CollectorRegistry::class, function (Application $app) {
-            return new CollectorRegistry(new Redis([
-                'host' => Config::get('database.redis.metrics.host'),
-                'port' => Config::get('database.redis.metrics.port'),
-                'password' => Config::get('database.redis.metrics.password'),
-                'timeout' => 0.1, // in seconds
-                'read_timeout' => '10', // in seconds
-                'persistent_connections' => false,
-            ]));
-        }, true);
+        $this->app->bind(CollectorRegistry::class, fn(Application $app) => new CollectorRegistry(new Redis([
+            'host' => Config::get('database.redis.metrics.host'),
+            'port' => Config::get('database.redis.metrics.port'),
+            'password' => Config::get('database.redis.metrics.password'),
+            'timeout' => 0.1, // in seconds
+            'read_timeout' => '10', // in seconds
+            'persistent_connections' => false,
+        ])), true);
     }
 
     /**

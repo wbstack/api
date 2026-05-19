@@ -9,10 +9,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class WikiProfileController extends Controller {
-    private $profileValidator;
-
-    public function __construct(ProfileValidator $profileValidator) {
-        $this->profileValidator = $profileValidator;
+    public function __construct(private readonly ProfileValidator $profileValidator)
+    {
     }
 
     public function create(Request $request): JsonResponse {
@@ -21,7 +19,7 @@ class WikiProfileController extends Controller {
             'profile' => ['required', 'json', new NonEmptyJsonRule],
         ]);
 
-        $rawProfile = json_decode($validatedInput['profile'], true);
+        $rawProfile = json_decode((string) $validatedInput['profile'], true);
         $profileValidator = $this->profileValidator->getValidator($rawProfile);
         $profileValidator->validateWithBag('post');
 

@@ -81,8 +81,8 @@ class ComplaintController extends Controller {
      * Get a validator for an incoming complaint report page request.
      */
     protected function validator(array $data): \Illuminate\Contracts\Validation\Validator {
-        $data['name'] = $data['name'] ?? '';
-        $data['email'] = $data['email'] ?? '';
+        $data['name'] ??= '';
+        $data['email'] ??= '';
 
         $validation = [
             'recaptcha' => ['required', 'string', 'bail', $this->recaptchaValidation],

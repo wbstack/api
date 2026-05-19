@@ -8,6 +8,7 @@ use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Support\Facades\Config;
 
 class Authenticate extends Middleware {
+    #[\Override]
     public function handle($request, Closure $next, ...$guards) {
         try {
             // Passport wants to read tokens from Authorization headers, so
@@ -19,7 +20,7 @@ class Authenticate extends Middleware {
                 $request->headers->set('Authorization', 'Bearer ' . $token);
             }
             $this->authenticate($request, $guards);
-        } catch (AuthenticationException $e) {
+        } catch (AuthenticationException) {
             // The "Unauthenticated." message is relied on by the UI to detect logged out state and cleanup its data
             // If this changes then the UI also needs to change..
             return response()->json([

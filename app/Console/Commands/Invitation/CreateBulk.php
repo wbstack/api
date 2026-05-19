@@ -22,7 +22,7 @@ class CreateBulk extends Command {
 
         for ($i = 0; $i < $numCodes; $i++) {
             $code = $helper->generate();
-            $jobResult = (new InvitationCreateJob($code))->handle();
+            $jobResult = new InvitationCreateJob($code)->handle();
 
             if ($jobResult) {
                 $this->line('Successfully created invitation: ' . $code);

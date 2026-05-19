@@ -24,16 +24,6 @@ use App\WikiDb;
  * for i in {1..10}; do php artisan job:dispatchNow MediawikiUpdate wiki_dbs.version mw1.34-wbs1 mw1.34-wbs1 mw1.35-wbs1 mediawiki-135; done
  */
 class MediawikiUpdate extends Job {
-    private $selectCol;
-
-    private $selectValue;
-
-    private $targetBackendHost;
-
-    private $from;
-
-    private $to;
-
     /**
      * @param  string  $selectCol  Selection field in the wiki_dbs table e.g. "wiki_id"
      * @param  string  $selectValue  Selection value in the wiki_dbs table e.g. "38"
@@ -41,13 +31,8 @@ class MediawikiUpdate extends Job {
      * @param  string  $to  The version of schema to say we updated to
      * @param  string  $targetBackendHost  the backend API hosts to hit (as they are versioned)
      */
-    public function __construct($selectCol, $selectValue, $from, $to, $targetBackendHost) {
-        $this->selectCol = $selectCol;
-        $this->selectValue = $selectValue;
-        $this->from = $from;
-        $this->to = $to;
-        // TODO in an ideal world the target backend would be known by the application somehow?
-        $this->targetBackendHost = $targetBackendHost;
+    public function __construct(private $selectCol, private $selectValue, private $from, private $to, private $targetBackendHost)
+    {
     }
 
     /**
@@ -108,7 +93,7 @@ class MediawikiUpdate extends Job {
 
         // Look for "Done in" in the response to see success...
         // This is normally the last line of update.php output
-        $success = strstr(end($response['output']), 'Done in ') && $response['return'] == 0;
+        $success = strstr((string) end($response['output']), 'Done in ') && $response['return'] == 0;
 
         // Update the DB version if successfull
         if ($success) {

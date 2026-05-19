@@ -9,17 +9,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class UserCreateJob extends Job {
-    private $email;
-
-    private $password;
-
     private $verified;
 
-    public function __construct($email, $password, $verified = false) {
-        // TODO maybe pass in an unsaved eloquent model?
-        // // but that would make CLI job creation hard
-        $this->email = $email;
-        $this->password = $password;
+    public function __construct(private $email, private $password, $verified = false) {
         $this->verified = false;
     }
 

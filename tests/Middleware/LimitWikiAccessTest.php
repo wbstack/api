@@ -15,11 +15,9 @@ class LimitWikiAccessTest extends TestCase {
 
     protected function setUp(): void {
         parent::setUp();
-        Route::middleware('limit_wiki_access')->get('/endpoint', function (Request $request) {
-            return response()->json([
-                'wiki_id' => $request->attributes->get('wiki')->id,
-            ]);
-        });
+        Route::middleware('limit_wiki_access')->get('/endpoint', fn(Request $request) => response()->json([
+            'wiki_id' => $request->attributes->get('wiki')->id,
+        ]));
     }
 
     protected function tearDown(): void {

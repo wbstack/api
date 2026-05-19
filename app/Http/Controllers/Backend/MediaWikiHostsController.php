@@ -15,9 +15,9 @@ class MediaWikiHostsController extends Controller {
         $domain = $request->query('domain');
         try {
             $hosts = $mediawikiHostResolver->getHostsForDomain($domain);
-        } catch (UnknownWikiDomainException $e) {
+        } catch (UnknownWikiDomainException) {
             return response()->json(['error' => 'Domain not found.'], 404);
-        } catch (UnknownDBVersionException $e) {
+        } catch (UnknownDBVersionException) {
             return response()->json(['error' => 'Unknown database version.'], 500);
         }
 

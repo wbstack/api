@@ -22,9 +22,7 @@ class ForgotPasswordTest extends TestCase {
             ->assertStatus(200);
         Notification::assertSentTo(
             $user,
-            function (ResetPasswordNotification $notification) use ($user) {
-                return str_contains($notification->toMail($user)->data()['actionUrl'], 'foo%2Bbar%40example.com');
-            }
+            fn(ResetPasswordNotification $notification) => str_contains((string) $notification->toMail($user)->data()['actionUrl'], 'foo%2Bbar%40example.com')
         );
     }
 

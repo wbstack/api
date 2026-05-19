@@ -13,13 +13,11 @@ use Illuminate\Database\DatabaseManager;
  * Prepends the MW Database, User with `deleted_` prefix and deletes WikiDB relation for a wiki
  */
 class DeleteWikiDbJob extends Job implements ShouldBeUnique {
-    private $wikiId;
-
     /**
      * @return void
      */
-    public function __construct(int $wikiId) {
-        $this->wikiId = $wikiId;
+    public function __construct(private readonly int $wikiId)
+    {
     }
 
     /**

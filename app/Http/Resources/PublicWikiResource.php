@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PublicWikiResource extends JsonResource {
+    #[\Override]
     public function toArray($request): array {
         $logoSetting = $this->settings()->where('name', 'wgLogo')->first();
 

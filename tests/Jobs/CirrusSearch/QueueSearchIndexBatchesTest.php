@@ -96,20 +96,14 @@ class QueueSearchIndexBatchesTest extends TestCase {
         $job->setJob($mockJob);
         $job->handle($request, $this->mockMwHostResolver);
 
-        Queue::assertPushed(function (ForceSearchIndex $job) {
-            return $job->wikiId() === $this->wiki->id
-            && $job->fromId() === 0 && $job->toId() === 1000;
-        });
+        Queue::assertPushed(fn(ForceSearchIndex $job) => $job->wikiId() === $this->wiki->id
+        && $job->fromId() === 0 && $job->toId() === 1000);
 
-        Queue::assertPushed(function (ForceSearchIndex $job) {
-            return $job->wikiId() === $this->wiki->id
-            && $job->fromId() === 1001 && $job->toId() === 1234;
-        });
+        Queue::assertPushed(fn(ForceSearchIndex $job) => $job->wikiId() === $this->wiki->id
+        && $job->fromId() === 1001 && $job->toId() === 1234);
 
-        Queue::assertPushed(function (ForceSearchIndex $job) {
-            return $job->wikiId() === $this->wiki->id
-            && $job->fromId() === 1235 && $job->toId() === 1236;
-        });
+        Queue::assertPushed(fn(ForceSearchIndex $job) => $job->wikiId() === $this->wiki->id
+        && $job->fromId() === 1235 && $job->toId() === 1236);
 
     }
 

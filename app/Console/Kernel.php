@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel {
     /**
      * Define the application's command schedule.
      */
+    #[\Override]
     protected function schedule(Schedule $schedule): void {
         // Make sure that the DB and QS pools are always populated somewhat.
         // This will create at most 1 new entry for each per minute...
@@ -66,6 +67,7 @@ class Kernel extends ConsoleKernel {
     /**
      * Register the commands for the application.
      */
+    #[\Override]
     protected function commands(): void {
         $this->load(__DIR__ . '/Commands');
         $this->load(__DIR__ . '/Commands/User');

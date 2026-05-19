@@ -55,7 +55,7 @@ class DeleteWikiJobTest extends TestCase {
         $job->handle($this->app->make('db'));
     }
 
-    public function testDeletesWiki() {
+    public function testDeletesWiki(): never {
         $this->markTestSkipped('Pollutes the deleted wiki list'); // This is harder to resolve
         // because the setup is guaranteed to end the
         // transaction that refresh database has started ue to the DROP statement

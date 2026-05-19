@@ -15,12 +15,9 @@ use Maclof\Kubernetes\Models\Job as KubernetesJob;
 class ProcessMediaWikiJobsJob implements ShouldBeUnique, ShouldQueue {
     use InteractsWithQueue, Queueable;
 
-    private string $wikiDomain;
-
     private string $jobsKubernetesNamespace;
 
-    public function __construct(string $wikiDomain) {
-        $this->wikiDomain = $wikiDomain;
+    public function __construct(private string $wikiDomain) {
         $this->jobsKubernetesNamespace = Config::get('wbstack.api_job_namespace');
     }
 

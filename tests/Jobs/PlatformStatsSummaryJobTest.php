@@ -69,7 +69,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
             WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
             $job = new ProvisionWikiDbJob($this->db_prefix . $n, $this->db_name . $n, null);
-            $job->handle($manager, $this->mockMwHostResolver);
+            $job->handle($manager);
 
             $wikiDb = WikiDb::whereName($this->db_name . $n)->first();
             $wikiDb->update(['wiki_id' => $wiki->id]);
@@ -80,7 +80,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
 
     }
 
-    public function testQueryGetsStats() {
+    public function testQueryGetsStats(): never {
         $this->markTestSkipped('Pollutes the deleted wiki list');
         Http::fake();
         $this->seedWikis();
@@ -234,7 +234,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
         );
     }
 
-    public function testCreationStats() {
+    public function testCreationStats(): never {
         $this->markTestSkipped('Pollutes the deleted wiki list');
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');

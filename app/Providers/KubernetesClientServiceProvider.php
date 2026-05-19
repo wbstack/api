@@ -12,6 +12,7 @@ class KubernetesClientServiceProvider extends ServiceProvider {
      *
      * @return void
      */
+    #[\Override]
     public function register() {
         $this->app->bind(Client::class, function ($app) {
             $httpClient = GuzzleClient::createWithConfig([

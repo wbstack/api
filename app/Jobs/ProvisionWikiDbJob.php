@@ -28,13 +28,11 @@ class ProvisionWikiDbJob extends Job {
 
     private $dbPassword;
 
-    private $maxFree;
-
     /**
      * @return void
      */
-    public function __construct($prefix = null, $dbName = false, $maxFree = null) {
-        if (preg_match('/[^A-Za-z0-9\-_]/', $prefix)) {
+    public function __construct($prefix = null, $dbName = false, private $maxFree = null) {
+        if (preg_match('/[^A-Za-z0-9\-_]/', (string) $prefix)) {
             throw new \InvalidArgumentException('Prefix must only contain [^A-Za-z0-9\-_], got ' . $prefix);
         }
 
@@ -59,7 +57,6 @@ class ProvisionWikiDbJob extends Job {
 
         $this->prefix = $prefix;
         $this->dbName = $dbName;
-        $this->maxFree = $maxFree;
         $this->newSqlFile = config('wbstack.wiki_db_provision_version');
     }
 
@@ -100,7 +97,7 @@ class ProvisionWikiDbJob extends Job {
         // So, catch this exception and check the error state ourselves, and allow us to continue past this?
         try {
             $conn->statement("CREATE USER '" . $this->dbUser . "'@'%' IDENTIFIED BY '" . $this->dbPassword . "'");
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             // Probably fine, and if not fine then the ALTER will fail below? :)
             $conn->statement("ALTER USER '" . $this->dbUser . "'@'%' IDENTIFIED BY '" . $this->dbPassword . "'");
         }
@@ -140,7 +137,7 @@ class ProvisionWikiDbJob extends Job {
         // Figure out the SQL version
         $stmt = $pdo->query('SELECT version() AS version');
         $fullVersion = $stmt->fetch()['version']; // "10.5.12-MariaDB-log"
-        preg_match('/^(\d+\.\d+\.\d+)(?!\d).*?$/', $fullVersion, $versionMatches); // [ 0 => '10.5.12-MariaDB-log', 1 => '10.5.12' ]
+        preg_match('/^(\d+\.\d+\.\d+)(?!\d).*?$/', (string) $fullVersion, $versionMatches); // [ 0 => '10.5.12-MariaDB-log', 1 => '10.5.12' ]
         $sqlVersion = $versionMatches[1]; // '10.5.12'
         $aboveMariaDb1059 = version_compare($sqlVersion, '10.5.9'); // 1 = higher, 0 = same, -1 = lower
         $aboveMariaDb1052 = version_compare($sqlVersion, '10.5.2'); // 1 = higher, 0 = same, -1 = lower
@@ -182,7 +179,7 @@ class ProvisionWikiDbJob extends Job {
         $sqlParts = explode("\n\n", $prefixedSql);
 
         foreach ($sqlParts as $part) {
-            if (strpos($part, '--') === 0) {
+            if (str_starts_with($part, '--')) {
                 // Skip comment blocks
                 continue;
             }

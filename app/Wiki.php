@@ -154,9 +154,7 @@ class Wiki extends Model {
      * Convert the IDN formatted domain name to it's Unicode representation.
      */
     protected function domainDecoded(): Attribute {
-        return Attribute::make(get: function () {
-            return DomainHelper::decode($this->domain);
-        });
+        return Attribute::make(get: fn() => DomainHelper::decode($this->domain));
     }
 
     public function wikiLatestProfile() {
@@ -174,6 +172,7 @@ class Wiki extends Model {
         return $this->settings()->where('name', $name)->delete();
     }
 
+    #[\Override]
     protected function casts(): array {
         return [
             'deleted_at' => 'datetime',

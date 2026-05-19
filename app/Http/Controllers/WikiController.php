@@ -27,13 +27,8 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class WikiController extends Controller {
-    private $domainValidator;
-
-    private $profileValidator;
-
-    public function __construct(DomainValidator $domainValidator, ProfileValidator $profileValidator) {
-        $this->profileValidator = $profileValidator;
-        $this->domainValidator = $domainValidator;
+    public function __construct(private readonly DomainValidator $domainValidator, private readonly ProfileValidator $profileValidator)
+    {
     }
 
     public function create(Request $request): Response {
@@ -46,11 +41,11 @@ class WikiController extends Controller {
         }
         $user = $request->user();
 
-        $submittedDomain = strtolower($request->input('domain'));
+        $submittedDomain = strtolower((string) $request->input('domain'));
         $submittedDomain = DomainHelper::encode($submittedDomain);
 
         $domainValidator = $this->domainValidator->getValidator($submittedDomain);
-        $isSubdomain = $this->isSubDomain($submittedDomain);
+        $isSubdomain = static::isSubDomain($submittedDomain);
 
         $domainValidator->validateWithBag('post');
 
@@ -72,7 +67,7 @@ class WikiController extends Controller {
 
         $rawProfile = false;
         if ($request->filled('profile')) {
-            $rawProfile = json_decode($request->input('profile'), true);
+            $rawProfile = json_decode((string) $request->input('profile'), true);
             $profileValidator = $this->profileValidator->getValidator($rawProfile);
             $profileValidator->validateWithBag('post');
         }
@@ -240,8 +235,8 @@ class WikiController extends Controller {
     }
 
     public static function isSubDomain(string $domain, ?string $subDomainSuffix = null): bool {
-        $subDomainSuffix = $subDomainSuffix ?? Config::get('wbstack.subdomain_suffix');
+        $subDomainSuffix ??= Config::get('wbstack.subdomain_suffix');
 
-        return preg_match('/' . preg_quote($subDomainSuffix) . '$/', $domain) === 1;
+        return preg_match('/' . preg_quote((string) $subDomainSuffix) . '$/', $domain) === 1;
     }
 }

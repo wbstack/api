@@ -18,6 +18,7 @@ class RouteServiceProvider extends ServiceProvider {
     /**
      * Define your route model bindings, pattern filters, etc.
      */
+    #[\Override]
     public function boot(): void {
         //
 

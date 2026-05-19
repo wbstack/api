@@ -6,13 +6,8 @@ use App\Http\Controllers\WikiController;
 use Illuminate\Support\Facades\Validator;
 
 class DomainValidator {
-    public array $subdomainRules;
-
-    public string $subDomainSuffix;
-
-    public function __construct(string $subDomainSuffix, array $subdomainRules) {
-        $this->subDomainSuffix = $subDomainSuffix;
-        $this->subdomainRules = $subdomainRules;
+    public function __construct(public string $subDomainSuffix, public array $subdomainRules)
+    {
     }
 
     public function getValidator($domain): \Illuminate\Contracts\Validation\Validator {

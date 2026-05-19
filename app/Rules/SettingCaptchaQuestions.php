@@ -13,7 +13,7 @@ class SettingCaptchaQuestions implements Rule {
      * @return bool
      */
     public function passes($attribute, $value) {
-        $value = json_decode($value, true);
+        $value = json_decode((string) $value, true);
 
         if ($value === null) {
             return false;

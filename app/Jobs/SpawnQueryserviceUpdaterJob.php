@@ -14,21 +14,14 @@ use Maclof\Kubernetes\Models\Job as KubernetesJob;
 class SpawnQueryserviceUpdaterJob implements ShouldBeUnique, ShouldQueue {
     use InteractsWithQueue, Queueable;
 
-    public string $wikiDomain;
-
     public string $entities;
-
-    public string $sparqlUrl;
 
     public string $qsKubernetesNamespace;
 
-    public function __construct(string $wikiDomain, string $entities, string $sparqlUrl) {
+    public function __construct(public string $wikiDomain, string $entities, public string $sparqlUrl) {
         $sortedEntities = explode(',', $entities);
         asort($sortedEntities);
-
-        $this->wikiDomain = $wikiDomain;
         $this->entities = implode(',', $sortedEntities);
-        $this->sparqlUrl = $sparqlUrl;
         $this->qsKubernetesNamespace = Config::get('wbstack.qs_job_namespace');
     }
 

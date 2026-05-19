@@ -13,9 +13,9 @@ use Prometheus\CollectorRegistry;
 use Prometheus\Counter;
 
 class WikiEntityImportController extends Controller {
-    private Counter $successfulCounter;
+    private readonly Counter $successfulCounter;
 
-    private Counter $failedCounter;
+    private readonly Counter $failedCounter;
 
     public function __construct(CollectorRegistry $registry) {
         $this->successfulCounter = $registry->getOrRegisterCounter(
@@ -75,7 +75,7 @@ class WikiEntityImportController extends Controller {
             wikiId: $wiki->id,
             sourceWikiUrl: $validatedInput['source_wiki_url'],
             importId: $import->id,
-            entityIds: explode(',', $validatedInput['entity_ids']),
+            entityIds: explode(',', (string) $validatedInput['entity_ids']),
         ));
 
         return response()->json(['data' => $import]);

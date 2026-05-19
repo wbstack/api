@@ -36,7 +36,7 @@ class QsController extends Controller {
 
     public function markBatchesDone(Request $request): Response {
         $batches = (array) $request->json()->all('batches');
-        QsBatch::whereIn('id', $batches)->increment(
+        QsBatch::whereIn('id')->increment(
             'processing_attempts', 1,
             ['done' => 1, 'pending_since' => null]
         );
@@ -46,7 +46,7 @@ class QsController extends Controller {
 
     public function markBatchesNotDone(Request $request): Response {
         $batches = (array) $request->json()->all('batches');
-        QsBatch::whereIn('id', $batches)->increment(
+        QsBatch::whereIn('id')->increment(
             'processing_attempts', 1,
             ['done' => 0, 'pending_since' => null]
         );

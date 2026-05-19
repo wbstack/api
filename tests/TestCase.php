@@ -12,6 +12,7 @@ abstract class TestCase extends BaseTestCase {
      *
      * @return Application
      */
+    #[\Override]
     public function createApplication() {
         putenv('QUEUE_CONNECTION=sync');
         $app = require __DIR__ . '/../bootstrap/app.php';

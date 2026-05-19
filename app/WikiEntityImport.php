@@ -19,6 +19,7 @@ class WikiEntityImport extends Model {
 
     protected $visible = self::FIELDS;
 
+    #[\Override]
     protected function casts(): array {
         return [
             'status' => WikiEntityImportStatus::class,

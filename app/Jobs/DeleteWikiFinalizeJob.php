@@ -13,13 +13,11 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 
 class DeleteWikiFinalizeJob extends Job implements ShouldBeUnique {
-    private $wikiId;
-
     /**
      * @return void
      */
-    public function __construct($wikiId) {
-        $this->wikiId = $wikiId;
+    public function __construct(private $wikiId)
+    {
     }
 
     /**

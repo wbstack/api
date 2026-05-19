@@ -12,7 +12,5 @@ use Illuminate\Routing\Router;
 // GET
 $router->get(
     'healthz',
-    function () {
-        return 'It\'s Alive';
-    }
+    fn() => 'It\'s Alive'
 );

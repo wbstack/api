@@ -8,13 +8,11 @@ use App\Wiki;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 class DeleteQueryserviceNamespaceJob extends Job implements ShouldBeUnique {
-    private $wikiId;
-
     /**
      * @return void
      */
-    public function __construct($wikiId) {
-        $this->wikiId = $wikiId;
+    public function __construct(private $wikiId)
+    {
     }
 
     /**

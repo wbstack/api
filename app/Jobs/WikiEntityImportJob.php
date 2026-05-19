@@ -38,9 +38,9 @@ class WikiEntityImportJob implements ShouldQueue {
         try {
             $wiki = Wiki::findOrFail($this->wikiId);
             $import = WikiEntityImport::findOrFail($this->importId);
-            $creds = $this->acquireCredentials($wiki->domain, $mwHostResolver);
+            $creds = self::acquireCredentials($wiki->domain, $mwHostResolver);
 
-            $this->targetWikiUrl = $this->domainToOrigin($wiki->domain);
+            $this->targetWikiUrl = self::domainToOrigin($wiki->domain);
 
             $kubernetesJob = new TransferBotKubernetesJob(
                 kubernetesClient: $kubernetesClient,
@@ -115,11 +115,11 @@ class TransferBotKubernetesJob {
         $this->transferbotImageVersion = Config::get('wbstack.transferbot_image_version');
     }
 
-    private string $kubernetesNamespace;
+    private readonly string $kubernetesNamespace;
 
-    private string $transferbotImageRepo;
+    private readonly string $transferbotImageRepo;
 
-    private string $transferbotImageVersion;
+    private readonly string $transferbotImageVersion;
 
     public function spawn(): string {
         $spec = $this->constructSpec();

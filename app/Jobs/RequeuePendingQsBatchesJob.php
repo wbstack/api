@@ -38,7 +38,7 @@ class RequeuePendingQsBatchesJob extends Job {
                 ->get()
                 ->pluck('id')
                 ->toArray();
-            QsBatch::whereIn('id', $failedBatches)->update([
+            QsBatch::whereIn('id')->update([
                 'failed' => true,
                 'pending_since' => null,
             ]);

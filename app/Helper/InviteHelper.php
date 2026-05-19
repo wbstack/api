@@ -3,23 +3,17 @@
 namespace App\Helper;
 
 class InviteHelper {
-    private $segments;
-
-    private $segmentLength;
-
     private $prefix;
 
-    public function __construct(int $numSegments = 2, int $segmentLength = 4) {
+    public function __construct(private readonly int $segments = 2, private readonly int $segmentLength = 4) {
         $this->prefix = 'wbcloud-';
-        $this->segments = $numSegments;
-        $this->segmentLength = $segmentLength;
     }
 
     private function generateSegment(int &$counter): string {
         $segment = '';
 
         for ($i = 0; $i < $this->segmentLength; $i++) {
-            $segment .= rand(0, 9);
+            $segment .= random_int(0, 9);
         }
 
         $counter++;

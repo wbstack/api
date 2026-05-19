@@ -11,14 +11,6 @@ use Illuminate\Support\Facades\Lang;
  * A notification to be sent when the legal complaint form is being used.
  */
 class ComplaintNotification extends Notification {
-    public $offendingUrls;
-
-    public $reason;
-
-    public $name;
-
-    public $mailAddress;
-
     /**
      * Create a notification instance.
      *
@@ -28,11 +20,8 @@ class ComplaintNotification extends Notification {
      * @param  string  $mailAddress
      * @return void
      */
-    public function __construct($offendingUrls, $reason, $name = null, $mailAddress = null) {
-        $this->offendingUrls = $offendingUrls;
-        $this->reason = $reason;
-        $this->name = $name;
-        $this->mailAddress = $mailAddress;
+    public function __construct(public $offendingUrls, public $reason, public $name = null, public $mailAddress = null)
+    {
     }
 
     /**
