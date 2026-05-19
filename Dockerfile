@@ -27,9 +27,6 @@ RUN apt-get update \
 	&& docker-php-ext-install pdo pdo_mysql \
 	# For rewrite rules
 	&& a2enmod rewrite \
-	# Needed for gluedev/laravel-stackdriver
-	&& pecl install opencensus-alpha \
-	&& docker-php-ext-enable opencensus \
 	&& rm -rf /var/lib/apt/lists/*
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
