@@ -136,9 +136,9 @@ class ConversionMetricTest extends TestCase {
 
     public function testDownloadJsonTruncatesFractionalDayDiffs() {
         $currentDate = CarbonImmutable::now();
-        $createdAt = $currentDate->subDays(200)->subHours(12); //200.5 days ago
-        $firstEditedAt = $createdAt->addDays(1)->addHours(12); //1.5 days after
-        $lastEditedAt = $currentDate->subDays(100); //100 days ago
+        $createdAt = $currentDate->subDays(200)->subHours(12); // 200.5 days ago
+        $firstEditedAt = $createdAt->addDays(1)->addHours(12); // 1.5 days after
+        $lastEditedAt = $currentDate->subDays(100); // 100 days ago
 
         $wiki = Wiki::factory()->create([
             'domain' => 'fractional.days.cloud',
