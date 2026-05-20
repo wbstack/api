@@ -118,7 +118,7 @@ class ConversionMetricTest extends TestCase {
         );
         $response->assertJsonFragment(
             [
-                'domain' => 'acvtively.used.for.the.last.year.wikibase.cloud',
+                'domain' => 'unused.for.a.year.but.now.active.wikibase.cloud',
                 'time_to_engage_days' => 0,
                 'time_before_wiki_abandoned_days' => null,
                 'number_of_active_editors' => 5,
@@ -169,7 +169,7 @@ class ConversionMetricTest extends TestCase {
 
     public function testFunctionalWithMissingLifecycleEventsandStats() {
         $wiki = Wiki::factory()->create([
-            'domain' => 'very.new.cloud', 'sitename' => 'Very New Site',
+            'domain' => 'very.new.wikibase.cloud', 'sitename' => 'bsite',
         ]);
 
         $response = $this->get($this->route);
