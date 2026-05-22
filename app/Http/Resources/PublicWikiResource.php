@@ -22,14 +22,14 @@ class PublicWikiResource extends JsonResource {
             'test_temporality' => $this->wikiLatestProfile ? $this->wikiLatestProfile->temporality : null,
             'test_audience' => $this->wikiLatestProfile ? $this->wikiLatestProfile->audience : null,
 
-            // TODO: As the `$this->wikiLatestProfile` property can be accessed regardless of if
-            // `->with('wikiLatestProfile')` is used in the controller, we are unable to return null if
-            // `$this->wikiLatestProfile` isn't set. We should either look into addressing this, or remove the
-            // `$this->wikiLatestProfile ? ... : null` conditional.
-            'reuse_prototype' => $this->wikiLatestProfile
-                ? $this->wikiLatestProfile->purpose === 'data_hub'
-                  && $this->wikiLatestProfile->temporality === 'permanent'
-                  && $this->wikiLatestProfile->audience === 'wide'
+            // Checking relation load state before reading it to avoid N+1 query
+            // This relies on the controller to eager load `wikiLatestProfile` relationship
+            'reuse_prototype' => $this->relationLoaded('wikiLatestProfile')
+                ? ($this->wikiLatestProfile
+                    ? $this->wikiLatestProfile->purpose === 'data_hub'
+                    && $this->wikiLatestProfile->temporality === 'permanent'
+                    && $this->wikiLatestProfile->audience === 'wide'
+                    : null)
                 : null,
         ];
     }
