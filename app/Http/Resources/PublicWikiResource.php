@@ -17,11 +17,6 @@ class PublicWikiResource extends JsonResource {
             'wiki_site_stats' => $this->wikiSiteStats,
             'logo_url' => $logoSetting ? $logoSetting->value : null,
 
-            // TODO: delete these three fields before merging; here to easily prove the `reuse_prototype` logic works
-            'test_purpose' => $this->wikiLatestProfile ? $this->wikiLatestProfile->purpose : null,
-            'test_temporality' => $this->wikiLatestProfile ? $this->wikiLatestProfile->temporality : null,
-            'test_audience' => $this->wikiLatestProfile ? $this->wikiLatestProfile->audience : null,
-
             // Checking relation load state before reading it to avoid N+1 query
             // This relies on the controller to eager load `wikiLatestProfile` relationship
             'reuse_prototype' => $this->relationLoaded('wikiLatestProfile')
