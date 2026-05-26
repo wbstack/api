@@ -19,7 +19,7 @@ class MWTimestampHelperTest extends TestCase {
 
     public function testGetCarbonFromMWTimestampWithInvalidTimestamp() {
         $this->expectException(InvalidFormatException::class);
-        $this->expectExceptionMessage('Unable to create Carbon object');
+        $this->expectExceptionMessage('Unable to create Carbon object: invalid MW timestamp format');
 
         $invalidMwTimestamp = 'invalid_timestamp';
         MWTimestampHelper::getCarbonFromMWTimestamp($invalidMwTimestamp);
