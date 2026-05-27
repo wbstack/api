@@ -317,7 +317,7 @@ class PublicWikiTest extends TestCase {
             'wiki_id' => $noProfileWiki->id,
         ]);
 
-        $this->json('GET', $this->route)
+        $this->json('GET', 'reusePrototype')
             ->assertStatus(200)
             ->assertJsonPath('data.0.domain', 'reusable.wikibase.cloud')
             ->assertJsonPath('data.0.reuse_prototype', true)
