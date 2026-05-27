@@ -132,6 +132,7 @@ class PlatformStatsSummaryJob extends Job {
             // is it edited in the last 90 days?
             if (!is_null($stats['lastEdit'])) {
                 $lastTimestamp = MWTimestampHelper::getCarbonFromMWTimestamp(intval($stats['lastEdit']));
+                // Carbon can return fractional seconds; cast to int so threshold checks use whole-second precision.
                 $diff = (int) $lastTimestamp->diffInSeconds($currentTime, true);
 
                 if ($diff <= $this->inactiveThreshold) {

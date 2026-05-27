@@ -34,6 +34,7 @@ class SendEmptyWikiNotificationsJob extends Job implements ShouldBeUnique {
         $emptyDaysThreshold = config('wbstack.wiki_empty_notification_threshold');
         $createdAt = $wiki->created_at;
         $now = CarbonImmutable::now();
+        // Normalize to whole days so comparisons with the integer config threshold stay deterministic.
         $emptyWikiDays = (int) $createdAt->diffInDays($now, true);
 
         $firstEdited = $wiki->wikiLifecycleEvents->first_edited;
