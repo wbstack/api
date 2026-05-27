@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider {
             report($wrappedException);
         });
 
-        // TODO: delete this listener before merging or is it useful to keep in the local environment?
+        // Local-only SQL query logging for debugging
         if ($this->app->environment('local')) {
             \Event::listen(QueryExecuted::class, function (QueryExecuted $query) {
                 \Log::debug('Query Executed: ', [
