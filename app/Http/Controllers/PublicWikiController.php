@@ -72,6 +72,6 @@ class PublicWikiController extends Controller {
      * Display the specified resource.
      */
     public function show($id) {
-        return new PublicWikiResource(Wiki::findOrFail($id));
+        return new PublicWikiResource(Wiki::query()->with('wikiLatestProfile')->findOrFail($id));
     }
 }
