@@ -64,8 +64,9 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
         $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => null]);
 
         $job = new SendEmptyWikiNotificationsJob;
-        $this->assertFalse($job->checkIfWikiIsOldAndEmpty($wiki));
         $job->handle();
+
+        Notification::assertNothingSent();
     }
 
     // fresh wiki that does not have lifecycle event records yet
