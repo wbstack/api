@@ -58,10 +58,10 @@ class ConversionMetricTest extends TestCase {
         $wiki->created_at = $current_date->subWeeks($createdWeeksAgo);
         $events = $wiki->wikiLifecycleEvents();
         $update = [];
-        if ($lastEditedWeeksAgo !== null) {
+        if ($lastEditedWeeksAgo) {
             $update['last_edited'] = $current_date->subWeeks($lastEditedWeeksAgo);
         }
-        if ($firstEditedWeeksAgo !== null) {
+        if ($firstEditedWeeksAgo) {
             $update['first_edited'] = $current_date->subWeeks($firstEditedWeeksAgo);
         }
         $events->updateOrCreate($update);
