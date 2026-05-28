@@ -29,6 +29,6 @@ class PublicWikiControllerTest extends TestCase {
         $resource = $controller->show($wiki->id);
 
         $this->assertInstanceOf(PublicWikiResource::class, $resource);
-        $this->assertSame(true, $resource->toArray(request())['reuse_prototype']);
+        $this->assertTrue($resource->resource->relationLoaded('wikiLatestProfile'));
     }
 }
