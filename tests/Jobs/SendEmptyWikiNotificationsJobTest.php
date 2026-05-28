@@ -51,7 +51,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
     }
 
     // empty wikis, that are almost old enough (29 days and 23 hrs)
-    public function testEmptyWikiNotificationsNotSendNotification() {
+    public function testEmptyWikiNotificationsNotificationNotSent() {
         $thresholdDaysAgo = Carbon::now()
             ->subDays((config('wbstack.wiki_empty_notification_threshold') - 1))
             ->subHours(23)
