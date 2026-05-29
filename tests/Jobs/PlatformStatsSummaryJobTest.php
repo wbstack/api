@@ -298,6 +298,11 @@ class PlatformStatsSummaryJobTest extends TestCase {
         ]);
 
         $job = new PlatformStatsSummaryJob;
+
+        // This is a hack to override the `private` `PlatformStatsSummaryJob::mwHostResolver` property.
+        // See https://www.php.net/manual/en/closure.call.php for more details on how this works.
+        // TODO: figure out how to stub the `DatabaseManager` correctly and/or refactor the Job so that
+        // we can more easily inject dependencies in the tests.
         (function ($resolver): void {
             $this->mwHostResolver = $resolver;
         })->call($job, $this->mockMwHostResolver);
