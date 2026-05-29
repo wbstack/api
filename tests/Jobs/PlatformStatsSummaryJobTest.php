@@ -274,4 +274,55 @@ class PlatformStatsSummaryJobTest extends TestCase {
         );
 
     }
+
+    public function testPrepareStatsTreatsSecondPrecisionTimestampAtThresholdAsActive() {
+        $currentTime = CarbonImmutable::now();
+
+        $wiki = Wiki::factory()->create(['deleted_at' => null, 'domain' => 'thresholdtest.com']);
+        WikiDb::create([
+            'name' => 'mwdb_threshold_' . $wiki->id,
+            'user' => 'user',
+            'password' => 'password',
+            'version' => 'version',
+            'prefix' => 'prefix',
+            'wiki_id' => $wiki->id,
+        ]);
+
+        Http::fake([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+                'query' => ['allpages' => []],
+            ], 200),
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+                'query' => ['allpages' => []],
+            ], 200),
+        ]);
+
+        $job = new PlatformStatsSummaryJob;
+
+        // This is a hack to override the `private` `PlatformStatsSummaryJob::mwHostResolver` property.
+        // See https://www.php.net/manual/en/closure.call.php for more details on how this works.
+        // TODO: figure out how to stub the `DatabaseManager` correctly and/or refactor the Job so that
+        // we can more easily inject dependencies in the tests.
+        (function ($resolver): void {
+            $this->mwHostResolver = $resolver;
+        })->call($job, $this->mockMwHostResolver);
+
+        $groups = $job->prepareStats([
+            [
+                'wiki' => 'thresholdtest.com',
+                'edits' => 1,
+                'pages' => 1,
+                'users' => 1,
+                'active_users' => 1,
+                'lastEdit' => MWTimestampHelper::getMWTimestampFromCarbon(
+                    $currentTime->subSeconds(config('wbstack.platform_summary_inactive_threshold'))
+                ),
+                'first100UsingOauth' => '0',
+                'platform_summary_version' => 'v1',
+            ],
+        ], [$wiki]);
+
+        $this->assertSame(1, $groups['edited_last_90_days']);
+        $this->assertSame(0, $groups['not_edited_last_90_days']);
+    }
 }

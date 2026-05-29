@@ -34,13 +34,16 @@ class ConversionMetricController extends Controller {
             $daysSinceLastEdit = null;
 
             if ($wikiLastEditedTime !== null) {
+                // cast to int to retain Carbon 2 behaviour of using whole days
                 $daysSinceLastEdit = (int) $wikiLastEditedTime->diffInDays($current_date, false);
             }
 
             if ($daysSinceLastEdit !== null && $daysSinceLastEdit >= 90) {
+                // cast to int to retain Carbon 2 behaviour of using whole days
                 $time_before_wiki_abandoned_days = (int) $wiki->created_at->diffInDays($wikiLastEditedTime, false);
             }
             if ($wikiFirstEditedTime !== null) {
+                // cast to int to retain Carbon 2 behaviour of using whole days
                 $time_to_engage_days = (int) $wiki->created_at->diffInDays($wikiFirstEditedTime, false);
             }
             $wiki_number_of_editors = $wiki->wikiSiteStats()->first()['activeusers'] ?? null;
