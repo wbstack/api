@@ -6,7 +6,9 @@ use App\Http\Controllers\PublicWikiController;
 use App\Http\Resources\PublicWikiResource;
 use App\Wiki;
 use App\WikiProfile;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class PublicWikiControllerTest extends TestCase {
@@ -30,5 +32,36 @@ class PublicWikiControllerTest extends TestCase {
 
         $this->assertInstanceOf(PublicWikiResource::class, $resource);
         $this->assertTrue($resource->resource->relationLoaded('wikiLatestProfile'));
+    }
+
+    public function testIndexEagerLoadsWikiLatestProfileOnceForCollection(): void {
+        $n = rand(3, 100);
+        echo $n;
+        for ($i = 1; $i <= $n; $i++) {
+            $wiki = Wiki::factory()->create([
+                'domain' => 'index-eager-load-test-' . $i . '.wikibase.cloud',
+                'sitename' => 'Index Eager Load Test Site ' . $i,
+            ]);
+
+            WikiProfile::create([
+                'wiki_id' => $wiki->id,
+                'purpose' => 'data_hub',
+                'temporality' => 'permanent',
+                'audience' => 'wide',
+            ]);
+        }
+
+        $profileQueryCount = 0;
+        DB::listen(function (QueryExecuted $query) use (&$profileQueryCount): void {
+            if (str_contains($query->sql, 'wiki_profiles')) {
+                $profileQueryCount++;
+            }
+        });
+
+        $controller = new PublicWikiController;
+        $resourceCollection = $controller->index(request());
+
+        $this->assertSame(1, $profileQueryCount);
+        $this->assertTrue($resourceCollection->collection[0]->resource->relationLoaded('wikiLatestProfile'));
     }
 }
