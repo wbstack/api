@@ -35,9 +35,7 @@ class PublicWikiControllerTest extends TestCase {
     }
 
     public function testIndexEagerLoadsWikiLatestProfileOnceForCollection(): void {
-        $n = rand(3, 100);
-        echo $n;
-        for ($i = 1; $i <= $n; $i++) {
+        for ($i = 1; $i <= rand(3, 100); $i++) {
             $wiki = Wiki::factory()->create([
                 'domain' => 'index-eager-load-test-' . $i . '.wikibase.cloud',
                 'sitename' => 'Index Eager Load Test Site ' . $i,
