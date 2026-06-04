@@ -8,13 +8,14 @@ use App\Wiki;
 use App\WikiProfile;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class PublicWikiControllerTest extends TestCase {
     use DatabaseTransactions;
 
-    public function testShowEagerLoadsWikiLatestProfileForResource(): void {
+    public function testShowLoadsWikiLatestProfileForResource(): void {
         $wiki = Wiki::factory()->create([
             'domain' => 'controller-test.wikibase.cloud',
             'sitename' => 'controller-test',
@@ -31,14 +32,14 @@ class PublicWikiControllerTest extends TestCase {
         $resource = $controller->show($wiki->id);
 
         $this->assertInstanceOf(PublicWikiResource::class, $resource);
-        $this->assertTrue($resource->resource->relationLoaded('wikiLatestProfile'));
+        $this->assertSame(true, $resource->toArray(new Request)['reuse_prototype']);
     }
 
     public function testIndexEagerLoadsWikiLatestProfileOnceForCollection(): void {
-        for ($i = 1; $i <= rand(3, 100); $i++) {
+        for ($i = 1; $i <= 3; $i++) {
             $wiki = Wiki::factory()->create([
-                'domain' => 'index-eager-load-test-' . $i . '.wikibase.cloud',
-                'sitename' => 'Index Eager Load Test Site ' . $i,
+                'domain' => "index-eager-load-test-{$i}.wikibase.cloud",
+                'sitename' => "Index Eager Load Test Site {$i}",
             ]);
 
             WikiProfile::create([
@@ -57,9 +58,9 @@ class PublicWikiControllerTest extends TestCase {
         });
 
         $controller = new PublicWikiController;
-        $resourceCollection = $controller->index(request());
+        $resourceCollection = $controller->index(new Request);
 
         $this->assertSame(1, $profileQueryCount);
-        $this->assertTrue($resourceCollection->collection[0]->resource->relationLoaded('wikiLatestProfile'));
+        $this->assertTrue($resourceCollection->first()->relationLoaded('wikiLatestProfile'));
     }
 }

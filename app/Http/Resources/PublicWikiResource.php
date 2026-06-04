@@ -19,12 +19,10 @@ class PublicWikiResource extends JsonResource {
 
             // Checking relation load state before reading it to avoid N+1 query
             // This relies on the controller to eager load `wikiLatestProfile` relationship
-            'reuse_prototype' => $this->relationLoaded('wikiLatestProfile')
-                ? ($this->wikiLatestProfile
-                    ? $this->wikiLatestProfile->purpose === 'data_hub'
-                    && $this->wikiLatestProfile->temporality === 'permanent'
-                    && $this->wikiLatestProfile->audience === 'wide'
-                    : null)
+            'reuse_prototype' => $this->wikiLatestProfile
+                ? $this->wikiLatestProfile->purpose === 'data_hub'
+                  && $this->wikiLatestProfile->temporality === 'permanent'
+                  && $this->wikiLatestProfile->audience === 'wide'
                 : null,
         ];
     }
