@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Http\Curl\CurlRequest;
 use App\Http\Curl\HttpRequest;
-use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
