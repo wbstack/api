@@ -50,17 +50,17 @@ class PublicWikiControllerTest extends TestCase {
             ]);
         }
 
-        $profileQueryCount = 0;
-        DB::listen(function (QueryExecuted $query) use (&$profileQueryCount): void {
+        $wikiProfileQueryCount = 0;
+        DB::listen(function (QueryExecuted $query) use (&$wikiProfileQueryCount): void {
             if (str_contains($query->sql, 'wiki_profiles')) {
-                $profileQueryCount++;
+                $wikiProfileQueryCount++;
             }
         });
 
         $controller = new PublicWikiController;
         $resourceCollection = $controller->index(new Request);
 
-        $this->assertSame(1, $profileQueryCount);
+        $this->assertSame(1, $wikiProfileQueryCount);
         $this->assertTrue($resourceCollection->first()->relationLoaded('wikiLatestProfile'));
     }
 }

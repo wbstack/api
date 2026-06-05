@@ -26,16 +26,5 @@ class AppServiceProvider extends ServiceProvider {
             $wrappedException = new \Exception("Executing Job '$name' failed.", 1, $event->exception);
             report($wrappedException);
         });
-
-        // Local-only SQL query logging for debugging
-        if ($this->app->environment('local')) {
-            \Event::listen(QueryExecuted::class, function (QueryExecuted $query) {
-                \Log::debug('Query Executed: ', [
-                    'sql' => $query->sql,
-                    'bindings' => $query->bindings,
-                    'connection' => $query->connectionName,
-                ]);
-            });
-        }
     }
 }
