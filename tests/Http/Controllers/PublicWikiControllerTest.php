@@ -63,4 +63,42 @@ class PublicWikiControllerTest extends TestCase {
         $this->assertSame(1, $wikiProfileQueryCount);
         $this->assertTrue($resourceCollection->first()->relationLoaded('wikiLatestProfile'));
     }
+
+    public function testIndexReturnsFalseWhenWikiHasNoLatestProfile(): void {
+        $wikiWithoutProfile = Wiki::factory()->create([
+            'domain' => 'no-profile.wikibase.cloud',
+            'sitename' => 'No Profile Test Site',
+        ]);
+
+        $controller = new PublicWikiController;
+        $request = new Request;
+        $resourceCollection = $controller->index($request);
+
+        $resource = $resourceCollection->firstWhere('id', $wikiWithoutProfile->id);
+
+        $this->assertNotNull($resource);
+        $this->assertFalse($resource->toArray($request)['reuse_prototype']);
+    }
+
+    public function testIndexReturnsFalseWhenWikiLatestProfileDoesNotMatchReusePrototype(): void {
+        $incompleteProfileWiki = Wiki::factory()->create([
+            'domain' => 'incomplete-profile.wikibase.cloud',
+            'sitename' => 'Incomplete Profile Test Site',
+        ]);
+        WikiProfile::create([
+            'wiki_id' => $incompleteProfileWiki->id,
+            'purpose' => 'other',
+            'temporality' => 'temporary',
+            'audience' => 'other',
+        ]);
+
+        $controller = new PublicWikiController;
+        $request = new Request;
+        $resourceCollection = $controller->index($request);
+
+        $resource = $resourceCollection->firstWhere('id', $incompleteProfileWiki->id);
+
+        $this->assertNotNull($resource);
+        $this->assertFalse($resource->toArray($request)['reuse_prototype']);
+    }
 }
