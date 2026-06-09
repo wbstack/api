@@ -81,22 +81,21 @@ class PublicWikiControllerTest extends TestCase {
     }
 
     public function testIndexReusePrototypeIsFalseWhenWikiIsNotIntendedForReuse(): void {
-        $incompleteProfileWiki = Wiki::factory()->create([
-            'domain' => 'incomplete-profile.wikibase.cloud',
-            'sitename' => 'Incomplete Profile Test Site',
+        $wiki = Wiki::factory()->create([
+            'domain' => 'not-intended-for-reuse.wikibase.cloud',
+            'sitename' => 'Not Intended for Reuse Test Site',
         ]);
         WikiProfile::create([
-            'wiki_id' => $incompleteProfileWiki->id,
-            'purpose' => 'other',
+            'wiki_id' => $wiki->id,
+            'purpose' => 'test_drive',
             'temporality' => 'temporary',
-            'audience' => 'other',
         ]);
 
         $controller = new PublicWikiController;
         $request = new Request;
         $resourceCollection = $controller->index($request);
 
-        $resource = $resourceCollection->firstWhere('id', $incompleteProfileWiki->id);
+        $resource = $resourceCollection->firstWhere('id', $wiki->id);
 
         $this->assertNotNull($resource);
         $this->assertFalse($resource->toArray($request)['reuse_prototype']);
