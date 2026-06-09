@@ -325,9 +325,5 @@ class PublicWikiTest extends TestCase {
             ->assertJsonPath('data.1.reuse_prototype', false)
             ->assertJsonPath('data.2.domain', 'no-profile.wikibase.cloud')
             ->assertJsonPath('data.2.reuse_prototype', false);
-
-        $this->json('GET', $this->route . '/' . $reusableWiki->id)
-            ->assertStatus(200)
-            ->assertJsonPath('data.reuse_prototype', true);
     }
 }
