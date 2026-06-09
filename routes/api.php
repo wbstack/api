@@ -57,5 +57,6 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
     });
 
     $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
+    $router->apiResource('reusePrototype', 'PublicWikiController')->only(['index']);
     $router->apiResource('wikiConversionData', 'ConversionMetricController')->only(['index']);
 });
