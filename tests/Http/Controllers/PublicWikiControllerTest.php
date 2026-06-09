@@ -6,10 +6,13 @@ use App\Http\Controllers\PublicWikiController;
 use App\Http\Resources\PublicWikiResource;
 use App\Wiki;
 use App\WikiProfile;
+use Generator;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class PublicWikiControllerTest extends TestCase {
@@ -33,6 +36,44 @@ class PublicWikiControllerTest extends TestCase {
 
         $this->assertInstanceOf(PublicWikiResource::class, $resource);
         $this->assertSame(true, $resource->toArray(new Request())['reuse_prototype']);
+    }
+
+    public static function provideQueryParamsAndErrorExpected(): Generator {
+        yield 'default params' => [[], false];
+        yield 'sort by sitename ascending' => [['sort' => 'sitename', 'direction' => 'asc'], false];
+        yield 'sort by pages descending' => [['sort' => 'pages', 'direction' => 'desc'], false];
+        yield 'sort by invalid value' => [['sort' => 'invalid'], true];
+        yield 'sort by invalid direction' => [['direction' => 'invalid'], true];
+        yield 'is_featured is boolean true' => [['is_featured' => true], false];
+        yield 'is_featured is boolean 0' => [['is_featured' => 0], false];
+        yield 'is_featured is invalid' => [['is_featured' => 'invalid'], true];
+        yield 'is_active is boolean false' => [['is_active' => false], false];
+        yield 'is_active is boolean 1' => [['is_active' => 1], false];
+        yield 'is_active is invalid' => [['is_active' => 'invalid'], true];
+        yield 'per_page is not int' => [['per_page' => 1.2], true];
+        yield 'per_page is too low' => [['per_page' => 0], true];
+        yield 'per_page is min value' => [['per_page' => 1], false];
+        yield 'per_page is max value' => [['per_page' => 100], false];
+        yield 'per_page is too high' => [['per_page' => 101], true];
+        yield 'page is not int' => [['page' => 2.3], true];
+        yield 'page is too low' => [['page' => 0], true];
+        yield 'page is min value' => [['page' => 1], false];
+    }
+
+    /**
+     * @dataProvider provideQueryParamsAndErrorExpected
+     */
+    public function testIndexQueryParamValidation(array $queryParams, bool $errorExpected): void {
+        $controller = new PublicWikiController;
+        $request = new Request($queryParams);
+
+        if ($errorExpected) {
+            $this->expectException(ValidationException::class);
+        }
+
+        $response = $controller->index($request);
+
+        $this->assertInstanceOf(AnonymousResourceCollection::class, $response);
     }
 
     public function testIndexReusePrototypeOnlyRequiresOneAdditionalDatabaseQuery(): void {

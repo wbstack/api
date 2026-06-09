@@ -24,8 +24,8 @@ class PublicWikiController extends Controller {
             'direction' => 'in:desc,asc',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
-            'per_page' => 'numeric',
-            'page' => 'numeric',
+            'per_page' => 'int|min:1|max:100',
+            'page' => 'int|min:1',
         ]);
 
         $params = array_merge(self::$defaultParams, $request->input());
