@@ -29,6 +29,7 @@ class PublicWikiController extends Controller {
         ]);
 
         $params = array_merge(self::$defaultParams, $request->input());
+        // eager load 'wikiLatestProfile' to avoid making N+1 queries
         $query = Wiki::query()->with('wikiLatestProfile');
 
         if (array_key_exists('is_featured', $params)) {
