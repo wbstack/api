@@ -35,7 +35,7 @@ class PublicWikiControllerTest extends TestCase {
         $this->assertSame(true, $resource->toArray(new Request)['reuse_prototype']);
     }
 
-    public function testIndexEagerLoadsWikiLatestProfileOnceForCollection(): void {
+    public function testIndexReusePrototypeOnlyRequiresOneAdditionalDatabaseQuery(): void {
         for ($i = 1; $i <= 3; $i++) {
             $wiki = Wiki::factory()->create([
                 'domain' => "index-eager-load-test-{$i}.wikibase.cloud",
@@ -64,7 +64,7 @@ class PublicWikiControllerTest extends TestCase {
         $this->assertTrue($resourceCollection->first()->relationLoaded('wikiLatestProfile'));
     }
 
-    public function testIndexReturnsFalseWhenWikiHasNoLatestProfile(): void {
+    public function testIndexReusePrototypeIsFalseWhenWikiHasNoLatestProfile(): void {
         $wikiWithoutProfile = Wiki::factory()->create([
             'domain' => 'no-profile.wikibase.cloud',
             'sitename' => 'No Profile Test Site',
@@ -80,7 +80,7 @@ class PublicWikiControllerTest extends TestCase {
         $this->assertFalse($resource->toArray($request)['reuse_prototype']);
     }
 
-    public function testIndexReturnsFalseWhenWikiLatestProfileDoesNotMatchReusePrototype(): void {
+    public function testIndexReusePrototypeIsFalseWhenWikiIsNotIntendedForReuse(): void {
         $incompleteProfileWiki = Wiki::factory()->create([
             'domain' => 'incomplete-profile.wikibase.cloud',
             'sitename' => 'Incomplete Profile Test Site',
