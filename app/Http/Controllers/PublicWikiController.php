@@ -11,6 +11,7 @@ class PublicWikiController extends Controller {
     private static $defaultParams = [
         'sort' => 'sitename',
         'direction' => 'asc',
+        'per_page' => 15,
     ];
 
     private static $activeThresholdPageCount = 2;
@@ -61,12 +62,7 @@ class PublicWikiController extends Controller {
                 break;
         }
 
-        $perPage = null;
-        if (array_key_exists('per_page', $params)) {
-            $perPage = intval($params['per_page']);
-        }
-
-        return PublicWikiResource::collection($query->paginate($perPage));
+        return PublicWikiResource::collection($query->paginate($params['per_page']));
     }
 
     /**
