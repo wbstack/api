@@ -22,7 +22,7 @@ class WikiMetricsTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         $manager = $this->app->make('db');
-        $job = new ProvisionWikiDbJob;
+        $job = new ProvisionWikiDbJob();
         $job->handle($manager);
     }
 
@@ -34,7 +34,7 @@ class WikiMetricsTest extends TestCase {
         $wikiDb = WikiDb::first();
         $wikiDb->update(['wiki_id' => $wiki->id]);
 
-        (new WikiMetrics)->saveMetrics($wiki);
+        (new WikiMetrics())->saveMetrics($wiki);
 
         // Assert new record is added to the database
         $this->assertDatabaseHas('wiki_daily_metrics', [
@@ -60,7 +60,7 @@ class WikiMetricsTest extends TestCase {
         ]);
 
         // Run saveMetrics()
-        (new WikiMetrics)->saveMetrics($wiki);
+        (new WikiMetrics())->saveMetrics($wiki);
 
         // Assert no new record was created for today
         $this->assertDatabaseMissing('wiki_daily_metrics', [
@@ -98,7 +98,7 @@ class WikiMetricsTest extends TestCase {
         $wiki->save();
 
         // Run saveMetrics()
-        (new WikiMetrics)->saveMetrics($wiki);
+        (new WikiMetrics())->saveMetrics($wiki);
 
         // Assert new record was created for newly deleted wiki
         $this->assertDatabaseHas('wiki_daily_metrics', [
@@ -130,7 +130,7 @@ class WikiMetricsTest extends TestCase {
         ]);
 
         // Run saveMetrics()
-        (new WikiMetrics)->saveMetrics($wiki);
+        (new WikiMetrics())->saveMetrics($wiki);
 
         // Assert no new record was created for previously deleted wiki
         $this->assertDatabaseMissing('wiki_daily_metrics', [
@@ -151,7 +151,7 @@ class WikiMetricsTest extends TestCase {
         $this->assertNull($wiki->wikiSiteStats()->first());
 
         // Run saveMetrics()
-        (new WikiMetrics)->saveMetrics($wiki);
+        (new WikiMetrics())->saveMetrics($wiki);
 
         // Assert new record was created with default values
         $this->assertDatabaseHas('wiki_daily_metrics', [
@@ -195,7 +195,7 @@ class WikiMetricsTest extends TestCase {
                 ],
             ], 200),
         ]);
-        (new WikiMetrics)->saveMetrics($wiki);
+        (new WikiMetrics())->saveMetrics($wiki);
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
             'number_of_triples' => 12345,
@@ -227,7 +227,7 @@ class WikiMetricsTest extends TestCase {
         Http::fake([
             '*' => Http::response('Error', 500),
         ]);
-        (new WikiMetrics)->saveMetrics($wiki);
+        (new WikiMetrics())->saveMetrics($wiki);
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
             'number_of_triples' => null,
@@ -416,7 +416,7 @@ class WikiMetricsTest extends TestCase {
             'is_deleted' => 0,
         ]);
 
-        (new WikiMetrics)->saveMetrics($wiki);
+        (new WikiMetrics())->saveMetrics($wiki);
 
         // clean up after the test
         $wiki->forceDelete();

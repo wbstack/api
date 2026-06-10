@@ -114,7 +114,7 @@ class SandboxController extends Controller {
     }
 
     private function generateDomain(): string {
-        $generator = new HumanPasswordGenerator;
+        $generator = new HumanPasswordGenerator();
 
         $generator
             ->setWordList(__DIR__ . '/words')

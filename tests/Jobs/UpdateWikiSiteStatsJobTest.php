@@ -155,7 +155,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
         $this->fakeResponse();
 
         $mockJob = $this->createMock(Job::class);
-        $job = new UpdateWikiSiteStatsJob;
+        $job = new UpdateWikiSiteStatsJob();
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
@@ -221,7 +221,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
         $this->fakeResponse();
 
         $mockJob = $this->createMock(Job::class);
-        $job = new UpdateWikiSiteStatsJob;
+        $job = new UpdateWikiSiteStatsJob();
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
@@ -254,7 +254,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
         $this->fakeResponse();
 
         $mockJob = $this->createMock(Job::class);
-        $job = new UpdateWikiSiteStatsJob;
+        $job = new UpdateWikiSiteStatsJob();
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
@@ -283,7 +283,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
         $this->fakeResponse();
 
         $mockJob = $this->createMock(Job::class);
-        $job = new UpdateWikiSiteStatsJob;
+        $job = new UpdateWikiSiteStatsJob();
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
@@ -305,7 +305,7 @@ class UpdateWikiSiteStatsJobTest extends TestCase {
         $this->fakeResponse();
 
         $mockJob = $this->createMock(Job::class);
-        $job = new UpdateWikiSiteStatsJob;
+        $job = new UpdateWikiSiteStatsJob();
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');

@@ -33,17 +33,17 @@ class Kernel extends ConsoleKernel {
         $schedule->job(new ProvisionQueryserviceNamespaceJob(null, 10))->everyMinute()->withoutOverlapping();
 
         // Slowly cleanup some tables
-        $schedule->job(new ExpireOldUserVerificationTokensJob)->hourly()->withoutOverlapping();
-        $schedule->job(new PruneEventPageUpdatesTable)->everyFifteenMinutes()->withoutOverlapping();
-        $schedule->job(new PruneQueryserviceBatchesTable)->everyFifteenMinutes()->withoutOverlapping();
-        $schedule->job(new CreateQueryserviceBatchesJob)->everyMinute()->withoutOverlapping();
-        $schedule->job(new RequeuePendingQsBatchesJob)->everyFifteenMinutes()->withoutOverlapping();
-        $schedule->job(new FailStalledEntityImportsJob)->hourly();
+        $schedule->job(new ExpireOldUserVerificationTokensJob())->hourly()->withoutOverlapping();
+        $schedule->job(new PruneEventPageUpdatesTable())->everyFifteenMinutes()->withoutOverlapping();
+        $schedule->job(new PruneQueryserviceBatchesTable())->everyFifteenMinutes()->withoutOverlapping();
+        $schedule->job(new CreateQueryserviceBatchesJob())->everyMinute()->withoutOverlapping();
+        $schedule->job(new RequeuePendingQsBatchesJob())->everyFifteenMinutes()->withoutOverlapping();
+        $schedule->job(new FailStalledEntityImportsJob())->hourly();
 
         // Sandbox
         // TODO this should maybe only be run when sandbox as a whole is loaded?
         // TODO instead of using LOAD ROUTES, we should just have different modes?
-        $schedule->job(new SandboxCleanupJob)->everyFifteenMinutes()->withoutOverlapping();
+        $schedule->job(new SandboxCleanupJob())->everyFifteenMinutes()->withoutOverlapping();
 
         // Schedule site stat updates for each wiki and platform-summary
         $schedule->command('schedule:stats')->dailyAt('7:00');
@@ -51,15 +51,15 @@ class Kernel extends ConsoleKernel {
         // https://laravel.com/docs/10.x/upgrade#redis-cache-tags
         $schedule->command('cache:prune-stale-tags')->hourly()->withoutOverlapping();
 
-        $schedule->job(new PollForMediaWikiJobsJob)->everyFifteenMinutes()->withoutOverlapping();
+        $schedule->job(new PollForMediaWikiJobsJob())->everyFifteenMinutes()->withoutOverlapping();
 
-        $schedule->job(new UpdateWikiSiteStatsJob)->dailyAt('19:00');
+        $schedule->job(new UpdateWikiSiteStatsJob())->dailyAt('19:00');
 
-        $schedule->job(new SendEmptyWikiNotificationsJob)->dailyAt('21:00');
+        $schedule->job(new SendEmptyWikiNotificationsJob())->dailyAt('21:00');
 
-        $schedule->job(new UpdateWikiDailyMetricJob)->dailyAt('23:00');
+        $schedule->job(new UpdateWikiDailyMetricJob())->dailyAt('23:00');
 
-        $schedule->job(new UpdateQueryserviceAllowList)->weeklyOn(Schedule::MONDAY, '01:00');
+        $schedule->job(new UpdateQueryserviceAllowList())->weeklyOn(Schedule::MONDAY, '01:00');
 
     }
 

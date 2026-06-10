@@ -40,7 +40,7 @@ class ComplaintController extends Controller {
 
         $validated = $validator->safe();
 
-        $complaintRecord = new ComplaintRecord;
+        $complaintRecord = new ComplaintRecord();
         $complaintRecord->name = $validated['name'];
         $complaintRecord->mail_address = $validated['email'];
         $complaintRecord->reason = $validated['message'];

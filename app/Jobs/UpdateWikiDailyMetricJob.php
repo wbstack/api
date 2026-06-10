@@ -20,7 +20,7 @@ class UpdateWikiDailyMetricJob extends Job implements ShouldBeUnique {
     public function handle(): void {
         $wikis = Wiki::withTrashed()->get();
         foreach ($wikis as $wiki) {
-            (new WikiMetrics)->saveMetrics($wiki);
+            (new WikiMetrics())->saveMetrics($wiki);
         }
     }
 }

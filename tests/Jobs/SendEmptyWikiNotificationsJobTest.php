@@ -24,7 +24,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
         $mockJob->expects($this->never())
             ->method('fail')
             ->withAnyParameters();
-        $job = new SendEmptyWikiNotificationsJob;
+        $job = new SendEmptyWikiNotificationsJob();
         $job->setJob($mockJob);
         $job->handle();
     }
@@ -41,7 +41,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => null]);
 
-        $job = new SendEmptyWikiNotificationsJob;
+        $job = new SendEmptyWikiNotificationsJob();
         $job->handle();
 
         Notification::assertSentTo(
@@ -63,7 +63,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => null]);
 
-        $job = new SendEmptyWikiNotificationsJob;
+        $job = new SendEmptyWikiNotificationsJob();
         $job->handle();
 
         Notification::assertNothingSent();
@@ -78,7 +78,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
         $wiki = Wiki::factory()->create(['created_at' => $now]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
-        $job = new SendEmptyWikiNotificationsJob;
+        $job = new SendEmptyWikiNotificationsJob();
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())
@@ -109,7 +109,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
             'first_edited' => $now,
         ]);
 
-        $job = new SendEmptyWikiNotificationsJob;
+        $job = new SendEmptyWikiNotificationsJob();
         $job->handle();
 
         Notification::assertNothingSent();
@@ -132,7 +132,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
             'user_id' => $manager->user_id,
         ]);
 
-        $job = new SendEmptyWikiNotificationsJob;
+        $job = new SendEmptyWikiNotificationsJob();
         $job->handle();
 
         Notification::assertNothingSent();

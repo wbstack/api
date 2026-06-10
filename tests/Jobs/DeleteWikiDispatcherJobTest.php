@@ -33,7 +33,7 @@ class DeleteWikiDispatcherJobTest extends TestCase {
 
     protected function setUp(): void {
         parent::setUp();
-        Log::swap(new LogFake);
+        Log::swap(new LogFake());
         Storage::fake('static-assets');
         $this->wiki = $this->getWiki();
     }
@@ -67,7 +67,7 @@ class DeleteWikiDispatcherJobTest extends TestCase {
         Bus::fake();
 
         $mockJob = $this->createMock(Job::class);
-        $job = new DeleteWikiDispatcherJob;
+        $job = new DeleteWikiDispatcherJob();
         $job->setJob($mockJob);
         $job->handle();
 
@@ -88,7 +88,7 @@ class DeleteWikiDispatcherJobTest extends TestCase {
         $existingWikiNotTimeYet = $this->getWiki(29);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new DeleteWikiDispatcherJob;
+        $job = new DeleteWikiDispatcherJob();
         $job->setJob($mockJob);
         $job->handle();
 
@@ -130,7 +130,7 @@ class DeleteWikiDispatcherJobTest extends TestCase {
         );
 
         $mockJob = $this->createMock(Job::class);
-        $job = new DeleteWikiDispatcherJob;
+        $job = new DeleteWikiDispatcherJob();
         $job->setJob($mockJob);
         $job->handle();
 
@@ -166,7 +166,7 @@ class DeleteWikiDispatcherJobTest extends TestCase {
         $this->assertNotNull(WikiDb::where(['wiki_id' => $this->wiki->id])->first());
 
         $mockJob = $this->createMock(Job::class);
-        $job = new DeleteWikiDispatcherJob;
+        $job = new DeleteWikiDispatcherJob();
         $job->setJob($mockJob);
         $job->handle();
 

@@ -148,10 +148,10 @@ class CreateTest extends TestCase {
     public function testCreateWikiLimitsNumWikisPerUser() {
         $manager = $this->app->make('db');
 
-        $job1 = new ProvisionWikiDbJob;
+        $job1 = new ProvisionWikiDbJob();
         $job1->handle($manager);
 
-        $job2 = new ProvisionWikiDbJob;
+        $job2 = new ProvisionWikiDbJob();
         $job2->handle($manager);
 
         QueryserviceNamespace::create([
@@ -223,7 +223,7 @@ class CreateTest extends TestCase {
 
     private function createSQLandQSDBs(): void {
         $manager = $this->app->make('db');
-        $job = new ProvisionWikiDbJob;
+        $job = new ProvisionWikiDbJob();
         $job->handle($manager);
 
         QueryserviceNamespace::create([

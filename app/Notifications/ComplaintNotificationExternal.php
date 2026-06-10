@@ -25,7 +25,7 @@ class ComplaintNotificationExternal extends ComplaintNotification {
         $mailFrom = config('app.complaint-mail-sender');
         $mailSubject = config('app.name') . ': Report of Illegal Content';
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->from($mailFrom)
             ->subject($mailSubject)
             ->line(Lang::get('Your message via the wikibase.cloud form for reporting illegal content has been submitted.'))

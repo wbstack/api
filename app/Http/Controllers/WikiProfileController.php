@@ -18,7 +18,7 @@ class WikiProfileController extends Controller {
     public function create(Request $request): JsonResponse {
         $wiki = $request->attributes->get('wiki');
         $validatedInput = $request->validate([
-            'profile' => ['required', 'json', new NonEmptyJsonRule],
+            'profile' => ['required', 'json', new NonEmptyJsonRule()],
         ]);
 
         $rawProfile = json_decode($validatedInput['profile'], true);

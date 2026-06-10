@@ -89,7 +89,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
-        $job = new PlatformStatsSummaryJob;
+        $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
 
         $job->handle($manager, $this->mockMwHostResolver);
@@ -100,7 +100,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
-        $job = new PlatformStatsSummaryJob;
+        $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
 
         $wikis = [
@@ -239,7 +239,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
-        $job = new PlatformStatsSummaryJob;
+        $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
 
         Wiki::factory()->create([
@@ -297,7 +297,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
             ], 200),
         ]);
 
-        $job = new PlatformStatsSummaryJob;
+        $job = new PlatformStatsSummaryJob();
 
         // This is a hack to override the `private` `PlatformStatsSummaryJob::mwHostResolver` property.
         // See https://www.php.net/manual/en/closure.call.php for more details on how this works.

@@ -28,11 +28,11 @@ class PublicWikiControllerTest extends TestCase {
             'audience' => 'wide',
         ]);
 
-        $controller = new PublicWikiController;
+        $controller = new PublicWikiController();
         $resource = $controller->show($wiki->id);
 
         $this->assertInstanceOf(PublicWikiResource::class, $resource);
-        $this->assertSame(true, $resource->toArray(new Request)['reuse_prototype']);
+        $this->assertSame(true, $resource->toArray(new Request())['reuse_prototype']);
     }
 
     public function testIndexReusePrototypeOnlyRequiresOneAdditionalDatabaseQuery(): void {
@@ -57,8 +57,8 @@ class PublicWikiControllerTest extends TestCase {
             }
         });
 
-        $controller = new PublicWikiController;
-        $resourceCollection = $controller->index(new Request);
+        $controller = new PublicWikiController();
+        $resourceCollection = $controller->index(new Request());
 
         $this->assertSame(1, $wikiProfilesQueryCount);
         $this->assertTrue($resourceCollection->first()->relationLoaded('wikiLatestProfile'));
@@ -70,8 +70,8 @@ class PublicWikiControllerTest extends TestCase {
             'sitename' => 'No Profile Test Site',
         ]);
 
-        $controller = new PublicWikiController;
-        $request = new Request;
+        $controller = new PublicWikiController();
+        $request = new Request();
         $resourceCollection = $controller->index($request);
 
         $resource = $resourceCollection->firstWhere('id', $wikiWithoutProfile->id);
@@ -91,8 +91,8 @@ class PublicWikiControllerTest extends TestCase {
             'temporality' => 'temporary',
         ]);
 
-        $controller = new PublicWikiController;
-        $request = new Request;
+        $controller = new PublicWikiController();
+        $request = new Request();
         $resourceCollection = $controller->index($request);
 
         $resource = $resourceCollection->firstWhere('id', $wiki->id);
