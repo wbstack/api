@@ -9,6 +9,8 @@
   xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
   cacheDirectory=".phpunit.cache"
   backupStaticProperties="false"
+  beStrictAboutOutputDuringTests="true"
+  failOnRisky="true"
 >
   <testsuites>
     <testsuite name="Application Test Suite">
