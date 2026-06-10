@@ -119,10 +119,10 @@ class SendMessageTest extends TestCase {
 
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(200);
-        Notification::assertSentTo(new AnonymousNotifiable, ContactNotification::class, function ($notification) {
+        Notification::assertSentTo(new AnonymousNotifiable(), ContactNotification::class, function ($notification) {
             $this->assertSame(
                 'contact-general-question@wikibase.cloud',
-                $notification->toMail(new AnonymousNotifiable)->from[0]
+                $notification->toMail(new AnonymousNotifiable())->from[0]
             );
 
             return true;

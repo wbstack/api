@@ -10,7 +10,7 @@ class ProfileValidatorTest extends TestCase {
      * @dataProvider validProfileProvider
      */
     public function testProfileValidatorWorksWithValidProfile($profile): void {
-        $validatorFactory = new ProfileValidator;
+        $validatorFactory = new ProfileValidator();
         $validator = $validatorFactory->getValidator($profile);
         $this->assertTrue($validator->passes());
     }
@@ -19,7 +19,7 @@ class ProfileValidatorTest extends TestCase {
      * @dataProvider invalidProfileProvider
      */
     public function testProfileValidatorWorksWithInvalidProfile($profile): void {
-        $validatorFactory = new ProfileValidator;
+        $validatorFactory = new ProfileValidator();
         $validator = $validatorFactory->getValidator($profile);
         $this->assertFalse($validator->passes());
     }

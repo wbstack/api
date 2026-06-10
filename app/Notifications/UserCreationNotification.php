@@ -57,7 +57,7 @@ class UserCreationNotification extends Notification {
 
         $verifyEmailLink = config('wbstack.ui_url') . '/emailVerification/' . $this->token;
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject(Lang::get('Action Needed: Please verify your email'))
             ->line(Lang::get('Welcome to Wikibase.cloud! You’re just one step away from taking advantage of all that the platform has to offer. To complete your registration, verify your email address by clicking below.'))
             ->action(Lang::get('Verify Email'), $verifyEmailLink)
