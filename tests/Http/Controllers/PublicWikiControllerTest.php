@@ -64,7 +64,7 @@ class PublicWikiControllerTest extends TestCase {
      * @dataProvider provideQueryParamsAndErrorExpected
      */
     public function testIndexQueryParamValidation(array $queryParams, bool $errorExpected): void {
-        $controller = new PublicWikiController;
+        $controller = new PublicWikiController();
         $request = new Request($queryParams);
 
         if ($errorExpected) {
