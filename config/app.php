@@ -188,7 +188,6 @@ return [
         AppServiceProvider::class,
         AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
-        EventServiceProvider::class,
         HorizonServiceProvider::class,
         KubernetesClientServiceProvider::class,
         RouteServiceProvider::class,
