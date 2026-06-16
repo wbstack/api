@@ -25,4 +25,8 @@ class Handler extends ExceptionHandler {
             (new ErrorReporting())->report($e);
         });
     }
+
+    protected function shouldReturnJson($request, Throwable $e): bool {
+        return true;
+    }
 }
