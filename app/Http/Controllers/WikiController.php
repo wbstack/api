@@ -18,7 +18,9 @@ use App\WikiDomain;
 use App\WikiManager;
 use App\WikiProfile;
 use App\WikiSetting;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -34,7 +36,7 @@ class WikiController extends Controller {
         $this->domainValidator = $domainValidator;
     }
 
-    public function create(Request $request): \Illuminate\Http\Response {
+    public function create(Request $request): Response {
         $sharedIndexPrefix = Config::get('wbstack.elasticsearch_shared_index_prefix');
         $esHosts = Config::get('wbstack.elasticsearch_hosts');
         $isSearchConfigValid = $esHosts && $sharedIndexPrefix;
@@ -47,7 +49,7 @@ class WikiController extends Controller {
         $submittedDomain = strtolower($request->input('domain'));
         $submittedDomain = DomainHelper::encode($submittedDomain);
 
-        $domainValidator = $this->domainValidator->validate($submittedDomain);
+        $domainValidator = $this->domainValidator->getValidator($submittedDomain);
         $isSubdomain = $this->isSubDomain($submittedDomain);
 
         $domainValidator->validateWithBag('post');
@@ -57,8 +59,9 @@ class WikiController extends Controller {
             'sitename' => 'required|min:3',
             'username' => 'required',
             'profile' => 'nullable|json',
+            'knowledgeEquityResponse' => 'nullable|array',
             'knowledgeEquityResponse.selectedOption' => [
-                'nullable',
+                'required_with:knowledgeEquityResponse',
                 Rule::in('yes', 'no', 'unsure', 'unsaid'),
             ],
             'knowledgeEquityResponse.freeTextResponse' => [
@@ -70,7 +73,7 @@ class WikiController extends Controller {
         $rawProfile = false;
         if ($request->filled('profile')) {
             $rawProfile = json_decode($request->input('profile'), true);
-            $profileValidator = $this->profileValidator->validate($rawProfile);
+            $profileValidator = $this->profileValidator->getValidator($rawProfile);
             $profileValidator->validateWithBag('post');
         }
 
@@ -80,7 +83,7 @@ class WikiController extends Controller {
         $dbAssignment = null;
 
         // TODO create with some sort of owner etc?
-        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $submittedDomain, $rawProfile, $rawKnowledgeEquityResponse) {
+        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $submittedDomain, $rawProfile, $rawKnowledgeEquityResponse): void {
             $dbVersion = Config::get('wbstack.wiki_db_use_version');
             $wikiDbCondition = ['wiki_id' => null, 'version' => $dbVersion];
 
@@ -205,7 +208,7 @@ class WikiController extends Controller {
         return response($res);
     }
 
-    public function delete(Request $request): \Illuminate\Http\JsonResponse {
+    public function delete(Request $request): JsonResponse {
         $wikiDeletionReason = $request->input('deletionReasons');
         $wiki = $request->attributes->get('wiki');
 
@@ -221,7 +224,7 @@ class WikiController extends Controller {
     }
 
     // TODO should this just be get wiki?
-    public function getWikiDetailsForIdForOwner(Request $request): \Illuminate\Http\Response {
+    public function getWikiDetailsForIdForOwner(Request $request): Response {
         $wiki = $request->attributes->get('wiki')
             ->load('wikiManagers')
             ->load('wikiDbVersion')

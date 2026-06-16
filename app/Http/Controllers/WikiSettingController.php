@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Rules\SettingCaptchaQuestions;
 use App\Rules\SettingWikibaseManifestEquivEntities;
 use App\WikiSetting;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class WikiSettingController extends Controller {
     /**
@@ -21,14 +23,14 @@ class WikiSettingController extends Controller {
             'wwWikibaseStringLengthMonolingualText' => ['required', 'integer', 'between:400,2500'],
             'wwWikibaseStringLengthMultilang' => ['required', 'integer', 'between:250,2500'],
             'wikibaseFedPropsEnable' => ['required', 'boolean'],
-            'wikibaseManifestEquivEntities' => ['required', 'json', new SettingWikibaseManifestEquivEntities],
+            'wikibaseManifestEquivEntities' => ['required', 'json', new SettingWikibaseManifestEquivEntities()],
             'wwUseQuestyCaptcha' => ['required', 'boolean'],
-            'wwCaptchaQuestions' => ['required', 'json', new SettingCaptchaQuestions],
+            'wwCaptchaQuestions' => ['required', 'json', new SettingCaptchaQuestions()],
         ];
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return JsonResponse|Response
      */
     public function update($setting, Request $request) {
         $settingValidations = $this->getSettingValidations();

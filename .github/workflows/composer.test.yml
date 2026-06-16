@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        databaseImageName: [ 'mariadb:10.5.9', 'mariadb:10.5.12' ]
+        databaseImageName: [ 'mariadb:10.5.15' ]
 
     runs-on: ubuntu-latest
     steps:

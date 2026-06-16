@@ -19,14 +19,16 @@ class UserTermsOfUseAcceptance extends Model {
 
     protected $visible = self::FIELDS;
 
-    protected $casts = [
-        'tou_version' => 'string',
-        'tou_accepted_at' => 'datetime',
-    ];
-
     protected $table = 'tou_acceptances';
 
     public function user(): BelongsTo {
         return $this->belongsTo(User::class);
+    }
+
+    protected function casts(): array {
+        return [
+            'tou_version' => 'string',
+            'tou_accepted_at' => 'datetime',
+        ];
     }
 }

@@ -18,7 +18,7 @@ class CreateBulk extends Command {
      */
     public function handle() {
         $numCodes = trim($this->argument('numCodes'));
-        $helper = new InviteHelper;
+        $helper = new InviteHelper();
 
         for ($i = 0; $i < $numCodes; $i++) {
             $code = $helper->generate();

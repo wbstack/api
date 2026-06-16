@@ -3,9 +3,14 @@
 namespace App;
 
 use App\Helper\DomainHelper;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Wiki.
@@ -13,16 +18,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $id
  * @property string $domain
  * @property string $sitename
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\WikiSetting[] $settings
+ * @property Carbon|null $deleted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection|WikiSetting[] $settings
  * @property-read int|null $settings_count
- * @property-read \App\WikiDb|null $wikiDb
- * @property-read \App\WikiDb|null $wikiDbVersion
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\User[] $wikiManagers
+ * @property-read WikiDb|null $wikiDb
+ * @property-read WikiDb|null $wikiDbVersion
+ * @property-read Collection|User[] $wikiManagers
  * @property-read int|null $wiki_managers_count
- * @property-read \App\QueryserviceNamespace|null $wikiQueryserviceNamespace
+ * @property-read QueryserviceNamespace|null $wikiQueryserviceNamespace
  *
  * @method static \Database\Factories\WikiFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki newModelQuery()
@@ -65,46 +70,42 @@ class Wiki extends Model {
         'domain_decoded',
     ];
 
-    protected $casts = [
-        'deleted_at' => 'datetime',
-    ];
-
     public function wikiDbVersion() {
         return $this->hasOne(WikiDb::class)->select(['id', 'wiki_id', 'version']);
     }
 
     // TODO these should just be on the backend model? =] Or marked as a private relationship or something?
     // OR some sort of access control needs to be done..
-    public function wikiDb(): \Illuminate\Database\Eloquent\Relations\HasOne {
+    public function wikiDb(): HasOne {
         return $this->hasOne(WikiDb::class);
     }
 
-    public function wikiSiteStats(): \Illuminate\Database\Eloquent\Relations\HasOne {
+    public function wikiSiteStats(): HasOne {
         return $this->hasOne(WikiSiteStats::class);
     }
 
-    public function wikiLifecycleEvents(): \Illuminate\Database\Eloquent\Relations\HasOne {
+    public function wikiLifecycleEvents(): HasOne {
         return $this->hasOne(WikiLifecycleEvents::class);
     }
 
-    public function wikiNotificationSentRecords(): \Illuminate\Database\Eloquent\Relations\HasMany {
+    public function wikiNotificationSentRecords(): HasMany {
         return $this->hasMany(WikiNotificationSentRecord::class);
     }
 
-    public function wikiEntityImports(): \Illuminate\Database\Eloquent\Relations\HasMany {
+    public function wikiEntityImports(): HasMany {
         return $this->hasMany(WikiEntityImport::class);
     }
 
-    public function wikiManagers(): \Illuminate\Database\Eloquent\Relations\HasMany {
+    public function wikiManagers(): HasMany {
         return $this->hasMany(WikiManager::class);
     }
 
-    public function wikiQueryserviceNamespace(): \Illuminate\Database\Eloquent\Relations\HasOne {
+    public function wikiQueryserviceNamespace(): HasOne {
         return $this->hasOne(QueryserviceNamespace::class);
     }
 
     // FIXME: rename to privateSettings / allSettings for clarity?
-    public function settings(): \Illuminate\Database\Eloquent\Relations\HasMany {
+    public function settings(): HasMany {
         return $this->hasMany(WikiSetting::class);
     }
 
@@ -152,8 +153,10 @@ class Wiki extends Model {
     /**
      * Convert the IDN formatted domain name to it's Unicode representation.
      */
-    public function getDomainDecodedAttribute(): string {
-        return DomainHelper::decode($this->domain);
+    protected function domainDecoded(): Attribute {
+        return Attribute::make(get: function () {
+            return DomainHelper::decode($this->domain);
+        });
     }
 
     public function wikiLatestProfile() {
@@ -169,5 +172,11 @@ class Wiki extends Model {
 
     public function deleteSetting(string $name): ?string {
         return $this->settings()->where('name', $name)->delete();
+    }
+
+    protected function casts(): array {
+        return [
+            'deleted_at' => 'datetime',
+        ];
     }
 }

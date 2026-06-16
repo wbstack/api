@@ -20,7 +20,7 @@ class AppServiceProvider extends ServiceProvider {
      * Bootstrap any application services.
      */
     public function boot(): void {
-        Queue::failing(function (JobFailed $event) {
+        Queue::failing(function (JobFailed $event): void {
             $name = data_get($event->job->payload(), 'data.commandName');
             $wrappedException = new \Exception("Executing Job '$name' failed.", 1, $event->exception);
             report($wrappedException);

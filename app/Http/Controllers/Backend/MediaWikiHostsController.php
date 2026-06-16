@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Services\MediaWikiHostResolver;
 use App\Services\UnknownDBVersionException;
 use App\Services\UnknownWikiDomainException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MediaWikiHostsController extends Controller {
-    public function getWikiHostsForDomain(Request $request): \Illuminate\Http\JsonResponse {
-        $mediawikiHostResolver = new MediaWikiHostResolver;
+    public function getWikiHostsForDomain(Request $request): JsonResponse {
+        $mediawikiHostResolver = new MediaWikiHostResolver();
         $domain = $request->query('domain');
         try {
             $hosts = $mediawikiHostResolver->getHostsForDomain($domain);

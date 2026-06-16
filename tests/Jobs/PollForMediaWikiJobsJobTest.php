@@ -47,7 +47,7 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         Bus::fake();
         $mockJob = $this->createMock(Job::class);
-        $job = new PollForMediaWikiJobsJob;
+        $job = new PollForMediaWikiJobsJob();
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
@@ -70,7 +70,7 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         $mockJob = $this->createMock(Job::class);
 
-        $job = new PollForMediaWikiJobsJob;
+        $job = new PollForMediaWikiJobsJob();
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
@@ -89,7 +89,7 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         $mockJob = $this->createMock(Job::class);
 
-        $job = new PollForMediaWikiJobsJob;
+        $job = new PollForMediaWikiJobsJob();
         $job->setJob($mockJob);
 
         $mockJob->expects($this->once())->method('markAsFailed');

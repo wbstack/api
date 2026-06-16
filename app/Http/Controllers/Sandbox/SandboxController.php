@@ -13,6 +13,7 @@ use App\WikiDomain;
 use App\WikiSetting;
 use Hackzilla\PasswordGenerator\Generator\HumanPasswordGenerator;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -24,7 +25,7 @@ class SandboxController extends Controller {
 
     const DOT = '.';
 
-    public function create(Request $request): \Illuminate\Http\Response {
+    public function create(Request $request): Response {
         $validation = [
             'recaptcha' => 'required|captcha',
             // TODO validate dataSet param
@@ -36,7 +37,7 @@ class SandboxController extends Controller {
         $dataSet = $request->get('dataSet');
 
         $wiki = null;
-        DB::transaction(function () use (&$wiki, $domain) {
+        DB::transaction(function () use (&$wiki, $domain): void {
             $wikiDbCondition = ['wiki_id' => null, 'version' => self::MW_VERSION];
 
             // Fail if there is not enough storage ready
@@ -113,7 +114,7 @@ class SandboxController extends Controller {
     }
 
     private function generateDomain(): string {
-        $generator = new HumanPasswordGenerator;
+        $generator = new HumanPasswordGenerator();
 
         $generator
             ->setWordList(__DIR__ . '/words')

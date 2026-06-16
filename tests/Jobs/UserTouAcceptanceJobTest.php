@@ -23,8 +23,8 @@ class UserTouAcceptanceJobTest extends TestCase {
         $u2 = User::factory()->create(['created_at' => $t2]);
         $u3 = User::factory()->create(['created_at' => $t3]);
 
-        (new CreateFirstTermsOfUseVersionJob)->handle();
-        (new UserTouAcceptanceJob)->handle();
+        (new CreateFirstTermsOfUseVersionJob())->handle();
+        (new UserTouAcceptanceJob())->handle();
 
         $latest = TermsOfUseVersion::latestActiveVersion()->version;
 

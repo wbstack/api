@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
@@ -52,7 +53,7 @@ class LoginController extends Controller {
             ->withCookie($this->deleteCookie());
     }
 
-    public function postLogin(Request $request): ?\Illuminate\Http\JsonResponse {
+    public function postLogin(Request $request): ?JsonResponse {
         // Validation
         $rules = [
             // Do not specify that the email is required to exist, as this exposes that a user is registered...

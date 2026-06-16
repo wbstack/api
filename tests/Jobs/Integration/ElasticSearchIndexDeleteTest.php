@@ -35,7 +35,7 @@ class ElasticSearchIndexDeleteTest extends TestCase {
 
     public function makeRequest($url, $method = 'GET') {
         // create some dummy index
-        $curlRequest = new CurlRequest;
+        $curlRequest = new CurlRequest();
         $curlRequest->setOptions(
             [
                 CURLOPT_URL => $url,

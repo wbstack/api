@@ -8,6 +8,7 @@ use App\Rules\ReCaptchaValidation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Tests\TestCase;
 
 class SendMessageTest extends TestCase {
@@ -69,7 +70,7 @@ class SendMessageTest extends TestCase {
 
         try {
             $response = $this->json('POST', $this->route, $data);
-        } catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
+        } catch (TransportException $e) {
             return;
         }
 
@@ -183,10 +184,10 @@ class SendMessageTest extends TestCase {
 
         $response = $this->json('POST', $this->route, $data);
         $response->assertStatus(200);
-        Notification::assertSentTo(new AnonymousNotifiable, ComplaintNotification::class, function ($notification) {
+        Notification::assertSentTo(new AnonymousNotifiable(), ComplaintNotification::class, function ($notification) {
             $this->assertSame(
                 'dsa@wikibase.cloud',
-                $notification->toMail(new AnonymousNotifiable)->from[0]
+                $notification->toMail(new AnonymousNotifiable())->from[0]
             );
 
             return true;

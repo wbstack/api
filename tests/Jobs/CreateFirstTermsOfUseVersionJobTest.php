@@ -12,7 +12,7 @@ class CreateFirstTermsOfUseVersionJobTest extends TestCase {
     public function testCreateFirstTermsOfUseVersionJob(): void {
         $this->assertDatabaseCount('tou_versions', 0);
 
-        (new CreateFirstTermsOfUseVersionJob)->handle();
+        (new CreateFirstTermsOfUseVersionJob())->handle();
 
         $this->assertDatabaseHas('tou_versions', [
             'version' => '2022-01-01',

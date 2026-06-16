@@ -6,10 +6,11 @@ use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use ReCaptcha\ReCaptcha;
+use ReCaptcha\Response;
 
 class ReCaptchaValidation implements ImplicitRule {
     /**
-     * @var \ReCaptcha\ReCaptcha instance
+     * @var ReCaptcha instance
      */
     protected $recaptcha;
 
@@ -56,10 +57,10 @@ class ReCaptchaValidation implements ImplicitRule {
      * Verifies the ReCaptcha Request with the official ReCaptcha service library
      *
      * @param  string  $secretKey
-     * @return \ReCaptcha\Response
+     * @return Response
      */
     private function verify($token) {
-        $recaptchaResponse = new \ReCaptcha\Response(false);
+        $recaptchaResponse = new Response(false);
 
         try {
             $recaptchaResponse = $this->recaptcha

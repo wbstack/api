@@ -2,7 +2,20 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\BackendAuth;
+use App\Http\Middleware\LimitWikiAccess;
+use App\Http\Middleware\RedirectIfAuthenticated;
+use App\Http\Middleware\Throttle;
+use App\Http\Middleware\ThrottleSignup;
+use Illuminate\Auth\Middleware\Authorize;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\AuthenticateSession;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class Kernel extends HttpKernel {
     /**
@@ -13,7 +26,7 @@ class Kernel extends HttpKernel {
      * @var array
      */
     protected $middleware = [
-        \Illuminate\Http\Middleware\TrustProxies::class,
+        TrustProxies::class,
     ];
 
     /**
@@ -31,20 +44,16 @@ class Kernel extends HttpKernel {
      * @var array
      */
     protected $middlewareAliases = [
-        // Came with Laravel
-        'auth' => \App\Http\Middleware\Authenticate::class,
-        'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        // Middleware from laravel upstream
+        'verified' => EnsureEmailIsVerified::class,
 
-        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'limit_wiki_access' => \App\Http\Middleware\LimitWikiAccess::class,
-
-        // https://laravel-news.com/signed-routes
-        // 'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
-
-        'backend.auth' => \App\Http\Middleware\BackendAuth::class,
-        'throttle.signup' => \App\Http\Middleware\ThrottleSignup::class,
-        'throttle' => \App\Http\Middleware\Throttle::class,
-        // 'auth' => App\Http\Middleware\Authenticate::class,
+        // Custom Middleware
+        'guest' => RedirectIfAuthenticated::class,
+        'limit_wiki_access' => LimitWikiAccess::class,
+        'backend.auth' => BackendAuth::class,
+        'throttle.signup' => ThrottleSignup::class,
+        'throttle' => Throttle::class,
+        'auth' => Authenticate::class,
     ];
 
     /**
@@ -55,11 +64,11 @@ class Kernel extends HttpKernel {
      * @var array
      */
     protected $middlewarePriority = [
-        \Illuminate\Session\Middleware\StartSession::class,
-        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        \App\Http\Middleware\Authenticate::class,
-        \Illuminate\Session\Middleware\AuthenticateSession::class,
-        \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        \Illuminate\Auth\Middleware\Authorize::class,
+        StartSession::class,
+        ShareErrorsFromSession::class,
+        Authenticate::class,
+        AuthenticateSession::class,
+        SubstituteBindings::class,
+        Authorize::class,
     ];
 }

@@ -9,6 +9,7 @@ use App\Traits;
 use App\User;
 use App\Wiki;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
@@ -131,7 +132,9 @@ class PlatformStatsSummaryJob extends Job {
             // is it edited in the last 90 days?
             if (!is_null($stats['lastEdit'])) {
                 $lastTimestamp = MWTimestampHelper::getCarbonFromMWTimestamp(intval($stats['lastEdit']));
-                $diff = $lastTimestamp->diffInSeconds($currentTime);
+                // cast to int retain Carbon 2 behaviour of using whole days
+                // pass `$absolute = true` argument to retain Carbon 2 behaviour of returning an absolute diff
+                $diff = (int) $lastTimestamp->diffInSeconds($currentTime, true);
 
                 if ($diff <= $this->inactiveThreshold) {
                     $editedLast90DaysWikis[] = $wiki;
@@ -174,7 +177,7 @@ class PlatformStatsSummaryJob extends Job {
         $conn = $manager->connection('mysql');
         $mwConn = $manager->connection('mw');
 
-        if (!$conn instanceof \Illuminate\Database\Connection || !$mwConn instanceof \Illuminate\Database\Connection) {
+        if (!$conn instanceof Connection || !$mwConn instanceof Connection) {
             throw new \RuntimeException('Must be run on a PDO based DB connection');
         }
 
