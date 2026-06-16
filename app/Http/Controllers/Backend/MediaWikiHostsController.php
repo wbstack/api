@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class MediaWikiHostsController extends Controller {
     public function getWikiHostsForDomain(Request $request): JsonResponse {
-        $mediawikiHostResolver = new MediaWikiHostResolver;
+        $mediawikiHostResolver = new MediaWikiHostResolver();
         $domain = $request->query('domain');
         try {
             $hosts = $mediawikiHostResolver->getHostsForDomain($domain);

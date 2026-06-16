@@ -20,8 +20,10 @@ class WikiLifecycleEvents extends Model {
 
     protected $visible = self::FIELDS;
 
-    protected $casts = [
-        'first_edited' => 'datetime',
-        'last_edited' => 'datetime',
-    ];
+    protected function casts(): array {
+        return [
+            'first_edited' => 'datetime',
+            'last_edited' => 'datetime',
+        ];
+    }
 }

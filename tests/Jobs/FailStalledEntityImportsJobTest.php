@@ -47,7 +47,7 @@ class FailStalledEntityImportsJobTest extends TestCase {
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
-        $job = new FailStalledEntityImportsJob;
+        $job = new FailStalledEntityImportsJob();
         $job->setJob($mockJob);
         $job->handle();
 

@@ -14,9 +14,9 @@ class MediaWikiHostResolverTest extends TestCase {
     use RefreshDatabase;
 
     public function testResolverRoutesToCorrectHost(): void {
-        $domain = (new Factory)->create()->unique()->text(30);
+        $domain = (new Factory())->create()->unique()->text(30);
         $this->createWiki($domain, 'mw1.43-wbs2');
-        $resolver = new MediaWikiHostResolver;
+        $resolver = new MediaWikiHostResolver();
         $this->assertEquals(
             'mediawiki-143-app-backend.default.svc.cluster.local',
             $resolver->getBackendHostForDomain($domain)
@@ -36,9 +36,9 @@ class MediaWikiHostResolverTest extends TestCase {
     }
 
     public function testResolverThrowsIfUnableToFindHostInMap(): void {
-        $domain = (new Factory)->create()->unique()->text(30);
+        $domain = (new Factory())->create()->unique()->text(30);
         $this->createWiki($domain, 'mw1.43-unmapped');
-        $resolver = new MediaWikiHostResolver;
+        $resolver = new MediaWikiHostResolver();
         $this->assertThrows(
             fn () => $resolver->getBackendHostForDomain($domain),
             UnknownDBVersionException::class
@@ -46,8 +46,8 @@ class MediaWikiHostResolverTest extends TestCase {
     }
 
     public function testResolverThrowsIfUnableToFindWiki(): void {
-        $domain = (new Factory)->create()->unique()->text(30);
-        $resolver = new MediaWikiHostResolver;
+        $domain = (new Factory())->create()->unique()->text(30);
+        $resolver = new MediaWikiHostResolver();
         $this->assertThrows(
             fn () => $resolver->getBackendHostForDomain($domain),
             UnknownWikiDomainException::class

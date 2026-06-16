@@ -83,7 +83,7 @@ class WikiController extends Controller {
         $dbAssignment = null;
 
         // TODO create with some sort of owner etc?
-        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $submittedDomain, $rawProfile, $rawKnowledgeEquityResponse) {
+        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $submittedDomain, $rawProfile, $rawKnowledgeEquityResponse): void {
             $dbVersion = Config::get('wbstack.wiki_db_use_version');
             $wikiDbCondition = ['wiki_id' => null, 'version' => $dbVersion];
 

@@ -132,7 +132,9 @@ class PlatformStatsSummaryJob extends Job {
             // is it edited in the last 90 days?
             if (!is_null($stats['lastEdit'])) {
                 $lastTimestamp = MWTimestampHelper::getCarbonFromMWTimestamp(intval($stats['lastEdit']));
-                $diff = $lastTimestamp->diffInSeconds($currentTime);
+                // cast to int retain Carbon 2 behaviour of using whole days
+                // pass `$absolute = true` argument to retain Carbon 2 behaviour of returning an absolute diff
+                $diff = (int) $lastTimestamp->diffInSeconds($currentTime, true);
 
                 if ($diff <= $this->inactiveThreshold) {
                     $editedLast90DaysWikis[] = $wiki;

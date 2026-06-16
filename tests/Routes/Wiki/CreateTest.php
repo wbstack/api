@@ -148,10 +148,10 @@ class CreateTest extends TestCase {
     public function testCreateWikiLimitsNumWikisPerUser() {
         $manager = $this->app->make('db');
 
-        $job1 = new ProvisionWikiDbJob;
+        $job1 = new ProvisionWikiDbJob();
         $job1->handle($manager);
 
-        $job2 = new ProvisionWikiDbJob;
+        $job2 = new ProvisionWikiDbJob();
         $job2->handle($manager);
 
         QueryserviceNamespace::create([
@@ -223,7 +223,7 @@ class CreateTest extends TestCase {
 
     private function createSQLandQSDBs(): void {
         $manager = $this->app->make('db');
-        $job = new ProvisionWikiDbJob;
+        $job = new ProvisionWikiDbJob();
         $job->handle($manager);
 
         QueryserviceNamespace::create([
@@ -307,7 +307,7 @@ class CreateTest extends TestCase {
                 self::defaultData
             );
         $response->assertStatus(200);
-        $id = $response->decodeResponseJson()['data']['id'];
+        $id = $response->json()['data']['id'];
         $this->assertEquals(1, WikiProfile::where(['wiki_id' => $id])->count());
     }
 
@@ -325,7 +325,7 @@ class CreateTest extends TestCase {
                 ]]
             );
         $response->assertStatus(200);
-        $id = $response->decodeResponseJson()['data']['id'];
+        $id = $response->json()['data']['id'];
         $this->assertEquals(1, KnowledgeEquityResponse::where(['wiki_id' => $id])->count());
     }
 
@@ -362,7 +362,7 @@ class CreateTest extends TestCase {
                 ]]
             );
         $response->assertStatus(200);
-        $id = $response->decodeResponseJson()['data']['id'];
+        $id = $response->json()['data']['id'];
         $this->assertEquals(1, KnowledgeEquityResponse::where(['wiki_id' => $id])->count());
     }
 

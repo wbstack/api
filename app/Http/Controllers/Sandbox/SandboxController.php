@@ -37,7 +37,7 @@ class SandboxController extends Controller {
         $dataSet = $request->get('dataSet');
 
         $wiki = null;
-        DB::transaction(function () use (&$wiki, $domain) {
+        DB::transaction(function () use (&$wiki, $domain): void {
             $wikiDbCondition = ['wiki_id' => null, 'version' => self::MW_VERSION];
 
             // Fail if there is not enough storage ready
@@ -114,7 +114,7 @@ class SandboxController extends Controller {
     }
 
     private function generateDomain(): string {
-        $generator = new HumanPasswordGenerator;
+        $generator = new HumanPasswordGenerator();
 
         $generator
             ->setWordList(__DIR__ . '/words')

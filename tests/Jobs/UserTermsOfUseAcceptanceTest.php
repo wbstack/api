@@ -13,7 +13,7 @@ class UserTermsOfUseAcceptanceTest extends TestCase {
     use RefreshDatabase;
 
     public function testUserCreationCreatesTouAcceptance(): void {
-        (new CreateFirstTermsOfUseVersionJob)->handle();
+        (new CreateFirstTermsOfUseVersionJob())->handle();
         $email = 'test+' . uniqid('', true) . '@example.com';
         $user = (new UserCreateJob($email, 'thisisapassword123', true))->handle();
 

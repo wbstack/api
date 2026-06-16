@@ -73,7 +73,7 @@ class KnowledgeEquityResponseTest extends TestCase {
         $knowledgeEquityResponse->save();
 
         $this->wiki->delete();
-        $this->assertThrows(function () {
+        $this->assertThrows(function (): void {
             $this->wiki->forceDelete();
         }, QueryException::class);
     }

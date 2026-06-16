@@ -7,11 +7,8 @@ use App\Wiki;
 use App\WikiEntityImport;
 use App\WikiEntityImportStatus;
 use Carbon\Carbon;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -19,7 +16,7 @@ use Maclof\Kubernetes\Client;
 use Maclof\Kubernetes\Models\Job as KubernetesJob;
 
 class WikiEntityImportJob implements ShouldQueue {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Queueable;
 
     /**
      * Create a new job instance.

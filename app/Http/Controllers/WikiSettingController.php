@@ -23,9 +23,9 @@ class WikiSettingController extends Controller {
             'wwWikibaseStringLengthMonolingualText' => ['required', 'integer', 'between:400,2500'],
             'wwWikibaseStringLengthMultilang' => ['required', 'integer', 'between:250,2500'],
             'wikibaseFedPropsEnable' => ['required', 'boolean'],
-            'wikibaseManifestEquivEntities' => ['required', 'json', new SettingWikibaseManifestEquivEntities],
+            'wikibaseManifestEquivEntities' => ['required', 'json', new SettingWikibaseManifestEquivEntities()],
             'wwUseQuestyCaptcha' => ['required', 'boolean'],
-            'wwCaptchaQuestions' => ['required', 'json', new SettingCaptchaQuestions],
+            'wwCaptchaQuestions' => ['required', 'json', new SettingCaptchaQuestions()],
         ];
     }
 
