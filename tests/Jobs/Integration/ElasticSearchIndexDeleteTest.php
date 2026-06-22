@@ -48,12 +48,11 @@ class ElasticSearchIndexDeleteTest extends TestCase {
         );
         $response = $curlRequest->execute();
         $err = $curlRequest->error();
-        var_dump($response);
+        $curlRequest->close();
 
         if ($err) {
-            var_dump($err);
+            $this->fail("Request returned an error: {$err}");
         }
-        $curlRequest->close();
 
         return json_decode($response, true);
     }
