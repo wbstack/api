@@ -1,4 +1,4 @@
-FROM composer:2.10 as composer
+FROM composer:2.10 AS composer
 
 COPY ./composer.json /tmp/src1/composer.json
 COPY ./composer.lock /tmp/src1/composer.lock
@@ -32,7 +32,7 @@ RUN apt-get update \
 	&& docker-php-ext-enable opencensus \
 	&& rm -rf /var/lib/apt/lists/*
 
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
 # Change the document root
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
