@@ -12,12 +12,12 @@ use Illuminate\Database\Eloquent\Model;
  *   - it reduces confuses by remaining consistent with other models that use the default timestamps
  *   - `accepted_at` will be before `created_at` when backfilling the terms-of-use acceptances
  *
- * @property-read int $id
+ * @property int $id
  * @property int $user_id
  * @property int $policy_id
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  * @property CarbonImmutable $accepted_at
- * @property CarbonImmutable $created_at
- * @property CarbonImmutable $updated_at
  *
  * @method static Builder<static>|PolicyAcceptance newModelQuery()
  * @method static Builder<static>|PolicyAcceptance newQuery()

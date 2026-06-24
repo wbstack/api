@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property-read int $id
+ * @property int $id
  * @property string $policy_type
  * @property CarbonImmutable|null $active_from
  * @property string $content_vue_file
- * @property CarbonImmutable $created_at
- * @property CarbonImmutable $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  *
  * @method static Builder<static>|Policy newModelQuery()
  * @method static Builder<static>|Policy newQuery()
