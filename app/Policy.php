@@ -45,7 +45,6 @@ class Policy extends Model {
             // cast `active_from` to a CarbonImmutable instance rather than a string
             'active_from' => 'immutable_date',
 
-            // TODO: should we make Laravel use CarbonImmutable globally instead of casting in models?
             'created_at' => 'immutable_datetime',
             'updated_at' => 'immutable_datetime',
         ];
