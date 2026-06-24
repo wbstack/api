@@ -32,14 +32,16 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin Eloquent
  */
 class PolicyAcceptance extends Model {
-    // TODO: also create a factory (and seeder)?
-
-    // define which attributes are mass assignable
     protected $fillable = [
         'user_id',
         'policy_id',
-        // Don't allow `accepted_at` to be mass assigned? Most of the time this will be set to the current timestamp by the database.
-        // 'accepted_at',
+
+    ];
+
+    protected $guarded = [
+        // Don't allow `accepted_at` to be mass assigned.
+        // Most of the time this will be set to the current timestamp by the database.
+        'accepted_at',
     ];
 
     protected function casts(): array {
@@ -48,6 +50,7 @@ class PolicyAcceptance extends Model {
             'accepted_at' => 'immutable_datetime',
 
             // TODO: should we make Laravel use CarbonImmutable globally instead of casting in models?
+            // TODO: should we do any casting with these built ins?
             'created_at' => 'immutable_datetime',
             'updated_at' => 'immutable_datetime',
         ];

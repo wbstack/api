@@ -28,8 +28,6 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin Eloquent
  */
 class Policy extends Model {
-    // TODO: also create a factory (and seeder)?
-
     // define which attributes are mass assignable
     protected $fillable = [
         'policy_type',
