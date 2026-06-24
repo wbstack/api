@@ -18,14 +18,14 @@ return new class() extends Migration {
 
             $table->foreignId('policy_id')->constrained()->restrictOnUpdate()->restrictOnDelete();
 
+            // Use Eloquent built in to create nullable `created_at` and `updated_at`
+            // timestamp fields
+            $table->timestamps();
+
             // Using a separate `accepted_at` column rather than renaming the default `created_at` column because:
             //   * it reduces confuses by remaining consistent with other tables that use the default columns
             //   * `accepted_at` will be before `created_at` when backfilling the terms-of-use acceptances
             $table->timestamp('accepted_at')->useCurrent();
-
-            // explicitly define the default timestamp columns so that they are not nullable
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
         });
     }
 

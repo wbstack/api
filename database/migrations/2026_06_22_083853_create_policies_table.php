@@ -17,9 +17,9 @@ return new class() extends Migration {
             // TODO: or `content_reference`?
             $table->string('content_vue_file', 255);
 
-            // explicitly define the default timestamp columns so that they are not nullable
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
+            // Use Eloquent built in to create nullable `created_at` and `updated_at`
+            // timestamp fields
+            $table->timestamps();
 
             // TODO: won't be able to create two upcoming policies of the same type with `active_from` set to `null`,
             // but that seems like a reasonable restriction
