@@ -47,4 +47,15 @@ class PolicyAcceptanceTest extends TestCase {
         $this->assertNotEmpty($policyAcceptance->accepted_at);
         $this->assertInstanceOf(CarbonImmutable::class, $policyAcceptance->accepted_at);
     }
+
+    public function testAcceptedAtIgnoresMassAssignment(): void {
+        $policyAcceptance = PolicyAcceptance::create(
+            [
+                'user_id' => $this->userId,
+                'policy_id' => $this->policyId,
+                'accepted_at' => CarbonImmutable::createFromDate(2026, 1, 1),
+            ]
+        );
+        $this->assertNull($policyAcceptance->accepted_at);
+    }
 }
