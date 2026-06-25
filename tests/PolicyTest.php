@@ -9,20 +9,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class PolicyTest extends TestCase {
     use RefreshDatabase;
 
-    public function testCreatesAndSavesSuccessfully(): void {
-        $yesterday = Carbon::yesterday();
-        $policy = Policy::create(
+    public function testCreatesSuccessfully(): void {
+        Policy::create(
             [
                 'policy_type' => 'terms-of-use',
-                'active_from' => $yesterday,
+                'active_from' => Carbon::createFromDate(2025, 4, 1),
                 'content_vue_file' => 'terms-of-use/example.vue',
             ]
         );
-        $policy->save();
 
         $this->assertDatabaseHas('policies', [
             'policy_type' => 'terms-of-use',
-            'active_from' => $yesterday,
+            'active_from' => '2025-04-01',
             'content_vue_file' => 'terms-of-use/example.vue',
         ]);
     }

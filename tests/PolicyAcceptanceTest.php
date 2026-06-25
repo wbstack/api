@@ -11,14 +11,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class PolicyAcceptanceTest extends TestCase {
     use RefreshDatabase;
 
-    protected int $user_id;
+    protected int $userId;
 
-    protected int $policy_id;
+    protected int $policyId;
 
     protected function setUp(): void {
         parent::setUp();
         $user = User::factory()->create();
-        $this->user_id = $user->id;
+        $this->userId = $user->id;
         $policy = Policy::create(
             [
                 'policy_type' => 'terms-of-use',
@@ -26,24 +26,25 @@ class PolicyAcceptanceTest extends TestCase {
                 'content_vue_file' => 'terms-of-use/example.vue',
             ]);
         $policy->save();
-        $this->policy_id = $policy->id;
+        $this->policyId = $policy->id;
     }
 
     public function testCreatesAndSavesSuccessfully(): void {
         $policyAcceptance = new PolicyAcceptance(
             [
-                'user_id' => $this->user_id,
-                'policy_id' => $this->policy_id,
+                'user_id' => $this->userId,
+                'policy_id' => $this->policyId,
             ]
         );
         $policyAcceptance->save();
         $policyAcceptance->refresh();
 
         $this->assertDatabaseHas('policy_acceptances', [
-            'user_id' => $this->user_id,
-            'policy_id' => $this->policy_id,
+            'user_id' => $this->userId,
+            'policy_id' => $this->policyId,
         ]);
 
         $this->assertNotEmpty($policyAcceptance->accepted_at);
+        $this->assertInstanceOf(CarbonImmutable::class, $policyAcceptance->accepted_at);
     }
 }

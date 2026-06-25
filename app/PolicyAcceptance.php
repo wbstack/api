@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * This model uses a separate `accepted_at` property rather than renaming the default `created_at` property because:
- *   - it reduces confuses by remaining consistent with other models that use the default timestamps
+ *   - it remains consistent with other models that use the default timestamps
  *   - `accepted_at` will be before `created_at` when backfilling the terms-of-use acceptances
  *
  * @property int $id
@@ -35,7 +35,6 @@ class PolicyAcceptance extends Model {
     protected $fillable = [
         'user_id',
         'policy_id',
-
     ];
 
     protected $guarded = [
