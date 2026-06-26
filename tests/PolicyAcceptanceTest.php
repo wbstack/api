@@ -25,7 +25,6 @@ class PolicyAcceptanceTest extends TestCase {
                 'active_from' => CarbonImmutable::yesterday(),
                 'content_vue_file' => 'terms-of-use/example.vue',
             ]);
-        $policy->save();
         $this->policyId = $policy->id;
     }
 
