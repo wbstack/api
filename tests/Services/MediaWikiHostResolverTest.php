@@ -32,7 +32,7 @@ class MediaWikiHostResolverTest extends TestCase {
         $resolver = new MediaWikiHostResolver();
         $this->assertEquals(
             'http://mediawiki-143-app-backend.default.svc.cluster.local',
-            $resolver->getBackendHostForDomain($domain)
+            $resolver->getBackendUrlForDomain($domain)
         );
     }
 
@@ -78,13 +78,12 @@ class MediaWikiHostResolverTest extends TestCase {
         );
     }
 
-    public function testGuzzleAcceptsSchemeUrls(): void {
+    public function testLaravelHttpAcceptsSchemeUrls(): void {
         Http::fake(['*' => Http::response()]);
 
-        $client = new Client();
-        // This should NOT throw
-        $response = $client->get('http://mediawiki-143-app-backend.default.svc.cluster.local/w/api.php');
+        // Using Laravel Http facade (which properly respects Http::fake())
+        $response = Http::get('http://mediawiki-143-app-backend.default.svc.cluster.local/w/api.php');
 
-        $this->assertTrue($response->getStatusCode() === 200);
+        $this->assertTrue($response->status() === 200);
     }
 }
