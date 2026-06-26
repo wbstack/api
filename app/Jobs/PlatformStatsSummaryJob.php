@@ -80,7 +80,7 @@ class PlatformStatsSummaryJob extends Job {
         $currentTime = CarbonImmutable::now();
 
         foreach ($wikis as $wiki) {
-            $this->apiUrl = $this->mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php'; // used in PageFetcher::fetchPagesInNamespace
+            $this->apiUrl = $this->mwHostResolver->getBackendUrlForDomain($wiki->domain) . '/w/api.php'; // used in PageFetcher::fetchPagesInNamespace
 
             if (!is_null($wiki->deleted_at)) {
                 $deletedWikis[] = $wiki;

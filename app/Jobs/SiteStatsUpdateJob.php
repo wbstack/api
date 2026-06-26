@@ -34,7 +34,7 @@ class SiteStatsUpdateJob extends Job {
         Log::info(__METHOD__ . ": Updating stats for $wiki->domain");
 
         $request->setOptions([
-            CURLOPT_URL => $mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php?action=wbstackSiteStatsUpdate&format=json',
+            CURLOPT_URL => $mwHostResolver->getBackendUrlForDomain($wiki->domain) . '/w/api.php?action=wbstackSiteStatsUpdate&format=json',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 60 * 5,
