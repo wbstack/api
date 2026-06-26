@@ -24,10 +24,10 @@ class MediawikiInitTest extends TestCase {
         $this->wikiDomain = 'some.domain.com';
         $this->username = 'username';
         $this->email = 'some@email.com';
-        $this->mwBackendHost = 'mediawiki.localhost';
+        $this->mwBackendHost = 'http://mediawiki.localhost';
 
         $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+        $this->mockMwHostResolver->method('getBackendUrlForDomain')->willReturn(
             $this->mwBackendHost
         );
     }
