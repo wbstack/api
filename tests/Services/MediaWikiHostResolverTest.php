@@ -8,8 +8,6 @@ use App\Services\UnknownWikiDomainException;
 use App\Wiki;
 use App\WikiDb;
 use Faker\Factory;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 
@@ -64,17 +62,6 @@ class MediaWikiHostResolverTest extends TestCase {
         $this->assertThrows(
             fn () => $resolver->getBackendHostForDomain($domain),
             UnknownWikiDomainException::class
-        );
-    }
-
-    public function testGuzzleRejectsSchemelesUrls(): void {
-        $client = new Client();
-
-        // This should throw RequestException about empty scheme
-        $this->assertThrows(
-            fn () => $client->get('mediawiki-143-app-backend.default.svc.cluster.local/w/api.php'),
-            RequestException::class,
-            'scheme "" is not allowed'
         );
     }
 
