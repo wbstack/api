@@ -18,7 +18,7 @@ return new class() extends Migration {
             // Use Eloquent built in to create nullable `created_at` and `updated_at` timestamp fields
             $table->timestamps();
 
-            // This prevents two policies of the same type with `active_from` set to the same value
+            // Prevent two policies of the same type with `active_from` set to the same value
             // (including `null` for upcoming policies)
             $table->unique(['policy_type', 'active_from']);
         });

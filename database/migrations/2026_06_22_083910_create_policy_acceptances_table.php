@@ -18,10 +18,10 @@ return new class() extends Migration {
 
             $table->foreignId('policy_id')->constrained()->restrictOnUpdate()->restrictOnDelete();
 
-            // Using a separate `accepted_at` column rather than renaming the default `created_at` column because:
+            // Use a separate `accepted_at` column rather than renaming the default `created_at` column because:
             //   * it reduces confusion by remaining consistent with other tables that use these default columns
             //   * `accepted_at` will be before `created_at` when backfilling the terms-of-use acceptances
-            // Using a DATETIME field as MariaDB has odd behavior around TIMESTAMPs and default values
+            // Use a DATETIME field as MariaDB has odd behavior around TIMESTAMPs and default values
             // `accepted_at` can be NOT NULL if we use a DATETIME which provides us with more data safety
             $table->dateTime('accepted_at');
 

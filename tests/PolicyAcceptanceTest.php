@@ -20,23 +20,20 @@ class PolicyAcceptanceTest extends TestCase {
         parent::setUp();
         $user = User::factory()->create();
         $this->userId = $user->id;
-        $policy = Policy::create(
-            [
-                'policy_type' => 'terms-of-use',
-                'active_from' => CarbonImmutable::yesterday(),
-                'content_vue_file' => 'terms-of-use/example.vue',
-            ]);
+        $policy = Policy::create([
+            'policy_type' => 'terms-of-use',
+            'active_from' => CarbonImmutable::yesterday(),
+            'content_vue_file' => 'terms-of-use/example.vue',
+        ]);
         $this->policyId = $policy->id;
     }
 
     public function testCreatesAndSavesSuccessfully(): void {
-        $policyAcceptance = new PolicyAcceptance(
-            [
-                'user_id' => $this->userId,
-                'policy_id' => $this->policyId,
-                'accepted_at' => CarbonImmutable::now(),
-            ]
-        );
+        $policyAcceptance = new PolicyAcceptance([
+            'user_id' => $this->userId,
+            'policy_id' => $this->policyId,
+            'accepted_at' => CarbonImmutable::now(),
+        ]);
         $policyAcceptance->save();
         $policyAcceptance->refresh();
 
