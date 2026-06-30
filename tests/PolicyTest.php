@@ -3,7 +3,7 @@
 namespace Tests;
 
 use App\Policy;
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PolicyTest extends TestCase {
@@ -13,7 +13,7 @@ class PolicyTest extends TestCase {
         Policy::create(
             [
                 'policy_type' => 'terms-of-use',
-                'active_from' => Carbon::createFromDate(2025, 4, 1),
+                'active_from' => CarbonImmutable::createMidnightDate(2025, 4, 1),
                 'content_vue_file' => 'terms-of-use/example.vue',
             ]
         );
