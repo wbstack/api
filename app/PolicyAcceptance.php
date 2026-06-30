@@ -15,9 +15,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int $user_id
  * @property int $policy_id
+ * @property CarbonImmutable $accepted_at
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
- * @property CarbonImmutable $accepted_at
  *
  * @method static Builder<static>|PolicyAcceptance newModelQuery()
  * @method static Builder<static>|PolicyAcceptance newQuery()
