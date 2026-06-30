@@ -15,8 +15,7 @@ return new class() extends Migration {
             $table->date('active_from')->nullable()->default(null);
             $table->string('content_vue_file', 255);
 
-            // Use Eloquent built in to create nullable `created_at` and `updated_at`
-            // timestamp fields
+            // Use Eloquent built in to create nullable `created_at` and `updated_at` timestamp fields
             $table->timestamps();
 
             // This prevents two upcoming policies of the same type with `active_from` set to `null`,
