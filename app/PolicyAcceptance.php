@@ -35,11 +35,6 @@ class PolicyAcceptance extends Model {
     protected $fillable = [
         'user_id',
         'policy_id',
-    ];
-
-    protected $guarded = [
-        // Don't allow `accepted_at` to be mass assigned.
-        // Most of the time this will be set to the current timestamp by the database.
         'accepted_at',
     ];
 
@@ -48,6 +43,7 @@ class PolicyAcceptance extends Model {
             // cast `accepted_at` to a `CarbonImmutable` instance rather than a string
             'accepted_at' => 'immutable_datetime',
 
+            // cast to `CarbonImmutable` until we default to using `CarbonImmutable` globally in T430656
             'created_at' => 'immutable_datetime',
             'updated_at' => 'immutable_datetime',
         ];

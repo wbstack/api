@@ -42,9 +42,10 @@ class Policy extends Model {
 
     protected function casts(): array {
         return [
-            // cast `active_from` to a CarbonImmutable instance rather than a string
+            // cast `active_from` to a `CarbonImmutable` instance rather than a string
             'active_from' => 'immutable_date',
 
+            // cast to `CarbonImmutable` until we default to using `CarbonImmutable` globally in T430656
             'created_at' => 'immutable_datetime',
             'updated_at' => 'immutable_datetime',
         ];

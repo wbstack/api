@@ -21,10 +21,15 @@ return new class() extends Migration {
             // Using a separate `accepted_at` column rather than renaming the default `created_at` column because:
             //   * it reduces confusion by remaining consistent with other tables that use these default columns
             //   * `accepted_at` will be before `created_at` when backfilling the terms-of-use acceptances
-            $table->timestamp('accepted_at')->useCurrent();
+            // Using a DATETIME field as MariaDB has odd behavior around TIMESTAMPs and default values
+            // `accepted_at` can be NOT NULL if we use a DATETIME which provides us with more data safety
+            $table->dateTime('accepted_at');
 
             // Use Eloquent built in to create nullable `created_at` and `updated_at` timestamp fields
             $table->timestamps();
+
+            // Prevent a user from accepting the same policy twice
+            $table->unique(['user_id', 'policy_id']);
         });
     }
 

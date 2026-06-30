@@ -7,6 +7,7 @@ use App\PolicyAcceptance;
 use App\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use RuntimeException;
 
 class PolicyAcceptanceTest extends TestCase {
     use RefreshDatabase;
@@ -33,6 +34,7 @@ class PolicyAcceptanceTest extends TestCase {
             [
                 'user_id' => $this->userId,
                 'policy_id' => $this->policyId,
+                'accepted_at' => CarbonImmutable::now(),
             ]
         );
         $policyAcceptance->save();
@@ -47,14 +49,34 @@ class PolicyAcceptanceTest extends TestCase {
         $this->assertInstanceOf(CarbonImmutable::class, $policyAcceptance->accepted_at);
     }
 
-    public function testAcceptedAtIgnoresMassAssignment(): void {
-        $policyAcceptance = PolicyAcceptance::create(
-            [
-                'user_id' => $this->userId,
-                'policy_id' => $this->policyId,
-                'accepted_at' => CarbonImmutable::createFromDate(2026, 1, 1),
-            ]
-        );
-        $this->assertNull($policyAcceptance->accepted_at);
+    public function testCreateFailsIfAcceptedAtIsMissing() {
+        $this->expectException(RuntimeException::class);
+        PolicyAcceptance::create([
+            'user_id' => $this->userId,
+            'policy_id' => $this->policyId,
+        ]);
+    }
+
+    public function testCreateFailsIfAcceptedAtIsNull() {
+        $this->expectException(RuntimeException::class);
+        PolicyAcceptance::create([
+            'user_id' => $this->userId,
+            'policy_id' => $this->policyId,
+            'accepted_at' => null,
+        ]);
+    }
+
+    public function testUserAcceptingSamePolicyTwiceFails() {
+        PolicyAcceptance::create([
+            'user_id' => $this->userId,
+            'policy_id' => $this->policyId,
+            'accepted_at' => CarbonImmutable::now()->subSeconds(2),
+        ]);
+        $this->expectException(RuntimeException::class);
+        PolicyAcceptance::create([
+            'user_id' => $this->userId,
+            'policy_id' => $this->policyId,
+            'accepted_at' => CarbonImmutable::now(),
+        ]);
     }
 }
