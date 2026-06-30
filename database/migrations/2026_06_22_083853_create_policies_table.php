@@ -19,6 +19,7 @@ return new class() extends Migration {
             $table->timestamps();
 
             // This prevents two upcoming policies of the same type with `active_from` set to `null`,
+            // This prevents two policies of the same type with `active_from` set to the same value (including `null` for upcoming policies)
             $table->unique(['policy_type', 'active_from']);
         });
     }
