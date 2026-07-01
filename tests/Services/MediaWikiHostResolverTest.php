@@ -9,6 +9,7 @@ use App\Wiki;
 use App\WikiDb;
 use Faker\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 
 class MediaWikiHostResolverTest extends TestCase {
     use RefreshDatabase;
@@ -20,6 +21,16 @@ class MediaWikiHostResolverTest extends TestCase {
         $this->assertEquals(
             'mediawiki-143-app-backend.default.svc.cluster.local',
             $resolver->getBackendHostForDomain($domain)
+        );
+    }
+
+    public function testResolverBuildsBackendUrl(): void {
+        $domain = (new Factory())->create()->unique()->text(30);
+        $this->createWiki($domain, 'mw1.43-wbs2');
+        $resolver = new MediaWikiHostResolver();
+        $this->assertEquals(
+            'http://mediawiki-143-app-backend.default.svc.cluster.local',
+            $resolver->getBackendUrlForDomain($domain)
         );
     }
 
@@ -52,5 +63,14 @@ class MediaWikiHostResolverTest extends TestCase {
             fn () => $resolver->getBackendHostForDomain($domain),
             UnknownWikiDomainException::class
         );
+    }
+
+    public function testLaravelHttpAcceptsSchemeUrls(): void {
+        Http::fake(['*' => Http::response()]);
+
+        // Using Laravel Http facade (which properly respects Http::fake())
+        $response = Http::get('http://mediawiki-143-app-backend.default.svc.cluster.local/w/api.php');
+
+        $this->assertTrue($response->status() === 200);
     }
 }

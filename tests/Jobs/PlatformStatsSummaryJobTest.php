@@ -44,10 +44,10 @@ class PlatformStatsSummaryJobTest extends TestCase {
         $this->wikis = [];
         $this->users = [];
 
-        $this->mwBackendHost = 'mediawiki.localhost';
+        $this->mwBackendHost = 'http://mediawiki.localhost';
 
         $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+        $this->mockMwHostResolver->method('getBackendUrlForDomain')->willReturn(
             $this->mwBackendHost
         );
     }

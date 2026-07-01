@@ -30,10 +30,10 @@ class SiteStatsUpdateJobTest extends TestCase {
         $this->user = User::factory()->create(['verified' => true]);
         $this->wiki = Wiki::factory()->create();
         $this->manager = WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
-        $this->mwBackendHost = 'mediawiki.localhost';
+        $this->mwBackendHost = 'http://mediawiki.localhost';
 
         $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+        $this->mockMwHostResolver->method('getBackendUrlForDomain')->willReturn(
             $this->mwBackendHost
         );
     }
