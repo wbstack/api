@@ -3,12 +3,10 @@
 namespace App;
 
 use App\Notifications\ResetPasswordNotification;
-use http\Exception\RuntimeException;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
@@ -91,10 +89,6 @@ class User extends Authenticatable implements MustVerifyEmail {
 
     public function managesWikis(): BelongsToMany {
         return $this->belongsToMany(Wiki::class, 'wiki_managers');
-    }
-
-    public function touAcceptances(): HasMany {
-        return $this->hasMany(UserTermsOfUseAcceptance::class, 'user_id');
     }
 
     public function hasVerifiedEmail() {
