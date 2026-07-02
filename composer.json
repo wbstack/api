@@ -17,7 +17,7 @@
         "intervention/image": "^2.5",
         "laravel/framework": "^11.51",
         "laravel/horizon": "^5.23",
-        "laravel/passport": "^12.4",
+        "laravel/passport": "^13.7",
         "laravel/tinker": "^3.0",
         "laravel/ui": "^4.4",
         "lcobucci/jwt": "^5.6",
