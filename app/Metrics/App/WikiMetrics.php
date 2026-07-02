@@ -106,7 +106,7 @@ class WikiMetrics {
     protected function normalizeBackendUrl(string $backend): string {
         $backend = rtrim($backend, '/');
 
-        if (str_starts_with($backend, 'http://') || str_starts_with($backend, 'https://')) {
+        if (filter_var($backend, FILTER_VALIDATE_URL) !== false) {
             return $backend;
         }
 
