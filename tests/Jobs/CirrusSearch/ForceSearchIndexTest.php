@@ -48,10 +48,10 @@ class ForceSearchIndexTest extends TestCase {
             'wiki_id' => $this->wiki->id,
         ]);
 
-        $this->mwBackendHost = 'http://mediawiki.localhost';
+        $this->mwBackendHost = 'mediawiki.localhost';
 
         $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwHostResolver->method('getBackendUrlForDomain')->willReturn(
+        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
             $this->mwBackendHost
         );
     }

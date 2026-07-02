@@ -31,7 +31,7 @@ class MediawikiInit extends Job {
         ];
 
         $request->setOptions([
-            CURLOPT_URL => $mwHostResolver->getBackendUrlForDomain($this->wikiDomain) . '/w/api.php?action=wbstackInit&format=json',
+            CURLOPT_URL => $mwHostResolver->getBackendHostForDomain($this->wikiDomain) . '/w/api.php?action=wbstackInit&format=json',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 60,
