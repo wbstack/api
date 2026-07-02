@@ -29,6 +29,8 @@ class UserCreateJob extends Job {
             'password' => Hash::make($this->password),
             'verified' => $this->verified,
         ]);
+
         return $user;
+
     }
 }
