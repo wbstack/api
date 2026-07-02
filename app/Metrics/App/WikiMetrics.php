@@ -79,7 +79,7 @@ class WikiMetrics {
             return null;
         }
 
-        $endpoint = $this->normalizeBackendUrl($qsNamespace->backend)
+        $endpoint = 'http://' . trim($qsNamespace->backend, '/')
             . '/bigdata/namespace/'
             . $qsNamespace->namespace
             . '/sparql';
@@ -98,19 +98,6 @@ class WikiMetrics {
         }
 
         return null;
-    }
-
-    /**
-     * Queryservice backends may be stored as bare hostnames, but Http expects a URL.
-     */
-    protected function normalizeBackendUrl(string $backend): string {
-        $backend = rtrim($backend, '/');
-
-        if (filter_var($backend, FILTER_VALIDATE_URL) !== false) {
-            return $backend;
-        }
-
-        return 'http://' . ltrim($backend, '/');
     }
 
     protected function getNumberOfActions(string $interval): ?int {
