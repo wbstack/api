@@ -100,6 +100,9 @@ class WikiMetrics {
         return null;
     }
 
+    /**
+     * Queryservice backends may be stored as bare hostnames, but Http expects a URL.
+     */
     protected function normalizeBackendUrl(string $backend): string {
         $backend = rtrim($backend, '/');
 

@@ -111,26 +111,6 @@ docker compose exec api vendor/bin/phpunit --filter DeleteWikiJobTest::testDelet
 docker compose exec api vendor/bin/pint --test -v
 ```
 
-### URL Scheme Handling (Guzzle 7.11+)
-
-Since Guzzle 7.11.0, bare hostnames without URL schemes are rejected as invalid. This means requests must include an explicit scheme (`http://` or `https://`).
-
-**Valid formats:**
-- `http://hostname.svc.cluster.local/api` ✓
-- `//hostname.svc.cluster.local/api` (defaults to http) ✓
-- `https://hostname.svc.cluster.local/api` ✓
-
-**Invalid formats:**
-- `hostname.svc.cluster.local/api` ✗ (bare hostname, no scheme)
-
-See [Guzzle issue #3713](https://github.com/guzzle/guzzle/issues/3713) and [Guzzle 7.13.0 release notes](https://github.com/guzzle/guzzle/releases/tag/7.13.0) for details.
-
-**In this codebase:** The `MediaWikiHostResolver::getBackendUrlForDomain()` method returns URLs with explicit `http://` scheme for internal Kubernetes service communication, which is appropriate for private cluster-to-cluster traffic without TLS requirements.
-
-**External Service Configuration:** Environment-based external service URLs (queryservice, elasticsearch) are not part of the Guzzle-specific fix. The request URL must be normalized at the call site when it is used by a Guzzle-backed client.
-
-**For custom internal service URLs:** If you add new Guzzle-backed HTTP clients, make sure the request URL includes an explicit scheme before the request is sent.
-
 #### Debugging
 
 If you get a CORS error from an API when testing, it might be due to an exception internally, resulting in a 500 response with no CORS.
