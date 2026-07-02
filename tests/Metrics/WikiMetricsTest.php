@@ -11,6 +11,7 @@ use App\WikiDb;
 use Carbon\Carbon;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
@@ -196,6 +197,13 @@ class WikiMetricsTest extends TestCase {
             ], 200),
         ]);
         (new WikiMetrics())->saveMetrics($wiki);
+        Http::assertSent(function (Request $request) use ($host, $namespace) {
+            return $request->method() === 'GET'
+                && str_starts_with(
+                    $request->url(),
+                    'http://' . $host . '/bigdata/namespace/' . $namespace . '/sparql'
+                );
+        });
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
             'number_of_triples' => 12345,

@@ -79,7 +79,10 @@ class WikiMetrics {
             return null;
         }
 
-        $endpoint = $qsNamespace->backend . '/bigdata/namespace/' . $qsNamespace->namespace . '/sparql';
+        $endpoint = $this->normalizeBackendUrl($qsNamespace->backend)
+            . '/bigdata/namespace/'
+            . $qsNamespace->namespace
+            . '/sparql';
         $query = 'SELECT (COUNT(*) AS ?triples) WHERE { ?s ?p ?o }';
 
         $response = Http::withHeaders([
@@ -95,6 +98,16 @@ class WikiMetrics {
         }
 
         return null;
+    }
+
+    protected function normalizeBackendUrl(string $backend): string {
+        $backend = rtrim($backend, '/');
+
+        if (str_starts_with($backend, 'http://') || str_starts_with($backend, 'https://')) {
+            return $backend;
+        }
+
+        return 'http://' . ltrim($backend, '/');
     }
 
     protected function getNumberOfActions(string $interval): ?int {
