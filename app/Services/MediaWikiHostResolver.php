@@ -37,6 +37,13 @@ class MediaWikiHostResolver {
         return sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
     }
 
+    /**
+     * Laravel Http or Guzzle callers need a full backend URL.
+     */
+    public function getBackendUrlForDomain(string $domain): string {
+        return 'http://' . $this->getBackendHostForDomain($domain);
+    }
+
     private function getMwVersionForDomain(string $domain): string {
         $wiki = Wiki::where('domain', $domain)->first();
 

@@ -29,10 +29,10 @@ class WikiEntityImportJobTest extends TestCase {
         Wiki::query()->delete();
         WikiEntityImport::query()->delete();
 
-        $this->mwBackendHost = 'mediawiki.localhost';
+        $this->mwBackendHost = 'http://mediawiki.localhost';
 
         $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+        $this->mockMwHostResolver->method('getBackendUrlForDomain')->willReturn(
             $this->mwBackendHost
         );
     }

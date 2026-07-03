@@ -77,7 +77,7 @@ class WikiEntityImportJob implements ShouldQueue {
 
     private static function acquireCredentials(string $wikiDomain, MediaWikiHostResolver $mwHostResolver): OAuthCredentials {
         $response = Http::withHeaders(['host' => $wikiDomain])->asForm()->post(
-            $mwHostResolver->getBackendHostForDomain($wikiDomain) . '/w/api.php?action=wbstackPlatformOauthGet&format=json',
+            $mwHostResolver->getBackendUrlForDomain($wikiDomain) . '/w/api.php?action=wbstackPlatformOauthGet&format=json',
             [
                 'consumerName' => 'WikiEntityImportJob',
                 'ownerOnly' => '1',
