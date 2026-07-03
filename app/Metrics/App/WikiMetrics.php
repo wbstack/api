@@ -79,7 +79,7 @@ class WikiMetrics {
             return null;
         }
 
-        $endpoint = 'http://' . trim($qsNamespace->backend, '/')
+        $endpoint = 'http://' . $qsNamespace->backend
             . '/bigdata/namespace/'
             . $qsNamespace->namespace
             . '/sparql';

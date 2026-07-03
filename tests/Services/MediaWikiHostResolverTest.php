@@ -9,7 +9,6 @@ use App\Wiki;
 use App\WikiDb;
 use Faker\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
 
 class MediaWikiHostResolverTest extends TestCase {
     use RefreshDatabase;
