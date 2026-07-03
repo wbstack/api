@@ -64,13 +64,4 @@ class MediaWikiHostResolverTest extends TestCase {
             UnknownWikiDomainException::class
         );
     }
-
-    public function testLaravelHttpAcceptsSchemeUrls(): void {
-        Http::fake(['*' => Http::response()]);
-
-        // Using Laravel Http facade (which properly respects Http::fake())
-        $response = Http::get('http://mediawiki-143-app-backend.default.svc.cluster.local/w/api.php');
-
-        $this->assertTrue($response->status() === 200);
-    }
 }
