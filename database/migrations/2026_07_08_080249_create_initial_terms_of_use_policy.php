@@ -5,6 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class() extends Migration {
     private const POLICY_TYPE = 'terms-of-use';
+
     private const ACTIVE_FROM = '2022-01-01';
 
     /**
