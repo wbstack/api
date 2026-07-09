@@ -3,6 +3,9 @@
 namespace App\Jobs;
 
 use App\User;
+use App\UserTermsOfUseAcceptance;
+use App\Policy;
+use App\PolicyAcceptance;
 use Illuminate\Support\Facades\Hash;
 
 class UserCreateJob extends Job {
