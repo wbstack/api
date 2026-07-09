@@ -43,7 +43,7 @@ class UserCreateJob extends Job {
             Log::warning("No active Terms of Use version found when creating user {$user->email} (ID {$user->id}).");
         }
 
-        if (is_array($this->acceptedPolicies)) {
+        if (is_array($this->acceptedPolicyIds)) {
             foreach($acceptedPolicyIds as $acceptedPolicyId) {
                 $policy = Policy::find($acceptedPolicyId);
 
