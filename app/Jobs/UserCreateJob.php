@@ -44,7 +44,7 @@ class UserCreateJob extends Job {
         }
 
         if (is_array($this->acceptedPolicyIds)) {
-            foreach($acceptedPolicyIds as $acceptedPolicyId) {
+            foreach($this->acceptedPolicyIds as $acceptedPolicyId) {
                 $policy = Policy::find($acceptedPolicyId);
 
                 if ($policy) {
