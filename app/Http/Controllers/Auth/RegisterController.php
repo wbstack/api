@@ -35,7 +35,8 @@ class RegisterController extends Controller {
         DB::transaction(function () use (&$user, $request): void {
             $user = (new UserCreateJob(
                 $request->input('email'),
-                $request->input('password')
+                $request->input('password'),
+                $request->input('accepted_policies')
             ))->handle();
             (UserVerificationCreateTokenAndSendJob::newForAccountCreation($user))->handle();
         });
