@@ -13,7 +13,7 @@ class PoliciesController extends Controller {
         $now = CarbonImmutable::now();
 
         // This works based on the assumption that the latest policy has the highest id given that id is AUTO_INCREMENT
-        $latestPolicyIds = Policy::where('active_from', '<=', $now)
+        $latestPolicyIds = Policy::where('active_from', '<', $now)
             ->selectRaw('MAX(id) as id')
             ->groupBy('policy_type')
             ->pluck('id');

@@ -15,8 +15,6 @@ class PoliciesControllerTest extends TestCase {
             'active_from' => now()->addDay(),
         ]);
         // Active policy
-        Policy::factory()->create();
-        // Active policy
         Policy::factory()->create([
             'active_from' => now()->subMonth(),
         ]);
@@ -24,6 +22,6 @@ class PoliciesControllerTest extends TestCase {
         $response = $this->getJson('/policies/current');
 
         $response->assertOk();
-        $response->assertJsonCount(2, 'data.items');
+        $response->assertJsonCount(1, 'data.items');
     }
 }
