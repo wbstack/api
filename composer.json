@@ -11,7 +11,7 @@
         "absszero/laravel-stackdriver-error-reporting": "^1.9",
         "firebase/php-jwt": "^7.0",
         "google/recaptcha": "^1.2",
-        "guzzlehttp/guzzle": "^7.8",
+        "guzzlehttp/guzzle": "^7.13",
         "guzzlehttp/psr7": "^2.9",
         "hackzilla/password-generator": "^1.6",
         "intervention/image": "^2.5",

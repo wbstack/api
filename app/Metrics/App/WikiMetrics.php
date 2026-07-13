@@ -79,7 +79,10 @@ class WikiMetrics {
             return null;
         }
 
-        $endpoint = $qsNamespace->backend . '/bigdata/namespace/' . $qsNamespace->namespace . '/sparql';
+        $endpoint = 'http://' . $qsNamespace->backend
+            . '/bigdata/namespace/'
+            . $qsNamespace->namespace
+            . '/sparql';
         $query = 'SELECT (COUNT(*) AS ?triples) WHERE { ?s ?p ?o }';
 
         $response = Http::withHeaders([

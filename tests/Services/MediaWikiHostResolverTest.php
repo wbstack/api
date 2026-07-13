@@ -23,6 +23,16 @@ class MediaWikiHostResolverTest extends TestCase {
         );
     }
 
+    public function testResolverBuildsBackendUrl(): void {
+        $domain = (new Factory())->create()->unique()->text(30);
+        $this->createWiki($domain, 'mw1.43-wbs2');
+        $resolver = new MediaWikiHostResolver();
+        $this->assertEquals(
+            'http://mediawiki-143-app-backend.default.svc.cluster.local',
+            $resolver->getBackendUrlForDomain($domain)
+        );
+    }
+
     private function createWiki(string $domain, string $version) {
         $wiki = Wiki::factory()->create(['domain' => $domain]);
         WikiDb::create([
