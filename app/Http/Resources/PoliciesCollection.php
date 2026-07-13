@@ -13,7 +13,7 @@ class PoliciesCollection extends ResourceCollection {
      */
     public function toArray(Request $request): array {
         return [
-            'items'=> $this->collection
+            'items' => $this->collection,
         ];
     }
 }

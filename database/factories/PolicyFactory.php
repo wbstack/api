@@ -4,13 +4,14 @@ namespace Database\Factories;
 
 use App\Policy;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Model>
+ * @extends Factory<Model>
  */
 class PolicyFactory extends Factory {
-
     protected $model = Policy::class;
+
     /**
      * Define the model's default state.
      *
@@ -18,7 +19,7 @@ class PolicyFactory extends Factory {
      */
     public function definition(): array {
         return [
-            'policy_type' => $this->faker->randomElement(['terms-of-use','hosting-policy']),
+            'policy_type' => $this->faker->randomElement(['terms-of-use', 'hosting-policy']),
             'active_from' => now(),
             'content_vue_file' => fake()->slug() . '.vue',
         ];

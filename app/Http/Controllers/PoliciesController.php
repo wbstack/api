@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Resources\PoliciesCollection;
 use App\Policy;
 use Carbon\CarbonImmutable;
-use Illuminate\Http\Request;
 
 class PoliciesController extends Controller {
-
     public function getCurrentPolicies() {
         $now = CarbonImmutable::now();
 
@@ -19,6 +17,7 @@ class PoliciesController extends Controller {
             ->pluck('id');
 
         $currentPolicies = Policy::whereIn('id', $latestPolicyIds)->get();
+
         return new PoliciesCollection($currentPolicies);
     }
 }
