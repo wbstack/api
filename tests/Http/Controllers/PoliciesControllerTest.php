@@ -10,18 +10,38 @@ class PoliciesControllerTest extends TestCase {
     use DatabaseTransactions;
 
     public function testGetCurrentPolicies(): void {
+        $currentTime = now();
         // Future policy
         Policy::factory()->create([
-            'active_from' => now()->addDay(),
+            'policy_type' => 'terms-of-use',
+            'active_from' => $currentTime->addDay(),
         ]);
-        // Active policy
+        // Old policy
         Policy::factory()->create([
-            'active_from' => now()->subMonth(),
+            'policy_type' => 'hosting-policy',
+            'active_from' => $currentTime->subMonth(),
+        ]);
+        // Active policies
+        $latestToUPolicy = Policy::factory()->create([
+            'policy_type' => 'terms-of-use',
+            'active_from' => $currentTime->subMonth(),
+        ]);
+        $latestHostingPolicy = Policy::factory()->create([
+            'policy_type' => 'hosting-policy',
+            'active_from' => $currentTime->subWeek(),
         ]);
 
         $response = $this->getJson('/policies/current');
 
         $response->assertOk();
-        $response->assertJsonCount(1, 'data.items');
+        $response->assertJsonCount(2, 'data.items');
+        $response->assertJsonFragment([
+            'id' => $latestToUPolicy->id,
+            'active_from' => $latestToUPolicy->active_from,
+        ]);
+        $response->assertJsonFragment([
+            'id' => $latestHostingPolicy->id,
+            'active_from' => $latestHostingPolicy->active_from,
+        ]);
     }
 }

@@ -7,7 +7,7 @@ use App\Policy;
 use Carbon\CarbonImmutable;
 
 class PoliciesController extends Controller {
-    public function getCurrentPolicies() {
+    public function getCurrentPolicies(): PoliciesCollection {
         $now = CarbonImmutable::now();
 
         // This works based on the assumption that the latest policy has the highest id given that id is AUTO_INCREMENT
