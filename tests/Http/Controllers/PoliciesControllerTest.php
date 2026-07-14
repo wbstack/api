@@ -22,11 +22,11 @@ class PoliciesControllerTest extends TestCase {
             'active_from' => $currentTime->subMonth(),
         ]);
         // Active policies
-        $latestToUPolicy = Policy::factory()->create([
+        $latestActiveToUPolicy = Policy::factory()->create([
             'policy_type' => 'terms-of-use',
             'active_from' => $currentTime->subMonth(),
         ]);
-        $latestHostingPolicy = Policy::factory()->create([
+        $latestActiveHostingPolicy = Policy::factory()->create([
             'policy_type' => 'hosting-policy',
             'active_from' => $currentTime->subWeek(),
         ]);
@@ -36,12 +36,12 @@ class PoliciesControllerTest extends TestCase {
         $response->assertOk();
         $response->assertJsonCount(2, 'data.items');
         $response->assertJsonFragment([
-            'id' => $latestToUPolicy->id,
-            'active_from' => $latestToUPolicy->active_from,
+            'id' => $latestActiveToUPolicy->id,
+            'active_from' => $latestActiveToUPolicy->active_from,
         ]);
         $response->assertJsonFragment([
-            'id' => $latestHostingPolicy->id,
-            'active_from' => $latestHostingPolicy->active_from,
+            'id' => $latestActiveHostingPolicy->id,
+            'active_from' => $latestActiveHostingPolicy->active_from,
         ]);
     }
 }
