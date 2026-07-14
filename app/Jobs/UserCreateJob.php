@@ -15,6 +15,9 @@ class UserCreateJob extends Job {
     private $password;
 
     private $verified;
+    
+    private $acceptedPolicyIds;
+    
 
     public function __construct($email, $password, $acceptedPolicyIds, $verified = false) {
         // TODO maybe pass in an unsaved eloquent model?
