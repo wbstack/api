@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
-use App\User;
 use App\Policy;
 use App\PolicyAcceptance;
+use App\User;
 use Illuminate\Support\Facades\Hash;
 
 class UserCreateJob extends Job {
@@ -36,7 +36,7 @@ class UserCreateJob extends Job {
         ]);
 
         if (is_array($this->acceptedPolicyIds)) {
-            foreach($this->acceptedPolicyIds as $acceptedPolicyId) {
+            foreach ($this->acceptedPolicyIds as $acceptedPolicyId) {
                 $policy = Policy::find($acceptedPolicyId);
 
                 if ($policy) {

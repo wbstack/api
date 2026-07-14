@@ -2,15 +2,12 @@
 
 namespace Tests\Jobs;
 
-use App\Policy;
-use App\Jobs\CreateFirstTermsOfUseVersionJob;
 use App\Jobs\UserCreateJob;
-use App\TermsOfUseVersion;
+use App\Policy;
 use App\PolicyAcceptance;
-use App\UserTermsOfUseAcceptance;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Carbon\CarbonImmutable;
 
 class UserAcceptedPoliciesTest extends TestCase {
     use RefreshDatabase;
@@ -26,7 +23,7 @@ class UserAcceptedPoliciesTest extends TestCase {
     }
 
     public function testUserRegistrationAcceptsOne(): void {
-        $termsOfUse = new Policy;
+        $termsOfUse = new Policy();
         $termsOfUse->policy_type = 'terms-of-use';
         $termsOfUse->active_from = CarbonImmutable::now();
         $termsOfUse->content_vue_file = 'termsOfUse.vue';
@@ -42,13 +39,13 @@ class UserAcceptedPoliciesTest extends TestCase {
     }
 
     public function testUserRegistrationAcceptsTwo(): void {
-        $termsOfUse = new Policy;
+        $termsOfUse = new Policy();
         $termsOfUse->policy_type = 'terms-of-use';
         $termsOfUse->active_from = CarbonImmutable::now();
         $termsOfUse->content_vue_file = 'termsOfUse.vue';
         $termsOfUse->save();
 
-        $hostingPolicy = new Policy;
+        $hostingPolicy = new Policy();
         $hostingPolicy->policy_type = 'hosting-policy';
         $hostingPolicy->active_from = CarbonImmutable::now();
         $hostingPolicy->content_vue_file = 'hostingPolicy.vue';
