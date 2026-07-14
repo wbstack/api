@@ -139,4 +139,19 @@ class PolicyAcceptanceControllerTest extends TestCase {
             ->assertStatus(422)
             ->assertJsonStructure(['errors' => ['policy_ids']]);
     }
+
+    public function testPolicyIdsContainingNonIntegerReturns422(): void {
+        $user = User::factory()->create();
+        $policy = $this->makePolicy();
+
+        $this->actingAs($user, 'api')
+            ->json('PUT', $this->route, ['policy_ids' => [$policy->id, 'abc']])
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['policy_ids.1']]);
+
+        $this->assertDatabaseMissing('policy_acceptances', [
+            'user_id' => $user->id,
+            'policy_id' => $policy->id,
+        ]);
+    }
 }
