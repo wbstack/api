@@ -19,25 +19,23 @@ return new class() extends Migration {
         $timestamp = now();
 
         DB::table('users')
-            ->leftJoin('policy_acceptances', fn ($join) =>
-                $join->on('users.id', '=', 'user_id')
-                    ->where('policy_id', '=', $policyId)
+            ->leftJoin('policy_acceptances', fn ($join) => $join->on('users.id', '=', 'user_id')
+                ->where('policy_id', '=', $policyId)
             )
             ->whereNull('policy_id')
             ->where('users.created_at', '<', self::USER_CREATED_AT_CUTOFF)
             ->orderBy('users.id')
             ->select('users.id', 'users.created_at')
-            ->chunkById(100, fn ($users) =>
-                DB::table('policy_acceptances')->insert(
-                    $users->map(fn ($user) => [
-                        'user_id' => $user->id,
-                        'policy_id' => $policyId,
-                        'accepted_at' => $user->created_at,
-                        'created_at' => $timestamp,
-                        'updated_at' => $timestamp,
-                    ])->all()
-                ),
-            'users.id', 'id');
+            ->chunkById(100, fn ($users) => DB::table('policy_acceptances')->insert(
+                $users->map(fn ($user) => [
+                    'user_id' => $user->id,
+                    'policy_id' => $policyId,
+                    'accepted_at' => $user->created_at,
+                    'created_at' => $timestamp,
+                    'updated_at' => $timestamp,
+                ])->all()
+            ),
+                'users.id', 'id');
     }
 
     /**
