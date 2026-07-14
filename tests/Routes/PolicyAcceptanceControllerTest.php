@@ -5,6 +5,7 @@ namespace Tests\Routes;
 use App\Policy;
 use App\PolicyAcceptance;
 use App\User;
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -77,6 +78,30 @@ class PolicyAcceptanceControllerTest extends TestCase {
             'user_id' => $user->id,
             'policy_id' => $policy->id,
         ])->count());
+    }
+
+    public function testAlreadyAcceptedPolicyKeepsOriginalAcceptedAt(): void {
+        $user = User::factory()->create();
+        $policy = $this->makePolicy();
+
+        $originalAcceptedAt = CarbonImmutable::create(2026, 7, 1, 10, 0, 0);
+        Carbon::setTestNow(CarbonImmutable::create(2026, 7, 2, 10, 0, 0));
+
+        PolicyAcceptance::create([
+            'user_id' => $user->id,
+            'policy_id' => $policy->id,
+            'accepted_at' => $originalAcceptedAt,
+        ]);
+
+        $this->actingAs($user, 'api')
+            ->json('PUT', $this->route, ['policy_ids' => [$policy->id]])
+            ->assertStatus(200)
+            ->assertJson(['success' => true]);
+
+        $this->assertEquals($originalAcceptedAt->toDateTimeString(), PolicyAcceptance::where([
+            'user_id' => $user->id,
+            'policy_id' => $policy->id,
+        ])->first()->accepted_at->toDateTimeString());
     }
 
     public function testNonExistentPolicyIdReturns400(): void {
