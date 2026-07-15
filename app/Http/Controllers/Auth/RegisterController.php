@@ -68,6 +68,8 @@ class RegisterController extends Controller {
             'recaptcha' => ['required', 'string', 'bail', $this->recaptchaValidation],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
+            'accepted_policies' => ['nullable', 'array'],
+            'accepted_policies.*' => ['integer', 'distinct']
         ];
 
         return Validator::make($data, $validation);
