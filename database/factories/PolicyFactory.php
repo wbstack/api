@@ -4,10 +4,9 @@ namespace Database\Factories;
 
 use App\Policy;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Model;
 
 /**
- * @extends Factory<Model>
+ * @extends Factory<Policy>
  */
 class PolicyFactory extends Factory {
     protected $model = Policy::class;
