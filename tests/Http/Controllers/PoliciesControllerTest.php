@@ -31,7 +31,7 @@ class PoliciesControllerTest extends TestCase {
             'active_from' => $currentTime->subWeek(),
         ]);
 
-        $response = $this->getJson('/policies/current');
+        $response = $this->getJson('/v1/policies/current');
 
         $response->assertOk();
         $response->assertJsonCount(2, 'data.items');
