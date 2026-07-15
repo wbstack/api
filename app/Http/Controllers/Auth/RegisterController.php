@@ -69,7 +69,7 @@ class RegisterController extends Controller {
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
             'accepted_policies' => ['nullable', 'array'],
-            'accepted_policies.*' => ['integer', 'distinct']
+            'accepted_policies.*' => ['integer', 'distinct'],
         ];
 
         return Validator::make($data, $validation);
