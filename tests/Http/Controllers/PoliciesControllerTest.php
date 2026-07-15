@@ -34,7 +34,7 @@ class PoliciesControllerTest extends TestCase {
         $response = $this->getJson('/v1/policies/current');
 
         $response->assertOk();
-        $response->assertJsonCount(2, 'data.items');
+        $response->assertJsonCount(2, 'data');
         $response->assertJsonFragment([
             'id' => $latestActiveToUPolicy->id,
             'active_from' => $latestActiveToUPolicy->active_from,
