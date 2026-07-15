@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class PolicyAcceptanceControllerTest extends TestCase {
-    protected $route = 'policy_acceptances';
+    protected $route = 'v1/policy_acceptances';
 
     use DatabaseTransactions;
 
