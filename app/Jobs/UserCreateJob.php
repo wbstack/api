@@ -6,6 +6,7 @@ use App\Policy;
 use App\PolicyAcceptance;
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class UserCreateJob extends Job {
     private $email;
