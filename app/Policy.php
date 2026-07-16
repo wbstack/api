@@ -5,6 +5,7 @@ namespace App;
 use Carbon\CarbonImmutable;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -24,10 +25,13 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder<static>|Policy whereId($value)
  * @method static Builder<static>|Policy wherePolicyType($value)
  * @method static Builder<static>|Policy whereUpdatedAt($value)
+ * @method static \Database\Factories\PolicyFactory factory(...$parameters)
  *
  * @mixin Eloquent
  */
 class Policy extends Model {
+    use HasFactory;
+
     // define which attributes are mass assignable
     protected $fillable = [
         'policy_type',

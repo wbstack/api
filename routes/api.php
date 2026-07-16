@@ -21,6 +21,7 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
     $router->post('user/resetPassword', ['uses' => 'Auth\ResetPasswordController@reset']);
     $router->post('contact/sendMessage', ['uses' => 'ContactController@sendMessage']);
     $router->post('complaint/sendMessage', ['uses' => 'ComplaintController@sendMessage']);
+    $router->get('v1/policies/current', ['uses' => 'PoliciesController@getCurrentPolicies']);
 
     $router->post('auth/login', ['uses' => 'Auth\LoginController@postLogin'])->name('login');
     // Authed
