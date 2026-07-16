@@ -11,6 +11,7 @@ class PoliciesControllerTest extends TestCase {
 
     public function testGetCurrentPolicies(): void {
         $currentTime = now();
+
         // Future policy
         Policy::factory()->create([
             'policy_type' => 'terms-of-use',
@@ -49,11 +50,11 @@ class PoliciesControllerTest extends TestCase {
 
         $response->assertJsonFragment([
             'policy_id' => $latestActiveToUPolicy->id,
-            'active_from' => $latestActiveToUPolicy->active_from,
+            'active_from' => $latestActiveToUPolicy->active_from->format('Y-m-d'),
         ]);
         $response->assertJsonFragment([
             'policy_id' => $latestActiveHostingPolicy->id,
-            'active_from' => $latestActiveHostingPolicy->active_from,
+            'active_from' => $latestActiveHostingPolicy->active_from->format('Y-m-d'),
         ]);
     }
 }
