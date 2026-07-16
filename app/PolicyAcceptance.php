@@ -38,6 +38,12 @@ class PolicyAcceptance extends Model {
         'accepted_at',
     ];
 
+    protected static function booted(): void {
+        static::creating(function (PolicyAcceptance $model): void {
+            $model->accepted_at ??= CarbonImmutable::now();
+        });
+    }
+
     protected function casts(): array {
         return [
             // cast `accepted_at` to a `CarbonImmutable` instance rather than a string
