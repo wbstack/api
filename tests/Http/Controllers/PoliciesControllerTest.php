@@ -34,13 +34,25 @@ class PoliciesControllerTest extends TestCase {
         $response = $this->getJson('/v1/policies/current');
 
         $response->assertOk();
-        $response->assertJsonCount(2, 'data');
+        $response->assertJsonStructure([
+            'items' => [
+                '*' => [
+                    'metadata' => [
+                        'policy_id',
+                        'active_from',
+                        'content_vue_file',
+                        'type',
+                    ],
+                ],
+            ],
+        ]);
+
         $response->assertJsonFragment([
-            'id' => $latestActiveToUPolicy->id,
+            'policy_id' => $latestActiveToUPolicy->id,
             'active_from' => $latestActiveToUPolicy->active_from,
         ]);
         $response->assertJsonFragment([
-            'id' => $latestActiveHostingPolicy->id,
+            'policy_id' => $latestActiveHostingPolicy->id,
             'active_from' => $latestActiveHostingPolicy->active_from,
         ]);
     }
