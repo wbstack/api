@@ -28,6 +28,9 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
         $router->get('auth/login', ['uses' => 'Auth\LoginController@getLogin']);
         $router->delete('auth/login', ['uses' => 'Auth\LoginController@deleteLogin']);
 
+        // policy acceptances
+        $router->put('v1/policy_acceptances', ['uses' => 'PolicyAcceptanceController@store']);
+
         // user
         $router->group(['prefix' => 'user'], function () use ($router): void {
             $router->post('sendVerifyEmail', ['uses' => 'UserVerificationTokenController@createAndSendForUser']);
