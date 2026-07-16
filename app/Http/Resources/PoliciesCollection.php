@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 class PoliciesCollection extends ResourceCollection {
     // per default Laravel wraps ResourceCollections in a `data` key: https://laravel.com/docs/11.x/eloquent-resources#data-wrapping
     // which is not wanted in this case: https://phabricator.wikimedia.org/T429591
-    public static $wrap = null;
+    public static $wrap = 'items';
 
     /**
      * Transform the resource collection into an array.
