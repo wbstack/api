@@ -28,6 +28,7 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
     $router->group(['middleware' => ['auth:api']], function () use ($router): void {
         $router->get('auth/login', ['uses' => 'Auth\LoginController@getLogin']);
         $router->delete('auth/login', ['uses' => 'Auth\LoginController@deleteLogin']);
+        $router->get('v1/policies/missing', ['uses' => 'PoliciesController@getMissingPolicies']);
 
         // policy acceptances
         $router->put('v1/policy_acceptances', ['uses' => 'PolicyAcceptanceController@store']);
