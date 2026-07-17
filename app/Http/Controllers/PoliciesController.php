@@ -4,21 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PoliciesCollection;
 use App\Policy;
-use App\PolicyAcceptance;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 
 class PoliciesController extends Controller {
     public function getCurrentPolicies(): PoliciesCollection {
         $now = CarbonImmutable::now();
 
-        // This works based on the assumption that the latest policy has the highest id given that id is AUTO_INCREMENT
-        $latestPolicyIds = Policy::where('active_from', '<', $now)
-            ->selectRaw('MAX(id) as id')
-            ->groupBy('policy_type')
-            ->pluck('id');
-
-        $currentPolicies = Policy::whereIn('id', $latestPolicyIds)->get();
+        $currentPolicies = Policy::whereIn('id', $this->activePolicyIdsQuery($now))->get();
 
         return new PoliciesCollection($currentPolicies);
     }
@@ -26,19 +20,23 @@ class PoliciesController extends Controller {
     public function getMissingPolicies(Request $request): PoliciesCollection {
         $now = CarbonImmutable::now();
 
-        $activePolicyIds = Policy::where('active_from', '<=', $now)
-            ->selectRaw('MAX(id) as id')
-            ->groupBy('policy_type')
-            ->pluck('id');
-
-        $acceptedPolicyIds = PolicyAcceptance::where('user_id', $request->user()->id)
-            ->whereIn('policy_id', $activePolicyIds)
-            ->pluck('policy_id');
-
-        $missingPolicies = Policy::whereIn('id', $activePolicyIds)
-            ->whereNotIn('id', $acceptedPolicyIds)
+        $missingPolicies = Policy::whereIn('id', $this->activePolicyIdsQuery($now))
+            ->whereNotExists(function (Builder $query) use ($request): void {
+                $query->selectRaw('1')
+                    ->from('policy_acceptances')
+                    ->whereColumn('policy_acceptances.policy_id', 'policies.id')
+                    ->where('policy_acceptances.user_id', $request->user()->id);
+            })
             ->get();
 
         return new PoliciesCollection($missingPolicies);
+    }
+
+    private function activePolicyIdsQuery(CarbonImmutable $now): Builder {
+        return Policy::query()
+            ->selectRaw('MAX(id) as id')
+            ->where('active_from', '<=', $now)
+            ->groupBy('policy_type')
+            ->toBase();
     }
 }
