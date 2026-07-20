@@ -5,13 +5,6 @@ use Illuminate\Support\Facades\DB;
 
 return new class() extends Migration {
     /**
-     * Users created before this timestamp are treated as having accepted
-     * our existing terms of use. Users created afterwards go through our
-     * new policy flow (T430529) and are excluded from the backfill.
-     */
-    private const USER_CREATED_AT_CUTOFF = '2026-07-13 08:00:00';
-
-    /**
      * Run the migrations.
      */
     public function up(): void {
@@ -23,7 +16,6 @@ return new class() extends Migration {
                 ->where('policy_id', '=', $policyId)
             )
             ->whereNull('policy_id')
-            ->where('users.created_at', '<', self::USER_CREATED_AT_CUTOFF)
             ->orderBy('users.id')
             ->select('users.id', 'users.created_at')
             ->chunkById(100, fn ($users) => DB::table('policy_acceptances')->insert(
@@ -44,7 +36,6 @@ return new class() extends Migration {
     public function down(): void {
         DB::table('policy_acceptances')
             ->where('policy_id', $this->getPolicyId())
-            ->where('accepted_at', '<', self::USER_CREATED_AT_CUTOFF)
             ->whereColumn('created_at', '>', 'accepted_at')
             ->delete();
     }
