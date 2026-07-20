@@ -21,12 +21,16 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
     $router->post('user/resetPassword', ['uses' => 'Auth\ResetPasswordController@reset']);
     $router->post('contact/sendMessage', ['uses' => 'ContactController@sendMessage']);
     $router->post('complaint/sendMessage', ['uses' => 'ComplaintController@sendMessage']);
+    $router->get('v1/policies/current', ['uses' => 'PoliciesController@getCurrentPolicies']);
 
     $router->post('auth/login', ['uses' => 'Auth\LoginController@postLogin'])->name('login');
     // Authed
     $router->group(['middleware' => ['auth:api']], function () use ($router): void {
         $router->get('auth/login', ['uses' => 'Auth\LoginController@getLogin']);
         $router->delete('auth/login', ['uses' => 'Auth\LoginController@deleteLogin']);
+
+        // policy acceptances
+        $router->put('v1/policy_acceptances', ['uses' => 'PolicyAcceptanceController@store']);
 
         // user
         $router->group(['prefix' => 'user'], function () use ($router): void {
