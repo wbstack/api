@@ -23,6 +23,14 @@ class PolicyControllerTest extends TestCase {
         $request = $this->getJson('v1/policies/hosting-policy/by_active_from/2026-07-01');
 
         $request->assertOk();
+        $request->assertJsonStructure([
+            'metadata' => [
+                'policy_id',
+                'active_from',
+                'content_vue_file',
+                'type',
+            ],
+        ]);
         $request->assertJsonFragment([
             'active_from' => '2026-07-01',
             'type' => 'hosting-policy',
