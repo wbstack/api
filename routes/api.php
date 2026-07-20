@@ -22,7 +22,7 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
     $router->post('contact/sendMessage', ['uses' => 'ContactController@sendMessage']);
     $router->post('complaint/sendMessage', ['uses' => 'ComplaintController@sendMessage']);
     $router->get('v1/policies/current', ['uses' => 'PoliciesController@getCurrentPolicies']);
-    $router->get('v1/policies/{policy_type}/by_active_from/{active_from}', ['uses' => 'PoliciesController@getPolicyByTypeAndActiveFrom']);
+    $router->get('v1/policies/{policy_type}/by_active_from/{active_from}', ['uses' => 'PolicyController@getPolicyByTypeAndActiveFrom']);
 
     $router->post('auth/login', ['uses' => 'Auth\LoginController@postLogin'])->name('login');
     // Authed
