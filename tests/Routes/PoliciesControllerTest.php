@@ -33,7 +33,6 @@ class PoliciesControllerTest extends TestCase {
 
         // Future policy (should be ignored because it is not active yet)
         $this->createPolicy('terms-of-use', $now->addDays(10), 'terms-of-use/version-future.vue');
-
         $olderTerms = $this->createPolicy('terms-of-use', $now->subDays(10), 'terms-of-use/version-1.vue');
         $latestTerms = $this->createPolicy('terms-of-use', $now->subDays(1), 'terms-of-use/version-2.vue');
         $this->createPolicy('terms-of-use', $now->addDays(1), 'terms-of-use/version-3.vue');
