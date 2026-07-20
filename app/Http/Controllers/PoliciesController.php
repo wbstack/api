@@ -26,7 +26,6 @@ class PoliciesController extends Controller {
     public function getMissingPolicies(Request $request): PoliciesCollection {
         $now = CarbonImmutable::now();
 
-        // This works based on the assumption that the active policy has the highest id given that id is AUTO_INCREMENT
         $activePolicyIds = Policy::where('active_from', '<=', $now)
             ->selectRaw('MAX(id) as id')
             ->groupBy('policy_type')
