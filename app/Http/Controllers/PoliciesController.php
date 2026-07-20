@@ -26,17 +26,17 @@ class PoliciesController extends Controller {
     public function getMissingPolicies(Request $request): PoliciesCollection {
         $now = CarbonImmutable::now();
 
-        // This works based on the assumption that the latest policy has the highest id given that id is AUTO_INCREMENT
-        $latestPolicyIds = Policy::where('active_from', '<', $now)
+        // This works based on the assumption that the active policy has the highest id given that id is AUTO_INCREMENT
+        $activePolicyIds = Policy::where('active_from', '<=', $now)
             ->selectRaw('MAX(id) as id')
             ->groupBy('policy_type')
             ->pluck('id');
 
         $acceptedPolicyIds = PolicyAcceptance::where('user_id', $request->user()->id)
-            ->whereIn('policy_id', $latestPolicyIds)
+            ->whereIn('policy_id', $activePolicyIds)
             ->pluck('policy_id');
 
-        $missingPolicies = Policy::whereIn('id', $latestPolicyIds)
+        $missingPolicies = Policy::whereIn('id', $activePolicyIds)
             ->whereNotIn('id', $acceptedPolicyIds)
             ->get();
 
