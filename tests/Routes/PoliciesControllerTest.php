@@ -12,6 +12,8 @@ use Tests\TestCase;
 class PoliciesControllerTest extends TestCase {
     use DatabaseTransactions;
 
+    private string $currentPoliciesRoute = 'v1/policies/current';
+
     private string $missingPoliciesRoute = 'v1/policies/missing';
 
     private function createPolicy(string $type, CarbonImmutable $activeFrom, string $content): Policy {
@@ -25,6 +27,45 @@ class PoliciesControllerTest extends TestCase {
     public function testMissingPoliciesRequiresAuthentication(): void {
         $this->json('GET', $this->missingPoliciesRoute)
             ->assertStatus(401);
+    }
+
+    public function testGetCurrentPolicies(): void {
+        $now = CarbonImmutable::now();
+
+        // Future policy
+        $this->createPolicy('terms-of-use', $now->addDay(), 'terms-of-use/version-future.vue');
+
+        // Older active policy of the same type should be excluded
+        $this->createPolicy('hosting-policy', $now->subMonths(2), 'hosting-policy/version-1.vue');
+
+        // Active policies
+        $latestActiveToUPolicy = $this->createPolicy('terms-of-use', $now->subMonth(), 'terms-of-use/version-2.vue');
+        $latestActiveHostingPolicy = $this->createPolicy('hosting-policy', $now->subWeek(), 'hosting-policy/version-2.vue');
+
+        $response = $this->json('GET', $this->currentPoliciesRoute);
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'items' => [
+                '*' => [
+                    'metadata' => [
+                        'policy_id',
+                        'active_from',
+                        'content_vue_file',
+                        'type',
+                    ],
+                ],
+            ],
+        ]);
+
+        $response->assertJsonFragment([
+            'policy_id' => $latestActiveToUPolicy->id,
+            'active_from' => $latestActiveToUPolicy->active_from->format('Y-m-d'),
+        ]);
+        $response->assertJsonFragment([
+            'policy_id' => $latestActiveHostingPolicy->id,
+            'active_from' => $latestActiveHostingPolicy->active_from->format('Y-m-d'),
+        ]);
     }
 
     public function testMissingPoliciesReturnsOnlyLatestCurrentPolicyPerType(): void {
