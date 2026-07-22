@@ -26,8 +26,7 @@ class PoliciesController extends Controller {
                     ->from('policy_acceptances')
                     ->whereColumn('policy_acceptances.policy_id', 'policies.id')
                     ->where('policy_acceptances.user_id', $request->user()->id);
-            })
-            ->get();
+            })->get();
 
         return new PoliciesCollection($missingPolicies);
     }
