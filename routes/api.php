@@ -21,11 +21,6 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
     $router->post('user/resetPassword', ['uses' => 'Auth\ResetPasswordController@reset']);
     $router->post('contact/sendMessage', ['uses' => 'ContactController@sendMessage']);
     $router->post('complaint/sendMessage', ['uses' => 'ComplaintController@sendMessage']);
-    $router->get('v1/policies/current', ['uses' => 'PoliciesController@getCurrentPolicies']);
-    $router->get('v1/policies/{policy_type}/by_active_from/{active_from}', ['uses' => 'PolicyController@getPolicyByTypeAndActiveFrom']);
-    $router->get('v1/policies/{policy_type}/current', ['uses' => 'PolicyController@getCurrentPolicyByType']);
-    $router->get('v1/policies/{policy_type}/upcoming', ['uses' => 'PolicyController@getUpcomingPolicyByType']);
-    $router->get('v1/policies/{policy_type}', ['uses' => 'PoliciesController@getPoliciesByType']);
 
     $router->post('auth/login', ['uses' => 'Auth\LoginController@postLogin'])->name('login');
     // Authed
@@ -64,6 +59,13 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
         $router->apiResource('deletedWikiMetrics', 'DeletedWikiMetricsController')->only(['index'])
             ->middleware(AuthorisedUsersForDeletedWikiMetricsMiddleware::class);
     });
+
+    $router->get('v1/policies/current', ['uses' => 'PoliciesController@getCurrentPolicies']);
+    $router->get('v1/policies/{policy_type}/current', ['uses' => 'PolicyController@getCurrentPolicyByType']);
+    $router->get('v1/policies/{policy_type}/upcoming', ['uses' => 'PolicyController@getUpcomingPolicyByType']);
+    $router->get('v1/policies/{policy_type}/by_active_from/{active_from}', ['uses' => 'PolicyController@getPolicyByTypeAndActiveFrom']);
+    $router->get('v1/policies/{policy_type}', ['uses' => 'PoliciesController@getPoliciesByType']);
+
 
     $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
     $router->apiResource('reusePrototype', 'PublicWikiController')->only(['index']);
