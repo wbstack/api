@@ -7,8 +7,18 @@ use App\Policy;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class PoliciesController extends Controller {
+    private function activePolicyIdsQuery(CarbonImmutable $now): Builder {
+        return Policy::query()
+            ->selectRaw('MAX(id) as id')
+            ->where('active_from', '<=', $now)
+            ->groupBy('policy_type')
+            ->toBase();
+    }
+
     public function getCurrentPolicies(): PoliciesCollection {
         $now = CarbonImmutable::now();
 
@@ -31,11 +41,21 @@ class PoliciesController extends Controller {
         return new PoliciesCollection($missingPolicies);
     }
 
-    private function activePolicyIdsQuery(CarbonImmutable $now): Builder {
-        return Policy::query()
-            ->selectRaw('MAX(id) as id')
-            ->where('active_from', '<=', $now)
-            ->groupBy('policy_type')
-            ->toBase();
+    public function getPoliciesByType($policyType): PoliciesCollection {
+        $validator = Validator::make(
+            [
+                'policy_type' => $policyType,
+            ],
+            [
+                'policy_type' => ['required', 'string', Rule::in(['terms-of-use', 'hosting-policy'])],
+            ]
+        );
+
+        $validator->validate();
+        $validated = $validator->safe();
+
+        $policies = Policy::where('policy_type', $validated['policy_type'])->get();
+
+        return new PoliciesCollection($policies);
     }
 }
