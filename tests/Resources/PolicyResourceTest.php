@@ -40,4 +40,20 @@ class PolicyResourceTest extends TestCase {
             data_get($data, 'metadata.active_from'),
         );
     }
+
+    public function testActiveFromNullExplicit(): void {
+        $policy = Policy::create([
+            'policy_type' => 'terms-of-use',
+            'content_vue_file' => 'terms-of-use/example.vue',
+            'active_from' => null,
+        ]);
+
+        $resource = new PolicyResource($policy);
+        $data = $resource->resolve();
+
+        $this->assertSame(
+            null,
+            data_get($data, 'metadata.active_from'),
+        );
+    }
 }
