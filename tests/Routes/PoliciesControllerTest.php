@@ -16,6 +16,10 @@ class PoliciesControllerTest extends TestCase {
 
     private string $missingPoliciesRoute = 'v1/policies/missing';
 
+    private string $allTermsOfUsePoliciesRoute = 'v1/policies/terms-of-use';
+
+    private string $allHostingPolicyPoliciesRoute = 'v1/policies/hosting-policy';
+
     private function createPolicy(string $type, CarbonImmutable $activeFrom, string $content): Policy {
         return Policy::create([
             'policy_type' => $type,
@@ -175,5 +179,85 @@ class PoliciesControllerTest extends TestCase {
             ->json('GET', $this->missingPoliciesRoute)
             ->assertStatus(200)
             ->assertJson(['items' => []]);
+    }
+
+    public function testGetAllTermsOfUsePolicies(): void {
+        $now = CarbonImmutable::now();
+
+        // Hosting Policies; should get excluded
+        $this->createPolicy('hosting-policy', $now->addDay(), 'hosting-policy/version-3.vue');
+        $this->createPolicy('hosting-policy', $now->subWeek(), 'hosting-policy/version-2.vue');
+        $this->createPolicy('hosting-policy', $now->subMonth(), 'hosting-policy/version-1.vue');
+
+        $termsOfUsePolicies = [
+            $this->createPolicy('terms-of-use', $now->addDay(), 'terms-of-use/version-future.vue'),
+            $this->createPolicy('terms-of-use', $now->subWeek(), 'terms-of-use/version-2.vue'),
+            $this->createPolicy('terms-of-use', $now->subMonth(), 'terms-of-use/version-1.vue'),
+        ];
+
+        $response = $this->json('GET', $this->allTermsOfUsePoliciesRoute);
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'items' => [
+                '*' => [
+                    'metadata' => [
+                        'policy_id',
+                        'active_from',
+                        'content_vue_file',
+                        'type',
+                    ],
+                ],
+            ],
+        ]);
+
+        foreach($termsOfUsePolicies as $policy) {
+            $response->assertJsonFragment([
+                'policy_id' => $policy->id,
+                'active_from' => $policy->active_from->format('Y-m-d'),
+                'content_vue_file' => $policy->content_vue_file,
+                'type' => 'terms-of-use',
+            ]);
+        }
+    }
+
+    public function testGetAllHostingPolicies(): void {
+        $now = CarbonImmutable::now();
+
+        // Terms of Use; should get excluded
+        $this->createPolicy('terms-of-use', $now->addDay(), 'terms-of-use/version-3.vue');
+        $this->createPolicy('terms-of-use', $now->subWeek(), 'terms-of-use/version-2.vue');
+        $this->createPolicy('terms-of-use', $now->subMonth(), 'terms-of-use/version-1.vue');
+
+        $hostingPolicies = [
+            $this->createPolicy('hosting-policy', $now->addDay(), 'hosting-policy/version-3.vue'),
+            $this->createPolicy('hosting-policy', $now->subWeek(), 'hosting-policy/version-2.vue'),
+            $this->createPolicy('hosting-policy', $now->subMonth(), 'hosting-policy/version-1.vue'),
+        ];
+
+        $response = $this->json('GET', $this->allHostingPolicyPoliciesRoute);
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'items' => [
+                '*' => [
+                    'metadata' => [
+                        'policy_id',
+                        'active_from',
+                        'content_vue_file',
+                        'type',
+                    ],
+                ],
+            ],
+        ]);
+
+        foreach($hostingPolicies as $policy) {
+            $response->assertJsonFragment([
+                'policy_id' => $policy->id,
+                'active_from' => $policy->active_from->format('Y-m-d'),
+                'content_vue_file' => $policy->content_vue_file,
+                'type' => 'hosting-policy',
+            ]);
+        }
     }
 }
