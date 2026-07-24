@@ -2,10 +2,10 @@
 
 namespace Tests\Resources;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Http\Resources\PolicyResource;
 use App\Policy;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class PolicyResourceTest extends TestCase {
     use RefreshDatabase;
