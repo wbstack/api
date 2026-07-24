@@ -103,11 +103,15 @@ class PolicyControllerTest extends TestCase {
     }
 
     public function testCurrentTermsOfUseMissing(): void {
+        Policy::query()->delete();
+
         $request = $this->getJson('v1/policies/terms-of-use/current');
         $request->assertNotFound();
     }
 
     public function testCurrentHostingPolicyMissing(): void {
+        Policy::query()->delete();
+
         $request = $this->getJson('v1/policies/hosting-policy/current');
         $request->assertNotFound();
     }
