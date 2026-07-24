@@ -14,6 +14,22 @@ class PolicyResourceTest extends TestCase {
         $policy = Policy::create([
             'policy_type' => 'terms-of-use',
             'content_vue_file' => 'terms-of-use/example.vue',
+            'active_from' => '2022-02-02',
+        ]);
+
+        $resource = new PolicyResource($policy);
+        $data = json_decode($resource->toJson());
+
+        $this->assertEquals(
+            data_get($data, 'metadata.active_from'),
+            '2022-02-02',
+        );
+    }
+
+    public function testActiveFromNull(): void {
+        $policy = Policy::create([
+            'policy_type' => 'terms-of-use',
+            'content_vue_file' => 'terms-of-use/example.vue',
         ]);
 
         $resource = new PolicyResource($policy);
