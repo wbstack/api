@@ -18,11 +18,11 @@ class PolicyResourceTest extends TestCase {
         ]);
 
         $resource = new PolicyResource($policy);
-        $data = json_decode($resource->toJson());
+        $data = $resource->resolve();
 
-        $this->assertEquals(
-            data_get($data, 'metadata.active_from'),
+        $this->assertSame(
             '2022-02-02',
+            data_get($data, 'metadata.active_from'),
         );
     }
 
@@ -33,11 +33,11 @@ class PolicyResourceTest extends TestCase {
         ]);
 
         $resource = new PolicyResource($policy);
-        $data = json_decode($resource->toJson());
+        $data = $resource->resolve();
 
-        $this->assertEquals(
-            data_get($data, 'metadata.active_from'),
+        $this->assertSame(
             null,
+            data_get($data, 'metadata.active_from'),
         );
     }
 }
