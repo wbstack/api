@@ -80,8 +80,12 @@ class PolicyController extends Controller {
             ->orderBy('active_from')
             ->get();
 
-        if ($policies->count() !== 1) {
+        if ($policies->count() < 1) {
             abort(404, 'Policy not found.');
+        }
+
+        if ($policies->count() > 1) {
+            abort(500, 'Multiple policies found.');
         }
 
         return new PolicyResource($policies->first());
