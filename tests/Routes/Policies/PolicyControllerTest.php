@@ -1,6 +1,6 @@
 <?php
 
-namespace Http\Controllers;
+namespace Tests\Routes;
 
 use App\Policy;
 use Carbon\CarbonImmutable;
