@@ -49,16 +49,22 @@ class PolicyControllerTest extends TestCase {
     }
 
     public function testUpcomingTermsOfUseMissing(): void {
+        Policy::query()->delete();
+
         $request = $this->getJson('v1/policies/terms-of-use/upcoming');
         $request->assertNotFound();
     }
 
     public function testUpcomingHostingPolicyMissing(): void {
+        Policy::query()->delete();
+
         $request = $this->getJson('v1/policies/hosting-policy/upcoming');
         $request->assertNotFound();
     }
 
     public function testUpcomingTermsOfUseMultiple(): void {
+        Policy::query()->delete();
+
         $now = CarbonImmutable::now();
 
         Policy::factory()->create([
@@ -68,6 +74,7 @@ class PolicyControllerTest extends TestCase {
 
         Policy::factory()->create([
             'policy_type' => 'terms-of-use',
+            'active_from' => null,
         ]);
 
         $request = $this->getJson('v1/policies/terms-of-use/upcoming');
@@ -75,6 +82,8 @@ class PolicyControllerTest extends TestCase {
     }
 
     public function testUpcomingTermsOfUse(): void {
+        Policy::query()->delete();
+
         $now = CarbonImmutable::now();
 
         Policy::factory()->create([
