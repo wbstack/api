@@ -25,7 +25,9 @@ class PolicyResource extends JsonResource {
             'metadata' => [
                 'policy_id' => $this->id,
                 'type' => $this->policy_type,
-                'active_from' => $activeFrom,
+                'active_from' => $this->active_from === null
+                    ? null
+                    : Carbon::parse($this->active_from)->format('Y-m-d'),
                 'content_vue_file' => $this->content_vue_file,
             ],
         ];
