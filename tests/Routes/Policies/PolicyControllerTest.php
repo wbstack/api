@@ -3,9 +3,9 @@
 namespace Http\Controllers;
 
 use App\Policy;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
-use Carbon\CarbonImmutable;
 
 class PolicyControllerTest extends TestCase {
     use DatabaseTransactions;
@@ -155,7 +155,7 @@ class PolicyControllerTest extends TestCase {
         $request->assertJsonFragment([
             'active_from' => $current->active_from->format('Y-m-d'),
             'type' => $current->policy_type,
-            'content_vue_file' => $current->content_vue_file
+            'content_vue_file' => $current->content_vue_file,
         ]);
     }
 }

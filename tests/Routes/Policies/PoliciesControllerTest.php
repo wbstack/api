@@ -211,7 +211,7 @@ class PoliciesControllerTest extends TestCase {
             ],
         ]);
 
-        foreach($termsOfUsePolicies as $policy) {
+        foreach ($termsOfUsePolicies as $policy) {
             $response->assertJsonFragment([
                 'policy_id' => $policy->id,
                 'active_from' => $policy->active_from->format('Y-m-d'),
@@ -251,7 +251,7 @@ class PoliciesControllerTest extends TestCase {
             ],
         ]);
 
-        foreach($hostingPolicies as $policy) {
+        foreach ($hostingPolicies as $policy) {
             $response->assertJsonFragment([
                 'policy_id' => $policy->id,
                 'active_from' => $policy->active_from->format('Y-m-d'),
