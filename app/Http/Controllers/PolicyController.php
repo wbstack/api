@@ -34,4 +34,56 @@ class PolicyController extends Controller {
 
         return new PolicyResource($policy);
     }
+
+    public function getCurrentPolicyByType($policyType): PolicyResource {
+        $validator = Validator::make(
+            [
+                'policy_type' => $policyType,
+            ],
+            [
+                'policy_type' => ['required', 'string', Rule::in(['terms-of-use', 'hosting-policy'])],
+            ]
+        );
+        $validator->validate();
+        $validated = $validator->safe();
+
+        $policy = Policy::where('policy_type', $validated['policy_type'])
+            ->where('active_from', '<=', today())
+            ->latest('active_from')
+            ->orderByDesc('id')
+            ->first();
+
+        if (!$policy) {
+            abort(404, 'Policy not found.');
+        }
+
+        return new PolicyResource($policy);
+    }
+
+    public function getUpcomingPolicyByType($policyType): PolicyResource {
+        $validator = Validator::make(
+            [
+                'policy_type' => $policyType,
+            ],
+            [
+                'policy_type' => ['required', 'string', Rule::in(['terms-of-use', 'hosting-policy'])],
+            ]
+        );
+        $validator->validate();
+        $validated = $validator->safe();
+
+        $policies = Policy::where('policy_type', $validated['policy_type'])
+            ->where(function ($query) {
+                $query->where('active_from', '>', today())
+                    ->orWhereNull('active_from');
+            })
+            ->orderBy('active_from')
+            ->get();
+
+        if ($policies->count() !== 1) {
+            abort(404, 'Policy not found.');
+        }
+
+        return new PolicyResource($policies->first());
+    }
 }
