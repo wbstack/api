@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Services\MediaWikiHostResolver;
+use App\Services\UnknownWikiDomainException;
 use App\Wiki;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,7 +17,7 @@ class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique, ShouldQueue
 
     public function handle(MediaWikiHostResolver $mwHostResolver): void {
         $this->mwHostResolver = $mwHostResolver;
-        $allWikiDomains = Wiki::all()->pluck('domain');
+        $allWikiDomains = Wiki::whereNull('deleted_at')->pluck('domain');
         foreach ($allWikiDomains as $wikiDomain) {
             if ($this->hasPendingJobs($wikiDomain)) {
                 $this->enqueueWiki($wikiDomain);
@@ -25,11 +26,17 @@ class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique, ShouldQueue
     }
 
     private function hasPendingJobs(string $wikiDomain): bool {
-        $response = Http::withHeaders([
-            'host' => $wikiDomain,
-        ])->get(
-            $this->mwHostResolver->getBackendUrlForDomain($wikiDomain) . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
-        );
+        try {
+            $response = Http::withHeaders([
+                'host' => $wikiDomain,
+            ])->get(
+                $this->mwHostResolver->getBackendUrlForDomain($wikiDomain) . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
+            );
+        } catch (UnknownWikiDomainException $e) {
+            Log::warning('Skipping wiki ' . $wikiDomain . ' for pending MediaWiki jobs: ' . $e->getMessage());
+
+            return false;
+        }
 
         if ($response->failed()) {
             $this->job->markAsFailed();
