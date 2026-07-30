@@ -17,7 +17,7 @@ class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique, ShouldQueue
 
     public function handle(MediaWikiHostResolver $mwHostResolver): void {
         $this->mwHostResolver = $mwHostResolver;
-        $allWikiDomains = Wiki::whereNull('deleted_at')->pluck('domain');
+        $allWikiDomains = Wiki::all()->pluck('domain');
         foreach ($allWikiDomains as $wikiDomain) {
             if ($this->hasPendingJobs($wikiDomain)) {
                 $this->enqueueWiki($wikiDomain);
