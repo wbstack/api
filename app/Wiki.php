@@ -109,6 +109,10 @@ class Wiki extends Model {
         return $this->hasMany(WikiSetting::class);
     }
 
+    public function scheduledSuspension(): HasOne {
+        return $this->hasOne(ScheduledSuspension::class);
+    }
+
     public function publicSettings() {
         return $this->settings()->whereIn('name',
             [

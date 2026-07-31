@@ -65,8 +65,13 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
     $router->get('v1/policies/{policy_type}/upcoming', ['uses' => 'PolicyController@getUpcomingPolicyByType']);
     $router->get('v1/policies/{policy_type}/by_active_from/{active_from}', ['uses' => 'PolicyController@getPolicyByTypeAndActiveFrom']);
     $router->get('v1/policies/{policy_type}', ['uses' => 'PoliciesController@getPoliciesByType']);
+    $router->apiResource('v1/scheduledSuspension', 'ScheduledSuspensionController');
+    $router->apiResource('v1/activeSuspension', 'ActiveSuspensionController')->only('destroy', 'store');
+    $router->apiResource('v1/reviewSubmission', 'ReviewSubmissionController')->only('store', 'update');
+    $router->get('v1/scheduledSuspension/wiki/{wiki}', ['uses' => 'ScheduledSuspensionController@showByWiki']);
 
     $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
     $router->apiResource('reusePrototype', 'PublicWikiController')->only(['index']);
     $router->apiResource('wikiConversionData', 'ConversionMetricController')->only(['index']);
+
 });
