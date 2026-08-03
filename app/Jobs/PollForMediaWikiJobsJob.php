@@ -24,7 +24,7 @@ class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique, ShouldQueue
         foreach ($wikis as $wiki) {
             try {
                 $backendUrl = $this->mwHostResolver->getBackendUrlForWiki($wiki);
-            } catch (UnknownWikiDomainException | UnknownDBVersionException $e) {
+            } catch (UnknownWikiDomainException|UnknownDBVersionException $e) {
                 Log::warning('Skipping wiki ' . $wiki->domain . ' for pending MediaWiki jobs: ' . $e->getMessage());
 
                 continue;

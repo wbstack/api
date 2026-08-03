@@ -29,7 +29,7 @@ class PollForMediaWikiJobsJobTest extends TestCase {
         $this->mwBackendHost = 'http://mediawiki.localhost';
 
         $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwHostResolver->method('getBackendUrlForDomain')->willReturn(
+        $this->mockMwHostResolver->method('getBackendUrlForWiki')->willReturn(
             $this->mwBackendHost
         );
     }

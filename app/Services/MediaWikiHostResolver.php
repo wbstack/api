@@ -44,6 +44,15 @@ class MediaWikiHostResolver {
         return 'http://' . $this->getBackendHostForDomain($domain);
     }
 
+    public function getBackendUrlForWiki($wiki): string {
+        return 'http://' . $this->getBackendHostForWiki($wiki);
+    }
+
+    public function getBackendHostForWiki($wiki): string {
+        // TODO: Make host format configurable for flexibility
+        return sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $this->getMwVersionForWiki($wiki));
+    }
+
     private function getMwVersionForDomain(string $domain): string {
         $wiki = Wiki::where('domain', $domain)->first();
 
@@ -51,12 +60,20 @@ class MediaWikiHostResolver {
             throw new UnknownWikiDomainException("Unknown Wiki Domain '{$domain}'.");
         }
 
-        $dbVersion = $wiki->wikiDb->version;
+        return $this->getMwVersionForWiki($wiki);
+    }
+
+    private function getMwVersionForWiki($wiki): string {
+        $dbVersion = $wiki->wikiDb?->version;
+
+        if ($dbVersion === null) {
+            throw new UnknownDBVersionException("Unknown DB version for domain '{$wiki->domain}'.");
+        }
 
         $versionMap = config('mw-db-version-map');
         if (array_key_exists($dbVersion, $versionMap)) {
             return $versionMap[$dbVersion];
         }
-        throw new UnknownDBVersionException("Unknown DB version '{$dbVersion}' for domain '{$domain}'.");
+        throw new UnknownDBVersionException("Unknown DB version '{$dbVersion}' for domain '{$wiki->domain}'.");
     }
 }
