@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Services\MediaWikiHostResolver;
+use App\Services\UnknownDBVersionException;
 use App\Services\UnknownWikiDomainException;
 use App\Wiki;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -17,26 +18,30 @@ class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique, ShouldQueue
 
     public function handle(MediaWikiHostResolver $mwHostResolver): void {
         $this->mwHostResolver = $mwHostResolver;
-        $allWikiDomains = Wiki::all()->pluck('domain');
-        foreach ($allWikiDomains as $wikiDomain) {
-            if ($this->hasPendingJobs($wikiDomain)) {
-                $this->enqueueWiki($wikiDomain);
+        $wikis = Wiki::with('wikiDb')
+            ->get();
+
+        foreach ($wikis as $wiki) {
+            try {
+                $backendUrl = $this->mwHostResolver->getBackendUrlForWiki($wiki);
+            } catch (UnknownWikiDomainException | UnknownDBVersionException $e) {
+                Log::warning('Skipping wiki ' . $wiki->domain . ' for pending MediaWiki jobs: ' . $e->getMessage());
+
+                continue;
+            }
+
+            if ($this->hasPendingJobs($wiki->domain, $backendUrl)) {
+                $this->enqueueWiki($wiki->domain);
             }
         }
     }
 
-    private function hasPendingJobs(string $wikiDomain): bool {
-        try {
-            $response = Http::withHeaders([
-                'host' => $wikiDomain,
-            ])->get(
-                $this->mwHostResolver->getBackendUrlForDomain($wikiDomain) . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
-            );
-        } catch (UnknownWikiDomainException $e) {
-            Log::warning('Skipping wiki ' . $wikiDomain . ' for pending MediaWiki jobs: ' . $e->getMessage());
-
-            return false;
-        }
+    private function hasPendingJobs(string $wikiDomain, string $backendUrl): bool {
+        $response = Http::withHeaders([
+            'host' => $wikiDomain,
+        ])->get(
+            $backendUrl . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
+        );
 
         if ($response->failed()) {
             $this->job->markAsFailed();
