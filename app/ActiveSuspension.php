@@ -10,4 +10,8 @@ class ActiveSuspension extends Model
         'since',
         'wiki_id'
     ];
+
+    public function Wiki(): BelongsTo {
+        return $this->belongsTo(Wiki::class);
+    }
 }
