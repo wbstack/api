@@ -5,7 +5,6 @@ namespace App\Notifications;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\HtmlString;
 
 class PolicyAnnouncementNotification extends Notification {
     /**
@@ -30,12 +29,12 @@ class PolicyAnnouncementNotification extends Notification {
             ->greeting(Lang::get('Dear Wikibase Cloud user,'))
             ->line(new HtmlString(Lang::get('We\'ve made two updates to the agreements that help run and maintain Wikibase Cloud. Please review and accept them if you agree. You can do it by logging in to the <a href="https://www.wikibase.cloud/">website</a>.')))
             ->line('')
-            ->line(Lang::get('What are we talking about and why is that important?'))
+            ->line(new HtmlString(Lang::get('What are we talking about and why is that important?')))
             ->line('')
-            ->line(Lang::get('1. Updated Terms of Use'))
+            ->line(new HtmlString(Lang::get('<p><strong>1. Updated Terms of Use</strong></p>')))
             ->line(Lang::get('In order to comply with the European Union\'s Digital Services Act (DSA) and to build more transparency on how Wikibase Cloud works, we\'ve revised our Terms of Use. The main additions are a clear way to report illegal content, an explanation of how we handle content moderation, and a complaints-and-appeals process. These changes don\'t affect how you build or run your Wikibases.'))
             ->line('')
-            ->line(Lang::get('2. New Hosting Policy'))
+            ->line(new HtmlString(Lang::get('<p><strong>2. New Hosting Policy</strong></p>')))
             ->line(new HtmlString(Lang::get('We\'re introducing a Hosting Policy for the first time. As a mission-driven non-profit, Wikimedia Deutschland wants Wikibase Cloud to be used purposefully and in line with our mission, that is: hosting open knowledge that serves the public and strengthens the wider Wikibase Ecosystem. The policy indicates driving factors for what the platform is for as well as the kinds of projects it\'s here to support, and lastly the basic expectations for Wikibases hosted on it.')))
             ->line('')
             ->line(new HtmlString(Lang::get('For now, we ask you to read through the documents when you log in next, and decide whether you agree with them. We want to add that we can no longer maintain your Wikibase in case you do not agree with these changes. Read the <a href="https://www.wikibase.cloud/terms-of-use">Terms of Use</a> and the <a href="https://www.wikibase.cloud/hosting-policy">Hosting Policy</a>.')))
