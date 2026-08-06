@@ -42,7 +42,7 @@ class PolicyAnnouncementNotification extends Notification {
             ->line('')
             ->line(Lang::get('Please note that nothing changes for your Wikibase today.'))
             ->line('')
-            ->line(Lang::get('<p><strong>One thing to know for later</strong></p>'))
+            ->line(new HtmlString(Lang::get('<p><strong>One thing to know for later</strong></p>')))
             ->line(Lang::get('Starting at the end of September, the Hosting Policy introduces a temporary-by-default model. To keep your Wikibase online long-term, you\'ll submit it for a short review, and you\'ll have 3 months to do so. We\'ll explain exactly how later - no Wikibase will be affected without clear notice.'))
             ->line('')
             ->line(Lang::get('We\'d encourage you to read the Hosting Policy now and consider whether your Wikibase fits what Wikibase Cloud is for. If it\'s a good fit, the review will be straightforward. If it isn\'t, it\'s better to know early - you\'ll have time to export your data and find a new home for it by the end of the year.'))
