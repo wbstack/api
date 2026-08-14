@@ -23,18 +23,16 @@ class MediaWikiHostResolver {
     public function getHostsForDomain(string $domain): array {
         $mwVersionForDomain = $this->getMwVersionForDomain($domain);
 
-        // TODO: Make hosts format configurable for flexibility
         return [
-            'web' => sprintf('mediawiki-%s-app-web.default.svc.cluster.local', $mwVersionForDomain),
-            'backend' => sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $mwVersionForDomain),
-            'api' => sprintf('mediawiki-%s-app-api.default.svc.cluster.local', $mwVersionForDomain),
-            'alpha' => sprintf('mediawiki-%s-app-alpha.default.svc.cluster.local', $mwVersionForDomain),
+            'web' => $this->getHostForService($mwVersionForDomain, 'web'),
+            'backend' => $this->getHostForService($mwVersionForDomain, 'backend'),
+            'api' => $this->getHostForService($mwVersionForDomain, 'api'),
+            'alpha' => $this->getHostForService($mwVersionForDomain, 'alpha'),
         ];
     }
 
     public function getBackendHostForDomain(string $domain): string {
-        // TODO: Make host format configurable for flexibility
-        return sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
+        return $this->getHostForService($this->getMwVersionForDomain($domain), 'backend');
     }
 
     /**
@@ -49,8 +47,11 @@ class MediaWikiHostResolver {
     }
 
     public function getBackendHostForWiki($wiki): string {
-        // TODO: Make host format configurable for flexibility
-        return sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $this->getMwVersionForWiki($wiki));
+        return $this->getHostForService($this->getMwVersionForWiki($wiki), 'backend');
+    }
+
+    private function getHostForService(string $mwVersion, string $service): string {
+        return sprintf('mediawiki-%s-app-%s.default.svc.cluster.local', $mwVersion, $service);
     }
 
     private function getMwVersionForDomain(string $domain): string {
