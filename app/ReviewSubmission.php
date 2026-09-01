@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Enums\ReviewSubmissionActionType;
+use Carbon\CarbonImmutable;
 use Database\Factories\ReviewSubmissionFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,14 +11,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $wiki_id
  * @property string|null $additional_information
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  * @property-read Collection<int, ReviewSubmissionAction> $actions
  * @property-read int|null $actions_count
  * @property-read ReviewSubmissionAction|null $latestAction
@@ -56,6 +56,14 @@ class ReviewSubmission extends Model {
         // TODO: should this be all actions rather than latest? The overhead will be minimal between the two.
         'latestAction',
     ];
+
+    protected function casts(): array {
+        return [
+            // cast to `CarbonImmutable` until we default to using `CarbonImmutable` globally in T430656
+            'created_at' => 'immutable_datetime',
+            'updated_at' => 'immutable_datetime',
+        ];
+    }
 
     /**
      * Get the Wiki this review submission is for.

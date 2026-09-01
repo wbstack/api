@@ -40,6 +40,9 @@ class ReviewSubmissionAction extends Model {
     protected function casts(): array {
         return [
             'type' => ReviewSubmissionActionType::class,
+            // cast to `CarbonImmutable` until we default to using `CarbonImmutable` globally in T430656
+            'created_at' => 'immutable_datetime',
+            'updated_at' => 'immutable_datetime',
         ];
     }
 

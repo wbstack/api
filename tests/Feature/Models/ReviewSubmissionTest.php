@@ -8,6 +8,7 @@ use App\Enums\ReviewSubmissionActionType;
 use App\ReviewSubmission;
 use App\ReviewSubmissionAction;
 use App\Wiki;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -81,5 +82,15 @@ class ReviewSubmissionTest extends TestCase {
         $submission->refresh();
 
         $this->assertSame(ReviewSubmissionActionType::REVIEW_STARTED, $submission->latestActionType());
+    }
+
+    /**
+     * A review submission casts its timestamps to CarbonImmutable.
+     */
+    public function testTimestampCasts(): void {
+        $action = ReviewSubmission::factory()->create();
+
+        $this->assertInstanceOf(CarbonImmutable::class, $action->created_at);
+        $this->assertInstanceOf(CarbonImmutable::class, $action->updated_at);
     }
 }

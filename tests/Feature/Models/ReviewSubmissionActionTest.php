@@ -5,6 +5,7 @@ namespace Tests\Feature\Models;
 use App\Enums\ReviewSubmissionActionType;
 use App\ReviewSubmission;
 use App\ReviewSubmissionAction;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -20,7 +21,7 @@ class ReviewSubmissionActionTest extends TestCase {
         $this->assertTrue($action->save());
     }
 
-     /**
+    /**
      * A review submission action can retrieve the review submission it belongs to.
      */
     public function testRetrievingReviewSubmission(): void {
@@ -41,6 +42,16 @@ class ReviewSubmissionActionTest extends TestCase {
             'type' => ReviewSubmissionActionType::REVIEW_STARTED,
         ]);
 
-        $this->assertSame( ReviewSubmissionActionType::REVIEW_STARTED, $action->type );
+        $this->assertSame(ReviewSubmissionActionType::REVIEW_STARTED, $action->type);
+    }
+
+    /**
+     * A review submission action casts its timestamps to CarbonImmutable.
+     */
+    public function testTimestampCasts(): void {
+        $action = ReviewSubmissionAction::factory()->create();
+
+        $this->assertInstanceOf(CarbonImmutable::class, $action->created_at);
+        $this->assertInstanceOf(CarbonImmutable::class, $action->updated_at);
     }
 }
