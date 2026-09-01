@@ -22,7 +22,7 @@ class ReviewSubmissionTest extends TestCase {
         $wiki = Wiki::factory()->create();
         $submission = ReviewSubmission::make([
             'wiki_id' => $wiki->id,
-            'additional_information' => 'This ReviewSubmission was created with a Factory. ' . fake()->paragraph(),
+            'additional_information' => fake()->paragraph(),
         ]);
 
         $this->assertTrue($submission->save());
