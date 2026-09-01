@@ -17,8 +17,10 @@ use Illuminate\Support\Facades\Notification;
  * DO NOT REPEAT THIS PATTERN FOR OTHER JOBS
  */
 class SendPolicyAnnouncementJob extends Job {
+    public function __construct(private readonly array $excludedEmails = []) {}
+
     public function handle() {
-        $users = User::query()->whereNotNull('email')->get();
+        $users = User::query()->whereNotNull('email')->whereNotIn('email', $this->excludedEmails)->get();
 
         Notification::send($users, new PolicyAnnouncementNotification());
     }
