@@ -30,7 +30,7 @@ class ReviewSubmissionActionTest extends TestCase {
         $actor = User::factory()->create();
 
         $action = ReviewSubmissionAction::factory()
-            ->for($actor, 'actor')
+            ->forActor($actor)
             ->create();
 
         $this->assertTrue($action->actor->is($actor));

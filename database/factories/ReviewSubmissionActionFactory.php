@@ -27,4 +27,8 @@ class ReviewSubmissionActionFactory extends Factory {
             'type' => ReviewSubmissionActionType::SUBMITTED,
         ];
     }
+
+    public function forActor(User $actor): static {
+        return $this->for($actor, 'actor');
+    }
 }
