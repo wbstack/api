@@ -21,27 +21,45 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Collection|WikiSetting[] $settings
+ * @property string|null $description
+ * @property int $is_featured
+ * @property string|null $wiki_deletion_reason
+ * @property-read mixed $domain_decoded
+ * @property-read Collection<int, ReviewSubmission> $reviewSubmissions
+ * @property-read int|null $review_submissions_count
+ * @property-read Collection<int, WikiSetting> $settings
  * @property-read int|null $settings_count
  * @property-read WikiDb|null $wikiDb
  * @property-read WikiDb|null $wikiDbVersion
- * @property-read Collection|User[] $wikiManagers
+ * @property-read Collection<int, WikiEntityImport> $wikiEntityImports
+ * @property-read int|null $wiki_entity_imports_count
+ * @property-read WikiProfile|null $wikiLatestProfile
+ * @property-read WikiLifecycleEvents|null $wikiLifecycleEvents
+ * @property-read Collection<int, WikiManager> $wikiManagers
  * @property-read int|null $wiki_managers_count
+ * @property-read Collection<int, User> $wikiManagersWithEmail
+ * @property-read int|null $wiki_managers_with_email_count
+ * @property-read Collection<int, WikiNotificationSentRecord> $wikiNotificationSentRecords
+ * @property-read int|null $wiki_notification_sent_records_count
  * @property-read QueryserviceNamespace|null $wikiQueryserviceNamespace
+ * @property-read WikiSiteStats|null $wikiSiteStats
  *
- * @method static \Database\Factories\WikiFactory factory(...$parameters)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki newQuery()
- * @method static \Illuminate\Database\Query\Builder|\App\Wiki onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereDomain($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereSitename($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Wiki whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Wiki withTrashed()
- * @method static \Illuminate\Database\Query\Builder|\App\Wiki withoutTrashed()
+ * @method static \Database\Factories\WikiFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki whereDomain($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki whereIsFeatured($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki whereSitename($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki whereWikiDeletionReason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Wiki withoutTrashed()
  *
  * @mixin \Eloquent
  */
@@ -69,6 +87,10 @@ class Wiki extends Model {
     protected $appends = [
         'domain_decoded',
     ];
+
+    public function reviewSubmissions(): HasMany {
+        return $this->hasMany(ReviewSubmission::class);
+    }
 
     public function wikiDbVersion() {
         return $this->hasOne(WikiDb::class)->select(['id', 'wiki_id', 'version']);
