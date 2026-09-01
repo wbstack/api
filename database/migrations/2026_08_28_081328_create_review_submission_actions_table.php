@@ -13,7 +13,8 @@ return new class() extends Migration {
             $table->id();
             $table->foreignId('review_submission_id')
                 ->constrained('review_submissions')
-                // Be explicit about the type of constraints
+                // Be explicit about the type of constraint restrictions,
+                // don't rely on the database's defaults as they might change
                 ->restrictOnUpdate()
                 ->restrictOnDelete();
             $table->foreignId('user_id');

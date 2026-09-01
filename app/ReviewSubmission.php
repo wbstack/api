@@ -4,12 +4,36 @@ namespace App;
 
 use App\Enums\ReviewSubmissionActionType;
 use Database\Factories\ReviewSubmissionFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $wiki_id
+ * @property string|null $additional_information
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, ReviewSubmissionAction> $actions
+ * @property-read int|null $actions_count
+ * @property-read ReviewSubmissionAction|null $latestAction
+ * @property-read Wiki|null $wiki
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereAdditionalInformation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereWikiId($value)
+ *
+ * @mixin \Eloquent
+ */
 class ReviewSubmission extends Model {
     /** @use HasFactory<ReviewSubmissionFactory> */
     use HasFactory;
@@ -64,7 +88,7 @@ class ReviewSubmission extends Model {
         return $this->hasOne(ReviewSubmissionAction::class)->latestOfMany();
     }
 
-    // TODO: should this return null or make a ReviewSubmissionActionType::NONE type in application code only?
+    // TODO: this could be an Attribute Accessor method: https://laravel.com/framework/docs/11.x/eloquent-mutators#accessors-and-mutators
     /**
      * Get the latest action type of the review submission.
      *
@@ -75,6 +99,6 @@ class ReviewSubmission extends Model {
         // TODO: $this->latestAction should never return null.
         // TODO: Should we defend against that assumption?
         // TODO: Make sure that a ReviewSubmissionAction is always created when the ReviewSubmission is?
-        return $this->latestAction->state;
+        return $this->latestAction->type;
     }
 }
