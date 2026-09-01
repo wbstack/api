@@ -3,6 +3,7 @@
 namespace Tests\Feature\Models;
 
 use App\Enums\ReviewSubmissionActionType;
+use App\Enums\UserRole;
 use App\ReviewSubmission;
 use App\ReviewSubmissionAction;
 use Carbon\CarbonImmutable;
@@ -32,6 +33,17 @@ class ReviewSubmissionActionTest extends TestCase {
             ->create();
 
         $this->assertTrue($action->reviewSubmission->is($submission));
+    }
+
+    /**
+     * A review submission action casts its actor_role attribute to a UserRole.
+     */
+    public function testActorRoleCast(): void {
+        $action = ReviewSubmissionAction::factory()->create([
+            'actor_role' => UserRole::WIKI_MANAGER,
+        ]);
+
+        $this->assertSame(UserRole::WIKI_MANAGER, $action->actor_role);
     }
 
     /**

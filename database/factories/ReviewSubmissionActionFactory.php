@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\ReviewSubmissionActionType;
+use App\Enums\UserRole;
 use App\ReviewSubmission;
 use App\ReviewSubmissionAction;
 use App\User;
@@ -22,7 +23,7 @@ class ReviewSubmissionActionFactory extends Factory {
             'review_submission_id' => ReviewSubmission::factory(),
             // TODO: this should be the same user as one of the ReviewSubmission::wiki->wikiManagersWithEmail
             'user_id' => User::factory(),
-            'actor_role' => 'wiki_manager',
+            'actor_role' => UserRole::WIKI_MANAGER,
             'type' => ReviewSubmissionActionType::SUBMITTED,
         ];
     }

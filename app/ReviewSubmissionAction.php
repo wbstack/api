@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Enums\ReviewSubmissionActionType;
+use App\Enums\UserRole;
 use Database\Factories\ReviewSubmissionActionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -39,6 +40,7 @@ class ReviewSubmissionAction extends Model {
 
     protected function casts(): array {
         return [
+            'actor_role' => UserRole::class,
             'type' => ReviewSubmissionActionType::class,
             // cast to `CarbonImmutable` until we default to using `CarbonImmutable` globally in T430656
             'created_at' => 'immutable_datetime',
