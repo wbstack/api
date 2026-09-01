@@ -17,6 +17,9 @@ return new class() extends Migration {
                 // don't rely on the database's defaults as they might change
                 ->restrictOnUpdate()
                 ->restrictOnDelete();
+            // TODO: should this be constrained? Even if we use `noActionOnUpdate()` and `noActionOnDelete()` adding
+            // the foreign key constraint will prevent any random number that isn't a `user_id` from being inserted
+            // https://laravel.com/framework/docs/11.x/migrations#foreign-key-constraints
             $table->foreignId('user_id');
             $table->enum('actor_role', ['wiki_manager', 'review_committee_admin']);
             $table->enum('type', ['submitted', 'review_started', 'approved', 'rejected', 'cancelled']);
