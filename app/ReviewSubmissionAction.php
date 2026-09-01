@@ -13,8 +13,8 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $review_submission_id
- * @property int $user_id
- * @property string $actor_role
+ * @property int $actor_user_id
+ * @property string $actor_user_role
  * @property ReviewSubmissionActionType $type
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -40,7 +40,7 @@ class ReviewSubmissionAction extends Model {
 
     protected function casts(): array {
         return [
-            'actor_role' => UserRole::class,
+            'actor_user_role' => UserRole::class,
             'type' => ReviewSubmissionActionType::class,
             // cast to `CarbonImmutable` until we default to using `CarbonImmutable` globally in T430656
             'created_at' => 'immutable_datetime',
@@ -49,7 +49,20 @@ class ReviewSubmissionAction extends Model {
     }
 
     /**
+     * Get the actor that performed this action.
+     *
+     * Access the related actions through the `actor` property, or use
+     * the relationship directly when further querying is required.
+     */
+    public function actor(): BelongsTo {
+        return $this->belongsTo(User::class, 'actor_user_id');
+    }
+
+    /**
      * Get the review submission to which this action belongs.
+     *
+     * Access the related actions through the `reviewSubmission` property,
+     * or use the relationship directly when further querying is required.
      */
     public function reviewSubmission(): BelongsTo {
         return $this->belongsTo(ReviewSubmission::class);

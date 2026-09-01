@@ -6,6 +6,7 @@ use App\Enums\ReviewSubmissionActionType;
 use App\Enums\UserRole;
 use App\ReviewSubmission;
 use App\ReviewSubmissionAction;
+use App\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -23,6 +24,19 @@ class ReviewSubmissionActionTest extends TestCase {
     }
 
     /**
+     * A review submission action can retrieve the actor who performed this action.
+     */
+    public function testRetrievingActor(): void {
+        $actor = User::factory()->create();
+
+        $action = ReviewSubmissionAction::factory()
+            ->for($actor, 'actor')
+            ->create();
+
+        $this->assertTrue($action->actor->is($actor));
+    }
+
+    /**
      * A review submission action can retrieve the review submission it belongs to.
      */
     public function testRetrievingReviewSubmission(): void {
@@ -36,14 +50,14 @@ class ReviewSubmissionActionTest extends TestCase {
     }
 
     /**
-     * A review submission action casts its actor_role attribute to a UserRole.
+     * A review submission action casts its actor_user_role attribute to a UserRole.
      */
     public function testActorRoleCast(): void {
         $action = ReviewSubmissionAction::factory()->create([
-            'actor_role' => UserRole::WIKI_MANAGER,
+            'actor_user_role' => UserRole::WIKI_MANAGER,
         ]);
 
-        $this->assertSame(UserRole::WIKI_MANAGER, $action->actor_role);
+        $this->assertSame(UserRole::WIKI_MANAGER, $action->actor_user_role);
     }
 
     /**

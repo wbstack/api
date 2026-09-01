@@ -31,15 +31,15 @@ class ReviewSubmissionSeeder extends Seeder {
         if ($submission->wasRecentlyCreated) {
             $submission->actions()->saveMany([
                 ReviewSubmissionAction::factory()->make([
-                    'actor_role' => UserRole::WIKI_MANAGER,
+                    'actor_user_role' => UserRole::WIKI_MANAGER,
                     'type' => ReviewSubmissionActionType::SUBMITTED,
                 ]),
                 ReviewSubmissionAction::factory()->make([
-                    'actor_role' => UserRole::REVIEW_COMMITTEE_ADMIN,
+                    'actor_user_role' => UserRole::REVIEW_COMMITTEE_ADMIN,
                     'type' => ReviewSubmissionActionType::REVIEW_STARTED,
                 ]),
                 ReviewSubmissionAction::factory()->make([
-                    'actor_role' => UserRole::REVIEW_COMMITTEE_ADMIN,
+                    'actor_user_role' => UserRole::REVIEW_COMMITTEE_ADMIN,
                     'type' => ReviewSubmissionActionType::APPROVED,
                 ]),
             ]);
@@ -58,15 +58,15 @@ class ReviewSubmissionSeeder extends Seeder {
         if ($submission->wasRecentlyCreated) {
             $submission->actions()->saveMany([
                 ReviewSubmissionAction::factory()->make([
-                    'actor_role' => UserRole::WIKI_MANAGER,
+                    'actor_user_role' => UserRole::WIKI_MANAGER,
                     'type' => ReviewSubmissionActionType::SUBMITTED,
                 ]),
                 ReviewSubmissionAction::factory()->make([
-                    'actor_role' => UserRole::REVIEW_COMMITTEE_ADMIN,
+                    'actor_user_role' => UserRole::REVIEW_COMMITTEE_ADMIN,
                     'type' => ReviewSubmissionActionType::REVIEW_STARTED,
                 ]),
                 ReviewSubmissionAction::factory()->make([
-                    'actor_role' => UserRole::REVIEW_COMMITTEE_ADMIN,
+                    'actor_user_role' => UserRole::REVIEW_COMMITTEE_ADMIN,
                     'type' => ReviewSubmissionActionType::REJECTED,
                 ]),
             ]);
@@ -85,11 +85,11 @@ class ReviewSubmissionSeeder extends Seeder {
         if ($submission->wasRecentlyCreated) {
             $submission->actions()->saveMany([
                 ReviewSubmissionAction::factory()->make([
-                    'actor_role' => UserRole::WIKI_MANAGER,
+                    'actor_user_role' => UserRole::WIKI_MANAGER,
                     'type' => ReviewSubmissionActionType::SUBMITTED,
                 ]),
                 ReviewSubmissionAction::factory()->make([
-                    'actor_role' => UserRole::WIKI_MANAGER,
+                    'actor_user_role' => UserRole::WIKI_MANAGER,
                     'type' => ReviewSubmissionActionType::CANCELLED,
                 ]),
             ]);

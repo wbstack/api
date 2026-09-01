@@ -22,8 +22,8 @@ class ReviewSubmissionActionFactory extends Factory {
         return [
             'review_submission_id' => ReviewSubmission::factory(),
             // TODO: this should be the same user as one of the ReviewSubmission::wiki->wikiManagersWithEmail
-            'user_id' => User::factory(),
-            'actor_role' => UserRole::WIKI_MANAGER,
+            'actor_user_id' => User::factory(),
+            'actor_user_role' => UserRole::WIKI_MANAGER,
             'type' => ReviewSubmissionActionType::SUBMITTED,
         ];
     }
