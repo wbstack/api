@@ -1,5 +1,6 @@
 <?php
 
+use Database\Seeders\ReviewSubmissionSeeder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 
@@ -16,5 +17,7 @@ class DatabaseSeeder extends Seeder {
         $this->call(QueryserviceNamespacesSeeder::class);
         $this->call(WikisSeeder::class);
         Model::reguard();
+
+        $this->call(ReviewSubmissionSeeder::class);
     }
 }
