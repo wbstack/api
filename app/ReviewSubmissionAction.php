@@ -29,6 +29,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmissionAction whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmissionAction whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmissionAction whereUserId($value)
+ * @method static \Database\Factories\ReviewSubmissionActionFactory factory($count = null, $state = [])
  *
  * @mixin \Eloquent
  */

@@ -31,6 +31,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereWikiId($value)
+ * @method static \Database\Factories\ReviewSubmissionFactory factory($count = null, $state = [])
  *
  * @mixin \Eloquent
  */
