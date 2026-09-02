@@ -2,16 +2,12 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\HtmlString;
 
-class PolicyAnnouncementNotification extends Notification implements ShouldQueue {
-    use Queueable;
-
+class PolicyAnnouncementNotification extends Notification {
     /**
      * Get the notification's delivery channels.
      *
