@@ -17,14 +17,13 @@ use Illuminate\Support\Facades\Log;
  * DO NOT REPEAT THIS PATTERN FOR OTHER JOBS
  */
 class SendPolicyAnnouncementJob extends Job {
-    public function __construct(private readonly array $excludedEmails = []) {}
-
     public function handle(): void {
-        $users = User::query()->whereNotNull('email')->whereNotIn('email', $this->excludedEmails)->get();
+        $users = User::query()->whereNotNull('email')->get();
 
         $users->each(function (User $user) {
             try {
                 $user->notify(new PolicyAnnouncementNotification());
+
                 Log::info('PolicyAnnouncementNotification sent successfully', [$user->id, $user->email]);
             } catch (\Exception $exception) {
                 Log::error($exception->getMessage(), [$user->id, $user->email]);

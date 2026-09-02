@@ -28,17 +28,6 @@ class SendPolicyAnnouncementJobTest extends TestCase {
         Notification::assertSentTo($users, PolicyAnnouncementNotification::class);
     }
 
-    public function testItExcludeUsersInTheExcludedEmailsList() {
-        Notification::fake();
-        $excludedUser = User::factory()->create(['email' => 'excluded.email@email.com']);
-        $includedUser = User::factory()->create(['email' => 'included.email@email.com']);
-
-        $job = new SendPolicyAnnouncementJob([$excludedUser->email]);
-        $job->handle();
-        Notification::assertNotSentTo($excludedUser, PolicyAnnouncementNotification::class);
-        Notification::assertSentTo($includedUser, PolicyAnnouncementNotification::class);
-    }
-
     public function testItNotifiedAllUsersEvenIfSomeEmailsAreInvalid() {
         Notification::fake();
         User::factory()->createMany([
