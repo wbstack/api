@@ -6,7 +6,6 @@ use App\Jobs\SendPolicyAnnouncementJob;
 use App\Notifications\PolicyAnnouncementNotification;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -40,21 +39,5 @@ class SendPolicyAnnouncementJobTest extends TestCase {
         $job = new SendPolicyAnnouncementJob();
         $job->handle();
         Notification::assertCount(5);
-    }
-
-    public function testItQueuesMailsForAllValidEmails() {
-        $this->markTestSkipped('Mocking the mailer failing to send seems to be difficult');
-        Mail::fake();
-        User::factory()->createMany([
-            ['email' => 'user1@email.com'],
-            ['email' => 'user2@email.com'],
-            ['email' => ''],
-            ['email' => 'asdfghjklertyuiopcvbnm'],
-            ['email' => 'user5@email.com'],
-        ]);
-        $job = new SendPolicyAnnouncementJob();
-        $job->handle();
-        // Seems like sending notifications doesn't actually result in queueing mails.
-        Mail::assertQueuedCount(3);
     }
 }
