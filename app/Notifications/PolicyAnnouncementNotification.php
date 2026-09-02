@@ -28,6 +28,7 @@ class PolicyAnnouncementNotification extends Notification {
             ->from('noreply@wikibase.cloud', 'Wikibase Cloud')
             ->subject(Lang::get('Please review and accept the updated Terms of Use and new Hosting Policy'))
             ->greeting(Lang::get('Dear Wikibase Cloud user,'))
+            ->line(new HtmlString(Lang::get('Apologies if you receive this mail twice. A glitch in our email sending system occurred and we want to be sure everyone got this message.')))
             ->line(new HtmlString(Lang::get('We\'ve made two updates to the agreements that help run and maintain Wikibase Cloud. Please review and accept them if you agree. You can do it by logging in to the <a href="https://www.wikibase.cloud/">website</a>.')))
             ->line('')
             ->line(new HtmlString(Lang::get('What are we talking about and why is that important?')))
