@@ -23,18 +23,16 @@ class MediaWikiHostResolver {
     public function getHostsForDomain(string $domain): array {
         $mwVersionForDomain = $this->getMwVersionForDomain($domain);
 
-        // TODO: Make hosts format configurable for flexibility
         return [
-            'web' => sprintf('mediawiki-%s-app-web.default.svc.cluster.local', $mwVersionForDomain),
-            'backend' => sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $mwVersionForDomain),
-            'api' => sprintf('mediawiki-%s-app-api.default.svc.cluster.local', $mwVersionForDomain),
-            'alpha' => sprintf('mediawiki-%s-app-alpha.default.svc.cluster.local', $mwVersionForDomain),
+            'web' => $this->getHostForService($mwVersionForDomain, 'web'),
+            'backend' => $this->getHostForService($mwVersionForDomain, 'backend'),
+            'api' => $this->getHostForService($mwVersionForDomain, 'api'),
+            'alpha' => $this->getHostForService($mwVersionForDomain, 'alpha'),
         ];
     }
 
     public function getBackendHostForDomain(string $domain): string {
-        // TODO: Make host format configurable for flexibility
-        return sprintf('mediawiki-%s-app-backend.default.svc.cluster.local', $this->getMwVersionForDomain($domain));
+        return $this->getHostForService($this->getMwVersionForDomain($domain), 'backend');
     }
 
     /**
@@ -44,6 +42,18 @@ class MediaWikiHostResolver {
         return 'http://' . $this->getBackendHostForDomain($domain);
     }
 
+    public function getBackendUrlForWiki($wiki): string {
+        return 'http://' . $this->getBackendHostForWiki($wiki);
+    }
+
+    public function getBackendHostForWiki($wiki): string {
+        return $this->getHostForService($this->getMwVersionForWiki($wiki), 'backend');
+    }
+
+    private function getHostForService(string $mwVersion, string $service): string {
+        return sprintf('mediawiki-%s-app-%s.default.svc.cluster.local', $mwVersion, $service);
+    }
+
     private function getMwVersionForDomain(string $domain): string {
         $wiki = Wiki::where('domain', $domain)->first();
 
@@ -51,12 +61,20 @@ class MediaWikiHostResolver {
             throw new UnknownWikiDomainException("Unknown Wiki Domain '{$domain}'.");
         }
 
-        $dbVersion = $wiki->wikiDb->version;
+        return $this->getMwVersionForWiki($wiki);
+    }
+
+    private function getMwVersionForWiki($wiki): string {
+        $dbVersion = $wiki->wikiDb?->version;
+
+        if ($dbVersion === null) {
+            throw new UnknownDBVersionException("Unknown DB version for domain '{$wiki->domain}'.");
+        }
 
         $versionMap = config('mw-db-version-map');
         if (array_key_exists($dbVersion, $versionMap)) {
             return $versionMap[$dbVersion];
         }
-        throw new UnknownDBVersionException("Unknown DB version '{$dbVersion}' for domain '{$domain}'.");
+        throw new UnknownDBVersionException("Unknown DB version '{$dbVersion}' for domain '{$wiki->domain}'.");
     }
 }
