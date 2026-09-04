@@ -234,6 +234,74 @@ class PlatformStatsSummaryJobTest extends TestCase {
         );
     }
 
+    public function testSkipDeletedWikisBeforeResolvingBackendUrl() {
+        $deletedWiki = Wiki::factory()->create(['deleted_at' => CarbonImmutable::now()->subDay(), 'domain' => 'deleted.cloud']);
+        WikiDb::create([
+            'name' => 'deleted_db',
+            'user' => 'asdasd',
+            'password' => 'asdasfasfasf',
+            'version' => 'version',
+            'prefix' => 'asdasd',
+            'wiki_id' => $deletedWiki->id,
+        ]);
+
+        $activeWiki = Wiki::factory()->create(['deleted_at' => null, 'domain' => 'active.cloud']);
+        WikiDb::create([
+            'name' => 'active_db',
+            'user' => 'asdasd',
+            'password' => 'asdasfasfasf',
+            'version' => 'version',
+            'prefix' => 'asdasd',
+            'wiki_id' => $activeWiki->id,
+        ]);
+
+        Http::fake([
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
+                'query' => ['allpages' => []],
+            ], 200),
+            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
+                'query' => ['allpages' => []],
+            ], 200),
+        ]);
+
+        $this->mockMwHostResolver
+            ->expects($this->once())
+            ->method('getBackendUrlForDomain')
+            ->with('active.cloud')
+            ->willReturn($this->mwBackendHost);
+
+        $job = new PlatformStatsSummaryJob();
+        (function ($resolver): void {
+            $this->mwHostResolver = $resolver;
+        })->call($job, $this->mockMwHostResolver);
+
+        $groups = $job->prepareStats([
+            [
+                'wiki' => 'active.cloud',
+                'edits' => 1,
+                'pages' => 1,
+                'users' => 1,
+                'active_users' => 1,
+                'lastEdit' => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()),
+                'first100UsingOauth' => '0',
+                'platform_summary_version' => 'v1',
+            ],
+            [
+                'wiki' => 'deleted.cloud',
+                'edits' => 1,
+                'pages' => 1,
+                'users' => 1,
+                'active_users' => 1,
+                'lastEdit' => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()),
+                'first100UsingOauth' => '0',
+                'platform_summary_version' => 'v1',
+            ],
+        ], [$deletedWiki, $activeWiki]);
+
+        $this->assertSame(1, $groups['deleted']);
+        $this->assertSame(1, $groups['edited_last_90_days']);
+    }
+
     public function testCreationStats() {
         $this->markTestSkipped('Pollutes the deleted wiki list');
         $mockJob = $this->createMock(Job::class);
