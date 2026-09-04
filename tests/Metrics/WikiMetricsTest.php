@@ -456,7 +456,7 @@ class WikiMetricsTest extends TestCase {
             ], 200),
         ]);
         $wiki->delete();
-        (new WikiMetrics)->saveMetrics($wiki);
+        (new WikiMetrics())->saveMetrics($wiki);
 
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
