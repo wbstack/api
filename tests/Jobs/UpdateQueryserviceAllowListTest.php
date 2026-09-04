@@ -31,7 +31,7 @@ class UpdateQueryserviceAllowListTest extends TestCase {
                 "Queryservice config map 'queryservice-allowlist' does not exist."
             ));
 
-        $job = new UpdateQueryserviceAllowList;
+        $job = new UpdateQueryserviceAllowList();
         $job->setJob($mockJob);
 
         $mock = new MockHandler([
@@ -55,7 +55,7 @@ class UpdateQueryserviceAllowListTest extends TestCase {
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
-        $job = new UpdateQueryserviceAllowList;
+        $job = new UpdateQueryserviceAllowList();
         $job->setJob($mockJob);
 
         $mock = new MockHandler([

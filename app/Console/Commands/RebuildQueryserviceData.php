@@ -42,7 +42,7 @@ class RebuildQueryserviceData extends Command {
         $skippedWikis = 0;
         $processedWikis = 0;
         foreach ($wikis as $wiki) {
-            $this->apiUrl = $mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php'; // used in PageFetcher::fetchPagesInNamespace
+            $this->apiUrl = $mwHostResolver->getBackendUrlForDomain($wiki->domain) . '/w/api.php'; // used in PageFetcher::fetchPagesInNamespace
 
             try {
                 $entities = $this->getEntitiesForWiki($wiki);

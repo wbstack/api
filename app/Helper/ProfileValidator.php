@@ -5,7 +5,7 @@ namespace App\Helper;
 use Illuminate\Support\Facades\Validator;
 
 class ProfileValidator {
-    public function validate($profile): \Illuminate\Validation\Validator {
+    public function getValidator($profile): \Illuminate\Contracts\Validation\Validator {
 
         return Validator::make($profile, [
             'purpose' => 'in:data_hub,data_lab,tool_lab,test_drive,decide_later,other',

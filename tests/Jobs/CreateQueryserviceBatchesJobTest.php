@@ -40,7 +40,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase {
 
     public function testEmpty(): void {
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob;
+        $job = new CreateQueryserviceBatchesJob();
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -64,7 +64,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase {
         EventPageUpdate::factory()->create(['id' => 6, 'wiki_id' => 1, 'namespace' => MediawikiNamespace::item, 'title' => 'Q152']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob;
+        $job = new CreateQueryserviceBatchesJob();
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -89,7 +89,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase {
         EventPageUpdate::factory()->create(['id' => 234, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q34']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob;
+        $job = new CreateQueryserviceBatchesJob();
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -115,7 +115,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase {
         EventPageUpdate::factory()->create(['id' => 124, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q11']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob;
+        $job = new CreateQueryserviceBatchesJob();
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -140,7 +140,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase {
         EventPageUpdate::factory()->create(['id' => 125, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q999']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob;
+        $job = new CreateQueryserviceBatchesJob();
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -166,7 +166,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase {
         EventPageUpdate::factory()->create(['id' => 134, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q12']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob;
+        $job = new CreateQueryserviceBatchesJob();
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -189,7 +189,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase {
         EventPageUpdate::factory()->create(['id' => 188, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q12']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob;
+        $job = new CreateQueryserviceBatchesJob();
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');
@@ -201,7 +201,7 @@ class CreateQueryserviceBatchesJobTest extends TestCase {
         EventPageUpdate::factory()->create(['id' => 198, 'wiki_id' => 99, 'namespace' => MediawikiNamespace::item, 'title' => 'Q126']);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new CreateQueryserviceBatchesJob;
+        $job = new CreateQueryserviceBatchesJob();
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');

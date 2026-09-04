@@ -11,6 +11,7 @@ class PublicWikiController extends Controller {
     private static $defaultParams = [
         'sort' => 'sitename',
         'direction' => 'asc',
+        'per_page' => 15,
     ];
 
     private static $activeThresholdPageCount = 2;
@@ -24,12 +25,13 @@ class PublicWikiController extends Controller {
             'direction' => 'in:desc,asc',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
-            'per_page' => 'numeric',
-            'page' => 'numeric',
+            'per_page' => 'int|min:1|max:100',
+            'page' => 'int|min:1',
         ]);
 
         $params = array_merge(self::$defaultParams, $request->input());
-        $query = Wiki::query();
+        // eager load 'wikiLatestProfile' to avoid making N+1 queries
+        $query = Wiki::query()->with('wikiLatestProfile');
 
         if (array_key_exists('is_featured', $params)) {
             $query = $query->where([
@@ -60,12 +62,7 @@ class PublicWikiController extends Controller {
                 break;
         }
 
-        $perPage = null;
-        if (array_key_exists('per_page', $params)) {
-            $perPage = intval($params['per_page']);
-        }
-
-        return PublicWikiResource::collection($query->paginate($perPage));
+        return PublicWikiResource::collection($query->paginate($params['per_page']));
     }
 
     /**

@@ -21,7 +21,7 @@ class CreateQueryserviceBatchesJob extends Job {
     }
 
     public function handle(): void {
-        DB::transaction(function () {
+        DB::transaction(function (): void {
             $latestCheckpoint = QsCheckpoint::get();
 
             [$newEntities, $latestEventId] = $this->getNewEntities($latestCheckpoint);
@@ -53,7 +53,7 @@ class CreateQueryserviceBatchesJob extends Job {
         )
             ->whereIn('namespace', [MediawikiNamespace::item, MediawikiNamespace::property, MediawikiNamespace::lexeme])
             ->has('wiki')
-            ->chunk(100, function (Collection $chunk) use (&$newEntitiesFromEvents, &$latestEventId) {
+            ->chunk(100, function (Collection $chunk) use (&$newEntitiesFromEvents, &$latestEventId): void {
                 foreach ($chunk as $event) {
                     $newEntitiesFromEvents[$event->wiki_id][] = $event->title;
                     $latestEventId = max($event->id, $latestEventId);

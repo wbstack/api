@@ -5,8 +5,8 @@ return [
 
     'ui_url' => env('WBSTACK_UI_URL', 'https://wbstack.com'),
 
-    'wiki_db_provision_version' => env('WBSTACK_WIKI_DB_PROVISION_VERSION', 'mw1.43-wbs1'),
-    'wiki_db_use_version' => env('WBSTACK_WIKI_DB_USE_VERSION', 'mw1.43-wbs1'),
+    'wiki_db_provision_version' => env('WBSTACK_WIKI_DB_PROVISION_VERSION', 'mw1.43-wbs2'),
+    'wiki_db_use_version' => env('WBSTACK_WIKI_DB_USE_VERSION', 'mw1.43-wbs2'),
     'wiki_hard_delete_threshold' => env('WBSTACK_HARD_DELETE_THRESHOLD', 30),
     'wiki_max_per_user' => env('WBSTACK_MAX_PER_USER', false),
 
@@ -21,8 +21,6 @@ return [
 
     'elasticsearch_hosts' => array_filter(explode(',', env('ELASTICSEARCH_HOST', ''))),
     'elasticsearch_enabled_by_default' => env('WBSTACK_ELASTICSEARCH_ENABLED_BY_DEFAULT', false),
-    'elasticsearch_cluster_without_shared_index' => env('ELASTICSEARCH_CLUSTER_WITHOUT_SHARED_INDEX', null),
-    'elasticsearch_shared_index_host' => env('ELASTICSEARCH_SHARED_INDEX_HOST', null),
     'elasticsearch_shared_index_prefix' => env('ELASTICSEARCH_SHARED_INDEX_PREFIX', null),
 
     'signup_throttling_limit' => env('WBSTACK_SIGNUP_THROTTLING_LIMIT', ''),

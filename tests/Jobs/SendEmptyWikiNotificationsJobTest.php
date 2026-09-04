@@ -24,7 +24,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
         $mockJob->expects($this->never())
             ->method('fail')
             ->withAnyParameters();
-        $job = new SendEmptyWikiNotificationsJob;
+        $job = new SendEmptyWikiNotificationsJob();
         $job->setJob($mockJob);
         $job->handle();
     }
@@ -38,16 +38,35 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
         Notification::fake();
         $user = User::factory()->create(['verified' => true]);
         $wiki = Wiki::factory()->create(['created_at' => $thresholdDaysAgo]);
-        $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => null]);
 
-        $job = new SendEmptyWikiNotificationsJob;
+        $job = new SendEmptyWikiNotificationsJob();
         $job->handle();
 
         Notification::assertSentTo(
             $user->select('email')->get(),
             EmptyWikiNotification::class
         );
+    }
+
+    // empty wikis, that are almost old enough (29 days and 23 hrs)
+    public function testEmptyWikiNotificationsNotificationNotSent() {
+        $thresholdDaysAgo = Carbon::now()
+            ->subDays((config('wbstack.wiki_empty_notification_threshold') - 1))
+            ->subHours(23)
+            ->toDateTimeString();
+
+        Notification::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $wiki = Wiki::factory()->create(['created_at' => $thresholdDaysAgo]);
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+        $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => null]);
+
+        $job = new SendEmptyWikiNotificationsJob();
+        $job->handle();
+
+        Notification::assertNothingSent();
     }
 
     // fresh wiki that does not have lifecycle event records yet
@@ -59,7 +78,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
         $wiki = Wiki::factory()->create(['created_at' => $now]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
-        $job = new SendEmptyWikiNotificationsJob;
+        $job = new SendEmptyWikiNotificationsJob();
 
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())
@@ -90,7 +109,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
             'first_edited' => $now,
         ]);
 
-        $job = new SendEmptyWikiNotificationsJob;
+        $job = new SendEmptyWikiNotificationsJob();
         $job->handle();
 
         Notification::assertNothingSent();
@@ -113,7 +132,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
             'user_id' => $manager->user_id,
         ]);
 
-        $job = new SendEmptyWikiNotificationsJob;
+        $job = new SendEmptyWikiNotificationsJob();
         $job->handle();
 
         Notification::assertNothingSent();

@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * App\UserVerificationToken.
@@ -10,9 +12,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int $user_id
  * @property string $token
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\User $user
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\UserVerificationToken newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\UserVerificationToken newQuery()
@@ -36,7 +38,7 @@ class UserVerificationToken extends Model {
         'token',
     ];
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+    public function user(): BelongsTo {
         return $this->belongsTo(User::class);
     }
 }

@@ -9,7 +9,7 @@ use Prometheus\CollectorRegistry;
 class PendingQsBatches implements Exporter {
     protected $gauge;
 
-    public function metrics(CollectorRegistry $collectorRegistry) {
+    public function metrics(CollectorRegistry $collectorRegistry): void {
         $this->gauge = $collectorRegistry->getOrRegisterGauge(
             config('horizon-exporter.namespace'),
             'qs_batches_pending_batches',
@@ -17,7 +17,7 @@ class PendingQsBatches implements Exporter {
         );
     }
 
-    public function collect() {
+    public function collect(): void {
         $numBatches = QsBatch::has('wiki')->where([
             'done' => 0,
             'failed' => 0,

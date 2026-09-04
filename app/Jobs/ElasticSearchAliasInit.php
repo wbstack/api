@@ -4,21 +4,42 @@ namespace App\Jobs;
 
 use App\Http\Curl\HttpRequest;
 use App\WikiDb;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Facades\Log;
 
 class ElasticSearchAliasInit extends Job {
-    private $wikiId;
+    use Dispatchable;
+
+    public readonly int $wikiId;
+
+    public readonly string $esHost;
 
     private $dbName;
 
-    private $sharedPrefix;
+    public readonly string $sharedPrefix;
+
+    // Set $tries to 0 to enable unlimited retries for this job
+    // https://laravel.com/docs/10.x/queues#max-attempts
+    public int $tries = 0;
+
+    public function __construct(int $wikiId, string $esHost, ?string $sharedPrefix = null) {
+        $this->wikiId = $wikiId;
+        $this->esHost = $esHost;
+        $this->sharedPrefix = $sharedPrefix ?? getenv('ELASTICSEARCH_SHARED_INDEX_PREFIX');
+    }
 
     /**
-     * @param  string  $dbName
+     * Get the middleware the job should pass through.
+     *
+     * @return array<int, object>
      */
-    public function __construct(int $wikiId, ?string $sharedPrefix = null) {
-        $this->wikiId = $wikiId;
-        $this->sharedPrefix = $sharedPrefix ?? getenv('ELASTICSEARCH_SHARED_INDEX_PREFIX');
+    public function middleware(): array {
+        return [
+            // Only allow one job per ES host to run at a time to avoid DoSing the ES cluster with alias updates.
+            // This job will only be retried after 15 seconds if another job for the same ES host is currently running.
+            (new WithoutOverlapping("elasticsearch-alias-init-{$this->esHost}"))->releaseAfter(15),
+        ];
     }
 
     public function handle(HttpRequest $request) {
@@ -68,7 +89,7 @@ class ElasticSearchAliasInit extends Job {
         }
 
         $request->setOptions([
-            CURLOPT_URL => getenv('ELASTICSEARCH_SHARED_INDEX_HOST') . '/_aliases',
+            CURLOPT_URL => $this->esHost . '/_aliases',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 60 * 15,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
@@ -91,6 +112,14 @@ class ElasticSearchAliasInit extends Job {
         }
 
         $json = json_decode($rawResponse, true);
+        if (!array_key_exists('acknowledged', $json)) {
+            Log::error("Missing 'acknowledged' key. Are the shared indices set up properly?");
+            $this->fail(
+                new \RuntimeException("Updating Elasticsearch aliases failed for $this->wikiId with $rawResponse")
+            );
+
+            return;
+        }
         if ($json['acknowledged'] !== true) {
             Log::error(__METHOD__ . ": Updating Elasticsearch aliases failed for $this->wikiId with $rawResponse");
             $this->fail(

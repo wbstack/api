@@ -29,7 +29,7 @@ class KubernetesIngressDeleteJobTest extends TestCase {
         $job = new KubernetesIngressDeleteJob($wiki->id);
         $job->setJob($mockJob);
 
-        App::call(function (Client $client) use ($job) {
+        App::call(function (Client $client) use ($job): void {
             $job->handle($client);
         });
 

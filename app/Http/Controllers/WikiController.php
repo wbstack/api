@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Helper\DomainHelper;
 use App\Helper\DomainValidator;
 use App\Helper\ProfileValidator;
-use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Jobs\ElasticSearchAliasInit;
 use App\Jobs\KubernetesIngressCreate;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ProvisionWikiDbJob;
+use App\KnowledgeEquityResponse;
 use App\QueryserviceNamespace;
 use App\Wiki;
 use App\WikiDb;
@@ -18,10 +18,13 @@ use App\WikiDomain;
 use App\WikiManager;
 use App\WikiProfile;
 use App\WikiSetting;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class WikiController extends Controller {
     private $domainValidator;
@@ -33,22 +36,20 @@ class WikiController extends Controller {
         $this->domainValidator = $domainValidator;
     }
 
-    public function create(Request $request): \Illuminate\Http\Response {
-        $clusterWithoutSharedIndex = Config::get('wbstack.elasticsearch_cluster_without_shared_index');
-        $sharedIndexHost = Config::get('wbstack.elasticsearch_shared_index_host');
+    public function create(Request $request): Response {
         $sharedIndexPrefix = Config::get('wbstack.elasticsearch_shared_index_prefix');
+        $esHosts = Config::get('wbstack.elasticsearch_hosts');
+        $isSearchConfigValid = $esHosts && $sharedIndexPrefix;
 
-        if (Config::get('wbstack.elasticsearch_enabled_by_default')) {
-            if (!$clusterWithoutSharedIndex && !($sharedIndexHost && $sharedIndexPrefix)) {
-                abort(503, 'Search enabled, but its configuration is invalid');
-            }
+        if (Config::get('wbstack.elasticsearch_enabled_by_default') && !$isSearchConfigValid) {
+            abort(503, 'Search enabled, but its configuration is invalid');
         }
         $user = $request->user();
 
         $submittedDomain = strtolower($request->input('domain'));
         $submittedDomain = DomainHelper::encode($submittedDomain);
 
-        $domainValidator = $this->domainValidator->validate($submittedDomain);
+        $domainValidator = $this->domainValidator->getValidator($submittedDomain);
         $isSubdomain = $this->isSubDomain($submittedDomain);
 
         $domainValidator->validateWithBag('post');
@@ -58,20 +59,31 @@ class WikiController extends Controller {
             'sitename' => 'required|min:3',
             'username' => 'required',
             'profile' => 'nullable|json',
+            'knowledgeEquityResponse' => 'nullable|array',
+            'knowledgeEquityResponse.selectedOption' => [
+                'required_with:knowledgeEquityResponse',
+                Rule::in('yes', 'no', 'unsure', 'unsaid'),
+            ],
+            'knowledgeEquityResponse.freeTextResponse' => [
+                'nullable',
+                'max:3000',
+            ],
         ]);
 
         $rawProfile = false;
         if ($request->filled('profile')) {
             $rawProfile = json_decode($request->input('profile'), true);
-            $profileValidator = $this->profileValidator->validate($rawProfile);
+            $profileValidator = $this->profileValidator->getValidator($rawProfile);
             $profileValidator->validateWithBag('post');
         }
+
+        $rawKnowledgeEquityResponse = $request->input('knowledgeEquityResponse');
 
         $wiki = null;
         $dbAssignment = null;
 
         // TODO create with some sort of owner etc?
-        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $submittedDomain, $rawProfile) {
+        DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $submittedDomain, $rawProfile, $rawKnowledgeEquityResponse): void {
             $dbVersion = Config::get('wbstack.wiki_db_use_version');
             $wikiDbCondition = ['wiki_id' => null, 'version' => $dbVersion];
 
@@ -161,6 +173,10 @@ class WikiController extends Controller {
             if ($rawProfile) {
                 WikiProfile::create(['wiki_id' => $wiki->id, ...$rawProfile]);
             }
+
+            if ($rawKnowledgeEquityResponse) {
+                KnowledgeEquityResponse::create(['wiki_id' => $wiki->id, ...$rawKnowledgeEquityResponse]);
+            }
         });
 
         // TODO maybe always make these run in a certain order..?
@@ -171,12 +187,9 @@ class WikiController extends Controller {
         }
 
         // dispatch elasticsearch init job to enable the feature
-        if (Config::get('wbstack.elasticsearch_enabled_by_default')) {
-            if ($clusterWithoutSharedIndex) {
-                dispatch(new ElasticSearchIndexInit($wiki->id, $clusterWithoutSharedIndex));
-            }
-            if ($sharedIndexHost && $sharedIndexPrefix) {
-                dispatch(new ElasticSearchAliasInit($wiki->id));
+        if (Config::get('wbstack.elasticsearch_enabled_by_default') && $isSearchConfigValid) {
+            foreach ($esHosts as $esHost) {
+                dispatch(new ElasticSearchAliasInit($wiki->id, $esHost));
             }
         }
 
@@ -195,7 +208,7 @@ class WikiController extends Controller {
         return response($res);
     }
 
-    public function delete(Request $request): \Illuminate\Http\JsonResponse {
+    public function delete(Request $request): JsonResponse {
         $wikiDeletionReason = $request->input('deletionReasons');
         $wiki = $request->attributes->get('wiki');
 
@@ -211,7 +224,7 @@ class WikiController extends Controller {
     }
 
     // TODO should this just be get wiki?
-    public function getWikiDetailsForIdForOwner(Request $request): \Illuminate\Http\Response {
+    public function getWikiDetailsForIdForOwner(Request $request): Response {
         $wiki = $request->attributes->get('wiki')
             ->load('wikiManagers')
             ->load('wikiDbVersion')

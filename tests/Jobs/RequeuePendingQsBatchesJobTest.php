@@ -38,7 +38,7 @@ class RequeuePendingQsBatchesJobTest extends TestCase {
         $this->app->instance(ExceptionHandler::class, $mockExceptionHandler);
 
         $mockJob = $this->createMock(Job::class);
-        $job = new RequeuePendingQsBatchesJob;
+        $job = new RequeuePendingQsBatchesJob();
         $job->setJob($mockJob);
         $mockJob->expects($this->never())
             ->method('fail');

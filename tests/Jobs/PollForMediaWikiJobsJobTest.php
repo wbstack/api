@@ -5,6 +5,7 @@ namespace Tests\Jobs;
 use App\Jobs\PollForMediaWikiJobsJob;
 use App\Jobs\ProcessMediaWikiJobsJob;
 use App\Services\MediaWikiHostResolver;
+use App\Services\UnknownDBVersionException;
 use App\Wiki;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Database\Eloquent\Model;
@@ -26,10 +27,10 @@ class PollForMediaWikiJobsJobTest extends TestCase {
         parent::setUp();
         $this->wiki = Wiki::factory()->create();
 
-        $this->mwBackendHost = 'mediawiki.localhost';
+        $this->mwBackendHost = 'http://mediawiki.localhost';
 
         $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $this->mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+        $this->mockMwHostResolver->method('getBackendUrlForWiki')->willReturn(
             $this->mwBackendHost
         );
     }
@@ -47,7 +48,7 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         Bus::fake();
         $mockJob = $this->createMock(Job::class);
-        $job = new PollForMediaWikiJobsJob;
+        $job = new PollForMediaWikiJobsJob();
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
@@ -70,7 +71,7 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         $mockJob = $this->createMock(Job::class);
 
-        $job = new PollForMediaWikiJobsJob;
+        $job = new PollForMediaWikiJobsJob();
         $job->setJob($mockJob);
 
         $mockJob->expects($this->never())->method('fail');
@@ -89,12 +90,50 @@ class PollForMediaWikiJobsJobTest extends TestCase {
 
         $mockJob = $this->createMock(Job::class);
 
-        $job = new PollForMediaWikiJobsJob;
+        $job = new PollForMediaWikiJobsJob();
         $job->setJob($mockJob);
 
         $mockJob->expects($this->once())->method('markAsFailed');
         $mockJob->expects($this->never())->method('fail');
         $job->handle($this->mockMwHostResolver);
         Bus::assertNothingDispatched();
+    }
+
+    public function testSkipsWikiWhenResolverThrowsAndContinuesProcessing(): void {
+        $secondWiki = Wiki::factory()->create();
+
+        $this->mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
+        $this->mockMwHostResolver
+            ->method('getBackendUrlForWiki')
+            ->willReturnCallback(function ($wiki) {
+                if ($wiki->id === $this->wiki->id) {
+                    throw new UnknownDBVersionException('Unmapped DB version');
+                }
+
+                return $this->mwBackendHost;
+            });
+
+        Http::fake([
+            $this->mwBackendHost . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json' => Http::response([
+                'query' => [
+                    'statistics' => [
+                        'jobs' => 2,
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        Bus::fake();
+
+        $mockJob = $this->createMock(Job::class);
+        $job = new PollForMediaWikiJobsJob();
+        $job->setJob($mockJob);
+
+        $mockJob->expects($this->never())->method('markAsFailed');
+        $job->handle($this->mockMwHostResolver);
+
+        Bus::assertDispatched(ProcessMediaWikiJobsJob::class, function ($queuedJob) use ($secondWiki) {
+            return $queuedJob->uniqueId() === $secondWiki->domain;
+        });
     }
 }

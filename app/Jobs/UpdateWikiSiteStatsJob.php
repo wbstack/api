@@ -50,7 +50,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
             $update['last_edited'] = Carbon::parse($lastEdited);
         }
 
-        DB::transaction(function () use ($wiki, $update) {
+        DB::transaction(function () use ($wiki, $update): void {
             $wiki->wikiLifecycleEvents()->lockForUpdate()->updateOrCreate(['wiki_id' => $wiki->id], $update);
         });
     }
@@ -59,7 +59,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
         $response = Http::withHeaders([
             'host' => $wiki->getAttribute('domain'),
         ])->get(
-            $this->mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
+            $this->mwHostResolver->getBackendUrlForDomain($wiki->domain) . '/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json'
         );
 
         if ($response->failed()) {
@@ -74,14 +74,14 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
                 $update[$field] = $value;
             }
         }
-        DB::transaction(function () use ($wiki, $update) {
+        DB::transaction(function () use ($wiki, $update): void {
             $wiki->wikiSiteStats()->lockForUpdate()->updateOrCreate(['wiki_id' => $wiki->id], $update);
         });
     }
 
     private function getFirstEditedDate(Wiki $wiki): ?CarbonInterface {
         $allRevisions = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-            $this->mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php',
+            $this->mwHostResolver->getBackendUrlForDomain($wiki->domain) . '/w/api.php',
             [
                 'action' => 'query',
                 'format' => 'json',
@@ -99,7 +99,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
         }
 
         $revisionInfo = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-            $this->mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php',
+            $this->mwHostResolver->getBackendUrlForDomain($wiki->domain) . '/w/api.php',
             [
                 'action' => 'query',
                 'format' => 'json',
@@ -119,7 +119,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
 
     private function getLastEditedDate(Wiki $wiki): ?CarbonInterface {
         $allRevisions = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-            $this->mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php',
+            $this->mwHostResolver->getBackendUrlForDomain($wiki->domain) . '/w/api.php',
             [
                 'action' => 'query',
                 'format' => 'json',
@@ -137,7 +137,7 @@ class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
         }
 
         $revisionInfo = Http::withHeaders(['host' => $wiki->getAttribute('domain')])->get(
-            $this->mwHostResolver->getBackendHostForDomain($wiki->domain) . '/w/api.php',
+            $this->mwHostResolver->getBackendUrlForDomain($wiki->domain) . '/w/api.php',
             [
                 'action' => 'query',
                 'format' => 'json',

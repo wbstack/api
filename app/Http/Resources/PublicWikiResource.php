@@ -16,6 +16,11 @@ class PublicWikiResource extends JsonResource {
             'sitename' => $this->sitename,
             'wiki_site_stats' => $this->wikiSiteStats,
             'logo_url' => $logoSetting ? $logoSetting->value : null,
+            'reuse_prototype' => $this->wikiLatestProfile
+                ? $this->wikiLatestProfile->purpose === 'data_hub'
+                  && $this->wikiLatestProfile->temporality === 'permanent'
+                  && $this->wikiLatestProfile->audience === 'wide'
+                : false,
         ];
     }
 }

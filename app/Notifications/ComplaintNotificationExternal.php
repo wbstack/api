@@ -13,7 +13,7 @@ class ComplaintNotificationExternal extends ComplaintNotification {
      * Build the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable) {
         $name = $this->name;
@@ -25,7 +25,7 @@ class ComplaintNotificationExternal extends ComplaintNotification {
         $mailFrom = config('app.complaint-mail-sender');
         $mailSubject = config('app.name') . ': Report of Illegal Content';
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->from($mailFrom)
             ->subject($mailSubject)
             ->line(Lang::get('Your message via the wikibase.cloud form for reporting illegal content has been submitted.'))

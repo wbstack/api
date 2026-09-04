@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * App\QsBatch.
@@ -13,9 +15,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $entityIds
  * @property \DateTime $pending_since
  * @property int $done
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Wiki $wiki
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Wiki $wiki
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\QsBatch newQuery()
@@ -42,11 +44,13 @@ class QsBatch extends Model {
         'processing_attempts',
     ];
 
-    protected $casts = [
-        'pending_since' => 'datetime',
-    ];
-
-    public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+    public function wiki(): BelongsTo {
         return $this->belongsTo(Wiki::class);
+    }
+
+    protected function casts(): array {
+        return [
+            'pending_since' => 'datetime',
+        ];
     }
 }

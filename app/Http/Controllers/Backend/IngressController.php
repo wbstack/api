@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Wiki;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class IngressController extends Controller {
-    public function getWikiVersionForDomain(Request $request): \Illuminate\Http\Response {
+    public function getWikiVersionForDomain(Request $request): Response {
         $domain = $request->query('domain');
         $version = Wiki::where('domain', $domain)
             ->whereNull('deleted_at')

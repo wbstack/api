@@ -42,8 +42,8 @@ class ThrottleSignupTest extends TestCase {
             ]
         );
 
-        $request = new Request;
-        $middleware = new ThrottleSignup;
+        $request = new Request();
+        $middleware = new ThrottleSignup();
         $called = false;
 
         $response = $middleware->handle($request, function ($req) use (&$called) {
@@ -75,8 +75,8 @@ class ThrottleSignupTest extends TestCase {
             ]
         );
 
-        $request = new Request;
-        $middleware = new ThrottleSignup;
+        $request = new Request();
+        $middleware = new ThrottleSignup();
         $called = false;
 
         $response = $middleware->handle($request, function ($req) use (&$called) {
@@ -108,8 +108,8 @@ class ThrottleSignupTest extends TestCase {
             ]
         );
 
-        $request = new Request;
-        $middleware = new ThrottleSignup;
+        $request = new Request();
+        $middleware = new ThrottleSignup();
         $called = false;
 
         $response = $middleware->handle($request, function ($req) use (&$called) {

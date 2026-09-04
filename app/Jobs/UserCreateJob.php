@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
-use App\TermsOfUseVersion;
+use App\Policy;
+use App\PolicyAcceptance;
 use App\User;
-use App\UserTermsOfUseAcceptance;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
@@ -15,11 +15,14 @@ class UserCreateJob extends Job {
 
     private $verified;
 
-    public function __construct($email, $password, $verified = false) {
+    private $acceptedPolicyIds;
+
+    public function __construct($email, $password, $acceptedPolicyIds, $verified = false) {
         // TODO maybe pass in an unsaved eloquent model?
         // // but that would make CLI job creation hard
         $this->email = $email;
         $this->password = $password;
+        $this->acceptedPolicyIds = $acceptedPolicyIds;
         $this->verified = false;
     }
 
@@ -33,17 +36,23 @@ class UserCreateJob extends Job {
             'verified' => $this->verified,
         ]);
 
-        $latest = TermsOfUseVersion::latestActiveVersion();
-        if ($latest) {
-            UserTermsOfUseAcceptance::create([
-                'user_id' => $user->id,
-                'tou_version' => $latest->version,
-                'tou_accepted_at' => now(),
-            ]);
-        } else {
-            Log::warning("No active Terms of Use version found when creating user {$user->email} (ID {$user->id}).");
+        if (is_array($this->acceptedPolicyIds)) {
+            foreach ($this->acceptedPolicyIds as $acceptedPolicyId) {
+                $policy = Policy::find($acceptedPolicyId);
+
+                if ($policy) {
+                    PolicyAcceptance::create([
+                        'user_id' => $user->id,
+                        'policy_id' => $policy->id,
+                        'accepted_at' => now(),
+                    ]);
+                } else {
+                    Log::warning("Policy ID '{$acceptedPolicyId}' not found when creating user {$user->email} (ID {$user->id}).");
+                }
+            }
         }
 
         return $user;
+
     }
 }

@@ -44,7 +44,7 @@ class EmptyWikiNotification extends Notification {
     public function toMail($notifiable) {
         $days = intval(config('wbstack.wiki_empty_notification_threshold'));
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->from('noreply@wikibase.cloud', 'Wikibase Cloud')
             ->subject(Lang::get('Need some help with your Wikibase?'))
             ->line(Lang::get('Thanks for creating a Wikibase instance on Wikibase Cloud! That was at least ' . $days . ' days ago. We couldn’t help but notice that your Wikibase instance `' . $this->sitename . '` remains empty, so we’re checking in to see if we can help.'))

@@ -10,7 +10,7 @@ use Tests\TestCase;
 class DomainValidatorTest extends TestCase {
     public function testValidatorUsesOldValidation() {
         $sut = new DomainValidator('.wbaas.localhost', []);
-        $validator = $sut->validate('derp');
+        $validator = $sut->getValidator('derp');
         $this->assertCount(1, $validator->errors());
     }
 
@@ -18,7 +18,7 @@ class DomainValidatorTest extends TestCase {
         $sut = new DomainValidator('.wbaas.localhost', [
             new ForbiddenSubdomainRule(['long-terrible-word'], '.wbaas.localhost'),
         ]);
-        $validator = $sut->validate('long-terrible-word.wbaas.localhost');
+        $validator = $sut->getValidator('long-terrible-word.wbaas.localhost');
         $this->assertCount(1, $validator->errors());
         $this->assertEquals(ForbiddenSubdomainRule::ERROR_MESSAGE, $validator->errors()->get('domain')[0]);
     }
@@ -26,7 +26,7 @@ class DomainValidatorTest extends TestCase {
     public function testAppValidator() {
         Config::set('wbstack.subdomain_suffix', '.wbaas.localhost');
         $sut = $this->app->make(DomainValidator::class);
-        $validator = $sut->validate('statistics.wbaas.localhost');
+        $validator = $sut->getValidator('statistics.wbaas.localhost');
         $this->assertCount(1, $validator->errors());
         $this->assertEquals(ForbiddenSubdomainRule::ERROR_MESSAGE, $validator->errors()->get('domain')[0]);
     }

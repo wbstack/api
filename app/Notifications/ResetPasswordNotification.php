@@ -48,7 +48,7 @@ class ResetPasswordNotification extends Notification {
      * Build the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable) {
         if (static::$toMailCallback) {
@@ -59,7 +59,7 @@ class ResetPasswordNotification extends Notification {
         $queryPart = "?token=$this->token&email={$encodedEmail}";
         $resetPasswordLink = config('wbstack.ui_url') . '/reset-password' . $queryPart;
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject(Lang::get('Please reset your password'))
             ->line(Lang::get('You are receiving this email because we received a password reset request for your account.'))
             ->action(Lang::get('Reset Password'), $resetPasswordLink)

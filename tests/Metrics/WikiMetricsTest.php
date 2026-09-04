@@ -11,6 +11,7 @@ use App\WikiDb;
 use Carbon\Carbon;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
@@ -22,7 +23,7 @@ class WikiMetricsTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         $manager = $this->app->make('db');
-        $job = new ProvisionWikiDbJob;
+        $job = new ProvisionWikiDbJob();
         $job->handle($manager);
     }
 
@@ -34,14 +35,15 @@ class WikiMetricsTest extends TestCase {
         $wikiDb = WikiDb::first();
         $wikiDb->update(['wiki_id' => $wiki->id]);
 
-        (new WikiMetrics)->saveMetrics($wiki);
-        // Assert the metric is updated in the database
+        (new WikiMetrics())->saveMetrics($wiki);
+
+        // Assert new record is added to the database
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'date' => now()->toDateString(),
         ]);
     }
 
-    public function testDoesNotAddDuplicateRecordsWithOnlyDateChange() {
+    public function testNoDuplicateRecordsWithOnlyDateChange() {
         $wiki = Wiki::factory()->create([
             'domain' => 'thisfake.wikibase.cloud',
         ]);
@@ -57,16 +59,18 @@ class WikiMetricsTest extends TestCase {
             'pages' => 0,
             'is_deleted' => 0,
         ]);
-        (new WikiMetrics)->saveMetrics($wiki);
 
-        // Assert No new record was created for today
+        // Run saveMetrics()
+        (new WikiMetrics())->saveMetrics($wiki);
+
+        // Assert no new record was created for today
         $this->assertDatabaseMissing('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
             'date' => Carbon::today()->toDateString(),
         ]);
     }
 
-    public function testAddRecordsWikiIsDeleted() {
+    public function testRecordCreatedWhenWikiFirstDeleted() {
         $wiki = Wiki::factory()->create([
             'domain' => 'thisfake.wikibase.cloud',
         ]);
@@ -74,7 +78,50 @@ class WikiMetricsTest extends TestCase {
         $wikiDb = WikiDb::first();
         $wikiDb->update(['wiki_id' => $wiki->id]);
 
+        $wikiSiteStats = $wiki->wikiSiteStats()->create();
+        $wikiSiteStats->update([
+            'pages' => 10,
+            'users' => 5,
+        ]);
+
         // Insert an old metric value for a wiki
+        WikiDailyMetrics::create([
+            'id' => $wiki->id . '_' . Carbon::yesterday()->toDateString(),
+            'wiki_id' => $wiki->id,
+            'date' => Carbon::yesterday()->toDateString(),
+            'pages' => 0,
+            'is_deleted' => 0,
+            'total_user_count' => null,
+        ]);
+
+        // Delete the wiki
+        $wiki->delete();
+        $wiki->save();
+
+        // Run saveMetrics()
+        (new WikiMetrics())->saveMetrics($wiki);
+
+        // Assert new record was created for newly deleted wiki
+        $this->assertDatabaseHas('wiki_daily_metrics', [
+            'wiki_id' => $wiki->id,
+            'is_deleted' => 1,
+            'total_user_count' => 5,
+            'date' => now()->toDateString(),
+        ]);
+    }
+
+    public function testNoDuplicateRecordsForDeletedWiki() {
+        $wiki = Wiki::factory()->create([
+            'domain' => 'thisfake.wikibase.cloud',
+        ]);
+        $wikiDb = WikiDb::first();
+        $wikiDb->update(['wiki_id' => $wiki->id]);
+
+        // Delete the wiki
+        $wiki->delete();
+        $wiki->save();
+
+        // Create an old metric record for the wiki
         WikiDailyMetrics::create([
             'id' => $wiki->id . '_' . Carbon::yesterday()->toDateString(),
             'wiki_id' => $wiki->id,
@@ -82,13 +129,11 @@ class WikiMetricsTest extends TestCase {
             'pages' => 0,
             'is_deleted' => 1,
         ]);
-        // delete the wiki
-        $wiki->delete();
-        $wiki->save();
 
-        (new WikiMetrics)->saveMetrics($wiki);
+        // Run saveMetrics()
+        (new WikiMetrics())->saveMetrics($wiki);
 
-        // Assert No new record was created for today
+        // Assert no new record was created for previously deleted wiki
         $this->assertDatabaseMissing('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
             'is_deleted' => 1,
@@ -96,7 +141,29 @@ class WikiMetricsTest extends TestCase {
         ]);
     }
 
-    public function testItSaveTripleCountSuccessfully() {
+    public function testDailyMetricCreatedWhenNoRecordsInWikiSiteStats() {
+        $wiki = Wiki::factory()->create([
+            'domain' => 'test.wbaas.dev',
+        ]);
+        $wikiDb = WikiDb::first();
+        $wikiDb->update(['wiki_id' => $wiki->id]);
+
+        // Ensure no wikiSiteStats record exists
+        $this->assertNull($wiki->wikiSiteStats()->first());
+
+        // Run saveMetrics()
+        (new WikiMetrics())->saveMetrics($wiki);
+
+        // Assert new record was created with default values
+        $this->assertDatabaseHas('wiki_daily_metrics', [
+            'wiki_id' => $wiki->id,
+            'pages' => 0,
+            'total_user_count' => 0,
+            'date' => now()->toDateString(),
+        ]);
+    }
+
+    public function testTripleCountSavedSuccessfully() {
         $wiki = Wiki::factory()->create([
             'domain' => 'somewikiforunittest.wikibase.cloud',
         ]);
@@ -129,7 +196,14 @@ class WikiMetricsTest extends TestCase {
                 ],
             ], 200),
         ]);
-        (new WikiMetrics)->saveMetrics($wiki);
+        (new WikiMetrics())->saveMetrics($wiki);
+        Http::assertSent(function (Request $request) use ($host, $namespace) {
+            return $request->method() === 'GET'
+                && str_starts_with(
+                    $request->url(),
+                    'http://' . $host . '/bigdata/namespace/' . $namespace . '/sparql'
+                );
+        });
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
             'number_of_triples' => 12345,
@@ -161,7 +235,7 @@ class WikiMetricsTest extends TestCase {
         Http::fake([
             '*' => Http::response('Error', 500),
         ]);
-        (new WikiMetrics)->saveMetrics($wiki);
+        (new WikiMetrics())->saveMetrics($wiki);
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $wiki->id,
             'number_of_triples' => null,
@@ -329,7 +403,7 @@ class WikiMetricsTest extends TestCase {
         $tablePage = $wikiDb->name . '.' . $wikiDb->prefix . '_page';
 
         Schema::dropIfExists($tablePage);
-        Schema::create($tablePage, function (Blueprint $table) {
+        Schema::create($tablePage, function (Blueprint $table): void {
             $table->increments('page_id');
             $table->integer('page_namespace');
             $table->boolean('page_is_redirect')->default(0);
@@ -350,7 +424,7 @@ class WikiMetricsTest extends TestCase {
             'is_deleted' => 0,
         ]);
 
-        (new WikiMetrics)->saveMetrics($wiki);
+        (new WikiMetrics())->saveMetrics($wiki);
 
         // clean up after the test
         $wiki->forceDelete();

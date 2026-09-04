@@ -1,4 +1,4 @@
-FROM composer:2.3 as composer
+FROM composer:2.10 AS composer
 
 COPY ./composer.json /tmp/src1/composer.json
 COPY ./composer.lock /tmp/src1/composer.lock
@@ -16,7 +16,7 @@ FROM php:8.2-apache
 
 RUN apt-get update \
 	# Needed for the imagick php extension install
-	&& apt-get install -y --no-install-recommends libmagickwand-dev libpq-dev \
+	&& apt-get install -y --no-install-recommends libmagickwand-dev libpq-dev mariadb-client \
 	&& echo "" | pecl install imagick redis \
 	&& docker-php-ext-enable imagick \
 	&& docker-php-ext-enable redis \
@@ -32,13 +32,16 @@ RUN apt-get update \
 	&& docker-php-ext-enable opencensus \
 	&& rm -rf /var/lib/apt/lists/*
 
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
 # Change the document root
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 COPY --chown=www-data:www-data --from=composer /tmp/src2 /var/www/html
+
+# Copy custom mysql config file to the container to set the `skip-ssl` option.
+COPY ./docker.mysql.cnf /etc/mysql/conf.d/docker.mysql.cnf
 
 WORKDIR /var/www/html
 

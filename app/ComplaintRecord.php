@@ -14,9 +14,9 @@ use Illuminate\Support\Carbon;
  * @property string|null $mail_address
  * @property string $reason
  * @property string $offending_urls
- * @property \Illuminate\Support\Carbon|null $dispatched_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $dispatched_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @mixin \Eloquent
  */

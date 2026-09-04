@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Wiki;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class WikiController extends Controller {
-    public function getWikiForDomain(Request $request): \Illuminate\Http\JsonResponse {
+    public function getWikiForDomain(Request $request): JsonResponse {
         $validated = $request->validate([
             'domain' => 'required|string',
         ]);

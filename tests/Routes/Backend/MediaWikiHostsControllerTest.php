@@ -21,7 +21,7 @@ class MediaWikiHostsControllerTest extends TestCase {
         ];
 
         $this->createWiki('test139.wikibase.cloud', 'mw1.39-wbs1');
-        $this->createWiki('test143.wikibase.cloud', 'mw1.43-wbs1');
+        $this->createWiki('test143.wikibase.cloud', 'mw1.43-wbs2');
 
         $this->getJson("$this->route?domain=test143.wikibase.cloud")
             ->assertStatus(200)

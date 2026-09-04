@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Wiki;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class WikiDbVersionController extends Controller {
-    public function updateWikiDbVersion(Request $request): \Illuminate\Http\JsonResponse {
+    public function updateWikiDbVersion(Request $request): JsonResponse {
         $validated = $request->validate([
             'domain' => 'required|string',
             'dbVersion' => 'required|string',

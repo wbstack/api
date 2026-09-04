@@ -17,7 +17,9 @@ class WikiNotificationSentRecord extends Model {
 
     protected $visible = self::FIELDS;
 
-    protected $casts = [
-        'notification_type' => 'string',
-    ];
+    protected function casts(): array {
+        return [
+            'notification_type' => 'string',
+        ];
+    }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Routes\Wiki;
 
 use App\Wiki;
+use App\WikiProfile;
 use App\WikiSetting;
 use App\WikiSiteStats;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -18,12 +19,14 @@ class PublicWikiTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         Wiki::query()->delete();
+        WikiProfile::query()->delete();
         WikiSiteStats::query()->delete();
         WikiSetting::query()->delete();
     }
 
     protected function tearDown(): void {
         Wiki::query()->delete();
+        WikiProfile::query()->delete();
         WikiSiteStats::query()->delete();
         WikiSetting::query()->delete();
         parent::tearDown();
@@ -278,5 +281,49 @@ class PublicWikiTest extends TestCase {
                 'https://storage.googleapis.com/wikibase-cloud/foo.bar.png'
             )
             ->assertJsonPath('data.1.logo_url', null);
+    }
+
+    public function testReusePrototype() {
+        $reusableWiki = Wiki::factory()->create([
+            'domain' => 'reusable.wikibase.cloud', 'sitename' => 'asite',
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $reusableWiki->id,
+        ]);
+        WikiProfile::create([
+            'wiki_id' => $reusableWiki->id,
+            'purpose' => 'data_hub',
+            'temporality' => 'permanent',
+            'audience' => 'wide',
+        ]);
+
+        $nonReusableWiki = Wiki::factory()->create([
+            'domain' => 'non-reusable.wikibase.cloud', 'sitename' => 'bsite',
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $nonReusableWiki->id,
+        ]);
+        WikiProfile::create([
+            'wiki_id' => $nonReusableWiki->id,
+            'purpose' => 'other',
+            'temporality' => 'other',
+            'audience' => 'other',
+        ]);
+
+        $noProfileWiki = Wiki::factory()->create([
+            'domain' => 'no-profile.wikibase.cloud', 'sitename' => 'csite',
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $noProfileWiki->id,
+        ]);
+
+        $this->json('GET', 'reusePrototype')
+            ->assertStatus(200)
+            ->assertJsonPath('data.0.domain', 'reusable.wikibase.cloud')
+            ->assertJsonPath('data.0.reuse_prototype', true)
+            ->assertJsonPath('data.1.domain', 'non-reusable.wikibase.cloud')
+            ->assertJsonPath('data.1.reuse_prototype', false)
+            ->assertJsonPath('data.2.domain', 'no-profile.wikibase.cloud')
+            ->assertJsonPath('data.2.reuse_prototype', false);
     }
 }

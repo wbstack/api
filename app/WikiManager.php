@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * App\WikiManager.
@@ -11,10 +13,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int $user_id
  * @property int $wiki_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\User $user
- * @property-read \App\Wiki $wiki
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $user
+ * @property-read Wiki $wiki
  *
  * @method static \Database\Factories\WikiManagerFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\WikiManager newModelQuery()
@@ -42,11 +44,11 @@ class WikiManager extends Model {
     ];
 
     // TODO remove these relationships if they are not used...
-    public function wiki(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+    public function wiki(): BelongsTo {
         return $this->belongsTo(Wiki::class);
     }
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+    public function user(): BelongsTo {
         return $this->belongsTo(User::class);
     }
 

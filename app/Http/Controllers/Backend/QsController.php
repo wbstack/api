@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use App\QsBatch;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class QsController extends Controller {
-    public function getBatches(Request $request): \Illuminate\Http\Response {
+    public function getBatches(Request $request): Response {
         return DB::transaction(function () {
             $oldestBatch = QsBatch::has('wiki')
                 ->where([
@@ -33,7 +34,7 @@ class QsController extends Controller {
 
     }
 
-    public function markBatchesDone(Request $request): \Illuminate\Http\Response {
+    public function markBatchesDone(Request $request): Response {
         $batches = (array) $request->json()->all('batches');
         QsBatch::whereIn('id', $batches)->increment(
             'processing_attempts', 1,
@@ -43,7 +44,7 @@ class QsController extends Controller {
         return response('1');
     }
 
-    public function markBatchesNotDone(Request $request): \Illuminate\Http\Response {
+    public function markBatchesNotDone(Request $request): Response {
         $batches = (array) $request->json()->all('batches');
         QsBatch::whereIn('id', $batches)->increment(
             'processing_attempts', 1,

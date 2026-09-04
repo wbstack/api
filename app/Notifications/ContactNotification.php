@@ -48,7 +48,7 @@ class ContactNotification extends Notification {
      * Build the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable) {
         $subject = Lang::get('contact.' . $this->subject);
@@ -57,7 +57,7 @@ class ContactNotification extends Notification {
         $mailFrom = str_replace('<subject>', $this->subject, config('app.contact-mail-sender'));
         $mailSubject = config('app.name') . Lang::get(' contact form message: ') . $subject;
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->from($mailFrom)
             ->subject($mailSubject)
             ->line(Lang::get('A message via the wikibase.cloud contact form has been submitted.'))

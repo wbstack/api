@@ -31,8 +31,8 @@ class UpdateWikiDailyMetricJobTest extends TestCase {
         ]);
 
         $manager = $this->app->make('db');
-        $job = new ProvisionWikiDbJob;
-        $job2 = new ProvisionWikiDbJob;
+        $job = new ProvisionWikiDbJob();
+        $job2 = new ProvisionWikiDbJob();
         $job->handle($manager);
         $job2->handle($manager);
 
@@ -44,7 +44,7 @@ class UpdateWikiDailyMetricJobTest extends TestCase {
 
         $deletedWiki->delete();
 
-        (new UpdateWikiDailyMetricJob)->handle();
+        (new UpdateWikiDailyMetricJob())->handle();
 
         $this->assertDatabaseHas('wiki_daily_metrics', [
             'wiki_id' => $activeWiki->id,

@@ -1,5 +1,17 @@
 <?php
 
+use App\Metrics\FailedQsBatches;
+use App\Metrics\PendingQsBatches;
+use App\Metrics\WikiEntityImports;
+use LKDevelopment\HorizonPrometheusExporter\Exporter\CurrentMasterSupervisors;
+use LKDevelopment\HorizonPrometheusExporter\Exporter\CurrentProcessesPerQueue;
+use LKDevelopment\HorizonPrometheusExporter\Exporter\CurrentWorkload;
+use LKDevelopment\HorizonPrometheusExporter\Exporter\FailedJobsPerHour;
+use LKDevelopment\HorizonPrometheusExporter\Exporter\HorizonStatus;
+use LKDevelopment\HorizonPrometheusExporter\Exporter\JobsPerMinute;
+use LKDevelopment\HorizonPrometheusExporter\Exporter\RecentJobs;
+use LKDevelopment\HorizonPrometheusExporter\Http\Middleware\IPWhitelistingMiddleware;
+
 return [
     'enabled' => getenv('ROUTES_LOAD_BACKEND') == 1,
     'namespace' => 'platform_api',
@@ -15,16 +27,16 @@ return [
      * If you want to add your own Exporter just add the Class Name to this array
      */
     'exporters' => [
-        \LKDevelopment\HorizonPrometheusExporter\Exporter\CurrentMasterSupervisors::class,
-        \LKDevelopment\HorizonPrometheusExporter\Exporter\JobsPerMinute::class,
-        \LKDevelopment\HorizonPrometheusExporter\Exporter\CurrentWorkload::class,
-        \LKDevelopment\HorizonPrometheusExporter\Exporter\CurrentProccesesPerQueue::class,
-        \LKDevelopment\HorizonPrometheusExporter\Exporter\FailedJobsPerHour::class,
-        \LKDevelopment\HorizonPrometheusExporter\Exporter\HorizonStatus::class,
-        \LKDevelopment\HorizonPrometheusExporter\Exporter\RecentJobs::class,
-        \App\Metrics\FailedQsBatches::class,
-        \App\Metrics\PendingQsBatches::class,
-        \App\Metrics\WikiEntityImports::class,
+        CurrentMasterSupervisors::class,
+        JobsPerMinute::class,
+        CurrentWorkload::class,
+        CurrentProcessesPerQueue::class,
+        FailedJobsPerHour::class,
+        HorizonStatus::class,
+        RecentJobs::class,
+        FailedQsBatches::class,
+        PendingQsBatches::class,
+        WikiEntityImports::class,
     ],
 
     /**
@@ -37,7 +49,7 @@ return [
     /**
      * You can change the Middleware which is used for the IP whitelisting.  You can add your own, like a token based authentication.
      */
-    'middleware' => \LKDevelopment\HorizonPrometheusExporter\Http\Middleware\IPWhitelistingMiddleware::class,
+    'middleware' => IPWhitelistingMiddleware::class,
 
     /**
      * Allow storage to be wiped after a render of data in metrics controller

@@ -134,6 +134,39 @@ class ConversionMetricTest extends TestCase {
         );
     }
 
+    public function testDownloadJsonTruncatesFractionalDayDiffs() {
+        $currentDate = CarbonImmutable::now();
+        $createdAt = $currentDate->subDays(200)->subHours(12); // 200.5 days ago
+        $firstEditedAt = $createdAt->addDays(1)->addHours(12); // 1.5 days after
+        $lastEditedAt = $currentDate->subDays(100); // 100 days ago
+
+        $wiki = Wiki::factory()->create([
+            'domain' => 'fractional.days.cloud',
+            'sitename' => 'Fractional Days Site',
+        ]);
+        WikiSiteStats::factory()->create([
+            'wiki_id' => $wiki->id,
+            'pages' => 77,
+            'activeusers' => 2,
+        ]);
+        $wiki->created_at = $createdAt;
+        $wiki->wikiLifecycleEvents()->updateOrCreate([
+            'first_edited' => $firstEditedAt,
+            'last_edited' => $lastEditedAt,
+        ]);
+        $wiki->save();
+
+        $response = $this->getJson($this->route);
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            'domain' => 'fractional.days.cloud',
+            'time_to_engage_days' => 1,
+            'time_before_wiki_abandoned_days' => 100,
+            'number_of_active_editors' => 2,
+        ]);
+    }
+
     public function testFunctionalWithMissingLifecycleEventsandStats() {
         $wiki = Wiki::factory()->create([
             'domain' => 'very.new.wikibase.cloud', 'sitename' => 'bsite',

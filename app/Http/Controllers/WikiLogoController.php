@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SetWikiLogo;
 use App\WikiSetting;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class WikiLogoController extends Controller {
     /**
@@ -12,7 +14,7 @@ class WikiLogoController extends Controller {
      * Right now WgLogo is always the same path when set, so if we start writing new files but die we still end up updating the site.
      * Fine for now but...
      *
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return JsonResponse|Response
      */
     public function update(Request $request) {
         $request->validate([

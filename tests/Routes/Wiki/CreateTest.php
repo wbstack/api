@@ -2,10 +2,10 @@
 
 namespace Tests\Routes\Wiki\Managers;
 
-use App\Jobs\CirrusSearch\ElasticSearchIndexInit;
 use App\Jobs\ElasticSearchAliasInit;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionWikiDbJob;
+use App\KnowledgeEquityResponse;
 use App\QueryserviceNamespace;
 use App\User;
 use App\Wiki;
@@ -41,14 +41,12 @@ class CreateTest extends TestCase {
      */
     public function testWikiCreateDispatchesSomeJobs($elasticSearchConfig) {
         $enabledForNewWikis = $elasticSearchConfig['enabledForNewWikis'];
-        $clusterWithoutSharedIndex = $elasticSearchConfig['clusterWithoutSharedIndex'] ?? null;
-        $sharedIndexHost = $elasticSearchConfig['sharedIndexHost'] ?? null;
         $sharedIndexPrefix = $elasticSearchConfig['sharedIndexPrefix'] ?? null;
+        $esHosts = $elasticSearchConfig['esHosts'] ?? null;
 
         Config::set('wbstack.elasticsearch_enabled_by_default', $enabledForNewWikis);
-        Config::set('wbstack.elasticsearch_cluster_without_shared_index', $clusterWithoutSharedIndex);
-        Config::set('wbstack.elasticsearch_shared_index_host', $sharedIndexHost);
         Config::set('wbstack.elasticsearch_shared_index_prefix', $sharedIndexPrefix);
+        Config::set('wbstack.elasticsearch_hosts', $esHosts);
 
         $this->createSQLandQSDBs();
 
@@ -73,21 +71,13 @@ class CreateTest extends TestCase {
                 ]
             );
 
-        if ($enabledForNewWikis && $clusterWithoutSharedIndex) {
-            Queue::assertPushed(function (ElasticSearchIndexInit $job) use ($clusterWithoutSharedIndex) {
-                return $job->cluster() === $clusterWithoutSharedIndex;
-            });
-        } else {
-            Queue::assertNotPushed(ElasticSearchIndexInit::class);
-        }
-
-        if ($enabledForNewWikis && $sharedIndexHost && $sharedIndexPrefix) {
-            Queue::assertPushed(ElasticSearchAliasInit::class, 1);
+        if ($enabledForNewWikis && $esHosts && $sharedIndexPrefix) {
+            Queue::assertPushed(ElasticSearchAliasInit::class, count($esHosts));
         } else {
             Queue::assertNotPushed(ElasticSearchAliasInit::class);
         }
 
-        if ($enabledForNewWikis && !$clusterWithoutSharedIndex && !($sharedIndexHost && $sharedIndexPrefix)) {
+        if ($enabledForNewWikis && !($esHosts && $sharedIndexPrefix)) {
             $response->assertStatus(503)
                 ->assertJsonPath('message', 'Search enabled, but its configuration is invalid');
 
@@ -119,20 +109,26 @@ class CreateTest extends TestCase {
     public static function createDispatchesSomeJobsProvider() {
         yield [[
             'enabledForNewWikis' => true,
-            'clusterWithoutSharedIndex' => 'all',
-            'sharedIndexHost' => 'somehost',
             'sharedIndexPrefix' => 'testing_1',
+            'esHosts' => ['elasticsearch-1.localhost'],
         ]];
 
         yield [[
             'enabledForNewWikis' => true,
-            'clusterWithoutSharedIndex' => 'default',
+            'sharedIndexPrefix' => 'testing_1',
+            'esHosts' => ['elasticsearch-1.localhost', 'elasticsearch-2.localhost'],
+        ]];
+
+        yield [[
+            'enabledForNewWikis' => false,
+            'sharedIndexPrefix' => 'testing_1',
+            'esHosts' => ['elasticsearch-1.localhost'],
         ]];
 
         yield [[
             'enabledForNewWikis' => true,
-            'sharedIndexHost' => 'somehost',
             'sharedIndexPrefix' => 'testing_1',
+            'esHosts' => [],
         ]];
 
         yield [[
@@ -152,10 +148,10 @@ class CreateTest extends TestCase {
     public function testCreateWikiLimitsNumWikisPerUser() {
         $manager = $this->app->make('db');
 
-        $job1 = new ProvisionWikiDbJob;
+        $job1 = new ProvisionWikiDbJob();
         $job1->handle($manager);
 
-        $job2 = new ProvisionWikiDbJob;
+        $job2 = new ProvisionWikiDbJob();
         $job2->handle($manager);
 
         QueryserviceNamespace::create([
@@ -227,7 +223,7 @@ class CreateTest extends TestCase {
 
     private function createSQLandQSDBs(): void {
         $manager = $this->app->make('db');
-        $job = new ProvisionWikiDbJob;
+        $job = new ProvisionWikiDbJob();
         $job->handle($manager);
 
         QueryserviceNamespace::create([
@@ -259,8 +255,8 @@ class CreateTest extends TestCase {
         unset($noSitename['sitename']);
         $noUsername = self::defaultData;
         unset($noUsername['username']);
-        $noprofile = self::defaultData;
-        unset($noprofile['profile']);
+        $noProfile = self::defaultData;
+        unset($noProfile['profile']);
         $profileWithOther = self::defaultData;
         $profileWithOther['profile'] = '{
                         "audience": "other",
@@ -292,7 +288,7 @@ class CreateTest extends TestCase {
             'missing domain' => [$noDomain, 422],
             'missing sitename' => [$noSitename, 422],
             'missing username' => [$noUsername, 422],
-            'missing profile' => [$noprofile, 200],
+            'missing profile' => [$noProfile, 200],
             'profile with other' => [$profileWithOther, 200],
             'profile with other string missing' => [$profileWithOtherStringMissing, 422],
             'profile with extraneous other' => [$profileWithExtraneousOther, 422],
@@ -310,9 +306,106 @@ class CreateTest extends TestCase {
                 $this->route,
                 self::defaultData
             );
-        $id = $response->decodeResponseJson()['data']['id'];
-        $this->assertEquals(1,
-            WikiProfile::where(['wiki_id' => $id])->count()
+        $response->assertStatus(200);
+        $id = $response->json()['data']['id'];
+        $this->assertEquals(1, WikiProfile::where(['wiki_id' => $id])->count());
+    }
+
+    public function testCreateWithKERCreatesProfiles(): void {
+        $this->createSQLandQSDBs();
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $response = $this->actingAs($user, 'api')
+            ->json(
+                'POST',
+                $this->route,
+                [...self::defaultData, 'knowledgeEquityResponse' => [
+                    // This only tests the selectedOption since the freeTextResponse is optional.
+                    'selectedOption' => 'yes',
+                ]]
+            );
+        $response->assertStatus(200);
+        $id = $response->json()['data']['id'];
+        $this->assertEquals(1, KnowledgeEquityResponse::where(['wiki_id' => $id])->count());
+    }
+
+    public function testCreateWithKERRejectsIfSelectedOptionIsInvalid(): void {
+        $this->createSQLandQSDBs();
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $response = $this->actingAs($user, 'api')
+            ->json(
+                'POST',
+                $this->route,
+                [...self::defaultData, 'knowledgeEquityResponse' => [
+                    'selectedOption' => 'yeeeeeah',
+                ]]
+            );
+        $response->assertStatus(422);
+        // This only tests for the existence of an error key.
+        // Using JSON path to check the specific errors message
+        // binds very tightly to the laravel implementation of validation and was hard to make work.
+        $response->assertJsonStructure(['errors']);
+    }
+
+    public function testCreateWithKERCreatesIf3000FreeTextResponse(): void {
+        $this->createSQLandQSDBs();
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $response = $this->actingAs($user, 'api')
+            ->json(
+                'POST',
+                $this->route,
+                [...self::defaultData, 'knowledgeEquityResponse' => [
+                    'selectedOption' => 'yes',
+                    'freeTextResponse' => str_repeat('a', 3000),
+                ]]
+            );
+        $response->assertStatus(200);
+        $id = $response->json()['data']['id'];
+        $this->assertEquals(1, KnowledgeEquityResponse::where(['wiki_id' => $id])->count());
+    }
+
+    public function testCreateWithKERErrorsIf3001FreeTextResponse(): void {
+        $this->createSQLandQSDBs();
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+        $response = $this->actingAs($user, 'api')
+            ->json(
+                'POST',
+                $this->route,
+                [...self::defaultData, 'knowledgeEquityResponse' => [
+                    'selectedOption' => 'yes',
+                    'freeTextResponse' => str_repeat('a', 3001),
+                ]]
+            );
+        $response->assertStatus(422);
+        // This only tests for the existence of an error key.
+        // Using JSON path to check the specific errors message
+        // binds very tightly to the laravel implementation of validation and was hard to make work.
+        $response->assertJsonStructure(['errors']);
+    }
+
+    public function testCreateWikiErrorsIfKerIsInvalid(): void {
+        $this->createSQLandQSDBs();
+        Queue::fake();
+        $user = User::factory()->create(['verified' => true]);
+
+        $response = $this->actingAs($user, 'api')->json(
+            'POST',
+            $this->route,
+            [
+                ...self::defaultData,
+                'knowledgeEquityResponse' => [
+                    'freeTextResponse' => 'valid free text response',
+                ],
+            ]
         );
+
+        $response->assertStatus(422);
+        // This only tests for the existence of an error key.
+        // Using JSON path to check the specific errors message
+        // binds very tightly to the laravel implementation of validation and was hard to make work.
+        $response->assertJsonStructure(['errors']);
     }
 }

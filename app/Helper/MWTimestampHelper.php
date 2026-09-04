@@ -15,9 +15,6 @@ class MWTimestampHelper {
 
     public static function getCarbonFromMWTimestamp(string $MWTimestamp): CarbonImmutable {
         $carbon = CarbonImmutable::createFromFormat(self::MWTimestampFormat, $MWTimestamp);
-        if ($carbon === false) {
-            throw new \Exception('Unable to create Carbon object');
-        }
 
         return $carbon;
     }

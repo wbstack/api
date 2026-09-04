@@ -8,13 +8,14 @@ use App\Jobs\UserVerificationCreateTokenAndSendJob;
 use App\Rules\ReCaptchaValidation;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller {
     /**
-     * @var \App\Rules\ReCaptchaValidation
+     * @var ReCaptchaValidation
      */
     protected $recaptchaValidation;
 
@@ -25,16 +26,17 @@ class RegisterController extends Controller {
     /**
      * Handle a registration request for the application.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function register(Request $request) {
         $this->validator($request->all())->validate();
 
         $user = null;
-        DB::transaction(function () use (&$user, $request) {
+        DB::transaction(function () use (&$user, $request): void {
             $user = (new UserCreateJob(
                 $request->input('email'),
-                $request->input('password')
+                $request->input('password'),
+                $request->input('accepted_policies')
             ))->handle();
             (UserVerificationCreateTokenAndSendJob::newForAccountCreation($user))->handle();
         });
@@ -66,6 +68,8 @@ class RegisterController extends Controller {
             'recaptcha' => ['required', 'string', 'bail', $this->recaptchaValidation],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
+            'accepted_policies' => ['nullable', 'array'],
+            'accepted_policies.*' => ['integer', 'distinct'],
         ];
 
         return Validator::make($data, $validation);

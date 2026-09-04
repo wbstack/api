@@ -25,10 +25,10 @@ class RebuildQueryserviceDataTest extends TestCase {
         WikiSetting::query()->delete();
         QueryserviceNamespace::query()->delete();
 
-        $this->mwBackendHost = 'mediawiki.localhost';
+        $this->mwBackendHost = 'http://mediawiki.localhost';
 
         $mockMwHostResolver = $this->createMock(MediaWikiHostResolver::class);
-        $mockMwHostResolver->method('getBackendHostForDomain')->willReturn(
+        $mockMwHostResolver->method('getBackendUrlForDomain')->willReturn(
             $this->mwBackendHost
         );
 
