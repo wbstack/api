@@ -28,6 +28,13 @@ class PolicyAcceptanceTest extends TestCase {
         $this->policyId = $policy->id;
     }
 
+    protected function tearDown(): void {
+        parent::tearDown();
+
+        // clear any mocking of CarbonImmutable after each test
+        CarbonImmutable::setTestNow();
+    }
+
     public function testCreatesAndSavesSuccessfully(): void {
         $policyAcceptance = new PolicyAcceptance([
             'user_id' => $this->userId,
@@ -46,21 +53,88 @@ class PolicyAcceptanceTest extends TestCase {
         $this->assertInstanceOf(CarbonImmutable::class, $policyAcceptance->accepted_at);
     }
 
-    public function testCreateFailsIfAcceptedAtIsMissing() {
-        $this->expectException(RuntimeException::class);
-        PolicyAcceptance::create([
+    // TODO: Quickly testing all different ways of creating and saving a model.
+    // TODO: Is there a better way to do this e.g. with a `@dataProvider`?
+    // TODO: Do we need all the options now that we have verified that they all work? Feels like testing Laravel's `Model::creating()` event works.
+    public function testAcceptedAtIsSetOnCreateIfMissing() {
+        $knownDate = CarbonImmutable::create(2026, 06, 01);
+        CarbonImmutable::setTestNow($knownDate);
+
+        $policyAcceptance = PolicyAcceptance::create([
             'user_id' => $this->userId,
             'policy_id' => $this->policyId,
         ]);
+        $this->assertEquals($knownDate, $policyAcceptance->accepted_at);
+
+        $policyAcceptance->delete();
+
+        $policyAcceptance = PolicyAcceptance::make([
+            'user_id' => $this->userId,
+            'policy_id' => $this->policyId,
+        ]);
+        $policyAcceptance->save();
+        $this->assertEquals($knownDate, $policyAcceptance->accepted_at);
+
+        $policyAcceptance->delete();
+
+        $policyAcceptance = new PolicyAcceptance([
+            'user_id' => $this->userId,
+            'policy_id' => $this->policyId,
+        ]);
+        $policyAcceptance->save();
+        $this->assertEquals($knownDate, $policyAcceptance->accepted_at);
+
+        $policyAcceptance->delete();
+
+        $policyAcceptance = new PolicyAcceptance();
+        $policyAcceptance->user_id = $this->userId;
+        $policyAcceptance->policy_id = $this->policyId;
+        $policyAcceptance->save();
+        $this->assertEquals($knownDate, $policyAcceptance->accepted_at);
+
+        $policyAcceptance->delete();
+
+        $policyAcceptance = new PolicyAcceptance();
+        $policyAcceptance->fill([
+            'user_id' => $this->userId,
+            'policy_id' => $this->policyId,
+        ]);
+        $policyAcceptance->save();
+        $this->assertEquals($knownDate, $policyAcceptance->accepted_at);
     }
 
-    public function testCreateFailsIfAcceptedAtIsNull() {
-        $this->expectException(RuntimeException::class);
-        PolicyAcceptance::create([
+    public function testAcceptedAtIsSetOnCreateIfNull() {
+        $knownDate = CarbonImmutable::create(2026, 06, 01);
+        CarbonImmutable::setTestNow($knownDate);
+
+        $policyAcceptance = PolicyAcceptance::create([
             'user_id' => $this->userId,
             'policy_id' => $this->policyId,
             'accepted_at' => null,
         ]);
+
+        $this->assertEquals($knownDate, $policyAcceptance->accepted_at);
+    }
+
+    public function testAcceptedAtIsNotModifiedOnUpdate() {
+        $knownDate = CarbonImmutable::create(2026, 06, 01);
+        CarbonImmutable::setTestNow($knownDate);
+
+        $policyAcceptance = PolicyAcceptance::create([
+            'user_id' => $this->userId,
+            'policy_id' => $this->policyId,
+        ]);
+
+        $nextDay = $knownDate->addDay();
+        CarbonImmutable::setTestNow($nextDay);
+        $user = User::factory()->create();
+
+        $policyAcceptance->user_id = $user->id;
+        $policyAcceptance->save();
+
+        $this->assertEquals($knownDate, $policyAcceptance->accepted_at);
+        $this->assertEquals($knownDate, $policyAcceptance->created_at);
+        $this->assertEquals($nextDay, $policyAcceptance->updated_at);
     }
 
     public function testUserAcceptingSamePolicyTwiceFails() {
