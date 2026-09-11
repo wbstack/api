@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\ReviewSubmissionController;
 use App\Http\Middleware\AuthorisedUsersForDeletedWikiMetricsMiddleware;
+use App\Http\Middleware\LimitWikiAccess;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Config;
 
@@ -65,6 +69,28 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
     $router->get('v1/policies/{policy_type}/upcoming', ['uses' => 'PolicyController@getUpcomingPolicyByType']);
     $router->get('v1/policies/{policy_type}/by_active_from/{active_from}', ['uses' => 'PolicyController@getPolicyByTypeAndActiveFrom']);
     $router->get('v1/policies/{policy_type}', ['uses' => 'PoliciesController@getPoliciesByType']);
+
+    // TODO: Move this to the Authed middleware section? Or keep things grouped by endpoint rather than if authentication required?
+    Route::apiResource('/v1/wikis.review_submissions', ReviewSubmissionController::class)
+        // TODO: the order middleware is listed here, is the order they will be executed in, is this order correct?
+        ->middleware([
+            // TODO: can use `Authenticate::class . ':api'` to match the other middleware if we prefer? I don't really like the dot notation
+            'auth:api',
+
+            EnsureEmailIsVerified::class,
+
+            // This middleware is currently required to make Laravel's Route Model Bindings work
+            // https://laravel.com/framework/docs/11.x/routing#route-model-binding
+            // If we register routes as Laravel expects, we likely won't need to manually specify this
+            // TODO: this returns the error response `{"message": "No query results for model [App\\Wiki] <wiki_id>"}`
+            // if an invalid wiki_id (such as `-1`, `abc`, `999999`) is requested - do we want to improve this error response?
+            SubstituteBindings::class,
+
+            LimitWikiAccess::class,
+        ])
+        // Ensure that the ReviewSubmission belongs to the Wiki, for endpoints that have both as path params (show/update/destroy)
+        ->scoped()
+        ->only('index', 'store', 'show');
 
     $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
     $router->apiResource('reusePrototype', 'PublicWikiController')->only(['index']);

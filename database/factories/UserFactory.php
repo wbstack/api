@@ -22,7 +22,16 @@ class UserFactory extends Factory {
         return [
             'password' => $this->faker->password(),
             'email' => $this->faker->unique()->safeEmail(),
-            'verified' => $this->faker->boolean(),
+            'verified' => true,
         ];
+    }
+
+    /**
+     * Indicate that the model's email address should be unverified.
+     */
+    public function unverified(): static {
+        return $this->state(fn (array $attributes) => [
+            'verified' => false,
+        ]);
     }
 }
