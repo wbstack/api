@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\ReviewSubmissionController;
 use App\Http\Middleware\AuthorisedUsersForDeletedWikiMetricsMiddleware;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Config;
 
@@ -65,6 +67,17 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
     $router->get('v1/policies/{policy_type}/upcoming', ['uses' => 'PolicyController@getUpcomingPolicyByType']);
     $router->get('v1/policies/{policy_type}/by_active_from/{active_from}', ['uses' => 'PolicyController@getPolicyByTypeAndActiveFrom']);
     $router->get('v1/policies/{policy_type}', ['uses' => 'PoliciesController@getPoliciesByType']);
+
+    // TODO: this currently has no middleware to restrict creating submissions only for Wikis you own
+    Route::apiResource('/v1/wikis.review_submissions', ReviewSubmissionController::class)
+        // This middleware is currently required to make Laravel's Route Model Bindings work
+        // https://laravel.com/framework/docs/11.x/routing#route-model-binding
+        // If we register routes as Laravel expects, we likely won't need to manually specify this
+        ->middleware(SubstituteBindings::class)
+        // ensure that the ReviewSubmission belongs to the Wiki; only required for 'show', 'update', and 'destroy'
+        ->scoped()
+        ->whereNumber(['wiki', 'review_submission'])
+        ->only('index', 'store', 'show');
 
     $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
     $router->apiResource('reusePrototype', 'PublicWikiController')->only(['index']);

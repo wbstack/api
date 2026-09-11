@@ -40,6 +40,14 @@ class ReviewSubmissionAction extends Model {
     /** @use HasFactory<ReviewSubmissionActionFactory> */
     use HasFactory;
 
+    // TODO: created while implementing ReviewSubmissionController::store() - decide if wanted
+    // if we create a `ReviewSubmission::addAction()` method, can we remove this $fillable?
+    protected $fillable = [
+        'actor_user_id',
+        'actor_user_role',
+        'type',
+    ];
+
     protected function casts(): array {
         return [
             'actor_user_role' => UserRole::class,
