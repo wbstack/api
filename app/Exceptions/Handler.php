@@ -4,6 +4,8 @@ namespace App\Exceptions;
 
 use Absszero\ErrorReporting;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class Handler extends ExceptionHandler {
@@ -23,6 +25,13 @@ class Handler extends ExceptionHandler {
     public function register(): void {
         $this->reportable(function (Throwable $e): void {
             (new ErrorReporting())->report($e);
+        });
+
+        $this->renderable(function (HttpExceptionInterface $e, Request $request) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode(), $e->getHeaders());
         });
     }
 
