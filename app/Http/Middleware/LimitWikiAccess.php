@@ -14,14 +14,19 @@ class LimitWikiAccess {
      * object into the request context.
      */
     public function handle(Request $request, Closure $next): Response {
-        $validatedInput = $request->validate([
-            'wiki' => ['required', 'integer'],
-        ]);
+        $wiki = $request->route('wiki') ?? $request->input('wiki');
 
-        $wiki = Wiki::find($validatedInput['wiki']);
+        if (!$wiki instanceof Wiki) {
+            $request->merge(['wiki' => $wiki]);
+            $validatedInput = $request->validate([
+                'wiki' => ['required', 'integer'],
+            ]);
 
-        if (!$wiki) {
-            abort(404, 'No such wiki');
+            $wiki = Wiki::find($validatedInput['wiki']);
+
+            if (!$wiki) {
+                abort(404, 'No such wiki');
+            }
         }
 
         $wikiManager = $wiki->wikiManagers()
@@ -29,7 +34,7 @@ class LimitWikiAccess {
             ->first();
 
         if (!$wikiManager) {
-            abort(403);
+            abort(403, "No permission to modify Wiki with ID {$wiki->id}");
         }
 
         $request->attributes->set('wiki', $wiki);

@@ -5,9 +5,11 @@ namespace Tests\Jobs;
 use App\User;
 use App\Wiki;
 use App\WikiManager;
+use Generator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\AssertionFailedError;
 use Tests\TestCase;
 
 class LimitWikiAccessTest extends TestCase {
@@ -15,7 +17,7 @@ class LimitWikiAccessTest extends TestCase {
 
     protected function setUp(): void {
         parent::setUp();
-        Route::middleware('limit_wiki_access')->get('/endpoint', function (Request $request) {
+        Route::middleware('limit_wiki_access')->get('/endpoint/{wiki?}', function (Request $request) {
             return response()->json([
                 'wiki_id' => $request->attributes->get('wiki')->id,
             ]);
@@ -34,17 +36,25 @@ class LimitWikiAccessTest extends TestCase {
         return [$wiki, $user];
     }
 
-    private function getURI(Wiki $wiki): string {
-        return "/endpoint?wiki={$wiki->id}";
+    public function generateRequestUriAndBody(Wiki $wiki): Generator {
+        yield 'query param and empty body' => ["/endpoint?wiki={$wiki->id}", []];
+        yield 'path param and empty body' => ["/endpoint/{$wiki->id}", []];
+        yield 'no params and body' => ['/endpoint', ['wiki' => $wiki->id]];
     }
 
     public function testSuccess(): void {
         [$wiki, $user] = $this->createWikiAndUser();
 
-        $this->actingAs($user)
-            ->json('GET', $this->getURI($wiki))
-            ->assertStatus(200)
-            ->assertJson(['wiki_id' => $wiki->id]);
+        foreach ($this->generateRequestUriAndBody($wiki) as $name => [$uri, $body]) {
+            try {
+                $this->actingAs($user)
+                    ->json('GET', $uri, $body)
+                    ->assertStatus(200)
+                    ->assertJson(['wiki_id' => $wiki->id]);
+            } catch (AssertionFailedError $e) {
+                throw new AssertionFailedError("with data set \"{$name}\" failed", $e->getCode(), $e);
+            }
+        }
     }
 
     public function testFailOnWrongWikiManager(): void {
@@ -52,23 +62,51 @@ class LimitWikiAccessTest extends TestCase {
         $otherWiki = Wiki::factory()->create();
         $user = User::factory()->create(['verified' => true]);
         WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
-        $this->actingAs($user)->json('GET', $this->getURI($otherWiki))->assertStatus(403);
+
+        foreach ($this->generateRequestUriAndBody($otherWiki) as $name => [$uri, $body]) {
+            try {
+                $this->actingAs($user)->json('GET', $uri, $body)->assertStatus(403);
+            } catch (AssertionFailedError $e) {
+                throw new AssertionFailedError("with data set \"{$name}\" failed", $e->getCode(), $e);
+            }
+        }
     }
 
     public function testFailOnDeletedWiki(): void {
         [$wiki, $user] = $this->createWikiAndUser();
         $wiki->wikiManagers()->delete();
         $wiki->delete();
-        $this->actingAs($user)->json('GET', $this->getURI($wiki))->assertStatus(404);
+
+        foreach ($this->generateRequestUriAndBody($wiki) as $name => [$uri, $body]) {
+            try {
+                $this->actingAs($user)->json('GET', $uri, $body)->assertStatus(404);
+            } catch (AssertionFailedError $e) {
+                throw new AssertionFailedError("with data set \"{$name}\" failed", $e->getCode(), $e);
+            }
+        }
     }
 
     public function testFailOnMissingWiki(): void {
         [$wiki, $user] = $this->createWikiAndUser();
-        $this->actingAs($user)->json('GET', '/endpoint')->assertStatus(422);
+
+        foreach ($this->generateRequestUriAndBody(new Wiki()) as $name => [$uri, $body]) {
+            try {
+                $this->actingAs($user)->json('GET', $uri, $body)->assertStatus(422);
+            } catch (AssertionFailedError $e) {
+                throw new AssertionFailedError("with data set \"{$name}\" failed", $e->getCode(), $e);
+            }
+        }
     }
 
     public function testFailOnMissingUser(): void {
         [$wiki, $user] = $this->createWikiAndUser();
-        $this->json('GET', $this->getURI($wiki))->assertStatus(403);
+
+        foreach ($this->generateRequestUriAndBody($wiki) as $name => [$uri, $body]) {
+            try {
+                $this->json('GET', $uri, $body)->assertStatus(403);
+            } catch (AssertionFailedError $e) {
+                throw new AssertionFailedError("with data set \"{$name}\" failed", $e->getCode(), $e);
+            }
+        }
     }
 }
