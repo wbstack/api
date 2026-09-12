@@ -241,18 +241,6 @@ class PlatformStatsSummaryJobTest extends TestCase {
         $activeWiki = Wiki::factory()->create(['deleted_at' => null, 'domain' => 'active.cloud']);
         WikiDb::factory()->for($activeWiki)->create(['name' => 'active_db']);
 
-        // TODO: investigate if this is needed or not
-        Http::fake([
-            "{$this->mwBackendHost}/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json"
-                => Http::response(['query' => ['allpages' => []]], 200),
-            "{$this->mwBackendHost}/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json"
-                => Http::response(['query' => ['allpages' => []]], 200),
-        ]);
-        // this passed
-        Http::assertNothingSent();
-        // this fails
-        Http::assertSentCount(1);
-
         $this->mockMwHostResolver
             ->expects($this->once())
             ->method('getBackendUrlForDomain')
