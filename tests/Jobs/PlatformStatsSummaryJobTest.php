@@ -235,34 +235,23 @@ class PlatformStatsSummaryJobTest extends TestCase {
     }
 
     public function testSkipDeletedWikisBeforeResolvingBackendUrl() {
-        $deletedWiki = Wiki::factory()->create(['deleted_at' => CarbonImmutable::now()->subDay(), 'domain' => 'deleted.cloud']);
-        WikiDb::create([
-            'name' => 'deleted_db',
-            'user' => 'asdasd',
-            'password' => 'asdasfasfasf',
-            'version' => 'version',
-            'prefix' => 'asdasd',
-            'wiki_id' => $deletedWiki->id,
-        ]);
+        $deletedWiki = Wiki::factory()->create(['deleted_at' => CarbonImmutable::yesterday(), 'domain' => 'deleted.cloud']);
+        WikiDb::factory()->for($deletedWiki)->create(['name' => 'deleted_db']);
 
         $activeWiki = Wiki::factory()->create(['deleted_at' => null, 'domain' => 'active.cloud']);
-        WikiDb::create([
-            'name' => 'active_db',
-            'user' => 'asdasd',
-            'password' => 'asdasfasfasf',
-            'version' => 'version',
-            'prefix' => 'asdasd',
-            'wiki_id' => $activeWiki->id,
-        ]);
+        WikiDb::factory()->for($activeWiki)->create(['name' => 'active_db']);
 
+        // TODO: investigate if this is needed or not
         Http::fake([
-            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
-                'query' => ['allpages' => []],
-            ], 200),
-            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
-                'query' => ['allpages' => []],
-            ], 200),
+            "{$this->mwBackendHost}/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json"
+                => Http::response(['query' => ['allpages' => []]], 200),
+            "{$this->mwBackendHost}/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json"
+                => Http::response(['query' => ['allpages' => []]], 200),
         ]);
+        // this passed
+        Http::assertNothingSent();
+        // this fails
+        Http::assertSentCount(1);
 
         $this->mockMwHostResolver
             ->expects($this->once())
@@ -271,6 +260,10 @@ class PlatformStatsSummaryJobTest extends TestCase {
             ->willReturn($this->mwBackendHost);
 
         $job = new PlatformStatsSummaryJob();
+        // This is a hack to override the `private` `PlatformStatsSummaryJob::mwHostResolver` property.
+        // See https://www.php.net/manual/en/closure.call.php for more details on how this works.
+        // TODO: figure out how to stub the `DatabaseManager` correctly and/or refactor the Job so that
+        // we can more easily inject dependencies in the tests.
         (function ($resolver): void {
             $this->mwHostResolver = $resolver;
         })->call($job, $this->mockMwHostResolver);
