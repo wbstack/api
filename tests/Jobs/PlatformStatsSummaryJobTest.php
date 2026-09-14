@@ -234,6 +234,55 @@ class PlatformStatsSummaryJobTest extends TestCase {
         );
     }
 
+    public function testSkipDeletedWikisBeforeResolvingBackendUrl() {
+        $deletedWiki = Wiki::factory()->create(['deleted_at' => CarbonImmutable::yesterday(), 'domain' => 'deleted.cloud']);
+        WikiDb::factory()->for($deletedWiki)->create(['name' => 'deleted_db']);
+
+        $activeWiki = Wiki::factory()->create(['deleted_at' => null, 'domain' => 'active.cloud']);
+        WikiDb::factory()->for($activeWiki)->create(['name' => 'active_db']);
+
+        $this->mockMwHostResolver
+            ->expects($this->once())
+            ->method('getBackendUrlForDomain')
+            ->with('active.cloud')
+            ->willReturn($this->mwBackendHost);
+
+        $job = new PlatformStatsSummaryJob();
+        // This is a hack to override the `private` `PlatformStatsSummaryJob::mwHostResolver` property.
+        // See https://www.php.net/manual/en/closure.call.php for more details on how this works.
+        // TODO: figure out how to stub the `DatabaseManager` correctly and/or refactor the Job so that
+        // we can more easily inject dependencies in the tests.
+        (function ($resolver): void {
+            $this->mwHostResolver = $resolver;
+        })->call($job, $this->mockMwHostResolver);
+
+        $groups = $job->prepareStats([
+            [
+                'wiki' => 'active.cloud',
+                'edits' => 1,
+                'pages' => 1,
+                'users' => 1,
+                'active_users' => 1,
+                'lastEdit' => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()),
+                'first100UsingOauth' => '0',
+                'platform_summary_version' => 'v1',
+            ],
+            [
+                'wiki' => 'deleted.cloud',
+                'edits' => 1,
+                'pages' => 1,
+                'users' => 1,
+                'active_users' => 1,
+                'lastEdit' => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()),
+                'first100UsingOauth' => '0',
+                'platform_summary_version' => 'v1',
+            ],
+        ], [$deletedWiki, $activeWiki]);
+
+        $this->assertSame(1, $groups['deleted']);
+        $this->assertSame(1, $groups['edited_last_90_days']);
+    }
+
     public function testCreationStats() {
         $this->markTestSkipped('Pollutes the deleted wiki list');
         $mockJob = $this->createMock(Job::class);
