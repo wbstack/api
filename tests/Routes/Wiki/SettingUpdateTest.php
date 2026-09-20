@@ -24,7 +24,7 @@ class SettingUpdateTest extends TestCase {
     public function testSetInvalidSetting() {
         $settingName = 'iDoNotExistAsASetting';
         $wiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
             ->json('POST', str_replace('foo', $settingName, $this->route), [
@@ -40,7 +40,7 @@ class SettingUpdateTest extends TestCase {
         $settingName = 'wwExtEnableConfirmAccount';
         $userWiki = Wiki::factory()->create();
         $otherWiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
             ->postJson(str_replace('foo', $settingName, $this->route), [
@@ -84,7 +84,7 @@ class SettingUpdateTest extends TestCase {
      * @dataProvider provideValidSettings
      */
     public function testValidSetting($settingName, $settingValue, $expectedStored) {
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory('nodb')->create();
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
@@ -150,7 +150,7 @@ class SettingUpdateTest extends TestCase {
      */
     public function testValidSettingBadValues($settingName, $settingValue) {
         $wiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
