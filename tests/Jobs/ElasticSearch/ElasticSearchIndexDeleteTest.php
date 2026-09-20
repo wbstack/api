@@ -26,7 +26,7 @@ class ElasticSearchIndexDeleteTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
 
-        $this->user = User::factory()->create(['verified' => true]);
+        $this->user = User::factory()->create();
         $this->wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
         WikiSetting::factory()->create(

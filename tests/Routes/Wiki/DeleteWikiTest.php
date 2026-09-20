@@ -14,7 +14,7 @@ class DeleteWikiTest extends TestCase {
     use RefreshDatabase;
 
     public function testDelete() {
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory('nodb')->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
@@ -36,7 +36,7 @@ class DeleteWikiTest extends TestCase {
     public function testFailOnWrongWikiManager(): void {
         $userWiki = Wiki::factory()->create();
         $otherWiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
             ->post('wiki/delete', ['wiki' => $otherWiki->id])

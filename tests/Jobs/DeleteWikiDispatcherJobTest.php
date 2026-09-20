@@ -39,7 +39,7 @@ class DeleteWikiDispatcherJobTest extends TestCase {
     }
 
     private function getWiki($daysSinceDelete = 30): Wiki {
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(
             [
                 'deleted_at' => $daysSinceDelete > 0 ? Carbon::now()->subDays($daysSinceDelete)->timestamp : null,

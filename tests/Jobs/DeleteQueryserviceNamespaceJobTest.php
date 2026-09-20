@@ -18,7 +18,7 @@ class DeleteQueryserviceNamespaceJobTest extends TestCase {
     use DatabaseTransactions;
 
     public function testDeleteNamespace() {
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['deleted_at' => Carbon::now()->subDays(30)->timestamp]);
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
@@ -83,7 +83,7 @@ class DeleteQueryserviceNamespaceJobTest extends TestCase {
 
     public function testNoNamespace() {
 
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['deleted_at' => Carbon::now()->subDays(30)->timestamp]);
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 

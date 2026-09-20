@@ -19,7 +19,7 @@ class LogoUpdateTest extends TestCase {
         $storage = Storage::fake('static-assets');
         $file = UploadedFile::fake()->createWithContent('logo_200x200.png', file_get_contents(__DIR__ . '/../../data/logo_200x200.png'));
 
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory('nodb')->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
@@ -56,7 +56,7 @@ class LogoUpdateTest extends TestCase {
     public function testFailOnWrongWikiManager(): void {
         $userWiki = Wiki::factory()->create();
         $otherWiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
         $file = UploadedFile::fake()
             ->createWithContent('logo_200x200.png', file_get_contents(__DIR__ . '/../../data/logo_200x200.png'));

@@ -20,7 +20,7 @@ class KubernetesIngressCreateTest extends TestCase {
 
     public function testCreateIngressJobDoesNotFail() {
 
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['deleted_at' => null]);
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
