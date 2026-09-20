@@ -37,7 +37,7 @@ class QueryserviceNamespaceJobTest extends TestCase {
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['deleted_at' => Carbon::now()->subDays(30)->timestamp]);
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 

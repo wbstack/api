@@ -35,7 +35,7 @@ class EntityImportTest extends TestCase {
 
     public function testNoCredentials() {
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $this->actingAs($user, 'api')
             ->json('GET', $this->route . '?wiki=' . $wiki->id)
             ->assertStatus(403);
@@ -43,7 +43,7 @@ class EntityImportTest extends TestCase {
 
     public function testEmpty() {
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
             ->json('GET', $this->route . '?wiki=' . $wiki->id)
@@ -54,7 +54,7 @@ class EntityImportTest extends TestCase {
     public function testResults() {
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
         $otherWiki = Wiki::factory()->create(['domain' => 'other.wikibase.cloud']);
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         WikiEntityImport::factory()->create([
@@ -81,7 +81,7 @@ class EntityImportTest extends TestCase {
     public function testCreateWhilePending() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         WikiEntityImport::factory()->create([
@@ -101,7 +101,7 @@ class EntityImportTest extends TestCase {
     public function testCreateWhenSucceeded() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         WikiEntityImport::factory()->create([
@@ -121,7 +121,7 @@ class EntityImportTest extends TestCase {
     public function testCreateWhenEmpty() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
@@ -135,7 +135,7 @@ class EntityImportTest extends TestCase {
     public function testCreateValidation() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
@@ -149,7 +149,7 @@ class EntityImportTest extends TestCase {
     public function testCreateWhenFailed() {
         Bus::fake();
         $wiki = Wiki::factory()->create(['domain' => 'test.wikibase.cloud']);
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         WikiEntityImport::factory()->create([

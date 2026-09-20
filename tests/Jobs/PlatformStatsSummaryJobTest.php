@@ -64,7 +64,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
         $manager = $this->app->make('db');
         for ($n = 0; $n < $this->numWikis; $n++) {
 
-            $user = User::factory()->create(['verified' => true]);
+            $user = User::factory()->create();
             $wiki = Wiki::factory()->create(['deleted_at' => null]);
             WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
