@@ -61,6 +61,25 @@ class ReviewSubmissionTest extends TestCase {
     }
 
     /**
+     * A review submission can retrieve its latest action type.
+     */
+    public function testRetrievingLatestActionType(): void {
+        $submission = ReviewSubmission::factory()->create();
+
+        ReviewSubmissionAction::factory()
+            ->for($submission)
+            ->create(['type' => ReviewSubmissionActionType::SUBMITTED]);
+
+        ReviewSubmissionAction::factory()
+            ->for($submission)
+            ->create(['type' => ReviewSubmissionActionType::REVIEW_STARTED]);
+
+        $submission->refresh();
+
+        $this->assertSame(ReviewSubmissionActionType::REVIEW_STARTED, $submission->latestActionType());
+    }
+
+    /**
      * A review submission casts its timestamps to CarbonImmutable.
      */
     public function testTimestampCasts(): void {
