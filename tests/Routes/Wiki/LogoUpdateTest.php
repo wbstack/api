@@ -6,7 +6,6 @@ use App\User;
 use App\Wiki;
 use App\WikiManager;
 use App\WikiSetting;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +13,6 @@ use Intervention\Image\Facades\Image;
 use Tests\TestCase;
 
 class LogoUpdateTest extends TestCase {
-    use HasFactory;
     use DatabaseTransactions;
 
     public function testUpdate() {
