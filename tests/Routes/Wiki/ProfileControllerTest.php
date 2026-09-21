@@ -6,24 +6,13 @@ use App\User;
 use App\Wiki;
 use App\WikiManager;
 use App\WikiProfile;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class ProfileControllerTest extends TestCase {
+    use DatabaseTransactions;
+
     protected $route = 'wiki/profile';
-
-    protected function setUp(): void {
-        parent::setUp();
-        Wiki::query()->delete();
-        WikiManager::query()->delete();
-        WikiProfile::query()->delete();
-    }
-
-    protected function tearDown(): void {
-        Wiki::query()->delete();
-        WikiManager::query()->delete();
-        WikiProfile::query()->delete();
-        parent::tearDown();
-    }
 
     public function testFailOnMissingWiki(): void {
         $wiki = Wiki::factory()->create();
