@@ -52,8 +52,10 @@ class PlatformStatsSummaryJobTest extends TestCase {
         );
     }
 
+    // TODO: Improve PlatformStatsSummaryJob and this test so that it isn't required to wipe whole database tables
     protected function tearDown(): void {
-        Wiki::query()->delete();
+        // Wikis are soft-deleted, leaving the database dirty, unless `->forceDelete()` is used
+        Wiki::query()->forceDelete();
         User::query()->delete();
         WikiManager::query()->delete();
         WikiDb::query()->delete();
