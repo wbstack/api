@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+// TODO: move models and tests to Models namespaces?
+
 namespace Tests\Feature\Models;
 
 use App\Enums\ReviewSubmissionActionType;
