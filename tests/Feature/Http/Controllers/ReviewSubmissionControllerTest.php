@@ -135,7 +135,8 @@ class ReviewSubmissionControllerTest extends TestCase {
         $response->assertStatus(200);
         $this->assertSame(3, count($response->json()['data']));
         // check that unrelated ReviewSubmissions aren't included in the response
-        $this->assertNotContains($otherSubmission, $response->json()['data']);
+        // TODO: verify this actually does a test - maybe just check for the 'id'?
+        $this->assertNotContains($otherSubmission->toArray(), $response->json()['data']);
     }
 
     public function testIndexWithQueryParams(): void {
@@ -191,7 +192,10 @@ class ReviewSubmissionControllerTest extends TestCase {
         Passport::actingAs($user);
         $response = $this->getJson("/v1/wikis/{$wiki->id}/review_submissions?{$queryString}");
 
-        $response->assertStatus(422);
+        $response
+            ->assertStatus(422)
+            ->assertExactJsonStructure(['success', 'message', 'errors'])
+            ->assertJsonPath('success', false);
     }
 
     /**
@@ -211,7 +215,10 @@ class ReviewSubmissionControllerTest extends TestCase {
         Passport::actingAs(User::factory()->create(['verified' => true]));
         $response = $this->getJson("/v1/wikis/{$wikiId}/review_submissions");
 
-        $response->assertStatus(404);
+        $response
+            ->assertStatus(404)
+            ->assertExactJsonStructure(['success', 'message'])
+            ->assertJsonPath('success', false);
     }
 
     /**
@@ -236,28 +243,32 @@ class ReviewSubmissionControllerTest extends TestCase {
 
         $response->assertStatus(201)
             ->assertExactJsonStructure([
-                'id',
-                'wiki_id',
-                'additional_information',
-                'created_at',
-                'updated_at',
-                'latest_action' => [
+                'success',
+                'data' => [
                     'id',
-                    'type',
-                    'review_submission_id',
-                    'actor_user_id',
-                    'actor_user_role',
+                    'wiki_id',
+                    'additional_information',
                     'created_at',
                     'updated_at',
+                    'latest_action' => [
+                        'id',
+                        'type',
+                        'review_submission_id',
+                        'actor_user_id',
+                        'actor_user_role',
+                        'created_at',
+                        'updated_at',
+                    ],
                 ],
             ])
-            ->assertJsonPath('id', $reviewSubmission->id)
-            ->assertJsonPath('wiki_id', $wiki->id)
-            ->assertJsonPath('additional_information', null)
-            ->assertJsonPath('latest_action.id', $reviewSubmission->latestAction->id)
-            ->assertJsonPath('latest_action.type', ReviewSubmissionActionType::SUBMITTED->value)
-            ->assertJsonPath('latest_action.actor_user_id', $user->id)
-            ->assertJsonPath('latest_action.actor_user_role', UserRole::WIKI_MANAGER->value);
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.id', $reviewSubmission->id)
+            ->assertJsonPath('data.wiki_id', $wiki->id)
+            ->assertJsonPath('data.additional_information', null)
+            ->assertJsonPath('data.latest_action.id', $reviewSubmission->latestAction->id)
+            ->assertJsonPath('data.latest_action.type', ReviewSubmissionActionType::SUBMITTED->value)
+            ->assertJsonPath('data.latest_action.actor_user_id', $user->id)
+            ->assertJsonPath('data.latest_action.actor_user_role', UserRole::WIKI_MANAGER->value);
     }
 
     /**
@@ -354,7 +365,7 @@ class ReviewSubmissionControllerTest extends TestCase {
 
         $response = $this->actingAs($user, 'api')->postJson("/v1/wikis/{$wiki->id}/review_submissions");
 
-        $response->assertStatus(201);
+        $response->assertStatus(201)->assertJsonPath('success', true);
     }
 
     /**
@@ -431,27 +442,30 @@ class ReviewSubmissionControllerTest extends TestCase {
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'id',
-            'wiki_id',
-            'additional_information',
-            'latest_action' => [
+            'success',
+            'data' => [
                 'id',
-                'type',
-                'review_submission_id',
-                'actor_user_role',
-                'actor_user_id',
+                'wiki_id',
+                'additional_information',
+                'latest_action' => [
+                    'id',
+                    'type',
+                    'review_submission_id',
+                    'actor_user_role',
+                    'actor_user_id',
+                    'created_at',
+                    'updated_at',
+                ],
                 'created_at',
                 'updated_at',
             ],
-            'created_at',
-            'updated_at',
         ]);
         $response
-            ->assertJsonPath('id', $submission->id)
-            ->assertJsonPath('wiki_id', $wiki->id)
-            ->assertJsonPath('latest_action.review_submission_id', $submission->id)
-            ->assertJsonPath('latest_action.type', ReviewSubmissionActionType::APPROVED->value)
-            ->assertJsonPath('latest_action.actor_user_role', UserRole::REVIEW_COMMITTEE_ADMIN->value);
+            ->assertJsonPath('data.id', $submission->id)
+            ->assertJsonPath('data.wiki_id', $wiki->id)
+            ->assertJsonPath('data.latest_action.review_submission_id', $submission->id)
+            ->assertJsonPath('data.latest_action.type', ReviewSubmissionActionType::APPROVED->value)
+            ->assertJsonPath('data.latest_action.actor_user_role', UserRole::REVIEW_COMMITTEE_ADMIN->value);
     }
 
     public function testShowReturnsNotFoundWhenReviewSubmissionDoesNotBelongToWiki(): void {
@@ -465,6 +479,9 @@ class ReviewSubmissionControllerTest extends TestCase {
         Passport::actingAs($user);
         $response = $this->getJson("/v1/wikis/{$wiki->id}/review_submissions/{$submission->id}");
 
-        $response->assertStatus(404);
+        $response
+            ->assertStatus(404)
+            ->assertExactJsonStructure(['success', 'message'])
+            ->assertJsonPath('success', false);
     }
 }

@@ -10,6 +10,7 @@ use App\ReviewSubmission;
 use App\Wiki;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,8 +41,12 @@ class ReviewSubmissionController extends Controller {
 
     /**
      * Store a newly created ReviewSubmission for the given Wiki in storage.
+     *
+     * @return JsonResource<ReviewSubmission>
+     *
+     * @throws HttpException
      */
-    public function store(Request $request, Wiki $wiki): ReviewSubmission {
+    public function store(Request $request, Wiki $wiki): JsonResource {
         $request->validate([
             'additional_information' => ['sometimes', 'string', 'nullable', 'max:1000'],
         ]);
@@ -80,14 +85,18 @@ class ReviewSubmissionController extends Controller {
             return $submission;
         });
 
-        return $submission;
+        // Return a JsonResource so that the ReviewSubmission is wrapped in a 'data' field
+        // without having to create a stock ReviewSubmissionResource class.
+        return JsonResource::make($submission)->additional(['success' => true]);
     }
 
     /**
      * Display the specified ReviewSubmission.
      */
     public function show(Wiki $wiki, ReviewSubmission $review_submission) {
-        return $review_submission;
+        // Return a JsonResource so that the ReviewSubmission is wrapped in a 'data' field
+        // without having to create a stock ReviewSubmissionResource class.
+        return JsonResource::make($review_submission)->additional(['success' => true]);
     }
 
     /**
