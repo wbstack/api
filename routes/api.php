@@ -84,8 +84,6 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
             // This middleware is currently required to make Laravel's Route Model Bindings work
             // https://laravel.com/framework/docs/11.x/routing#route-model-binding
             // If we register routes as Laravel expects, we likely won't need to manually specify this
-            // TODO: this returns the error response `{"message": "No query results for model [App\\Wiki] <wiki_id>"}`
-            // if an invalid wiki_id (such as `-1`, `abc`, `999999`) is requested - do we want to improve this error response?
             SubstituteBindings::class,
             LimitWikiAccess::class,
         ])

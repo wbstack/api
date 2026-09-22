@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Absszero\ErrorReporting;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
@@ -32,6 +33,14 @@ class Handler extends ExceptionHandler {
                 'success' => false,
                 'message' => $e->getMessage(),
             ], $e->getStatusCode(), $e->getHeaders());
+        });
+
+        $this->renderable(function (ValidationException $e, Request $request) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'errors' => $e->errors(),
+            ], $e->status);
         });
     }
 
