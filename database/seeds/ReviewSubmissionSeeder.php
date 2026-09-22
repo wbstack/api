@@ -24,6 +24,7 @@ class ReviewSubmissionSeeder extends Seeder {
         $this->createReviewStartedThenCancelledReviewSubmission();
     }
 
+    // TODO: Make sure that the same user is used?
     public function createSubmittedReviewSubmission(): void {
         $wiki = Wiki::firstOrCreate([
             'sitename' => 'ReviewSubmissionSeeder::createSubmittedReviewSubmission()',
