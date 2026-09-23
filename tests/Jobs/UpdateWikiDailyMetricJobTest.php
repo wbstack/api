@@ -72,4 +72,39 @@ class UpdateWikiDailyMetricJobTest extends TestCase {
             'entity_schema_count' => 0,
         ]);
     }
+
+    public function testRunningJobTwiceForSameWikiWithChangedValuesCreatesOnlyOneDailyRecord() {
+        $wiki = Wiki::factory()->create([
+            'domain' => 'duplicate.wikibase.cloud',
+        ]);
+
+        $manager = $this->app->make('db');
+        $job = new ProvisionWikiDbJob();
+        $job->handle($manager);
+
+        $wikiDb = WikiDb::whereDoesntHave('wiki')->first();
+        $wikiDb->update(['wiki_id' => $wiki->id]);
+
+        $wiki->wikiSiteStats()->create([
+            'pages' => 10,
+            'users' => 3,
+        ]);
+
+        $dailyMetricJob = new UpdateWikiDailyMetricJob();
+        $dailyMetricJob->handle();
+
+        $wiki->wikiSiteStats()->first()->update([
+            'pages' => 12,
+            'users' => 5,
+        ]);
+
+        $dailyMetricJob->handle();
+
+        $this->assertDatabaseCount('wiki_daily_metrics', 1)
+            ->assertDatabaseHas('wiki_daily_metrics', [
+                'wiki_id' => $wiki->id,
+                'date' => Carbon::today()->toDateString(),
+                'pages' => 12,
+            ]);
+    }
 }
