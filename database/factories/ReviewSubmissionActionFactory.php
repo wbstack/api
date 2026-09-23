@@ -9,6 +9,7 @@ use App\Enums\UserRole;
 use App\ReviewSubmission;
 use App\ReviewSubmissionAction;
 use App\User;
+use App\Wiki;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -28,6 +29,14 @@ class ReviewSubmissionActionFactory extends Factory {
             // Can likely be achieved with an anonymous method as demonstrated in the Laravel docs:
             // https://laravel.com/framework/docs/11.x/eloquent-factories#defining-relationships-within-factories
             'actor_user_id' => User::factory(),
+            // 'actor_user_id' => function (array $attributes) {
+            //     return Wiki::whereReviewSubmissionId($attributes['review_submission_id'])->first()->wikiManagers->firstOrFail();
+            // },
+            // 'actor_user_id' => function (array $attributes) {
+            //     return Wiki::whereHas('reviewSubmissions', function ($query) use ($attributes) {
+            //         $query->findOrFail($attributes['review_submission_id']);
+            //     })->first()->wikiManagers->firstOrFail();
+            // },
             'actor_user_role' => UserRole::WIKI_MANAGER,
             'type' => ReviewSubmissionActionType::SUBMITTED,
         ];

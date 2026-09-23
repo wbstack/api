@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Enums\ReviewSubmissionActionType;
 use Carbon\CarbonImmutable;
 use Database\Factories\ReviewSubmissionFactory;
 use Illuminate\Database\Eloquent\Collection;
@@ -91,5 +92,19 @@ class ReviewSubmission extends Model {
      */
     public function latestAction(): HasOne {
         return $this->hasOne(ReviewSubmissionAction::class)->latestOfMany();
+    }
+
+    // TODO: could this be an Attribute Accessor method? https://laravel.com/framework/docs/11.x/eloquent-mutators#accessors-and-mutators
+    /**
+     * Get the latest action type of the review submission.
+     *
+     * The type of the latest action represents the current "state" of the submission.
+     */
+    public function latestActionType(): ReviewSubmissionActionType {
+        // TODO: There should always be at least 1 action as when the review is submitted it's type is 'submitted'.
+        // TODO: $this->latestAction should never return null.
+        // TODO: Should we defend against that assumption?
+        // TODO: Make sure that a ReviewSubmissionAction is always created when the ReviewSubmission is?
+        return $this->latestAction->type;
     }
 }

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+// TODO: move models and tests to Models namespaces?
+
 namespace Tests\Feature\Models;
 
 use App\Enums\ReviewSubmissionActionType;
@@ -58,6 +60,25 @@ class ReviewSubmissionTest extends TestCase {
         $submission->refresh();
 
         $this->assertTrue($submission->latestAction->is($latestAction));
+    }
+
+    /**
+     * A review submission can retrieve its latest action type.
+     */
+    public function testRetrievingLatestActionType(): void {
+        $submission = ReviewSubmission::factory()->create();
+
+        ReviewSubmissionAction::factory()
+            ->for($submission)
+            ->create(['type' => ReviewSubmissionActionType::SUBMITTED]);
+
+        ReviewSubmissionAction::factory()
+            ->for($submission)
+            ->create(['type' => ReviewSubmissionActionType::REVIEW_STARTED]);
+
+        $submission->refresh();
+
+        $this->assertSame(ReviewSubmissionActionType::REVIEW_STARTED, $submission->latestActionType());
     }
 
     /**
