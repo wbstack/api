@@ -57,7 +57,7 @@ class Kernel extends ConsoleKernel {
 
         $schedule->job(new SendEmptyWikiNotificationsJob())->dailyAt('21:00');
 
-        $schedule->job(new UpdateWikiDailyMetricJob())->dailyAt('23:00');
+        $schedule->job(new UpdateWikiDailyMetricJob())->dailyAt('23:00')->withoutOverlapping();
 
         $schedule->job(new UpdateQueryserviceAllowList())->weeklyOn(Schedule::MONDAY, '01:00');
 
