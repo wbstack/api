@@ -1,6 +1,11 @@
 <?php
 
+use App\Http\Controllers\ReviewSubmissionController;
+use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\AuthorisedUsersForDeletedWikiMetricsMiddleware;
+use App\Http\Middleware\LimitWikiAccess;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Config;
 
@@ -69,4 +74,20 @@ $router->group(['middleware' => ['throttle:45,1']], function () use ($router): v
     $router->apiResource('wiki', 'PublicWikiController')->only(['index', 'show']);
     $router->apiResource('reusePrototype', 'PublicWikiController')->only(['index']);
     $router->apiResource('wikiConversionData', 'ConversionMetricController')->only(['index']);
+
+    Route::apiResource('/v1/wikis.review_submissions', ReviewSubmissionController::class)
+        // TODO: the order middleware is listed here, is the order they will be executed in, is this order correct?
+        // The `$middlewarePriority` property in app/Http/Kernel.php also defines priority of "non-global" middleware?
+        ->middleware([
+            Authenticate::class . ':api',
+            EnsureEmailIsVerified::class,
+            // This middleware is currently required to make Laravel's Route Model Bindings work
+            // https://laravel.com/framework/docs/11.x/routing#route-model-binding
+            // If we register routes as Laravel expects, we likely won't need to manually specify this
+            SubstituteBindings::class,
+            LimitWikiAccess::class,
+        ])
+        // Ensure that the ReviewSubmission belongs to the Wiki, for endpoints that have both as path params (show/update/destroy)
+        ->scoped()
+        ->only('index', 'store', 'show');
 });
