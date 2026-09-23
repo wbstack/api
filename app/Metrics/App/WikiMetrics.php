@@ -57,6 +57,26 @@ class WikiMetrics {
             'total_user_count' => $numberOfUsers,
         ]);
 
+        // check if a record already exists for this wiki and date
+        $existingRecord = WikiDailyMetrics::where('wiki_id', $wiki->id)
+            ->where('date', $today)
+            ->first();
+
+        if ($existingRecord) {
+            if ($existingRecord->areMetricsEqual($dailyMetrics)) {
+                Log::info("Record unchanged for Wiki ID {$wiki->id} on {$today}, no update needed.");
+
+                return;
+            }
+
+            $existingRecord->fill($dailyMetrics->toArray());
+            $existingRecord->save();
+
+            Log::info("Updated daily metric for Wiki ID {$wiki->id} on {$today}");
+
+            return;
+        }
+
         // compare current record to previous record and only save if there is a change
         $previousRecord = WikiDailyMetrics::where('wiki_id', $wiki->id)->latest('date')->first();
         if ($previousRecord?->areMetricsEqual($dailyMetrics)) {
