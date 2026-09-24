@@ -25,6 +25,18 @@ class WikiMetrics {
         $this->wiki = $wiki;
 
         $today = now()->format('Y-m-d');
+
+        // Skip expensive metrics collection if today's record already exists.
+        $recordExists = WikiDailyMetrics::where('wiki_id', $wiki->id)
+            ->where('date', $today)
+            ->exists();
+
+        if ($recordExists) {
+            Log::warning("Daily metric already exists for Wiki ID {$wiki->id} on {$today}; skipping metrics collection.");
+
+            return;
+        }
+
         $tripleCount = $this->getNumOfTriples();
         $todayPageCount = $wiki->wikiSiteStats()->first()->pages ?? 0;
         $isDeleted = (bool) $wiki->deleted_at;
@@ -56,26 +68,6 @@ class WikiMetrics {
             'monthly_active_users' => $monthlyNumberOfUsersPerActivityType[1],
             'total_user_count' => $numberOfUsers,
         ]);
-
-        // check if a record already exists for this wiki and date
-        $existingRecord = WikiDailyMetrics::where('wiki_id', $wiki->id)
-            ->where('date', $today)
-            ->first();
-
-        if ($existingRecord) {
-            if ($existingRecord->areMetricsEqual($dailyMetrics)) {
-                Log::info("Record unchanged for Wiki ID {$wiki->id} on {$today}, no update needed.");
-
-                return;
-            }
-
-            $existingRecord->fill($dailyMetrics->toArray());
-            $existingRecord->save();
-
-            Log::info("Updated daily metric for Wiki ID {$wiki->id} on {$today}");
-
-            return;
-        }
 
         // compare current record to previous record and only save if there is a change
         $previousRecord = WikiDailyMetrics::where('wiki_id', $wiki->id)->latest('date')->first();
