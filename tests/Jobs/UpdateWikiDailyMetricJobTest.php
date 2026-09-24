@@ -73,7 +73,7 @@ class UpdateWikiDailyMetricJobTest extends TestCase {
         ]);
     }
 
-    public function testRunningJobTwiceForSameWikiWithChangedValuesCreatesOnlyOneDailyRecord() {
+    public function testRunningJobTwiceForSameWikiWithChangedValuesSkipsSecondRunWhenRecordExistsForToday() {
         $wiki = Wiki::factory()->create([
             'domain' => 'duplicate.wikibase.cloud',
         ]);
@@ -104,7 +104,7 @@ class UpdateWikiDailyMetricJobTest extends TestCase {
             ->assertDatabaseHas('wiki_daily_metrics', [
                 'wiki_id' => $wiki->id,
                 'date' => Carbon::today()->toDateString(),
-                'pages' => 12,
+                'pages' => 10,
             ]);
     }
 }
