@@ -50,7 +50,7 @@ docker compose down --volumes
 Run everything in one go:
 
 ```sh
-docker compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install --no-interaction && php artisan db:seed && php artisan key:generate && php artisan storage:link'
+docker compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install --no-interaction && php artisan db:seed && php artisan key:generate'
 ```
 
 Or each command separately:
@@ -67,9 +67,6 @@ docker compose exec api php artisan db:seed
 
 # Generate and set the APP_KEY env variable.
 docker compose exec api php artisan key:generate
-
-# Create a symlink from `public/storage` to `storage/app/public`
-docker compose exec api php artisan storage:link
 ```
 
 Try loading http://localhost:8070/ until the DB is up and the connection works.
