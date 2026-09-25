@@ -7,7 +7,7 @@
   processIsolation="false"
   stopOnFailure="false"
   xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
-  cacheDirectory=".phpunit.cache"
+  cacheDirectory="storage/framework/phpunit-cache"
   backupStaticProperties="false"
   beStrictAboutOutputDuringTests="true"
   failOnRisky="true"
