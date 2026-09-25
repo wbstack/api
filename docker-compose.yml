@@ -12,7 +12,8 @@ services:
       - 8082:80
     restart: always
     depends_on:
-      - sql
+      sql:
+        condition: service_healthy
     links:
       - sql
       - redis
@@ -26,6 +27,12 @@ services:
     restart: always
     volumes:
       - sql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -uroot -pimarootpassword --silent"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:4.8
     restart: always
