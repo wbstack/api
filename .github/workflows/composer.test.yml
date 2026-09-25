@@ -44,7 +44,7 @@ jobs:
 
     - name: Setup - Other things
       run: |
-        docker compose exec -T api bash -c 'php artisan key:generate && php artisan passport:install --no-interaction'
+        docker compose exec -T api php artisan passport:install --no-interaction
 
     - name: PHPUnit
       run: docker compose exec -e APP_ENV=testing -T api vendor/bin/phpunit
