@@ -18,6 +18,8 @@ services:
       - redis
     environment:
       - CONTAINER_ROLE=app
+      # Development-only key. Never reuse outside local Docker Compose.
+      - APP_KEY=base64:7CtZbRpmIO4valwzbXDiCT0CQAo309naCXpEqkwtv5c=
   sql:
     image: "${DOCKER_DATABASE_IMAGE_NAME}"
     environment:

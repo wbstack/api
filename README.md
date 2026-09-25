@@ -31,6 +31,8 @@ docker run --rm -it -v $PWD:/app -u $(id -u):$(id -g) composer:2.9.2 --ignore-pl
 
 `cp .env.example .env` and modify the contents accordingly.
 
+Docker Compose supplies a fixed development-only `APP_KEY`. Never reuse it outside local development.
+
 ### Docker compose
 
 You should be able to run some amount of this application in docker compose.
@@ -50,7 +52,7 @@ docker compose down --volumes
 Run everything in one go:
 
 ```sh
-docker compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install --no-interaction && php artisan db:seed && php artisan key:generate && php artisan storage:link'
+docker compose exec api bash -c 'php artisan migrate:fresh && php artisan passport:install --no-interaction && php artisan db:seed && php artisan storage:link'
 ```
 
 Or each command separately:
@@ -64,9 +66,6 @@ docker compose exec api php artisan passport:install --no-interaction
 
 # Seed some useful development data
 docker compose exec api php artisan db:seed
-
-# Generate and set the APP_KEY env variable.
-docker compose exec api php artisan key:generate
 
 # Create a symlink from `public/storage` to `storage/app/public`
 docker compose exec api php artisan storage:link
