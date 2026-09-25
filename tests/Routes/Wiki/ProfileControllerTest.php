@@ -6,28 +6,17 @@ use App\User;
 use App\Wiki;
 use App\WikiManager;
 use App\WikiProfile;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class ProfileControllerTest extends TestCase {
+    use DatabaseTransactions;
+
     protected $route = 'wiki/profile';
-
-    protected function setUp(): void {
-        parent::setUp();
-        Wiki::query()->delete();
-        WikiManager::query()->delete();
-        WikiProfile::query()->delete();
-    }
-
-    protected function tearDown(): void {
-        Wiki::query()->delete();
-        WikiManager::query()->delete();
-        WikiProfile::query()->delete();
-        parent::tearDown();
-    }
 
     public function testFailOnMissingWiki(): void {
         $wiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $wiki->delete();
 
@@ -50,7 +39,7 @@ class ProfileControllerTest extends TestCase {
     public function testFailOnWrongWikiManager(): void {
         $userWiki = Wiki::factory()->create();
         $otherWiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
@@ -71,7 +60,7 @@ class ProfileControllerTest extends TestCase {
 
     public function testFailOnEmptyProfile(): void {
         $userWiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
@@ -88,7 +77,7 @@ class ProfileControllerTest extends TestCase {
 
     public function testFailOnInvalidProfile(): void {
         $wiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
@@ -117,7 +106,7 @@ class ProfileControllerTest extends TestCase {
 
     public function testKeepAllVersions(): void {
         $wiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $versionA = $this->actingAs($user, 'api')

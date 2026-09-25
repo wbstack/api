@@ -39,7 +39,7 @@ class DetailsTest extends TestCase {
     }
 
     public function testSkipsNonPublicSettings() {
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['domain' => 'other.wikibase.cloud']);
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
@@ -58,7 +58,7 @@ class DetailsTest extends TestCase {
     public function testReturnsCorrectWikiNotFirstWiki(): void {
         $firstWiki = Wiki::factory()->create();
         $userWiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
         $this->assertEquals($firstWiki->id, Wiki::first()->id);
         $this->actingAs($user, 'api')
@@ -70,7 +70,7 @@ class DetailsTest extends TestCase {
     public function testFailOnWrongWikiManager(): void {
         $userWiki = Wiki::factory()->create();
         $otherWiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
         $this->actingAs($user, 'api')
             ->postJson($this->route, ['wiki' => $otherWiki->id])
@@ -79,7 +79,7 @@ class DetailsTest extends TestCase {
 
     public function testWikiProfile() {
         $wiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $versionA = WikiProfile::create([

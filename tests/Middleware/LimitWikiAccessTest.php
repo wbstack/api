@@ -30,7 +30,7 @@ class LimitWikiAccessTest extends TestCase {
 
     private function createWikiAndUser(): array {
         $wiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         return [$wiki, $user];
@@ -60,7 +60,7 @@ class LimitWikiAccessTest extends TestCase {
     public function testFailOnWrongWikiManager(): void {
         $userWiki = Wiki::factory()->create();
         $otherWiki = Wiki::factory()->create();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $userWiki->id, 'user_id' => $user->id]);
 
         foreach ($this->generateRequestUriAndBody($otherWiki) as $name => [$uri, $body]) {

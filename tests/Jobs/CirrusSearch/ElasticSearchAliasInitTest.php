@@ -7,9 +7,12 @@ use App\Jobs\ElasticSearchAliasInit;
 use App\Wiki;
 use App\WikiDb;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class ElasticSearchAliasInitTest extends TestCase {
+    use DatabaseTransactions;
+
     private $wikiId;
 
     private $esHost;
@@ -29,8 +32,6 @@ class ElasticSearchAliasInitTest extends TestCase {
 
     protected function tearDown(): void {
         putenv('ELASTICSEARCH_SHARED_INDEX_PREFIX');
-        Wiki::query()->delete();
-        WikiDb::query()->delete();
         parent::tearDown();
     }
 

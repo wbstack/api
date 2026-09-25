@@ -426,7 +426,9 @@ class WikiMetricsTest extends TestCase {
 
         (new WikiMetrics())->saveMetrics($wiki);
 
-        // clean up after the test
+        // clean up test data after metrics have been saved
+        // TODO: Why does the `RefreshDatabase` trait not handle this?
+        $wikiDb = $wikiDb->delete();
         $wiki->forceDelete();
 
         $this->assertDatabaseHas('wiki_daily_metrics', [
