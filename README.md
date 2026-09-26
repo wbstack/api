@@ -41,6 +41,9 @@ Though the experience is not that refined...
 # Start the stack in the background
 docker compose up -d
 
+# Local Compose disables reCAPTCHA by default. Set RECAPTCHA_ENABLED=true
+# only when both the UI site key and API secret are configured.
+
 # Stop the stack and delete all volumes
 docker compose down --volumes
 ```
