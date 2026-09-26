@@ -1,14 +1,24 @@
+# SECURITY: pull_request_target runs this workflow from the base branch, not the
+# pull request's branch. This lets it access repository secrets for forked PRs.
+# Do not check out, run, or otherwise consume pull-request code in this workflow.
+# https://docs.github.com/en/actions/reference/events-that-trigger-workflows#pull_request_target
 on:
-  pull_request:
+  pull_request_target:
     types: [ opened, reopened ]
+
+permissions: {}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
+    env:
+      MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
     steps:
-      - uses: mattermost/action-mattermost-notify@v2.1.0
+      - name: Notify Mattermost
+        if: ${{ env.MATTERMOST_WEBHOOK_URL != '' }}
+        uses: mattermost/action-mattermost-notify@ae31bb6f9e26a54336e79696f108a2c91cf55b4e # v2.1.0
         with:
-          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
+          MATTERMOST_WEBHOOK_URL: ${{ env.MATTERMOST_WEBHOOK_URL }}
           TEXT: "Pull request opened: [${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})"
 
