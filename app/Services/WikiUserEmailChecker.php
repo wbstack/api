@@ -17,7 +17,7 @@ class WikiUserEmailChecker {
         $userTables = $this->getAllMediaWikiUserTables($pdo);
 
         foreach ($userTables as $dbName => $userTable) {
-            if ($this->emailExists($pdo, $dbName, $userTable, $email)) {
+            if ($this->emailExists($dbName, $userTable, $email)) {
                 $foundIn[] = "{$dbName}.{$userTable}";
             }
         }
@@ -42,19 +42,11 @@ class WikiUserEmailChecker {
         return $tablesByDb;
     }
 
-    private function emailExists(PDO $pdo, string $dbName, string $table, string $email): bool {
-        $stmt = $pdo->prepare("
-            SELECT 1
-            FROM {$dbName}.{$table}
-
-            -- converting from tinyblob data type, see https://github.com/wbstack/api/blob/main/database/mw/new/mw1.43-wbs2.sql#L1006
-            WHERE LOWER(CONVERT(user_email USING utf8mb4)) = LOWER(:email)
-
-            LIMIT 1
-        ");
-
-        $stmt->execute(['email' => $email]);
-
-        return (bool) $stmt->fetch();
+    private function emailExists(string $dbName, string $table, string $email): bool {
+        return $this->db->connection('mw')
+            ->table("{$dbName}.{$table}")
+            // Convert from tinyblob; see https://github.com/wbstack/api/blob/main/database/mw/new/mw1.43-wbs2.sql#L1006.
+            ->whereRaw('LOWER(CONVERT(user_email USING utf8mb4)) = LOWER(?)', [$email])
+            ->exists();
     }
 }
