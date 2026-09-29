@@ -8,11 +8,19 @@ use App\Wiki;
 use App\WikiDb;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
+use TiMacDonald\Log\LogEntry;
+use TiMacDonald\Log\LogFake;
 
 class UpdateWikiDailyMetricJobTest extends TestCase {
     use RefreshDatabase;
+
+    protected function setUp(): void {
+        parent::setUp();
+        Log::swap(new LogFake());
+    }
 
     public function testDispatchJob() {
         Queue::fake();
@@ -106,5 +114,13 @@ class UpdateWikiDailyMetricJobTest extends TestCase {
                 'date' => Carbon::today()->toDateString(),
                 'pages' => 10,
             ]);
+
+        Log::assertLogged(function (LogEntry $log) use ($wiki) {
+            if ($log->level !== 'warning') {
+                return false;
+            }
+
+            return str_contains($log->message, "Daily metric already exists for Wiki ID {$wiki->id} on " . Carbon::today()->toDateString());
+        });
     }
 }
