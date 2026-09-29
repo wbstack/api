@@ -5,6 +5,7 @@ namespace Tests\Routes\Auth;
 use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config;
 use Tests\Routes\Traits\OptionsRequestAllowed;
 use Tests\TestCase;
 
@@ -52,8 +53,21 @@ class LoginTest extends TestCase {
 
     public function testDelete() {
         $user = User::factory()->create();
-        $this->actingAs($user, 'api')
+        $token = $user->createToken('logout-test');
+        $otherToken = $user->createToken('other-session');
+
+        $this->withCredentials()
+            ->withUnencryptedCookie(Config::get('auth.cookies.key'), $token->accessToken)
             ->delete($this->route)
             ->assertStatus(204);
+
+        $this->assertDatabaseHas('oauth_access_tokens', [
+            'id' => $token->token->id,
+            'revoked' => true,
+        ]);
+        $this->assertDatabaseHas('oauth_access_tokens', [
+            'id' => $otherToken->token->id,
+            'revoked' => false,
+        ]);
     }
 }
