@@ -7,8 +7,10 @@ use App\Notifications\ComplaintNotification;
 use App\Rules\ReCaptchaValidation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Tests\TestCase;
 
 class SendMessageTest extends TestCase {
@@ -66,15 +68,16 @@ class SendMessageTest extends TestCase {
     public function testRecordOnMailFail() {
         $this->mockReCaptchaValidation();
 
+        $transport = $this->createMock(TransportInterface::class);
+        $transport->expects($this->once())
+            ->method('send')
+            ->willThrowException(new TransportException('Simulated mail delivery failure'));
+        Mail::mailer()->setSymfonyTransport($transport);
+
         $data = $this->postDataTemplateFilled;
 
-        try {
-            $response = $this->json('POST', $this->route, $data);
-        } catch (TransportException $e) {
-            return;
-        }
-
-        $this->assertNotEquals($response->status(), 200);
+        $response = $this->json('POST', $this->route, $data);
+        $response->assertStatus(500);
 
         $this->assertComplaintRecorded();
         $this->assertComplaintNotMarkedAsDispatched();
