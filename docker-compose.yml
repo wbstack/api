@@ -18,6 +18,7 @@ services:
       - redis
     environment:
       - CONTAINER_ROLE=app
+      - RECAPTCHA_ENABLED=${RECAPTCHA_ENABLED:-false}
   sql:
     image: "${DOCKER_DATABASE_IMAGE_NAME}"
     environment:
