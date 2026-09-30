@@ -2,12 +2,14 @@
 
 namespace App\Jobs;
 
+use App\Services\SvgLogo;
 use App\Wiki;
 use App\WikiSetting;
 use Illuminate\Database\QueryException;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Intervention\Image\Facades\Image;
 
 /**
@@ -68,30 +70,58 @@ class SetWikiLogo extends Job {
         // Get the directory for storing this site's logos
         $logosDir = Wiki::getLogosDirectory($wiki->id);
 
+        $file = new File($this->logoPath);
+        $isSvg = $file->getMimeType() === 'image/svg+xml';
+        $svg = null;
+        if ($isSvg) {
+            $svgLogo = new SvgLogo();
+            $svg = $svgLogo->sanitize(file_get_contents($this->logoPath));
+            $image = Image::canvas(135, 135)->insert(Image::make($svgLogo->rasterize($svg)), 'center');
+        } else {
+            if ($file->getMimeType() !== 'image/png') {
+                throw ValidationException::withMessages(['logo' => 'The logo must be a PNG or SVG image.']);
+            }
+            $image = Image::make($this->logoPath)->resize(135, 135);
+        }
+
         // Upload the local image to the cloud storage
-        $storage->putFileAs($logosDir, new File($this->logoPath), 'raw.png', ['visibility' => 'public']);
+        if ($svg !== null) {
+            $stored = $storage->put($logosDir . '/logo.svg', $svg, [
+                'visibility' => 'public',
+                'ContentType' => 'image/svg+xml',
+            ]);
+        } else {
+            $stored = $storage->putFileAs($logosDir, $file, 'raw.png', ['visibility' => 'public']);
+        }
+        if (!$stored) {
+            throw new \RuntimeException('Failed to store the wiki logo.');
+        }
 
         // Store a conversion for the actual site logo
         $reducedPath = $logosDir . '/135.png';
         if ($storage->exists($reducedPath)) {
             $storage->delete($reducedPath);
         }
-        $storage->writeStream(
+        if (!$storage->writeStream(
             $reducedPath,
-            Image::make($this->logoPath)->resize(135, 135)->stream()->detach(),
+            $image->stream('png')->detach(),
             ['visibility' => 'public'],
-        );
+        )) {
+            throw new \RuntimeException('Failed to store the PNG wiki logo.');
+        }
 
         // Store a conversion for the favicon
         $faviconPath = $logosDir . '/64.ico';
         if ($storage->exists($faviconPath)) {
             $storage->delete($faviconPath);
         }
-        $storage->writeStream(
+        if (!$storage->writeStream(
             $faviconPath,
-            Image::make($this->logoPath)->resize(64, 64)->stream()->detach(),
+            ($isSvg ? $image : Image::make($this->logoPath))->resize(64, 64)->stream('png')->detach(),
             ['visibility' => 'public'],
-        );
+        )) {
+            throw new \RuntimeException('Failed to store the wiki favicon.');
+        }
 
         // Get the urls
         $logoUrl = $storage->url($reducedPath);
@@ -111,5 +141,14 @@ class SetWikiLogo extends Job {
             ['wiki_id' => $wiki->id, 'name' => WikiSetting::wgFavicon],
             ['value' => $faviconUrl]
         );
+
+        if ($svg !== null) {
+            WikiSetting::updateOrCreate(
+                ['wiki_id' => $wiki->id, 'name' => WikiSetting::wwLogoSvg],
+                ['value' => $storage->url($logosDir . '/logo.svg') . '?u=' . time()]
+            );
+        } else {
+            $wiki->settings()->where('name', WikiSetting::wwLogoSvg)->delete();
+        }
     }
 }
