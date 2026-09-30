@@ -2,7 +2,6 @@
 
 namespace Tests\Jobs;
 
-use App\Constants\MediawikiNamespace;
 use App\Helper\MWTimestampHelper;
 use App\Jobs\PlatformStatsSummaryJob;
 use App\Jobs\ProvisionWikiDbJob;
@@ -28,6 +27,8 @@ class PlatformStatsSummaryJobTest extends TestCase {
 
     private $users = [];
 
+    private $provisionedWikiDbs = [];
+
     private $db_prefix = 'somecoolprefix';
 
     private $db_name = 'some_cool_db_name';
@@ -39,10 +40,11 @@ class PlatformStatsSummaryJobTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         for ($n = 0; $n < $this->numWikis; $n++) {
-            DB::connection('mysql')->getPdo()->exec("DROP DATABASE IF EXISTS {$this->db_name}{$n};");
+            DB::connection('mw')->getPdo()->exec("DROP DATABASE IF EXISTS {$this->db_name}{$n};");
         }
         $this->wikis = [];
         $this->users = [];
+        $this->provisionedWikiDbs = [];
 
         $this->mwBackendHost = 'http://mediawiki.localhost';
 
@@ -53,11 +55,16 @@ class PlatformStatsSummaryJobTest extends TestCase {
     }
 
     protected function tearDown(): void {
-        Wiki::query()->delete();
-        User::query()->delete();
-        WikiManager::query()->delete();
-        WikiDb::query()->delete();
+        $this->cleanupProvisionedWikiDbs();
         parent::tearDown();
+    }
+
+    private function cleanupProvisionedWikiDbs(): void {
+        $pdo = DB::connection('mw')->getPdo();
+        foreach ($this->provisionedWikiDbs as $wikiDb) {
+            $pdo->exec("DROP DATABASE IF EXISTS `{$wikiDb->name}`");
+            $pdo->exec('DROP USER IF EXISTS ' . $pdo->quote($wikiDb->user) . "@'%'");
+        }
     }
 
     private function seedWikis() {
@@ -76,13 +83,12 @@ class PlatformStatsSummaryJobTest extends TestCase {
 
             $this->wikis[] = $wiki;
             $this->users[] = $user;
+            $this->provisionedWikiDbs[] = $wikiDb;
         }
 
     }
 
     public function testQueryGetsStats() {
-        $this->markTestSkipped('Pollutes the deleted wiki list');
-        Http::fake();
         $this->seedWikis();
         $manager = $this->app->make('db');
 
@@ -91,12 +97,11 @@ class PlatformStatsSummaryJobTest extends TestCase {
 
         $job = new PlatformStatsSummaryJob();
         $job->setJob($mockJob);
-
-        $job->handle($manager, $this->mockMwHostResolver);
+        Http::preventStrayRequests();
+        $job->handle($manager);
     }
 
     public function testGroupings() {
-        $this->markTestSkipped('Pollutes the deleted wiki list');
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
@@ -120,42 +125,6 @@ class PlatformStatsSummaryJobTest extends TestCase {
                 'prefix' => 'asdasd',
                 'wiki_id' => $wiki->id,
             ]);
-            // Generate some items/properties for testing, each wiki will have 3 props and 9 items
-            Http::fake([
-                $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
-                    'query' => [
-                        'allpages' => [
-                            ['title' => 'Property:P1', 'namespace' => MediawikiNamespace::property],
-                            ['title' => 'Property:P9', 'namespace' => MediawikiNamespace::property],
-                            ['title' => 'Property:P11', 'namespace' => MediawikiNamespace::property],
-                        ],
-                    ],
-                ], 200),
-                $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
-                    'continue' => [
-                        'apcontinue' => 'Q6',
-                    ],
-                    'query' => [
-                        'allpages' => [
-                            ['title' => 'Item:Q1', 'namespace' => MediawikiNamespace::item],
-                            ['title' => 'Item:Q2', 'namespace' => MediawikiNamespace::item],
-                            ['title' => 'Item:Q3', 'namespace' => MediawikiNamespace::item],
-                            ['title' => 'Item:Q4', 'namespace' => MediawikiNamespace::item],
-                            ['title' => 'Item:Q5', 'namespace' => MediawikiNamespace::item],
-                        ],
-                    ],
-                ], 200),
-                $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=Q6&aplimit=max&format=json' => Http::response([
-                    'query' => [
-                        'allpages' => [
-                            ['title' => 'Item:Q6', 'namespace' => MediawikiNamespace::item],
-                            ['title' => 'Item:Q7', 'namespace' => MediawikiNamespace::item],
-                            ['title' => 'Item:Q8', 'namespace' => MediawikiNamespace::item],
-                            ['title' => 'Item:Q9', 'namespace' => MediawikiNamespace::item],
-                        ],
-                    ],
-                ], 200),
-            ]);
         }
 
         $stats = [
@@ -166,6 +135,8 @@ class PlatformStatsSummaryJobTest extends TestCase {
                 'users' => 1,
                 'active_users' => null,
                 'lastEdit' => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()->subDays(100)),
+                'items' => 9,
+                'properties' => 3,
                 'first100UsingOauth' => '0',
                 'platform_summary_version' => 'v1',
             ],
@@ -176,6 +147,8 @@ class PlatformStatsSummaryJobTest extends TestCase {
                 'users' => 1,
                 'active_users' => null,
                 'lastEdit' => null,
+                'items' => 9,
+                'properties' => 3,
                 'first100UsingOauth' => '0',
                 'platform_summary_version' => 'v1',
             ],
@@ -186,6 +159,8 @@ class PlatformStatsSummaryJobTest extends TestCase {
                 'users' => null,
                 'active_users' => null,
                 'lastEdit' => null,
+                'items' => 9,
+                'properties' => 3,
                 'first100UsingOauth' => '0',
                 'platform_summary_version' => 'v1',
             ],
@@ -197,6 +172,8 @@ class PlatformStatsSummaryJobTest extends TestCase {
                 'users' => 3,
                 'active_users' => 1,
                 'lastEdit' => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()),
+                'items' => 9,
+                'properties' => 3,
                 'first100UsingOauth' => '0',
                 'platform_summary_version' => 'v1',
             ],
@@ -208,6 +185,8 @@ class PlatformStatsSummaryJobTest extends TestCase {
                 'users' => 3,
                 'active_users' => 0,
                 'lastEdit' => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()),
+                'items' => 9,
+                'properties' => 3,
                 'first100UsingOauth' => '0',
                 'platform_summary_version' => 'v1',
             ],
@@ -234,27 +213,14 @@ class PlatformStatsSummaryJobTest extends TestCase {
         );
     }
 
-    public function testSkipDeletedWikisBeforeResolvingBackendUrl() {
+    public function testSkipDeletedWikis() {
         $deletedWiki = Wiki::factory()->create(['deleted_at' => CarbonImmutable::yesterday(), 'domain' => 'deleted.cloud']);
         WikiDb::factory()->for($deletedWiki)->create(['name' => 'deleted_db']);
 
         $activeWiki = Wiki::factory()->create(['deleted_at' => null, 'domain' => 'active.cloud']);
         WikiDb::factory()->for($activeWiki)->create(['name' => 'active_db']);
 
-        $this->mockMwHostResolver
-            ->expects($this->once())
-            ->method('getBackendUrlForDomain')
-            ->with('active.cloud')
-            ->willReturn($this->mwBackendHost);
-
         $job = new PlatformStatsSummaryJob();
-        // This is a hack to override the `private` `PlatformStatsSummaryJob::mwHostResolver` property.
-        // See https://www.php.net/manual/en/closure.call.php for more details on how this works.
-        // TODO: figure out how to stub the `DatabaseManager` correctly and/or refactor the Job so that
-        // we can more easily inject dependencies in the tests.
-        (function ($resolver): void {
-            $this->mwHostResolver = $resolver;
-        })->call($job, $this->mockMwHostResolver);
 
         $groups = $job->prepareStats([
             [
@@ -264,6 +230,8 @@ class PlatformStatsSummaryJobTest extends TestCase {
                 'users' => 1,
                 'active_users' => 1,
                 'lastEdit' => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()),
+                'items' => 0,
+                'properties' => 0,
                 'first100UsingOauth' => '0',
                 'platform_summary_version' => 'v1',
             ],
@@ -274,6 +242,8 @@ class PlatformStatsSummaryJobTest extends TestCase {
                 'users' => 1,
                 'active_users' => 1,
                 'lastEdit' => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()),
+                'items' => 0,
+                'properties' => 0,
                 'first100UsingOauth' => '0',
                 'platform_summary_version' => 'v1',
             ],
@@ -283,8 +253,46 @@ class PlatformStatsSummaryJobTest extends TestCase {
         $this->assertSame(1, $groups['edited_last_90_days']);
     }
 
+    public function testPrepareStatsDoesNotQueryEagerLoadedWikiDbs(): void {
+        $wikiCount = 25;
+        $itemsPerWiki = 10;
+        $propertiesPerWiki = 3;
+        $wikis = Wiki::factory()->count($wikiCount)->create(['deleted_at' => null]);
+        foreach ($wikis as $wiki) {
+            WikiDb::factory()->for($wiki)->create();
+        }
+
+        $wikis = Wiki::with('wikiDb')->get();
+        $stats = $wikis->map(fn (Wiki $wiki) => [
+            'wiki' => $wiki->domain,
+            'edits' => 1,
+            'pages' => 1,
+            'users' => 1,
+            'active_users' => 1,
+            'lastEdit' => MWTimestampHelper::getMWTimestampFromCarbon(CarbonImmutable::now()),
+            'items' => $itemsPerWiki,
+            'properties' => $propertiesPerWiki,
+        ])->all();
+
+        $job = new PlatformStatsSummaryJob();
+        Http::preventStrayRequests();
+
+        $connection = DB::connection('mysql');
+        $connection->flushQueryLog();
+        $connection->enableQueryLog();
+        $groups = $job->prepareStats($stats, $wikis);
+        $queries = $connection->getQueryLog();
+        $connection->disableQueryLog();
+
+        $wikiDbQueries = array_filter($queries, fn (array $query) => str_contains($query['query'], 'from `wiki_dbs`'));
+
+        $this->assertSame($wikiCount, $groups['edited_last_90_days']);
+        $this->assertSame($wikiCount * $itemsPerWiki, $groups['total_items_count']);
+        $this->assertSame($wikiCount * $propertiesPerWiki, $groups['total_properties_count']);
+        $this->assertCount(0, $wikiDbQueries);
+    }
+
     public function testCreationStats() {
-        $this->markTestSkipped('Pollutes the deleted wiki list');
         $mockJob = $this->createMock(Job::class);
         $mockJob->expects($this->never())->method('fail');
 
@@ -337,24 +345,7 @@ class PlatformStatsSummaryJobTest extends TestCase {
             'wiki_id' => $wiki->id,
         ]);
 
-        Http::fake([
-            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=122&apcontinue=&aplimit=max&format=json' => Http::response([
-                'query' => ['allpages' => []],
-            ], 200),
-            $this->mwBackendHost . '/w/api.php?action=query&list=allpages&apnamespace=120&apcontinue=&aplimit=max&format=json' => Http::response([
-                'query' => ['allpages' => []],
-            ], 200),
-        ]);
-
         $job = new PlatformStatsSummaryJob();
-
-        // This is a hack to override the `private` `PlatformStatsSummaryJob::mwHostResolver` property.
-        // See https://www.php.net/manual/en/closure.call.php for more details on how this works.
-        // TODO: figure out how to stub the `DatabaseManager` correctly and/or refactor the Job so that
-        // we can more easily inject dependencies in the tests.
-        (function ($resolver): void {
-            $this->mwHostResolver = $resolver;
-        })->call($job, $this->mockMwHostResolver);
 
         $groups = $job->prepareStats([
             [
@@ -366,6 +357,8 @@ class PlatformStatsSummaryJobTest extends TestCase {
                 'lastEdit' => MWTimestampHelper::getMWTimestampFromCarbon(
                     $currentTime->subSeconds(config('wbstack.platform_summary_inactive_threshold'))
                 ),
+                'items' => 0,
+                'properties' => 0,
                 'first100UsingOauth' => '0',
                 'platform_summary_version' => 'v1',
             ],
