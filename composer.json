@@ -13,7 +13,6 @@
         "google/recaptcha": "^1.2",
         "guzzlehttp/guzzle": "^7.13",
         "guzzlehttp/psr7": "^2.9",
-        "hackzilla/password-generator": "^1.6",
         "intervention/image": "^2.5",
         "laravel/framework": "^11.51",
         "laravel/horizon": "^5.23",
