@@ -41,9 +41,15 @@ Though the experience is not that refined...
 # Start the stack in the background
 docker compose up -d
 
+# View locally sent email, including account verification links
+# http://localhost:8025/
+
 # Stop the stack and delete all volumes
 docker compose down --volumes
 ```
+
+The Compose setup sends email to the local MailHog inbox instead of an external
+mail provider.
 
 ### Migrations  
 
