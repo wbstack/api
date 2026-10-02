@@ -190,7 +190,17 @@ return [
             'maxShift' => intval(env('HORIZON_MAX_SHIFT', 1)),
             'coolDown' => intval(env('HORIZON_COOL_DOWN', 3)),
             'memory' => intval(env('HORIZON_MEMORY', 128)),
+            // Horizon passes "tries" to its queue workers as the default maximum number of attempts for
+            // a job. A job's `$tries` property or `tries()` method takes precedence over this default.
+            // https://laravel.com/framework/docs/11.x/queues#max-attempts
             'tries' => intval(env('HORIZON_TRIES', 1)),
+            // Horizon passes "timeout" to its queue workers as the default job timeout in seconds.
+            // A job's `$timeout` property takes precedence over this default.
+            // https://laravel.com/framework/docs/11.x/queues#timeout
+            // A job's "timeout" value should be several seconds shorter than the queue connection's
+            // `retry_after` value. Otherwise, the job may be released back onto the queue, where another
+            // queue worker can attempt it, before the original has finished executing or timed out.
+            // https://laravel.com/framework/docs/11.x/queues#job-expirations-and-timeouts
             'timeout' => intval(env('HORIZON_TIMEOUT', 3600)),
         ],
     ],
