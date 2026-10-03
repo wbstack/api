@@ -2,7 +2,6 @@
 
 namespace App\Jobs\CirrusSearch;
 
-use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -13,8 +12,6 @@ use Illuminate\Support\Facades\Log;
  * php artisan job:dispatch CirrusSearch\\QueueSearchIndexBatches 1
  */
 class QueueSearchIndexBatches extends CirrusSearchJob {
-    use DispatchesJobs;
-
     public function apiModule(): string {
         return 'wbstackQueueSearchIndexBatches';
     }
