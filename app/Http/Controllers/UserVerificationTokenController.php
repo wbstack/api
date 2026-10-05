@@ -43,7 +43,7 @@ class UserVerificationTokenController extends Controller {
 
         if ($user->verified) {
             $res['success'] = true;
-            $res['message'] = 'Already verified';
+            $res['message'] = 'Already verified!';
 
             return response($res);
         }
