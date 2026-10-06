@@ -25,6 +25,18 @@ class WikiMetrics {
         $this->wiki = $wiki;
 
         $today = now()->format('Y-m-d');
+
+        // Skip expensive metrics collection if today's record already exists.
+        $recordExists = WikiDailyMetrics::where('wiki_id', $wiki->id)
+            ->where('date', $today)
+            ->exists();
+
+        if ($recordExists) {
+            Log::warning("Daily metric already exists for Wiki ID {$wiki->id} on {$today}; skipping metrics collection.");
+
+            return;
+        }
+
         $tripleCount = $this->getNumOfTriples();
         $todayPageCount = $wiki->wikiSiteStats()->first()->pages ?? 0;
         $isDeleted = (bool) $wiki->deleted_at;
