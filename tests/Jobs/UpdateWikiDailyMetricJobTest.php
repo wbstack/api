@@ -17,11 +17,6 @@ use TiMacDonald\Log\LogFake;
 class UpdateWikiDailyMetricJobTest extends TestCase {
     use RefreshDatabase;
 
-    protected function setUp(): void {
-        parent::setUp();
-        Log::swap(new LogFake());
-    }
-
     public function testDispatchJob() {
         Queue::fake();
 
@@ -81,14 +76,14 @@ class UpdateWikiDailyMetricJobTest extends TestCase {
         ]);
     }
 
-    public function testRunningJobTwiceForSameWikiWithChangedValuesSkipsSecondRunWhenRecordExistsForToday() {
+    public function testWikiMetricsCollectionStopsEarlyWhenRecordExistsForToday() {
+        Log::swap(new LogFake());
+
         $wiki = Wiki::factory()->create([
             'domain' => 'duplicate.wikibase.cloud',
         ]);
 
-        $manager = $this->app->make('db');
-        $job = new ProvisionWikiDbJob();
-        $job->handle($manager);
+        dispatch(new ProvisionWikiDbJob());
 
         $wikiDb = WikiDb::whereDoesntHave('wiki')->first();
         $wikiDb->update(['wiki_id' => $wiki->id]);
@@ -98,15 +93,14 @@ class UpdateWikiDailyMetricJobTest extends TestCase {
             'users' => 3,
         ]);
 
-        $dailyMetricJob = new UpdateWikiDailyMetricJob();
-        $dailyMetricJob->handle();
+        UpdateWikiDailyMetricJob::dispatch();
 
         $wiki->wikiSiteStats()->first()->update([
             'pages' => 12,
             'users' => 5,
         ]);
 
-        $dailyMetricJob->handle();
+        UpdateWikiDailyMetricJob::dispatch();
 
         $this->assertDatabaseCount('wiki_daily_metrics', 1)
             ->assertDatabaseHas('wiki_daily_metrics', [

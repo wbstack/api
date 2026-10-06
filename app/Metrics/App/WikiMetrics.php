@@ -25,13 +25,10 @@ class WikiMetrics {
         $this->wiki = $wiki;
 
         $today = now()->format('Y-m-d');
+        $previousRecord = WikiDailyMetrics::where('wiki_id', $wiki->id)->latest('date')->first();
 
-        // Skip expensive metrics collection if today's record already exists.
-        $recordExists = WikiDailyMetrics::where('wiki_id', $wiki->id)
-            ->where('date', $today)
-            ->exists();
-
-        if ($recordExists) {
+        // Skip expensive metrics collection if a record for today already exists.
+        if ($previousRecord?->date === $today) {
             Log::warning("Daily metric already exists for Wiki ID {$wiki->id} on {$today}; skipping metrics collection.");
 
             return;
@@ -69,8 +66,7 @@ class WikiMetrics {
             'total_user_count' => $numberOfUsers,
         ]);
 
-        // compare current record to previous record and only save if there is a change
-        $previousRecord = WikiDailyMetrics::where('wiki_id', $wiki->id)->latest('date')->first();
+        // compare current metrics to previous record and only save if there is a change
         if ($previousRecord?->areMetricsEqual($dailyMetrics)) {
             Log::info("Record unchanged for Wiki ID {$wiki->id}, no new record added.");
 
