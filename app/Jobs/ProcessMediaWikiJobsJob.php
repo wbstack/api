@@ -3,18 +3,13 @@
 namespace App\Jobs;
 
 use App\Services\MediaWikiHostResolver;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Maclof\Kubernetes\Client;
 use Maclof\Kubernetes\Models\Job as KubernetesJob;
 
-class ProcessMediaWikiJobsJob implements ShouldBeUnique, ShouldQueue {
-    use InteractsWithQueue, Queueable;
-
+class ProcessMediaWikiJobsJob extends Job implements ShouldBeUnique {
     private string $wikiDomain;
 
     private string $jobsKubernetesNamespace;

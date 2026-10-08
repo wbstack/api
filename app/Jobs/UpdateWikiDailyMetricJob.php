@@ -5,13 +5,10 @@ namespace App\Jobs;
 use App\Metrics\App\WikiMetrics;
 use App\Wiki;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Foundation\Bus\Dispatchable;
 
 // This job is for the daily measurements of metrics per wikibases.
 // This is to help in understanding the purpose of active wikis.
 class UpdateWikiDailyMetricJob extends Job implements ShouldBeUnique {
-    use Dispatchable;
-
     public $timeout = 3600;
 
     /**

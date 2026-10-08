@@ -7,11 +7,10 @@ use App\Services\UnknownDBVersionException;
 use App\Services\UnknownWikiDomainException;
 use App\Wiki;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique, ShouldQueue {
+class PollForMediaWikiJobsJob extends Job implements ShouldBeUnique {
     private MediaWikiHostResolver $mwHostResolver;
 
     public $timeout = 1800;

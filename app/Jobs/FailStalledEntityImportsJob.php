@@ -5,13 +5,9 @@ namespace App\Jobs;
 use App\WikiEntityImport;
 use App\WikiEntityImportStatus;
 use Carbon\Carbon;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 
-class FailStalledEntityImportsJob implements ShouldQueue {
-    use Queueable;
-
+class FailStalledEntityImportsJob extends Job {
     public function handle(): void {
         $deadline = Carbon::now()->subHours(24);
         $now = Carbon::now();

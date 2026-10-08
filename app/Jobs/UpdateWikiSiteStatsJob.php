@@ -8,14 +8,11 @@ use App\WikiSiteStats;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class UpdateWikiSiteStatsJob extends Job implements ShouldBeUnique {
-    use Dispatchable;
-
     public $timeout = 3600;
 
     private MediaWikiHostResolver $mwHostResolver;
