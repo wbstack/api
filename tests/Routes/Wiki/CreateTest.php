@@ -52,7 +52,7 @@ class CreateTest extends TestCase {
 
         Queue::fake();
 
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         Queue::assertNothingPushed();
 
         $response = $this->actingAs($user, 'api')
@@ -167,7 +167,7 @@ class CreateTest extends TestCase {
 
         Queue::fake();
 
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         Queue::assertNothingPushed();
 
         // This shouldn't stop first create since it's deleted
@@ -238,7 +238,7 @@ class CreateTest extends TestCase {
     public function testCreateWikiHandlesRangeOfPostValues($data, $expectedStatus): void {
         $this->createSQLandQSDBs();
         Queue::fake();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $response = $this->actingAs($user, 'api')
             ->json(
                 'POST',
@@ -299,7 +299,7 @@ class CreateTest extends TestCase {
     public function testCreateWithProfileCreatesProfiles(): void {
         $this->createSQLandQSDBs();
         Queue::fake();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $response = $this->actingAs($user, 'api')
             ->json(
                 'POST',
@@ -314,7 +314,7 @@ class CreateTest extends TestCase {
     public function testCreateWithKERCreatesProfiles(): void {
         $this->createSQLandQSDBs();
         Queue::fake();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $response = $this->actingAs($user, 'api')
             ->json(
                 'POST',
@@ -332,7 +332,7 @@ class CreateTest extends TestCase {
     public function testCreateWithKERRejectsIfSelectedOptionIsInvalid(): void {
         $this->createSQLandQSDBs();
         Queue::fake();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $response = $this->actingAs($user, 'api')
             ->json(
                 'POST',
@@ -351,7 +351,7 @@ class CreateTest extends TestCase {
     public function testCreateWithKERCreatesIf3000FreeTextResponse(): void {
         $this->createSQLandQSDBs();
         Queue::fake();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $response = $this->actingAs($user, 'api')
             ->json(
                 'POST',
@@ -369,7 +369,7 @@ class CreateTest extends TestCase {
     public function testCreateWithKERErrorsIf3001FreeTextResponse(): void {
         $this->createSQLandQSDBs();
         Queue::fake();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $response = $this->actingAs($user, 'api')
             ->json(
                 'POST',
@@ -389,7 +389,7 @@ class CreateTest extends TestCase {
     public function testCreateWikiErrorsIfKerIsInvalid(): void {
         $this->createSQLandQSDBs();
         Queue::fake();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
 
         $response = $this->actingAs($user, 'api')->json(
             'POST',

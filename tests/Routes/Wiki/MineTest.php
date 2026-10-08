@@ -19,7 +19,7 @@ class MineTest extends TestCase {
     public function testMineDefault() {
         Config::set('wbstack.wiki_max_per_user', false);
 
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $this->actingAs($user, 'api')
             ->json('POST', $this->route, [])
             ->assertStatus(200)
@@ -29,7 +29,7 @@ class MineTest extends TestCase {
     public function testMineWithWikis() {
         Config::set('wbstack.wiki_max_per_user', 1);
 
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 

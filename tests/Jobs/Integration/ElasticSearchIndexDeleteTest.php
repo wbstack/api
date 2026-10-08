@@ -77,7 +77,7 @@ class ElasticSearchIndexDeleteTest extends TestCase {
         $response = $this->makeRequest("http://$ELASTICSEARCH_HOST/test_db_name_content_first?pretty", 'PUT');
         $this->assertTrue($response['acknowledged']);
 
-        $this->user = User::factory()->create(['verified' => true]);
+        $this->user = User::factory()->create();
         $this->wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $this->user->id]);
         WikiSetting::factory()->create(

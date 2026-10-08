@@ -76,7 +76,6 @@ class WikisSeeder extends Seeder {
         $user = User::create([
             'email' => $email,
             'password' => Hash::make($email),
-            'verified' => true,
         ]);
 
         for ($id = 0; $id < 50; $id++) {
