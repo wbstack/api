@@ -42,6 +42,8 @@ class WikiSetting extends Model {
 
     public const wgLogo = 'wgLogo';
 
+    public const wwLogoSvg = 'wwLogoSvg';
+
     public const wgFavicon = 'wgFavicon';
 
     public const wgOAuth2PrivateKey = 'wgOAuth2PrivateKey';

@@ -18,7 +18,7 @@ class WikiLogoController extends Controller {
      */
     public function update(Request $request) {
         $request->validate([
-            'logo' => 'required|mimes:png',
+            'logo' => 'required|file|mimes:png,svg|max:2048',
         ]);
 
         $wiki = $request->attributes->get('wiki');
