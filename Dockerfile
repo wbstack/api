@@ -12,7 +12,7 @@ WORKDIR /tmp/src2
 RUN composer install --no-dev --no-progress --optimize-autoloader --ignore-platform-req=ext-pcntl
 
 
-FROM php:8.2-apache
+FROM php:8.3-apache
 
 RUN apt-get update \
 	# Needed for the imagick php extension install
