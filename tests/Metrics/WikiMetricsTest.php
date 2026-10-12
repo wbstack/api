@@ -15,7 +15,11 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
+use Log;
+use Psr\Log\LogLevel;
 use Tests\TestCase;
+use TiMacDonald\Log\LogEntry;
+use TiMacDonald\Log\LogFake;
 
 class WikiMetricsTest extends TestCase {
     use RefreshDatabase;
@@ -68,6 +72,55 @@ class WikiMetricsTest extends TestCase {
             'wiki_id' => $wiki->id,
             'date' => Carbon::today()->toDateString(),
         ]);
+    }
+
+    public function testPreventMetricsCollectionWhenRecordExistsForToday(): void {
+        Log::swap(new LogFake());
+
+        $wiki = Wiki::factory()->create();
+        WikiDb::first()->update(['wiki_id' => $wiki->id]);
+
+        $wiki->wikiSiteStats()->create([
+            'pages' => 10,
+            'users' => 3,
+        ]);
+
+        $wikiMetrics = new WikiMetrics();
+        $wikiMetrics->saveMetrics($wiki);
+
+        $this->assertDatabaseCount('wiki_daily_metrics', 1)
+            ->assertDatabaseHas('wiki_daily_metrics', [
+                'wiki_id' => $wiki->id,
+                'date' => now()->toDateString(),
+                'pages' => 10,
+                'total_user_count' => 3,
+            ]);
+
+        $wiki->wikiSiteStats()->first()->update([
+            'pages' => 12,
+            'users' => 5,
+        ]);
+
+        $wikiMetrics->saveMetrics($wiki);
+
+        $this->assertDatabaseCount('wiki_daily_metrics', 1)
+            ->assertDatabaseHas('wiki_daily_metrics', [
+                'wiki_id' => $wiki->id,
+                'date' => now()->toDateString(),
+                'pages' => 10,
+                'total_user_count' => 3,
+            ]);
+
+        Log::assertLogged(function (LogEntry $log) use ($wiki) {
+            if ($log->level !== LogLevel::WARNING) {
+                return false;
+            }
+
+            return str_contains(
+                $log->message,
+                "Daily metric already exists for Wiki ID {$wiki->id} on " . now()->toDateString()
+            );
+        });
     }
 
     public function testRecordCreatedWhenWikiFirstDeleted() {
