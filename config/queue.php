@@ -63,6 +63,11 @@ return [
             'driver' => 'redis',
             'connection' => 'default',
             'queue' => env('REDIS_QUEUE', 'default'),
+            // `retry_after` specifies how many seconds the queue connection should wait before a
+            // job that is being processed is released back onto the queue. This should be several
+            // seconds longer than every effective job or worker timeout to prevent jobs from being
+            // re-attempted by another queue worker before it has finished executing or timed out.
+            // https://laravel.com/framework/docs/11.x/queues#job-expirations-and-timeouts
             'retry_after' => 100,
             'block_for' => null,
         ],
