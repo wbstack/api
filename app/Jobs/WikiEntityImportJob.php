@@ -7,17 +7,13 @@ use App\Wiki;
 use App\WikiEntityImport;
 use App\WikiEntityImportStatus;
 use Carbon\Carbon;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Maclof\Kubernetes\Client;
 use Maclof\Kubernetes\Models\Job as KubernetesJob;
 
-class WikiEntityImportJob implements ShouldQueue {
-    use Queueable;
-
+class WikiEntityImportJob extends Job {
     /**
      * Create a new job instance.
      */
