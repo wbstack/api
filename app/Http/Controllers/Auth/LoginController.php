@@ -47,6 +47,11 @@ class LoginController extends Controller {
     }
 
     public function deleteLogin(Request $request) {
+        $token = $request->user()->token();
+        if ($token) {
+            $token->revoke();
+        }
+
         return response()
             ->json()
             ->setStatusCode(204)
