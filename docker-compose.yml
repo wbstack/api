@@ -13,11 +13,16 @@ services:
     restart: always
     depends_on:
       - sql
+      - mailhog
     links:
       - sql
       - redis
     environment:
-      - CONTAINER_ROLE=app
+      CONTAINER_ROLE: app
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_ENCRYPTION: ""
   sql:
     image: "${DOCKER_DATABASE_IMAGE_NAME}"
     environment:
@@ -41,6 +46,11 @@ services:
     restart: always
     expose:
       - 6379
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    restart: always
+    ports:
+      - 127.0.0.1:8025:8025
 
 volumes:
   sql-data:
