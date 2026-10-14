@@ -11,7 +11,6 @@ use App\Jobs\ProvisionWikiDbJob;
 use App\Jobs\PruneEventPageUpdatesTable;
 use App\Jobs\PruneQueryserviceBatchesTable;
 use App\Jobs\RequeuePendingQsBatchesJob;
-use App\Jobs\SandboxCleanupJob;
 use App\Jobs\SendEmptyWikiNotificationsJob;
 use App\Jobs\UpdateQueryserviceAllowList;
 use App\Jobs\UpdateWikiDailyMetricJob;
@@ -39,11 +38,6 @@ class Kernel extends ConsoleKernel {
         $schedule->job(new CreateQueryserviceBatchesJob())->everyMinute()->withoutOverlapping();
         $schedule->job(new RequeuePendingQsBatchesJob())->everyFifteenMinutes()->withoutOverlapping();
         $schedule->job(new FailStalledEntityImportsJob())->hourly();
-
-        // Sandbox
-        // TODO this should maybe only be run when sandbox as a whole is loaded?
-        // TODO instead of using LOAD ROUTES, we should just have different modes?
-        $schedule->job(new SandboxCleanupJob())->everyFifteenMinutes()->withoutOverlapping();
 
         // Schedule site stat updates for each wiki and platform-summary
         $schedule->command('schedule:stats')->dailyAt('7:00');
