@@ -66,6 +66,31 @@ class ReCaptchaValidationTest extends TestCase {
         );
     }
 
+    public function testRecaptchaCanBeDisabledInLocalDevelopment() {
+        config([
+            'app.env' => 'local',
+            'recaptcha.enabled' => false,
+        ]);
+
+        $rule = $this->buildReCaptchaValidation();
+
+        $this->assertTrue($rule->passes('token', ''));
+    }
+
+    public function testRecaptchaCannotBeDisabledOutsideLocalDevelopment() {
+        config([
+            'app.env' => 'production',
+            'recaptcha.enabled' => false,
+        ]);
+
+        $mockReCaptcha = $this->buildMockedReCaptcha(
+            $this->buildReCaptchaFakeResponse(['success' => false])
+        );
+        $rule = $this->buildReCaptchaValidation($mockReCaptcha);
+
+        $this->assertFalse($rule->passes('token', 'someToken'));
+    }
+
     public function testLowScore() {
         $fakeResponse = $this->buildReCaptchaFakeResponse([
             'score' => config('recaptcha.min_score') - 1,
