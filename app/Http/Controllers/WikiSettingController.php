@@ -13,10 +13,14 @@ class WikiSettingController extends Controller {
     /**
      * @return (SettingWikibaseManifestEquivEntities|string)[][]
      */
-    private function getSettingValidations(): array {
+    private function getSettingValidations(bool $allowModernSkin = false): array {
         // FIXME: this list is evil and should be kept in sync with the model in Wiki.php?! (mostly)
+        $defaultSkinValidation = $allowModernSkin
+            ? 'in:vector,modern,timeless'
+            : 'in:vector,timeless';
+
         return [
-            'wgDefaultSkin' => ['required', 'string', 'in:vector,modern,timeless'],
+            'wgDefaultSkin' => ['required', 'string', $defaultSkinValidation],
             'wwExtEnableConfirmAccount' => ['required', 'boolean'],
             'wwExtEnableWikibaseLexeme' => ['required', 'boolean'],
             'wwWikibaseStringLengthString' => ['required', 'integer', 'between:400,2500'],
@@ -40,10 +44,17 @@ class WikiSettingController extends Controller {
             'setting' => 'required|string|in:' . implode(',', array_keys($settingValidations)),
         ]);
         $settingName = $request->input('setting');
+        $wiki = $request->attributes->get('wiki');
+
+        if ($settingName === 'wgDefaultSkin' && $request->input('value') === 'modern') {
+            $hasModernDefault = $wiki->settings()
+                ->where('name', 'wgDefaultSkin')
+                ->value('value') === 'modern';
+            $settingValidations = $this->getSettingValidations($hasModernDefault);
+        }
 
         $request->validate(['value' => $settingValidations[$settingName]]);
         $value = $request->input('value');
-        $wiki = $request->attributes->get('wiki');
 
         WikiSetting::updateOrCreate(
             [

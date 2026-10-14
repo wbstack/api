@@ -102,8 +102,28 @@ class SettingUpdateTest extends TestCase {
         );
     }
 
+    public function testExistingModernDefaultCanBeRetained(): void {
+        $user = User::factory()->create(['verified' => true]);
+        $wiki = Wiki::factory('nodb')->create();
+        WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
+        WikiSetting::factory()->create([
+            'wiki_id' => $wiki->id,
+            'name' => 'wgDefaultSkin',
+            'value' => 'modern',
+        ]);
+
+        $this->actingAs($user, 'api')
+            ->json('POST', str_replace('foo', 'wgDefaultSkin', $this->route), [
+                'wiki' => $wiki->id,
+                'setting' => 'wgDefaultSkin',
+                'value' => 'modern',
+            ])
+            ->assertStatus(200);
+    }
+
     public static function provideValidSettingsBadValues() {
         yield ['wgDefaultSkin', 'foo'];
+        yield ['wgDefaultSkin', 'modern'];
         yield ['wwExtEnableConfirmAccount', 'foo'];
         yield ['wwWikibaseStringLengthString', 12];
         yield ['wwWikibaseStringLengthMonolingualText', 12];
