@@ -61,7 +61,7 @@ class DeleteWikiJobTest extends TestCase {
         // transaction that refresh database has started ue to the DROP statement
         Carbon::setTestNow(Carbon::create(2021, 9, 13, 12));
 
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $this->wiki = Wiki::factory()->create(['deleted_at' => Carbon::now()->timestamp]);
         WikiManager::factory()->create(['wiki_id' => $this->wiki->id, 'user_id' => $user->id]);
 

@@ -36,7 +36,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
         )->toDateTimeString();
 
         Notification::fake();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['created_at' => $thresholdDaysAgo]);
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => null]);
@@ -58,7 +58,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
             ->toDateTimeString();
 
         Notification::fake();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['created_at' => $thresholdDaysAgo]);
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $wiki->wikiLifecycleEvents()->updateOrCreate(['first_edited' => null]);
@@ -74,7 +74,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
         $now = Carbon::now()->toDateTimeString();
 
         Notification::fake();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['created_at' => $now]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
@@ -100,7 +100,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
         $now = Carbon::now()->toDateTimeString();
 
         Notification::fake();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['created_at' => $thresholdDaysAgo]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
@@ -122,7 +122,7 @@ class SendEmptyWikiNotificationsJobTest extends TestCase {
         )->toDateTimeString();
 
         Notification::fake();
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['created_at' => $thresholdDaysAgo]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 

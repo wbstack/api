@@ -24,7 +24,7 @@ class DeleteWikiFinalizeJobTest extends TestCase {
     }
 
     public function testDeleteWiki() {
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['deleted_at' => Carbon::now()->timestamp]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $setting = WikiSetting::create(['wiki_id' => $wiki->id, 'name' => 'asdf', 'value' => false]);
@@ -41,7 +41,7 @@ class DeleteWikiFinalizeJobTest extends TestCase {
     }
 
     public function testDoesNotDeleteWhenResourcesStillExist() {
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['deleted_at' => Carbon::now()->timestamp]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $setting = WikiSetting::create(['wiki_id' => $wiki->id, 'name' => 'asdf', 'value' => false]);
@@ -81,7 +81,7 @@ class DeleteWikiFinalizeJobTest extends TestCase {
     }
 
     public function testDoesNotDeleteNonDeletedWikis() {
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['deleted_at' => null]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $setting = WikiSetting::create(['wiki_id' => $wiki->id, 'name' => 'asdf', 'value' => false]);
@@ -100,7 +100,7 @@ class DeleteWikiFinalizeJobTest extends TestCase {
 
     public function testDeletesFiles() {
 
-        $user = User::factory()->create(['verified' => true]);
+        $user = User::factory()->create();
         $wiki = Wiki::factory()->create(['deleted_at' => Carbon::now()->timestamp]);
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         $setting = WikiSetting::create(['wiki_id' => $wiki->id, 'name' => WikiSetting::wgFavicon, 'value' => false]);
