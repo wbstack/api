@@ -15,7 +15,7 @@ class DeleteWikiTest extends TestCase {
 
     public function testDelete() {
         $user = User::factory()->create(['verified' => true]);
-        $wiki = Wiki::factory('nodb')->create();
+        $wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $response = $this
