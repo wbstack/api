@@ -32,24 +32,14 @@ jobs:
     - name: Run docker-compose setup
       env:
         DATABASE_IMAGE_NAME: ${{ matrix.databaseImageName }}
-      run: docker compose -f docker-compose.yml -f docker-compose.integration.yml up -d
+      run: docker compose -f docker-compose.yml -f docker-compose.integration.yml up -d --wait
 
-    - name: Setup - Keep trying to install the DBs (try for 30 seconds)
-      uses: nick-invision/retry@v4.0.0
-      with:
-        max_attempts: 30
-        retry_wait_seconds: 1
-        timeout_seconds: 30
-        command: docker compose exec -T api php artisan migrate:fresh
-
-    - name: Setup - Other things
-      run: |
-        docker compose exec -T api bash -c 'php artisan key:generate && php artisan passport:install --no-interaction'
-
-    - name: PHPUnit
+    - name: Run application setup and initialization
+      run: make init
+    - name: Run PHPUnit tests
       run: docker compose exec -e APP_ENV=testing -T api vendor/bin/phpunit
-    - name: Linting
-      run: docker compose exec api vendor/bin/pint --test -v
+    - name: Run pint php linting
+      run: make lint
 
     - name: Run elasticsearch index deletion integration test
       run: docker compose exec -e RUN_PHPUNIT_INTEGRATION_TEST=1 -e ELASTICSEARCH_HOST=elasticsearch.svc:9200 -T api vendor/bin/phpunit tests/Jobs/Integration/ElasticSearchIndexDeleteTest.php
