@@ -7,7 +7,14 @@ use Illuminate\Http\Response;
 
 class WikisController extends Controller {
     public function getWikisOwnedByCurrentUser(Request $request): Response {
-        $wikis = $request->user()->managesWikis()->get();
+        // TODO: Is augmenting the data here understandable
+        // I believe using withExists is quite efficient
+
+        $wikis = $request
+            ->user()
+            ->managesWikis()
+            ->withExists('pendingReview as hasPendingReview')
+            ->get();
 
         return response(
             [
