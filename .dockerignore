@@ -1,7 +1,48 @@
-# We only want to ignore these for the docker build
-# I hope they are included in docker-compose...
+# Dependencies are installed in the Composer build stage.
 /vendor
+
+# Local configuration and credentials.
+.env
+.env.*
+/.aws
+/.agents
+/.codex
+
+# Git and CI configuration.
+/.git
+/.github
+/.gitignore
+/.git-blame-ignore-revs
+
+# Development orchestration and tooling.
+**/docker-compose*.yml
+/Makefile
+/.editorconfig
+/.hadolint.yml
+/pint.json
+/rector.php
+
+# Tests and generated test caches.
+/tests
+/phpunit.xml
+/.phpunit.cache
+/.phpunit.result.cache
+
+# Documentation and SQL preparation helpers (keep runtime SQL files).
+/docs
+/README.md
+/database/mw/README.md
+/database/mw/CHANGES.md
+/database/mw/cleanSql.php
+
+# Generated runtime data (keep directory placeholders).
 /bootstrap/cache/*
 /storage/*.key
-.env
-Makefile
+/storage/logs/*
+!/storage/logs/.gitignore
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
