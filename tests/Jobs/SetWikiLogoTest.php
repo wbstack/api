@@ -56,7 +56,7 @@ class SetWikiLogoTest extends TestCase {
     public function testSetLogoSucceeds($wikiKey, $wikiValue, $logoPath) {
         // create user and wiki for this test
         $user = User::factory()->create(['verified' => true]);
-        $wiki = Wiki::factory('nodb')->create([$wikiKey => $wikiValue]);
+        $wiki = Wiki::factory()->create([$wikiKey => $wikiValue]);
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         // $wiki = Wiki::firstWhere($wikiKey, $wikiValue);

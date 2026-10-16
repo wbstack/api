@@ -20,7 +20,7 @@ class LogoUpdateTest extends TestCase {
         $file = UploadedFile::fake()->createWithContent('logo_200x200.png', file_get_contents(__DIR__ . '/../../data/logo_200x200.png'));
 
         $user = User::factory()->create(['verified' => true]);
-        $wiki = Wiki::factory('nodb')->create();
+        $wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $response = $this
