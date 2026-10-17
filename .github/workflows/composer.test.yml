@@ -34,6 +34,9 @@ jobs:
         DATABASE_IMAGE_NAME: ${{ matrix.databaseImageName }}
       run: docker compose -f docker-compose.yml -f docker-compose.integration.yml up -d --wait
 
+    - name: Show images used by Compose containers
+      run: docker compose -f docker-compose.yml -f docker-compose.integration.yml images
+
     - name: Run application setup and initialization
       run: make init
     - name: Run PHPUnit tests
