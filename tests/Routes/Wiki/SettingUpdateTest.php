@@ -85,7 +85,7 @@ class SettingUpdateTest extends TestCase {
      */
     public function testValidSetting($settingName, $settingValue, $expectedStored) {
         $user = User::factory()->create(['verified' => true]);
-        $wiki = Wiki::factory('nodb')->create();
+        $wiki = Wiki::factory()->create();
         $manager = WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
 
         $this->actingAs($user, 'api')
@@ -104,7 +104,7 @@ class SettingUpdateTest extends TestCase {
 
     public function testExistingModernDefaultCanBeRetained(): void {
         $user = User::factory()->create(['verified' => true]);
-        $wiki = Wiki::factory('nodb')->create();
+        $wiki = Wiki::factory()->create();
         WikiManager::factory()->create(['wiki_id' => $wiki->id, 'user_id' => $user->id]);
         WikiSetting::factory()->create([
             'wiki_id' => $wiki->id,
