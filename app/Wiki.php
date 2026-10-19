@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\WikiSuspensionActionType;
 use App\Helper\DomainHelper;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -95,6 +96,14 @@ class Wiki extends Model {
 
     public function pendingReviewSubmission(): HasOne {
         return $this->hasOne(ReviewSubmission::class)->pending();
+    }
+
+    public function latestSuspensionAction(): HasOne {
+        return $this->hasOne(WikiSuspensionAction::class)
+            ->latestOfMany()
+            // Don't expose unsuspension actions to the public. This should look and feel the same
+            // as if there were no suspensions on the Wiki.
+            ->where('suspension_type', WikiSuspensionActionType::SUSPEND);
     }
 
     public function wikiDbVersion() {
