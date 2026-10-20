@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Enums\ReviewSubmissionActionType;
 use App\Helper\DomainHelper;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -93,21 +92,9 @@ class Wiki extends Model {
         return $this->hasMany(ReviewSubmission::class);
     }
 
-    public function pendingReview(): HasOne {
-        // TODO: Is this easy to understand? I got here after a lot of asking questions to google
-        // but to me this is now quite readable.
-        // It includes only these relatively simple eloquent relationships.
-        // I disliked the raw string `actions` and the nested query into the actions table
-        // perhaps takes a little thinking. I'm also hesitant about how clean it is to keep piling
-        // relationshipships into this already big model. Happy to hear what you think.
+    public function pendingReviewSubmission(): HasOne {
         return $this->hasOne(ReviewSubmission::class)
-            ->latestOfMany()
-            ->whereHas('actions', function ($query) {
-                $query->whereIn('type', [
-                    ReviewSubmissionActionType::REVIEW_STARTED,
-                    ReviewSubmissionActionType::SUBMITTED,
-                ]);
-            });
+            ->pending();
     }
 
     public function wikiDbVersion() {
