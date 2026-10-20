@@ -13,7 +13,7 @@ class WikisController extends Controller {
         $wikis = $request
             ->user()
             ->managesWikis()
-            ->withExists('pendingReview as hasPendingReview')
+            ->withExists('pendingReview as has_pending_review')
             ->get();
 
         return response(
