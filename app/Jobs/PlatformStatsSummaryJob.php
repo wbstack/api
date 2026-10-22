@@ -2,10 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Constants\MediawikiNamespace;
 use App\Helper\MWTimestampHelper;
-use App\Services\MediaWikiHostResolver;
-use App\Traits;
 use App\User;
 use App\Wiki;
 use Carbon\CarbonImmutable;
@@ -31,8 +28,6 @@ use PDO;
 * Example: php artisan job:dispatch PlatformStatsSummaryJob
 */
 class PlatformStatsSummaryJob extends Job {
-    use Traits\PageFetcher;
-
     public $timeout = 3600;
 
     private $inactiveThreshold;
@@ -40,8 +35,6 @@ class PlatformStatsSummaryJob extends Job {
     private $creationRateRanges;
 
     private $platformSummaryStatsVersion = 'v1';
-
-    private MediaWikiHostResolver $mwHostResolver;
 
     public function __construct() {
         $this->inactiveThreshold = Config::get('wbstack.platform_summary_inactive_threshold');
@@ -78,6 +71,7 @@ class PlatformStatsSummaryJob extends Job {
         $propertiesCount = [];
 
         $currentTime = CarbonImmutable::now();
+        $statsByWiki = array_column($allStats, null, 'wiki');
 
         foreach ($wikis as $wiki) {
             if (!is_null($wiki->deleted_at)) {
@@ -86,23 +80,7 @@ class PlatformStatsSummaryJob extends Job {
                 continue;
             }
 
-            $this->apiUrl = $this->mwHostResolver->getBackendUrlForDomain($wiki->domain) . '/w/api.php'; // used in PageFetcher::fetchPagesInNamespace
-
-            // add items and properties counts of the wiki to the corresponded arrays
-            try {
-                $nextItemCount = count($this->fetchPagesInNamespace($wiki->domain, MediawikiNamespace::item));
-                array_push($itemsCount, $nextItemCount);
-            } catch (\Exception $ex) {
-                Log::warning('Failed to fetch item count for wiki ' . $wiki->domain . ', will use 0 instead.');
-            }
-            try {
-                $nextPropertyCount = count($this->fetchPagesInNamespace($wiki->domain, MediawikiNamespace::property));
-                array_push($propertiesCount, $nextPropertyCount);
-            } catch (\Exception $ex) {
-                Log::warning('Failed to fetch property count for wiki ' . $wiki->domain . ', will use 0 instead.');
-            }
-
-            $wikiDb = $wiki->wikiDb()->first();
+            $wikiDb = $wiki->wikiDb;
 
             if (!$wikiDb) {
                 Log::error(__METHOD__ . ": Could not find WikiDB for {$wiki->domain}");
@@ -110,15 +88,16 @@ class PlatformStatsSummaryJob extends Job {
                 continue;
             }
 
-            $found_key = array_search($wiki->domain, array_column($allStats, 'wiki'));
+            $stats = $statsByWiki[$wiki->domain] ?? null;
 
-            if ($found_key === false) {
+            if ($stats === null) {
                 Log::warning(__METHOD__ . ": Could not find stats for {$wiki->domain}");
 
                 continue;
             }
 
-            $stats = $allStats[$found_key];
+            $itemsCount[] = $stats['items'];
+            $propertiesCount[] = $stats['properties'];
 
             // is it empty?
             if ($this->isNullOrEmpty($stats['edits']) && $this->isNullOrEmpty($stats['pages']) && $this->isNullOrEmpty($stats['lastEdit'])) {
@@ -170,9 +149,8 @@ class PlatformStatsSummaryJob extends Job {
         ];
     }
 
-    public function handle(DatabaseManager $manager, MediaWikiHostResolver $mwHostResolver): void {
-        $this->mwHostResolver = $mwHostResolver;
-        $wikis = Wiki::withTrashed()->with('wikidb')->get();
+    public function handle(DatabaseManager $manager): void {
+        $wikis = Wiki::withTrashed()->with('wikiDb')->get();
 
         $conn = $manager->connection('mysql');
         $mwConn = $manager->connection('mw');
@@ -232,8 +210,15 @@ FROM ",wiki_dbs.name,".",wiki_dbs.prefix,"_change_tag
 WHERE ct_rev_id < 100
 ) t4,
     (
+SELECT
+    COUNT(CASE WHEN page_namespace = 120 THEN 1 END) AS items,
+    COUNT(CASE WHEN page_namespace = 122 THEN 1 END) AS properties
+FROM ",wiki_dbs.name,".",wiki_dbs.prefix,"_page
+WHERE page_namespace IN (120, 122)
+) t5,
+    (
 SELECT '",wikis.domain,"' as wiki
-) t5
+) t6
 "
 
 ) SEPARATOR ' UNION ALL ')
