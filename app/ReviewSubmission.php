@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Enums\ReviewSubmissionActionType;
 use Carbon\CarbonImmutable;
 use Database\Factories\ReviewSubmissionFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,15 +26,16 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read ReviewSubmissionAction|null $latestAction
  * @property-read Wiki|null $wiki
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereAdditionalInformation($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReviewSubmission whereWikiId($value)
  * @method static \Database\Factories\ReviewSubmissionFactory factory($count = null, $state = [])
+ * @method static Builder<static>|ReviewSubmission newModelQuery()
+ * @method static Builder<static>|ReviewSubmission newQuery()
+ * @method static Builder<static>|ReviewSubmission pending()
+ * @method static Builder<static>|ReviewSubmission query()
+ * @method static Builder<static>|ReviewSubmission whereAdditionalInformation($value)
+ * @method static Builder<static>|ReviewSubmission whereCreatedAt($value)
+ * @method static Builder<static>|ReviewSubmission whereId($value)
+ * @method static Builder<static>|ReviewSubmission whereUpdatedAt($value)
+ * @method static Builder<static>|ReviewSubmission whereWikiId($value)
  *
  * @mixin \Eloquent
  */
@@ -91,5 +94,18 @@ class ReviewSubmission extends Model {
      */
     public function latestAction(): HasOne {
         return $this->hasOne(ReviewSubmissionAction::class)->latestOfMany();
+    }
+
+    /**
+     * Scope the query to pending review submissions (latest action is SUBMITTED or REVIEW_STARTED).
+     */
+    public function scopePending(Builder $query): void {
+        $query->whereHas(
+            'latestAction',
+            fn (Builder $query) => $query->whereIn('type', [
+                ReviewSubmissionActionType::SUBMITTED,
+                ReviewSubmissionActionType::REVIEW_STARTED,
+            ])
+        );
     }
 }
