@@ -4,6 +4,8 @@ namespace Tests\Routes\Wiki\Managers;
 
 use App\Enums\ReviewSubmissionActionType;
 use App\Enums\UserRole;
+use App\Enums\WikiSuspensionActionReason;
+use App\Enums\WikiSuspensionActionType;
 use App\ReviewSubmission;
 use App\User;
 use App\Wiki;
@@ -85,31 +87,41 @@ class MineTest extends TestCase {
     }
 
     public function testMineIncludesScheduledSuspensions() {
-        $user = User::factory()->create(['verified' => true]);
+        $wikiManagerUser = User::factory()->create(['verified' => true]);
+        $platformAdminUser = User::factory()->create(['verified' => true, 'is_admin' => true]);
 
-        $wikiWithoutSuspension = Wiki::factory()->create();
-
-        WikiManager::factory()
-            ->for($user)
-            ->for($wikiWithoutSuspension)
+        $wikiWithoutSuspension = Wiki::factory()
+            ->has(WikiManager::factory())
+            ->recycle($wikiManagerUser)
             ->create();
 
-        $wikiWithSuspension = Wiki::factory()->create();
-
-        WikiManager::factory()
-            ->for($user)
-            ->for($wikiWithSuspension)
+        $wikiWithUnsuspension = Wiki::factory()
+            ->has(WikiManager::factory())
+            ->recycle($wikiManagerUser)
             ->create();
+        WikiSuspensionAction::factory()->for($wikiWithUnsuspension)->create();
+        WikiSuspensionAction::factory()
+            ->for($wikiWithUnsuspension)
+            ->create([
+                'suspension_type' => WikiSuspensionActionType::UNSUSPEND,
+                'actor_user_id' => $platformAdminUser,
+                'reason' => WikiSuspensionActionReason::INDEFINITELY_ALLOWED,
+            ]);
 
+        $wikiWithSuspension = Wiki::factory()
+            ->has(WikiManager::factory())
+            ->recycle($wikiManagerUser)
+            ->create();
         $suspensionAction = WikiSuspensionAction::factory()
             ->for($wikiWithSuspension)
             ->create();
 
-        $this->actingAs($user, 'api')
+        $this->actingAs($wikiManagerUser, 'api')
             ->json('POST', $this->route, [])
             ->assertStatus(200)
             ->assertJson(['wikis' => [
                 ['id' => $wikiWithoutSuspension->id, 'latest_suspension_action' => null],
+                ['id' => $wikiWithUnsuspension->id, 'latest_suspension_action' => null],
                 ['id' => $wikiWithSuspension->id, 'latest_suspension_action' => [
                     'id' => $suspensionAction->id,
                 ]],
