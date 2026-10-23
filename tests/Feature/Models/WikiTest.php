@@ -113,7 +113,29 @@ class WikiTest extends TestCase {
         $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspendSuspensionAction->is($latestSuspendSuspensionAction));
     }
 
-    public function testLatestSuspensionActionIsNullAfterUnsuspension(): void {
+    public function testLatestSuspendSuspensionActionReturnsWHATWhenSuspensionIsAFutureUnsuspend(): void {
+        $wiki = Wiki::factory()->create();
+        $suspendSuspensionAction = WikiSuspensionAction::factory()->for($wiki)->create();
+        $unsuspendSuspensionAction = WikiSuspensionAction::factory()
+            ->for($wiki)
+            ->create([
+                'suspension_type' => WikiSuspensionActionType::UNSUSPEND,
+                'reason' => WikiSuspensionActionReason::INDEFINITELY_ALLOWED,
+                'active_from' => now()->addMonth(),
+            ]);
+
+        // This is what is currently returned, will we end up making a Wiki available before $unsuspendSuspensionAction->active_from?
+        $this->assertNull(Wiki::findOrFail($wiki->id)->latestSuspendSuspensionAction);
+        // This is what should be returned if you take the name of the relationship at face value
+        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspendSuspensionAction->is($suspendSuspensionAction));
+        // I'm not sure if returning this would help, we would then need to look at the next suspension action...
+        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspendSuspensionAction->is($unsuspendSuspensionAction));
+        // Things that might make it easier to deal with:
+        //   * a wiki is suspended due to expiry unless marked otherwise
+        //   * we don't allow suspension actions of type UNSUSPEND have an active_from date in the future - how best to enforce this?
+    }
+
+    public function testLatestSuspendSuspensionActionIsNullAfterUnsuspension(): void {
         $wiki = Wiki::factory()->create();
         WikiSuspensionAction::factory()->for($wiki)->create();
         WikiSuspensionAction::factory()
