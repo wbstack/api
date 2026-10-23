@@ -73,44 +73,44 @@ class WikiTest extends TestCase {
         $this->assertNull(Wiki::findOrFail($wiki->id)->pendingReviewSubmission);
     }
 
-    public function testLatestSuspensionActionIsNullWithoutAnySuspensionActions(): void {
+    public function testLatestSuspendSuspensionActionIsNullWithoutAnySuspensionActions(): void {
         $wiki = Wiki::factory()->create();
         WikiSuspensionAction::factory()->create();
 
-        $this->assertNull(Wiki::findOrFail($wiki->id)->latestSuspensionAction);
+        $this->assertNull(Wiki::findOrFail($wiki->id)->latestSuspendSuspensionAction);
     }
 
-    public function testLatestSuspensionActionReturnsLatestSuspensionForTheGivenWiki(): void {
+    public function testLatestSuspendSuspensionActionReturnsLatestSuspensionForTheGivenWiki(): void {
         $wiki = Wiki::factory()->create();
         // Create two suspension actions for $wiki
         WikiSuspensionAction::factory()->for($wiki)->create();
-        $latestSuspensionAction = WikiSuspensionAction::factory()->for($wiki)->create();
+        $latestSuspendSuspensionAction = WikiSuspensionAction::factory()->for($wiki)->create();
         // Create a suspension action for a different wiki
         WikiSuspensionAction::factory()->create();
 
-        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspensionAction->is($latestSuspensionAction));
+        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspendSuspensionAction->is($latestSuspendSuspensionAction));
     }
 
-    public function testLatestSuspensionActionReturnsSuspensionScheduledInTheFuture(): void {
+    public function testLatestSuspendSuspensionActionReturnsSuspensionScheduledInTheFuture(): void {
         $wiki = Wiki::factory()->create();
         WikiSuspensionAction::factory()
             ->for($wiki)
             ->create(['active_from' => now()->addWeek()]);
-        $latestSuspensionAction = WikiSuspensionAction::factory()
+        $latestSuspendSuspensionAction = WikiSuspensionAction::factory()
             ->for($wiki)
             ->create(['active_from' => now()->addMonth()]);
 
-        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspensionAction->is($latestSuspensionAction));
+        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspendSuspensionAction->is($latestSuspendSuspensionAction));
     }
 
-    public function testLatestSuspensionActionReturnsSuspensionScheduledInThePast(): void {
+    public function testLatestSuspendSuspensionActionReturnsSuspensionScheduledInThePast(): void {
         $wiki = Wiki::factory()->create();
         WikiSuspensionAction::factory()->for($wiki)->create();
-        $latestSuspensionAction = WikiSuspensionAction::factory()
+        $latestSuspendSuspensionAction = WikiSuspensionAction::factory()
             ->for($wiki)
             ->create(['active_from' => now()->subMonth()]);
 
-        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspensionAction->is($latestSuspensionAction));
+        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspendSuspensionAction->is($latestSuspendSuspensionAction));
     }
 
     public function testLatestSuspensionActionIsNullAfterUnsuspension(): void {
@@ -123,10 +123,10 @@ class WikiTest extends TestCase {
                 'reason' => WikiSuspensionActionReason::INDEFINITELY_ALLOWED,
             ]);
 
-        $this->assertNull(Wiki::findOrFail($wiki->id)->latestSuspensionAction);
+        $this->assertNull(Wiki::findOrFail($wiki->id)->latestSuspendSuspensionAction);
     }
 
-    public function testLatestSuspensionActionReturnsSuspensionAfterUnsuspension(): void {
+    public function testLatestSuspendSuspensionActionReturnsSuspensionAfterUnsuspension(): void {
         $wiki = Wiki::factory()->create();
         WikiSuspensionAction::factory()->for($wiki)->create();
         WikiSuspensionAction::factory()
@@ -135,8 +135,8 @@ class WikiTest extends TestCase {
                 'suspension_type' => WikiSuspensionActionType::UNSUSPEND,
                 'reason' => WikiSuspensionActionReason::INDEFINITELY_ALLOWED,
             ]);
-        $latestSuspensionAction = WikiSuspensionAction::factory()->for($wiki)->create();
+        $latestSuspendSuspensionAction = WikiSuspensionAction::factory()->for($wiki)->create();
 
-        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspensionAction->is($latestSuspensionAction));
+        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspendSuspensionAction->is($latestSuspendSuspensionAction));
     }
 }
