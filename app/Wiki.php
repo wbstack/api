@@ -26,7 +26,7 @@ use Illuminate\Support\Carbon;
  * @property int $is_featured
  * @property string|null $wiki_deletion_reason
  * @property-read mixed $domain_decoded
- * @property-read WikiSuspensionAction|null $latestSuspensionAction
+ * @property-read WikiSuspensionAction|null $latestSuspendSuspensionAction
  * @property-read ReviewSubmission|null $pendingReviewSubmission
  * @property-read Collection<int, ReviewSubmission> $reviewSubmissions
  * @property-read int|null $review_submissions_count
@@ -99,11 +99,12 @@ class Wiki extends Model {
         return $this->hasOne(ReviewSubmission::class)->pending();
     }
 
-    public function latestSuspensionAction(): HasOne {
+    /**
+     * Get latest suspension action if it is of type 'suspend', otherwise `null`.
+     */
+    public function latestSuspendSuspensionAction(): HasOne {
         return $this->hasOne(WikiSuspensionAction::class)
             ->latestOfMany()
-            // Don't expose unsuspension actions to the public. This should look and feel the same
-            // as if there were no suspensions on the Wiki.
             ->where('suspension_type', WikiSuspensionActionType::SUSPEND);
     }
 
