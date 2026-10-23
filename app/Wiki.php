@@ -26,6 +26,7 @@ use Illuminate\Support\Carbon;
  * @property int $is_featured
  * @property string|null $wiki_deletion_reason
  * @property-read mixed $domain_decoded
+ * @property-read WikiSuspensionAction|null $latestSuspensionAction
  * @property-read ReviewSubmission|null $pendingReviewSubmission
  * @property-read Collection<int, ReviewSubmission> $reviewSubmissions
  * @property-read int|null $review_submissions_count
