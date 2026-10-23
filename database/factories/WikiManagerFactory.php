@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\User;
+use App\Wiki;
 use App\WikiManager;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -20,8 +22,8 @@ class WikiManagerFactory extends Factory {
      */
     public function definition() {
         return [
-            'user_id' => $this->faker->unique()->randomNumber(),
-            'wiki_id' => $this->faker->unique()->randomNumber(),
+            'user_id' => User::factory(),
+            'wiki_id' => Wiki::factory(),
         ];
     }
 }
