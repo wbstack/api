@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Enums\WikiSuspensionActionReason;
-use App\Enums\WikiSuspensionActionType;
+use App\Enums\WikiSuspensionReason;
 use App\ReviewSubmissionAction;
 use App\User;
 use App\Wiki;
-use App\WikiSuspensionAction;
+use App\WikiSuspension;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<WikiSuspensionAction>
+ * @extends Factory<WikiSuspension>
  */
-class WikiSuspensionActionFactory extends Factory {
+class WikiSuspensionFactory extends Factory {
     /**
      * Define the model's default state.
      *
@@ -23,12 +22,11 @@ class WikiSuspensionActionFactory extends Factory {
      */
     public function definition(): array {
         return [
-            'suspension_type' => WikiSuspensionActionType::SUSPEND,
             'actor_user_id' => null,
             'wiki_id' => Wiki::factory(),
             'review_submission_action_id' => null,
             'active_from' => now(),
-            'reason' => WikiSuspensionActionReason::AUTOMATIC_EXPIRY,
+            'reason' => WikiSuspensionReason::AUTOMATIC_EXPIRY,
         ];
     }
 
