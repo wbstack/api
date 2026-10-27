@@ -68,7 +68,7 @@ class WikiSuspension extends Model {
 
     protected function active(): Attribute {
         return Attribute::make(
-            get: fn (mixed $value, array $attributes): bool => CarbonImmutable::now()->greaterThan($attributes['active_from']),
+            get: fn (mixed $value, array $attributes): bool => CarbonImmutable::now()->gte($attributes['active_from']),
         );
     }
 
