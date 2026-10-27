@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property WikiSuspensionReason $reason
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
+ * @property-read bool $active
  * @property-read User|null $actor
  * @property-read ReviewSubmissionAction|null $reviewSubmissionAction
  * @property-read Wiki|null $wiki
