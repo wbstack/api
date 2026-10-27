@@ -44,6 +44,8 @@ class WikiSuspension extends Model {
     /** @use HasFactory<WikiSuspensionFactory> */
     use HasFactory;
 
+    protected $appends = ['active'];
+
     protected function casts() {
         return [
             'reason' => WikiSuspensionReason::class,
@@ -52,6 +54,12 @@ class WikiSuspension extends Model {
             'created_at' => 'immutable_datetime',
             'updated_at' => 'immutable_datetime',
         ];
+    }
+
+    protected function active(): Attribute {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes): bool => CarbonImmutable::now()->gte($attributes['active_from']),
+        );
     }
 
     public function actor(): BelongsTo {
@@ -65,12 +73,4 @@ class WikiSuspension extends Model {
     public function wiki(): BelongsTo {
         return $this->belongsTo(Wiki::class);
     }
-
-    protected function active(): Attribute {
-        return Attribute::make(
-            get: fn (mixed $value, array $attributes): bool => CarbonImmutable::now()->gte($attributes['active_from']),
-        );
-    }
-
-    protected $appends = ['active'];
 }
