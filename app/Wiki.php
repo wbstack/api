@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Enums\WikiSuspensionActionType;
 use App\Helper\DomainHelper;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -26,7 +25,7 @@ use Illuminate\Support\Carbon;
  * @property int $is_featured
  * @property string|null $wiki_deletion_reason
  * @property-read mixed $domain_decoded
- * @property-read WikiSuspensionAction|null $latestSuspendSuspensionAction
+ * @property-read WikiSuspension|null $latestSuspension
  * @property-read ReviewSubmission|null $pendingReviewSubmission
  * @property-read Collection<int, ReviewSubmission> $reviewSubmissions
  * @property-read int|null $review_submissions_count
@@ -100,12 +99,10 @@ class Wiki extends Model {
     }
 
     /**
-     * Get latest suspension action if it is of type 'suspend', otherwise `null`.
+     * Get latest suspension or `null`.
      */
-    public function latestSuspendSuspensionAction(): HasOne {
-        return $this->hasOne(WikiSuspensionAction::class)
-            ->latestOfMany()
-            ->where('suspension_type', WikiSuspensionActionType::SUSPEND);
+    public function latestSuspension(): HasOne {
+        return $this->hasOne(WikiSuspension::class)->latestOfMany();
     }
 
     public function wikiDbVersion() {

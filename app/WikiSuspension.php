@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read ReviewSubmissionAction|null $reviewSubmissionAction
  * @property-read Wiki|null $wiki
  *
+ * @method static \Database\Factories\WikiSuspensionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WikiSuspension newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WikiSuspension newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WikiSuspension query()

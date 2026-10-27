@@ -11,7 +11,7 @@ class WikisController extends Controller {
             ->user()
             ->managesWikis()
             ->withExists('pendingReviewSubmission as has_pending_review')
-            ->with('latestSuspendSuspensionAction')
+            ->with('latestSuspension')
             ->get();
 
         return response(
