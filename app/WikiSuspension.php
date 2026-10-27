@@ -7,6 +7,7 @@ namespace App;
 use App\Enums\WikiSuspensionReason;
 use Carbon\CarbonImmutable;
 use Database\Factories\WikiSuspensionFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -64,4 +65,12 @@ class WikiSuspension extends Model {
     public function wiki(): BelongsTo {
         return $this->belongsTo(Wiki::class);
     }
+
+    protected function active(): Attribute {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes): bool => CarbonImmutable::now()->greaterThan($attributes['active_from']),
+        );
+    }
+
+    protected $appends = ['active'];
 }
