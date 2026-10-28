@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\WikiSuspensionReason;
 use App\Helper\DomainHelper;
 use App\Helper\DomainValidator;
 use App\Helper\ProfileValidator;
@@ -18,6 +19,8 @@ use App\WikiDomain;
 use App\WikiManager;
 use App\WikiProfile;
 use App\WikiSetting;
+use App\WikiSuspension;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -106,6 +109,13 @@ class WikiController extends Controller {
                 'sitename' => $request->input('sitename'),
                 'domain' => $submittedDomain,
             ]);
+
+            $suspension = new WikiSuspension();
+            $suspension->wiki_id = $wiki->id;
+            // TODO get this 91 days from config instead of hard-coding?
+            $suspension->active_from = CarbonImmutable::now()->addDays(91);
+            $suspension->reason = WikiSuspensionReason::AUTOMATIC_EXPIRY;
+            $suspension->save();
 
             // Assign storage
             $dbAssignment = DB::table('wiki_dbs')->where($wikiDbCondition)->limit(1)->update(['wiki_id' => $wiki->id]);

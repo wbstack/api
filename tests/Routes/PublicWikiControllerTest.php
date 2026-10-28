@@ -2,21 +2,59 @@
 
 namespace Tests\Http\Controllers;
 
+use App\Enums\WikiSuspensionReason;
 use App\Http\Controllers\PublicWikiController;
 use App\Http\Resources\PublicWikiResource;
+use App\QueryserviceNamespace;
+use App\User;
 use App\Wiki;
+use App\WikiDb;
 use App\WikiProfile;
+use App\WikiSuspension;
+use Carbon\CarbonImmutable;
 use Generator;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class PublicWikiControllerTest extends TestCase {
     use DatabaseTransactions;
+
+    public function testCreateSchedulesAutomaticExpirySuspension(): void {
+        Queue::fake();
+
+        $user = User::factory()->create(['verified' => true]);
+
+        $now = CarbonImmutable::parse('2026-06-01 12:00');
+        $this->travelTo($now);
+
+        WikiDb::factory()->create([
+            'wiki_id' => null,
+            'version' => config('wbstack.wiki_db_use_version'),
+        ]);
+        QueryserviceNamespace::create([
+            'namespace' => 'automatic-expiry-test',
+            'backend' => 'wdqs.svc',
+        ]);
+
+        $response = $this->actingAs($user, 'api')->postJson('wiki/create', [
+            'domain' => 'automatic-expiry-test.wikibase.cloud',
+            'sitename' => 'Automatic Expiry Test',
+            'username' => 'Admin',
+        ]);
+
+        $response->assertOk()->assertJsonPath('success', true);
+        $suspension = WikiSuspension::where('wiki_id', $response->json('data.id'))->sole();
+        $this->assertSame(WikiSuspensionReason::AUTOMATIC_EXPIRY, $suspension->reason);
+        $this->assertTrue($suspension->active_from->equalTo('2026-08-31 12:00'));
+        $this->assertNull($suspension->actor_user_id);
+        $this->assertNull($suspension->review_submission_action_id);
+    }
 
     public function testShowLoadsWikiLatestProfileForResource(): void {
         $wiki = Wiki::factory()->create([
