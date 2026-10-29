@@ -20,8 +20,9 @@ class UserFactory extends Factory {
      */
     public function definition() {
         return [
-            'password' => $this->faker->password(),
             'email' => $this->faker->unique()->safeEmail(),
+            // use the email as the password so that it is easier to log in as these users
+            'password' => fn (array $attributes) => $attributes['email'],
             'verified' => $this->faker->boolean(),
         ];
     }
