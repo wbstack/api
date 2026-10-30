@@ -135,7 +135,7 @@ class WikiSuspensionTest extends TestCase {
         $suspensionAlreadyActive = WikiSuspension::factory()->create(['active_from' => now()->subDay()]);
         $suspensionNotActive = WikiSuspension::factory()->create(['active_from' => now()->addDay()]);
 
-        $this->assertTrue($suspensionAlreadyActive->active);
-        $this->assertFalse($suspensionNotActive->active);
+        $this->assertTrue($suspensionAlreadyActive->is_active);
+        $this->assertFalse($suspensionNotActive->is_active);
     }
 }
