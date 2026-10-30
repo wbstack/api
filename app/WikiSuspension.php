@@ -21,8 +21,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property WikiSuspensionReason $reason
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
- * @property-read bool $active
  * @property-read User|null $actor
+ * @property-read bool $is_active
  * @property-read ReviewSubmissionAction|null $reviewSubmissionAction
  * @property-read Wiki|null $wiki
  *
@@ -45,7 +45,7 @@ class WikiSuspension extends Model {
     /** @use HasFactory<WikiSuspensionFactory> */
     use HasFactory;
 
-    protected $appends = ['active'];
+    protected $appends = ['is_active'];
 
     protected function casts() {
         return [
@@ -57,7 +57,7 @@ class WikiSuspension extends Model {
         ];
     }
 
-    protected function active(): Attribute {
+    protected function isActive(): Attribute {
         return Attribute::make(
             get: fn (mixed $value, array $attributes): bool => CarbonImmutable::now()->gte($attributes['active_from']),
         );

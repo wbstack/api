@@ -107,7 +107,7 @@ class MineTest extends TestCase {
                 ['id' => $wikiWithNoSuspensions->id, 'latest_suspension' => null],
                 ['id' => $wikiWithSuspension->id, 'latest_suspension' => [
                     'id' => $suspension->id,
-                    'active' => true,
+                    'is_active' => true,
                 ]],
             ]]);
     }
