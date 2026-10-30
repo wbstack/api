@@ -8,6 +8,7 @@ use App\ReviewSubmission;
 use App\User;
 use App\Wiki;
 use App\WikiManager;
+use App\WikiSuspension;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Config;
 use Tests\Routes\Traits\OptionsRequestAllowed;
@@ -80,6 +81,34 @@ class MineTest extends TestCase {
                 ['id' => $wikiWithNoSubmissions->id, 'has_pending_review' => false],
                 ['id' => $wikiWithPendingSubmission->id, 'has_pending_review' => true],
                 ['id' => $wikiWithApprovedSubmission->id, 'has_pending_review' => false],
+            ]]);
+    }
+
+    public function testMineIncludesScheduledSuspensions() {
+        $wikiManagerUser = User::factory()->create(['verified' => true]);
+
+        $wikiWithNoSuspensions = Wiki::factory()
+            ->has(WikiManager::factory())
+            ->recycle($wikiManagerUser)
+            ->create();
+
+        $wikiWithSuspension = Wiki::factory()
+            ->has(WikiManager::factory())
+            ->recycle($wikiManagerUser)
+            ->create();
+        $suspension = WikiSuspension::factory()
+            ->for($wikiWithSuspension)
+            ->create();
+
+        $this->actingAs($wikiManagerUser, 'api')
+            ->json('POST', $this->route, [])
+            ->assertStatus(200)
+            ->assertJson(['wikis' => [
+                ['id' => $wikiWithNoSuspensions->id, 'latest_suspension' => null],
+                ['id' => $wikiWithSuspension->id, 'latest_suspension' => [
+                    'id' => $suspension->id,
+                    'is_active' => true,
+                ]],
             ]]);
     }
 }

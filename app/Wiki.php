@@ -25,6 +25,7 @@ use Illuminate\Support\Carbon;
  * @property int $is_featured
  * @property string|null $wiki_deletion_reason
  * @property-read mixed $domain_decoded
+ * @property-read WikiSuspension|null $latestSuspension
  * @property-read ReviewSubmission|null $pendingReviewSubmission
  * @property-read Collection<int, ReviewSubmission> $reviewSubmissions
  * @property-read int|null $review_submissions_count
@@ -95,6 +96,13 @@ class Wiki extends Model {
 
     public function pendingReviewSubmission(): HasOne {
         return $this->hasOne(ReviewSubmission::class)->pending();
+    }
+
+    /**
+     * Get latest suspension or `null`.
+     */
+    public function latestSuspension(): HasOne {
+        return $this->hasOne(WikiSuspension::class)->latestOfMany();
     }
 
     public function wikiDbVersion() {

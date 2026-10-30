@@ -8,6 +8,7 @@ use App\Enums\ReviewSubmissionActionType;
 use App\Enums\UserRole;
 use App\ReviewSubmission;
 use App\Wiki;
+use App\WikiSuspension;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -68,5 +69,51 @@ class WikiTest extends TestCase {
             ->create();
 
         $this->assertNull(Wiki::findOrFail($wiki->id)->pendingReviewSubmission);
+    }
+
+    public function testLatestSuspendSuspensionIsNullWithNoSuspensions(): void {
+        $wiki = Wiki::factory()->create();
+
+        // Create a suspension for a different wiki to make sure it isn't returned by $wiki->latestSuspension
+        WikiSuspension::factory()->create();
+
+        $this->assertNull(Wiki::findOrFail($wiki->id)->latestSuspension);
+    }
+
+    public function testLatestSuspendSuspensionReturnsLatestSuspensionForTheGivenWiki(): void {
+        $wiki = Wiki::factory()->create();
+
+        // Create two suspensions for $wiki
+        WikiSuspension::factory()->for($wiki)->create();
+        $latestSuspension = WikiSuspension::factory()->for($wiki)->create();
+
+        // Create a suspension for a different wiki after the $latestSuspension
+        WikiSuspension::factory()->create();
+
+        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspension->is($latestSuspension));
+    }
+
+    public function testLatestSuspendSuspensionActionReturnsSuspensionScheduledInTheFuture(): void {
+        $wiki = Wiki::factory()->create();
+
+        WikiSuspension::factory()
+            ->for($wiki)
+            ->create(['active_from' => now()->addWeek()]);
+        $latestSuspension = WikiSuspension::factory()
+            ->for($wiki)
+            ->create(['active_from' => now()->addMonth()]);
+
+        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspension->is($latestSuspension));
+    }
+
+    public function testLatestSuspendSuspensionActionReturnsSuspensionScheduledInThePast(): void {
+        $wiki = Wiki::factory()->create();
+
+        WikiSuspension::factory()->for($wiki)->create();
+        $latestSuspension = WikiSuspension::factory()
+            ->for($wiki)
+            ->create(['active_from' => now()->subMonth()]);
+
+        $this->assertTrue(Wiki::findOrFail($wiki->id)->latestSuspension->is($latestSuspension));
     }
 }
