@@ -112,8 +112,9 @@ class WikiController extends Controller {
 
             $suspension = new WikiSuspension();
             $suspension->wiki_id = $wiki->id;
-            // TODO get this 91 days from config instead of hard-coding?
-            $suspension->active_from = CarbonImmutable::now()->addDays(91);
+            $suspension->active_from = CarbonImmutable::now()->addDays(
+                Config::get('wbstack.automatic_expiry_suspension_days')
+            );
             $suspension->reason = WikiSuspensionReason::AUTOMATIC_EXPIRY;
             $suspension->save();
 
