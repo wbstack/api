@@ -2,6 +2,7 @@
 
 namespace Tests\Routes\Wiki\Managers;
 
+use App\Enums\WikiSuspensionReason;
 use App\Jobs\ElasticSearchAliasInit;
 use App\Jobs\MediawikiInit;
 use App\Jobs\ProvisionWikiDbJob;
@@ -9,10 +10,13 @@ use App\KnowledgeEquityResponse;
 use App\QueryserviceNamespace;
 use App\User;
 use App\Wiki;
+use App\WikiDb;
 use App\WikiManager;
 use App\WikiProfile;
 use App\WikiSetting;
+use App\WikiSuspension;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Queue;
@@ -35,6 +39,37 @@ class CreateTest extends TestCase {
 
     use DatabaseTransactions;
     use OptionsRequestAllowed;
+
+    public function testCreateSchedulesAutomaticExpirySuspension(): void {
+        Queue::fake();
+
+        $user = User::factory()->create(['verified' => true]);
+
+        $now = CarbonImmutable::parse('2026-06-01 12:00');
+        $this->travelTo($now);
+
+        WikiDb::factory()->create([
+            'wiki_id' => null,
+            'version' => config('wbstack.wiki_db_use_version'),
+        ]);
+        QueryserviceNamespace::create([
+            'namespace' => 'automatic-expiry-test',
+            'backend' => 'wdqs.svc',
+        ]);
+
+        $response = $this->actingAs($user, 'api')->postJson($this->route, [
+            'domain' => 'automatic-expiry-test.wikibase.cloud',
+            'sitename' => 'Automatic Expiry Test',
+            'username' => 'Admin',
+        ]);
+
+        $response->assertOk()->assertJsonPath('success', true);
+        $suspension = WikiSuspension::where('wiki_id', $response->json('data.id'))->sole();
+        $this->assertSame(WikiSuspensionReason::AUTOMATIC_EXPIRY, $suspension->reason);
+        $this->assertTrue($suspension->active_from->equalTo('2026-08-31 12:00'));
+        $this->assertNull($suspension->actor_user_id);
+        $this->assertNull($suspension->review_submission_action_id);
+    }
 
     /**
      * @dataProvider createDispatchesSomeJobsProvider

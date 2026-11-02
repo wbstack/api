@@ -35,4 +35,8 @@ return [
 
     'transferbot_image_repo' => env('WBSTACK_TRANSFERBOT_IMAGE_REPO', 'ghcr.io/wbstack/transferbot'),
     'transferbot_image_version' => env('WBSTACK_TRANSFERBOT_IMAGE_VERSION', '1.1.0'),
+
+    'automatic_expiry_suspension_days' => intval(
+        env('WBSTACK_AUTOMATIC_EXPIRY_SUSPENSION_DAYS', '91')
+    ),
 ];
