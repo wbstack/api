@@ -130,4 +130,12 @@ class WikiSuspensionTest extends TestCase {
         $this->assertInstanceOf(CarbonImmutable::class, $suspension->created_at);
         $this->assertInstanceOf(CarbonImmutable::class, $suspension->updated_at);
     }
+
+    public function testActiveAccessor(): void {
+        $suspensionAlreadyActive = WikiSuspension::factory()->create(['active_from' => now()->subDay()]);
+        $suspensionNotActive = WikiSuspension::factory()->create(['active_from' => now()->addDay()]);
+
+        $this->assertTrue($suspensionAlreadyActive->is_active);
+        $this->assertFalse($suspensionNotActive->is_active);
+    }
 }

@@ -7,6 +7,7 @@ namespace App;
 use App\Enums\WikiSuspensionReason;
 use Carbon\CarbonImmutable;
 use Database\Factories\WikiSuspensionFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,9 +22,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read User|null $actor
+ * @property-read bool $is_active
  * @property-read ReviewSubmissionAction|null $reviewSubmissionAction
  * @property-read Wiki|null $wiki
  *
+ * @method static \Database\Factories\WikiSuspensionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WikiSuspension newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WikiSuspension newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WikiSuspension query()
@@ -42,6 +45,8 @@ class WikiSuspension extends Model {
     /** @use HasFactory<WikiSuspensionFactory> */
     use HasFactory;
 
+    protected $appends = ['is_active'];
+
     protected function casts() {
         return [
             'reason' => WikiSuspensionReason::class,
@@ -50,6 +55,12 @@ class WikiSuspension extends Model {
             'created_at' => 'immutable_datetime',
             'updated_at' => 'immutable_datetime',
         ];
+    }
+
+    protected function isActive(): Attribute {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes): bool => CarbonImmutable::now()->gte($attributes['active_from']),
+        );
     }
 
     public function actor(): BelongsTo {
