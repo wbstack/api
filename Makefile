@@ -6,7 +6,12 @@ test:
 	docker compose exec api bash -c 'LOG_CHANNEL=stderr LOG_LEVEL=debug vendor/bin/phpunit ${FILTER}'
 
 init:
-	docker compose exec api bash -c 'php artisan migrate:fresh && su -s /bin/sh www-data -c "php artisan passport:install --no-interaction" && php artisan key:generate'
+	docker compose exec api bash -c ' \
+		php artisan migrate:fresh \
+		&& su -s /bin/sh www-data -c "php artisan passport:install --no-interaction" \
+		&& php artisan key:generate \
+		&& php artisan db:seed \
+	'
 
 test-fresh: init test
 
