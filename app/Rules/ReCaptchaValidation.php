@@ -91,6 +91,10 @@ class ReCaptchaValidation implements ImplicitRule {
      * @return bool
      */
     public function passes($attribute, $value) {
+        if (config('app.env') === 'local' && config('recaptcha.enabled') === false) {
+            return true;
+        }
+
         $recaptchaResponse = $this->verify($value);
 
         if ($this->verifyHostname($recaptchaResponse->getHostname()) === false) {
