@@ -15,6 +15,8 @@ jobs:
       - name: Docker meta
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v6.2.0
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: index
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
@@ -45,6 +47,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v7.4.0
         with:
           context: .
@@ -54,7 +57,8 @@ jobs:
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
+          # Index annotations preserve traceability without changing the runnable image.
+          annotations: ${{ github.event_name != 'pull_request' && steps.docker_meta.outputs.annotations || '' }}
       - name: Check out `wmde/wbaas-deploy` repository in staging child directory
         if: github.event_name != 'pull_request'
         uses: actions/checkout@v7
@@ -70,14 +74,43 @@ jobs:
       - name: Update values for local, staging and production
         if: github.event_name != 'pull_request'
         id: update-values
+        shell: bash
+        env:
+          IMAGE: ghcr.io/${{ github.repository }}
+          NEW_IMAGE: ghcr.io/${{ github.repository }}@${{ steps.build.outputs.digest }}
         run: |
           TAG="$(echo ${{ steps.docker_meta.outputs.tags }} | cut -d':' -f2)"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
-          sed -i "/image:/{n;s/tag:.*/tag: $TAG/;}" ./repos/wbaas-deploy-staging/k8s/helmfile/env/local/api.values.yaml.gotmpl
-          sed -i "/image:/{n;s/tag:.*/tag: $TAG/;}" ./repos/wbaas-deploy-staging/k8s/helmfile/env/staging/api.values.yaml.gotmpl
-          sed -i "/image:/{n;s/tag:.*/tag: $TAG/;}" ./repos/wbaas-deploy-production/k8s/helmfile/env/production/api.values.yaml.gotmpl
+          platform_digest() {
+            # Select the runnable image, excluding index annotations and provenance.
+            docker buildx imagetools inspect "$1" --format '{{json .Manifest}}' | jq -er '
+              if .manifests then
+                [.manifests[] | select(.platform.os == "linux" and .platform.architecture == "amd64")]
+                | if length == 1 then .[0].digest else error("Expected one linux/amd64 manifest") end
+              else .digest end
+              | select(test("^sha256:[0-9a-f]{64}$"))
+            '
+          }
+          new_digest=$(platform_digest "$NEW_IMAGE")
+          for environment in local staging production; do
+            repository=./repos/wbaas-deploy-staging
+            if [[ $environment == production ]]; then
+              repository=./repos/wbaas-deploy-production
+            fi
+            values="$repository/k8s/helmfile/env/$environment/api.values.yaml.gotmpl"
+            current_tag=$(yq -er '.image.tag' "$values")
+            current_digest=$(platform_digest "$IMAGE:$current_tag")
+            changed=false
+            if [[ $current_digest != "$new_digest" ]]; then
+              sed -i "/image:/{n;s/tag:.*/tag: $TAG/;}" "$values"
+              changed=true
+            else
+              echo "$environment: image unchanged; skipping deployment update"
+            fi
+            echo "${environment}_changed=$changed" >> "$GITHUB_OUTPUT"
+          done
       - name: Update argo values for local, staging and production
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && (steps.update-values.outputs.local_changed == 'true' || steps.update-values.outputs.staging_changed == 'true' || steps.update-values.outputs.production_changed == 'true')
         id: update-argo-values
         run: |
           cd ./repos/wbaas-deploy-staging
@@ -96,7 +129,7 @@ jobs:
           echo "msg=$MSG" >> $GITHUB_OUTPUT
       - name: Create Staging+Local Pull Request
         uses: peter-evans/create-pull-request@v8
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && (steps.update-values.outputs.local_changed == 'true' || steps.update-values.outputs.staging_changed == 'true')
         with:
           path: ./repos/wbaas-deploy-staging
           commit-message: 'Staging+Local: Deploy new Platform API image ${{ steps.docker_meta.outputs.tags }}'
@@ -112,7 +145,7 @@ jobs:
             **Changes**: [${{ steps.truncate-commit-message.outputs.msg }}](https://github.com/wbstack/api/commit/${{ github.sha }})
       - name: Create Production Pull Request
         uses: peter-evans/create-pull-request@v8
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.update-values.outputs.production_changed == 'true'
         with:
           path: ./repos/wbaas-deploy-production
           commit-message: 'Production: Deploy new Platform API image ${{ steps.docker_meta.outputs.tags }}'
