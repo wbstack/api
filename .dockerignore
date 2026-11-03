@@ -1,7 +1,28 @@
-# We only want to ignore these for the docker build
-# I hope they are included in docker-compose...
-/vendor
+# Only include application files and build inputs.
+*
+!app/
+!artisan
+!bootstrap/
+!composer.json
+!composer.lock
+!config/
+!database/
+!docker.mysql.cnf
+!LICENSE.md
+!public/
+!resources/
+!routes/
+!start.sh
+!storage/
+
+# Exclude development helpers and generated runtime data.
+**/docker-compose*.yml
+/database/mw/*.md
+/database/mw/cleanSql.php
 /bootstrap/cache/*
 /storage/*.key
-.env
-Makefile
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+!/storage/**/.gitignore
