@@ -13,6 +13,7 @@ use App\Jobs\ProvisionQueryserviceNamespaceJob;
 use App\Jobs\ProvisionWikiDbJob;
 use App\KnowledgeEquityResponse;
 use App\QueryserviceNamespace;
+use App\User;
 use App\Wiki;
 use App\WikiDb;
 use App\WikiDomain;
@@ -87,6 +88,10 @@ class WikiController extends Controller {
 
         // TODO create with some sort of owner etc?
         DB::transaction(function () use ($user, $request, &$wiki, &$dbAssignment, $submittedDomain, $rawProfile, $rawKnowledgeEquityResponse): void {
+            // Lock the user before any reads establish a repeatable-read snapshot.
+            // Creation always locks in this order: user, wiki DB, then QS namespace.
+            $user = User::whereKey($user->getKey())->lockForUpdate()->firstOrFail();
+
             $dbVersion = Config::get('wbstack.wiki_db_use_version');
             $wikiDbCondition = ['wiki_id' => null, 'version' => $dbVersion];
 
@@ -101,7 +106,7 @@ class WikiController extends Controller {
             $numWikis = $user->managesWikis()->count() + 1;
             $maxWikis = config('wbstack.wiki_max_per_user');
 
-            if (config('wbstack.wiki_max_per_user') !== false && $numWikis > config('wbstack.wiki_max_per_user')) {
+            if ($maxWikis !== false && $numWikis > $maxWikis) {
                 abort(403, "Too many wikis. Your new total of {$numWikis} would exceed the limit of {$maxWikis} per user.");
             }
 
