@@ -139,7 +139,6 @@ return [
     'registration',
     'resolver',
     'rss',
-    'sandbox',
     'search',
     'secure',
     'server',
