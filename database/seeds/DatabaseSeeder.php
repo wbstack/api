@@ -14,7 +14,6 @@ class DatabaseSeeder extends Seeder {
     public function run() {
         Model::unguard();
         $this->call(UsersSeeder::class);
-        $this->call(InvitationsSeeder::class);
         $this->call(WikiDbsSeeder::class);
         $this->call(QueryserviceNamespacesSeeder::class);
         $this->call(WikisSeeder::class);
