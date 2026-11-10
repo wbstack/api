@@ -8,6 +8,7 @@ use App\WikiDomain;
 use App\WikiManager;
 use App\WikiSetting;
 use App\WikiSiteStats;
+use App\WikiSuspension;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
@@ -69,6 +70,13 @@ class WikisSeeder extends Seeder {
         WikiSiteStats::create(
             array_merge($stats, ['wiki_id' => $wiki->id])
         );
+
+        WikiSuspension::factory()
+            ->recycle($wiki)
+            ->create([
+                // even wiki ids will expire immediately, odd ids will expire in 72 days
+                'active_from' => $wiki->id % 2 ? now() : now()->addDays(72),
+            ]);
     }
 
     public function run() {
