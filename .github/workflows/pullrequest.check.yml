@@ -6,6 +6,8 @@ on:
 
 jobs:
   check-pr-git-trailers:
+    permissions:
+      pull_requests: write
     if: github.event.pull_request.user.login != 'dependabot[bot]'
 
     runs-on: ubuntu-24.04
