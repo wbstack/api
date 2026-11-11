@@ -1,0 +1,25 @@
+name: Check PR description for a Phabricator task Git trailer
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  check-pr-git-trailers:
+    permissions:
+      pull-requests: write
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
+
+    runs-on: ubuntu-24.04
+
+    steps:
+
+      - name: Checkout workflow scripts
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+
+      - name: Check trailers and request related tasks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/check-pr-git-trailers.sh
