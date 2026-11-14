@@ -2,7 +2,6 @@
 
 namespace Tests\Routes\User;
 
-use App\Invitation;
 use App\Notifications\UserCreationNotification;
 use App\Rules\ReCaptchaValidation;
 use App\User;
@@ -32,7 +31,6 @@ class RegisterTest extends TestCase {
         $this->mockReCaptchaValidation();
         Notification::fake();
 
-        $invite = Invitation::factory()->create();
         $userToCreate = User::factory()->make();
 
         $resp = $this->json('POST', $this->route, [
@@ -48,15 +46,11 @@ class RegisterTest extends TestCase {
         Notification::assertSentTo(
             [User::whereEmail($userToCreate->email)->first()], UserCreationNotification::class
         );
-
-        // SHIFT doesnt have missingFromDatabase
-        // ->missingFromDatabase('invitations', ['code' => $invite->code]);
     }
 
     public function testCreateEmailAlreadyTaken() {
         $this->mockReCaptchaValidation();
 
-        $invite = Invitation::factory()->create();
         $user = User::factory()->create();
 
         $this->json('POST', $this->route, [
@@ -70,7 +64,6 @@ class RegisterTest extends TestCase {
     public function testCreateNoToken() {
         $this->mockReCaptchaValidation(false);
 
-        $invite = Invitation::factory()->create();
         $user = User::factory()->make();
 
         $this->json('POST', $this->route, [
@@ -90,8 +83,6 @@ class RegisterTest extends TestCase {
 
     public function testCreateBadEmail() {
         $this->mockReCaptchaValidation();
-
-        $invite = Invitation::factory()->create();
 
         $this->json('POST', $this->route, [
             'email' => 'notAnEmail',
