@@ -9,6 +9,7 @@ use App\WikiManager;
 use App\WikiSetting;
 use ErrorException;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Storage;
@@ -106,6 +107,46 @@ class SetWikiLogoTest extends TestCase {
         // $wikiKey, $wikiValue, $logoPath
         yield ['id', 42, __DIR__ . '/../data/logo_200x200.png'];
         yield ['domain', 'example.test.dev', __DIR__ . '/../data/logo_200x200.png'];
+    }
+
+    public function testSvgLogoHasVectorAndRasterOutputsAndCanBeReplacedWithPng(): void {
+        $wiki = Wiki::factory('nodb')->create();
+        $storage = Storage::fake('static-assets');
+        $directory = Wiki::getLogosDirectory($wiki->id);
+
+        $this->assertJobSucceeds('id', $wiki->id, __DIR__ . '/../data/logo.svg');
+
+        $storage->assertExists([$directory . '/logo.svg', $directory . '/135.png', $directory . '/64.ico']);
+        $storage->assertMissing($directory . '/raw.svg');
+        $this->assertSame('public', $storage->getVisibility($directory . '/logo.svg'));
+        $this->assertStringContainsString('<svg', $storage->get($directory . '/logo.svg'));
+        $this->assertStringContainsString('/logo.svg?u=', $wiki->settings()->firstWhere('name', WikiSetting::wwLogoSvg)->value);
+        foreach (['135.png' => 135, '64.ico' => 64] as $file => $size) {
+            $image = Image::make($storage->path($directory . '/' . $file));
+            $this->assertSame($size, $image->width());
+            $this->assertSame($size, $image->height());
+            $this->assertSame('image/png', $image->mime());
+        }
+
+        $this->assertJobSucceeds('id', $wiki->id, __DIR__ . '/../data/logo_200x200.png');
+        $this->assertNull($wiki->settings()->firstWhere('name', WikiSetting::wwLogoSvg));
+        $this->assertStringContainsString('/135.png?u=', $wiki->settings()->firstWhere('name', WikiSetting::wgLogo)->value);
+    }
+
+    public function testSvgStorageFailureDoesNotUpdateSettings(): void {
+        $wiki = Wiki::factory('nodb')->create();
+        $storage = $this->createMock(FilesystemAdapter::class);
+        $storage->expects($this->once())->method('put')->willReturn(false);
+        Storage::shouldReceive('disk')->with('static-assets')->andReturn($storage);
+
+        try {
+            (new SetWikiLogo('id', $wiki->id, __DIR__ . '/../data/logo.svg'))->handle();
+            $this->fail('A failed upload must not report success.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Failed to store the wiki logo.', $e->getMessage());
+            $this->assertNull($wiki->settings()->firstWhere('name', WikiSetting::wwLogoSvg));
+            $this->assertNull($wiki->settings()->firstWhere('name', WikiSetting::wgLogo));
+        }
     }
 
     public static function invalidProvider() {
