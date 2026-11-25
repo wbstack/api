@@ -68,8 +68,8 @@ class PlatformNginxWikiInfoControllerTest extends TestCase {
             ->create();
     }
 
-    // FUTURE: Do we write each individual test case or write some for loops?
-    // FUTURE: Improve readability of tests/providers (e.g. Create helper methods? Name parameters in provider?
+    // TODO: Do we keep each individual test case or write some for loops?
+    // TODO: Improve readability of tests/providers (e.g. Create helper methods? Name parameters in provider?
     //         Shorted data set names? Calculate days relative to now()? Create builder class for constructing test cases?)
     /**
      * @covers PlatformNginxWikiInfoController::getInfoForDomain
@@ -323,10 +323,6 @@ class PlatformNginxWikiInfoControllerTest extends TestCase {
                 ->create();
         }
 
-        // FIXME: The PlatformNginxWikiInfoController creates 5-6 database queries
-        // Uncomment to see the number of database queries are made in the preceding code
-        // $this->expectsDatabaseQueryCount(0);
-
         $response = $this->get("{$this->route}?domain=$wiki->domain")
             ->assertStatus($wikiExpectedToBeAccessible ? 200 : 403)
             ->assertContent($wikiExpectedToBeAccessible ? 'OK' : 'Wiki suspended');
@@ -338,45 +334,4 @@ class PlatformNginxWikiInfoControllerTest extends TestCase {
             $response->assertHeader('x-mw-web-host');
         }
     }
-
-    // FUTURE: Possible helper method?
-    // private function createReviewSubmission(
-    //     Wiki $wiki,
-    //     string $createdAt,
-    //     ?ReviewSubmissionActionType $latestActionType,
-    //     string $latestActionCreatedAt,
-    // ): ReviewSubmission {
-    //     $submission = ReviewSubmission::factory(['created_at' => $createdAt])
-    //         ->for($wiki)
-    //         ->create();
-
-    //     if ($latestActionType === null) {
-    //         return $submission;
-    //     }
-
-    //     ReviewSubmissionAction::factory()->for($submission)->create([
-    //         'type' => ReviewSubmissionActionType::SUBMITTED,
-    //         'actor_user_role' => UserRole::WIKI_MANAGER,
-    //         'created_at' => $createdAt,
-    //     ]);
-
-    //     if ($latestActionType !== ReviewSubmissionActionType::SUBMITTED) {
-    //         ReviewSubmissionAction::factory()->for($submission)->create([
-    //             'type' => ReviewSubmissionActionType::REVIEW_STARTED,
-    //             'actor_user_role' => UserRole::REVIEW_COMMITTEE_ADMIN,
-    //             'created_at' => $latestActionType === ReviewSubmissionActionType::REVIEW_STARTED
-    //                 ? $latestActionCreatedAt : $createdAt,
-    //         ]);
-
-    //         if ($latestActionType !== ReviewSubmissionActionType::REVIEW_STARTED) {
-    //             ReviewSubmissionAction::factory()->for($submission)->create([
-    //                 'type' => $latestActionType,
-    //                 'actor_user_role' => UserRole::REVIEW_COMMITTEE_ADMIN,
-    //                 'created_at' => $latestActionCreatedAt,
-    //             ]);
-    //         }
-    //     }
-
-    //     return $submission->refresh();
-    // }
 }
