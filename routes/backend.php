@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Backend\PlatformNginxWikiInfoController;
 use Illuminate\Routing\Router;
 
 /**
@@ -26,6 +27,7 @@ $router->group(['prefix' => 'ingress'], function () use ($router): void {
 $router->group(['prefix' => 'wiki'], function () use ($router): void {
     // GET
     $router->get('getWikiForDomain', ['uses' => 'WikiController@getWikiForDomain']);
+    $router->get('platformNginxInfo', PlatformNginxWikiInfoController::class . '@getInfoForDomain');
     // PATCH
     $router->patch('updateEntityImport', ['uses' => '\App\Http\Controllers\WikiEntityImportController@update']);
 });
