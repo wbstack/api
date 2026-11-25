@@ -5,6 +5,7 @@ namespace Tests\Routes\QsBatch;
 use App\EventPageUpdate;
 use App\QsBatch;
 use App\Wiki;
+use App\WikiDb;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -56,6 +57,30 @@ class QsControllerTest extends TestCase {
             ->assertStatus(200);
 
         $this->assertNotNull($response->json()[0]['pending_since']);
+    }
+
+    public function testGetOldestBatchIncludesMediaWikiBackendHost(): void {
+        $wiki = Wiki::factory()->create(['id' => 99, 'domain' => 'test.wikibase.cloud']);
+        WikiDb::factory()->create(['wiki_id' => $wiki->id, 'version' => 'mw1.43-wbs2']);
+        QsBatch::factory()->create(['id' => 1, 'done' => 0, 'wiki_id' => 99, 'entityIds' => 'a,b']);
+
+        $this->json('GET', $this->route . '/getBatches')
+            ->assertStatus(200)
+            ->assertJsonPath('0.mediawiki_backend_host', 'mediawiki-143-app-backend.default.svc.cluster.local')
+            ->assertJsonMissingPath('0.wiki.wiki_db');
+    }
+
+    public function testGetOldestBatchWithUnknownMediaWikiVersionStillReturnsBatch(): void {
+        $wiki = Wiki::factory()->create(['id' => 99, 'domain' => 'test.wikibase.cloud']);
+        WikiDb::factory()->create(['wiki_id' => $wiki->id, 'version' => 'mw1.43-unmapped']);
+        QsBatch::factory()->create(['id' => 1, 'done' => 0, 'wiki_id' => 99, 'entityIds' => 'a,b']);
+
+        $this->json('GET', $this->route . '/getBatches')
+            ->assertStatus(200)
+            ->assertJsonPath('0.id', 1)
+            ->assertJsonPath('0.mediawiki_backend_host', null);
+
+        $this->assertNotNull(QsBatch::where('id', 1)->first()->pending_since);
     }
 
     public function testMarkDone(): void {
